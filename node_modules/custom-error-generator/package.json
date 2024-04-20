@@ -1,0 +1,47 @@
+{
+  "name": "custom-error-generator",
+  "version": "7.0.0",
+  "description": "Custom errors and exceptions in Node.js",
+  "main": "error.js",
+  "scripts": {
+    "test": "make test"
+  },
+  "engines": [
+    "node >=0.6.0"
+  ],
+  "config": {
+    "blanket": {
+      "pattern": "/error.js",
+      "data-cover-never": "node_modules"
+    },
+    "travis-cov": {
+      "threshold": 80
+    }
+  },
+  "author": "Jesse Proulx <github@jproulx.net>",
+  "license": "ISC",
+  "devDependencies": {
+    "mocha": "",
+    "should": "",
+    "blanket": "",
+    "mocha-lcov-reporter": "",
+    "jshint": "",
+    "travis-cov": "",
+    "codeclimate-test-reporter": "",
+    "coveralls": ""
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jproulx/node-custom-error.git"
+  },
+  "keywords": [
+    "error",
+    "errors",
+    "error factory",
+    "custom error"
+  ],
+  "bugs": {
+    "url": "https://github.com/jproulx/node-custom-error/issues"
+  },
+  "homepage": "https://github.com/jproulx/node-custom-error"
+}
