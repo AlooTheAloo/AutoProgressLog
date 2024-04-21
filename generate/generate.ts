@@ -1,16 +1,10 @@
 import { Toggl } from 'toggl-track';
-import { entry } from '../types/entry';
-import fs from "fs";
-import { cache } from '../types/cache';
-import dayjs, { Dayjs } from 'dayjs';
-import { activity } from '../types/activity';
-import duration from "dayjs/plugin/duration";
-import { compareActivities } from '../Helpers/activityHelper';
-import { sumTime } from '../Helpers/entryHelper';
-import { Client, TextChannel } from 'discord.js-selfbot-v13';
-import { getAnkiCardReviewCount } from "../anki/db";
-import { buildMessage } from '../Helpers/buildMessage';
-
+import { entry } from '../types/entry.js';import fs from "fs";
+import { cache } from '../types/cache.js';import dayjs, { Dayjs } from 'dayjs';
+import { activity } from '../types/activity.js';
+import duration from "dayjs/plugin/duration.js";
+import { compareActivities } from '../Helpers/activityHelper.js';import { sumTime } from '../Helpers/entryHelper.js';import { Client, TextChannel } from 'discord.js-selfbot-v13';
+import { getAnkiCardReviewCount } from "../anki/db.js";import { buildMessage } from '../Helpers/buildMessage.js';
 export const cache_location:string = "./cache/cache.json";
 
 export const toggl = new Toggl({
@@ -20,7 +14,6 @@ export const toggl = new Toggl({
 });
 
 export async function runGeneration(isDev = true){
-    fs.writeFileSync("./lolux.txt", process.argv[2] + "Started running program but never finished...");
     dayjs.extend(duration)
     const startCache:cache = JSON.parse(fs.readFileSync(cache_location).toString())
     const lastGenerated = dayjs(startCache.lastGenerated);
@@ -31,14 +24,14 @@ export async function runGeneration(isDev = true){
 
     const uniqueEvents:string[] = [...new Set(entriesAfterLastGen.map(x => x.description))]
     const allEvents = uniqueEvents.map(function(evt) {
-    const correspondingEntries = entriesAfterLastGen.filter(x => x.description == evt)
-    const activityTime = sumTime(correspondingEntries)
-    const ret:activity = {
-        activityTitle: evt,
-        activityDurationHR: dayjs.duration(activityTime * 1000).format("HH:mm:ss") + "",
-        activitySeconds: activityTime
-    }
-    return ret;
+        const correspondingEntries = entriesAfterLastGen.filter(x => x.description == evt)
+        const activityTime = sumTime(correspondingEntries)
+        const ret:activity = {
+            activityTitle: evt,
+            activityDurationHR: dayjs.duration(activityTime * 1000).format("HH:mm:ss") + "",
+            activitySeconds: activityTime
+        }
+        return ret;
     }).sort(compareActivities).reverse()
 
 
@@ -53,15 +46,17 @@ export async function runGeneration(isDev = true){
     // Output
     if(!isDev){
         client.on('ready', async () => {
-            (client.channels.cache.get("1051583420955897967") as TextChannel).send(ans.message)
+            (client.channels.cache.get("787776122708295745") as TextChannel).send(ans.message)
             console.log(`Sent message!`);
         })
 
         client.login(process.env.DISCORD_TOKEN);
-        //fs.writeFileSync(cache_location, JSON.stringify(ans.cache))
+        fs.writeFileSync(cache_location, JSON.stringify(ans.cache))
+        fs.writeFileSync("./output.txt", ans.message);
+
     }
     else{
-        fs.writeFileSync("./lolux.txt", process.argv[2] + "Generated at " + dayjs().toString() + "\n\n" + ans.message);
+        fs.writeFileSync("./output.txt", "Generated at " + dayjs().toString() + "\n\n" + ans.message);
     }
 
 }

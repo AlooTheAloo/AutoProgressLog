@@ -1,10 +1,9 @@
 import dayjs from "dayjs";
-import { activity } from "../types/activity";
-import { cache } from "../types/cache";
-import { indicator } from "ordinal";
+import { activity } from "../types/activity.js";import { cache } from "../types/cache.js";
+import ordinal from "ordinal";
 
 export function buildMessage(count:number|null, allEvents:activity[], cache:cache, timeToAdd:number) {
-    let message = `**Progress report for ${dayjs().format("dddd MMMM DD") + indicator(dayjs().date())}**\n\nImmersion report :\n`
+    let message = `**Progress report for ${dayjs().format("dddd MMMM ") + ordinal(dayjs().date())}**\n\nImmersion report :\n`
 
     if(allEvents.length == 0){
         message += "No Immersion today. Resetting streak.\n\n"
