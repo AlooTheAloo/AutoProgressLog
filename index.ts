@@ -2,6 +2,8 @@ import schedule from 'node-schedule';
 import { exec} from 'child_process';
 import proc from 'find-process';
 import { runGeneration } from './generate/generate.js';
+import dotenv from "dotenv"
+dotenv.config()
 
 console.log("running...");
 schedule.scheduleJob("55 23 * * *", () => {

@@ -1,5 +1,5 @@
 import dayjs, { Dayjs } from 'dayjs';
-import * as sqlite3 from 'sqlite3';
+import sqlite3 from 'sqlite3';
 
 interface row {
     reviews:number

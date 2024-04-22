@@ -5,6 +5,10 @@ import { activity } from '../types/activity.js';
 import duration from "dayjs/plugin/duration.js";
 import { compareActivities } from '../Helpers/activityHelper.js';import { sumTime } from '../Helpers/entryHelper.js';import { Client, TextChannel } from 'discord.js-selfbot-v13';
 import { getAnkiCardReviewCount } from "../anki/db.js";import { buildMessage } from '../Helpers/buildMessage.js';
+import dotenv from "dotenv";
+
+dotenv.config()
+
 export const cache_location:string = "./cache/cache.json";
 
 export const toggl = new Toggl({
@@ -20,6 +24,7 @@ export async function runGeneration(isDev = true){
 
     // Toggl stuff
     const entries:entry[] = await toggl.timeEntry.list();
+    console.log(entries);
     const entriesAfterLastGen = entries.filter(x => dayjs(x.start).isAfter(lastGenerated))
 
     const uniqueEvents:string[] = [...new Set(entriesAfterLastGen.map(x => x.description))]
@@ -49,7 +54,7 @@ export async function runGeneration(isDev = true){
             (client.channels.cache.get("787776122708295745") as TextChannel).send(ans.message)
             console.log(`Sent message!`);
         })
-
+        console.log(process.env.DISCORD_TOKEN);
         client.login(process.env.DISCORD_TOKEN);
         fs.writeFileSync(cache_location, JSON.stringify(ans.cache))
         fs.writeFileSync("./output.txt", ans.message);
