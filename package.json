@@ -2,21 +2,24 @@
   "name": "autoprogresslog",
   "module": "index.ts",
   "devDependencies": {
-    "bun-types": "latest"
+    "bun-types": "latest",
+    "ts-node": "^10.9.2"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
   },
   "scripts": {
-    "start": "bun run --watch index.ts",
-    "serve": "npx ts-node --esm index.ts"
+    "start:node": "node --loader ts-node/esm ./index.ts",
+    "start:bun": "bun run index.ts",
+    "config": "node --loader ts-node/esm ./config/generate_config.ts"
   },
   "type": "module",
   "dependencies": {
+    "@types/better-sqlite3": "^7.6.10",
     "@types/node-schedule": "^2.1.7",
     "@types/sqlite3": "^3.1.11",
+    "colors": "^1.4.0",
     "dayjs": "^1.11.10",
-    "discord.js-selfbot-v13": "^3.1.4",
     "find-process": "^1.4.7",
     "node-schedule": "^2.1.1",
     "ordinal": "^1.0.3",

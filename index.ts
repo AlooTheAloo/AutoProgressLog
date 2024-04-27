@@ -1,20 +1,18 @@
 import schedule from 'node-schedule';
-import { exec} from 'child_process';
-import proc from 'find-process';
-import { runGeneration } from './generate/generate.js';
+import { getConfig } from './Helpers/getConfig.js';
+import { ankiGeneration } from './generate/ankiGeneration.js';
+import dayjs from 'dayjs';
 
-console.log("running...");
-schedule.scheduleJob("55 23 * * *", () => {
-     console.log("Starting anki for sync...")
-     console.log(process.env.ANKI_APP_PATH)
-     exec(process.env.ANKI_APP_PATH ?? "");
-     setTimeout(async () => {
-         console.log("Generating message..");
-         const prog = await proc("name", "Anki")
-         process.kill(prog.filter(x => x.name.toLowerCase() == "anki.exe")[0].pid); 
-         runGeneration(false);
-     }, 20000);
-});
+
+const config = getConfig()
+
+if(config.type == "Server"){
+    console.log(`Server started! Generation will happen at ${dayjs.duration({minutes: getConfig().serverOptions?.generationTime.minutes, hours: getConfig().serverOptions?.generationTime.hours}).format('HH:mm')}`);
+    schedule.scheduleJob(`${config.serverOptions?.generationTime.minutes} ${config.serverOptions?.generationTime.hours} * * *`, () => {
+        ankiGeneration()
+    });    
+}
+else ankiGeneration();
 
 
 

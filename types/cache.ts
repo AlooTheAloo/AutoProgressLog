@@ -3,5 +3,6 @@ export interface cache {
     lastGenerated:string,
     cardsStudied:number,
     ankiStreak:number
-    immersionStreak:number
+    immersionStreak:number,
+    reportNo:number
 }

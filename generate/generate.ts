@@ -3,18 +3,41 @@ import { entry } from '../types/entry.js';import fs from "fs";
 import { cache } from '../types/cache.js';import dayjs, { Dayjs } from 'dayjs';
 import { activity } from '../types/activity.js';
 import duration from "dayjs/plugin/duration.js";
-import { compareActivities } from '../Helpers/activityHelper.js';import { sumTime } from '../Helpers/entryHelper.js';import { Client, TextChannel } from 'discord.js-selfbot-v13';
-import { getAnkiCardReviewCount } from "../anki/db.js";import { buildMessage } from '../Helpers/buildMessage.js';
+import { compareActivities } from '../Helpers/activityHelper.js';
+import { sumTime } from '../Helpers/entryHelper.js';
+import { getAnkiCardReviewCount } from "../anki/db.js";
+import { buildMessage } from '../Helpers/buildMessage.js';
+import { getConfig } from '../Helpers/getConfig.js';
 export const cache_location:string = "./cache/cache.json";
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+export const __filename = fileURLToPath(import.meta.url);
+export const __dirname = path.dirname(__filename);
+
 
 export const toggl = new Toggl({
     auth: {
-        token: process.env.TOGGL_TRACK_API_TOKEN ?? "",
+        token: getConfig().toggl.togglToken ?? "",
     },
 });
 
-export async function runGeneration(isDev = true){
+export async function runGeneration(){
     dayjs.extend(duration)
+
+
+    if(!fs.existsSync(cache_location)){
+        const cache:cache = {
+            totalSeconds:0,
+            lastGenerated:dayjs().startOf("day").toISOString(),
+            cardsStudied:0,
+            ankiStreak:0,
+            immersionStreak:0,
+            reportNo:1
+        }
+        fs.writeFileSync(cache_location, JSON.stringify(cache));
+    }
+
     const startCache:cache = JSON.parse(fs.readFileSync(cache_location).toString())
     const lastGenerated = dayjs(startCache.lastGenerated);
 
@@ -35,28 +58,24 @@ export async function runGeneration(isDev = true){
     }).sort(compareActivities).reverse()
 
 
-    // Anki stuff
-    const count = await getAnkiCardReviewCount(lastGenerated);
-    const client = new Client();
+    let count:null|number = null;
+
+    if(getConfig().anki.enabled){
+        // Anki stuff
+        count = await getAnkiCardReviewCount(lastGenerated);
+    }    
+       
     const timeToAdd = sumTime(entriesAfterLastGen)
 
     // Build message
     const ans = buildMessage(count, allEvents, startCache, timeToAdd);
 
     // Output
-    if(!isDev){
-        client.on('ready', async () => {
-            (client.channels.cache.get("787776122708295745") as TextChannel).send(ans.message)
-            console.log(`Sent message!`);
-        })
-
-        client.login(process.env.DISCORD_TOKEN);
-        fs.writeFileSync(cache_location, JSON.stringify(ans.cache))
-        fs.writeFileSync("./output.txt", ans.message);
-
+    fs.writeFileSync(cache_location, JSON.stringify(ans.cache))
+    
+    if(getConfig().outputOptions.enabled){
+        const outputPath = path.join(__dirname, "..", "output", `${(getConfig().outputOptions.outputFileName ?? "output")} #${startCache.reportNo}.txt`)
+        fs.writeFileSync(outputPath , ans.message);
     }
-    else{
-        fs.writeFileSync("./output.txt", "Generated at " + dayjs().toString() + "\n\n" + ans.message);
-    }
-
+    console.log(ans.message);
 }

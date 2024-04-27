@@ -1,5 +1,6 @@
 import dayjs, { Dayjs } from 'dayjs';
-import * as sqlite3 from 'sqlite3';
+import sqlite3 from 'sqlite3'
+import { getConfig } from '../Helpers/getConfig.js';
 
 interface row {
     reviews:number
@@ -7,21 +8,19 @@ interface row {
 
 export async function getAnkiCardReviewCount(startTime:Dayjs){
     return new Promise<number|null>((res, rej) => {
-        console.log(process.env.ANKI_DB_PATH)
         // Create a database connection
-        const db = new sqlite3.Database(process.env.ANKI_DB_PATH ?? "", (err) => {
+        const db = new sqlite3.Database(getConfig().anki.ankiDB ?? "", (err) => {
             if (err) {
                 res(null);
             } else {
             }
         });
 
-        // Execute a SQL query
+        // Execute SQL query
         db.all('SELECT COUNT(*) as "reviews" FROM revlog WHERE id > ' + startTime.valueOf(), (err, rows:row[]) => {
             if (err) {
                 res(null);
             } else {
-                console.log(startTime.valueOf())
                 // Process the results
                 res(rows[0].reviews)
             }
