@@ -21,6 +21,7 @@
     "colors": "^1.4.0",
     "dayjs": "^1.11.10",
     "find-process": "^1.4.7",
+    "js-abbreviation-number": "^1.4.0",
     "node-schedule": "^2.1.1",
     "ordinal": "^1.0.3",
     "sqlite3": "^5.1.7",

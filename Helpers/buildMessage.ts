@@ -1,6 +1,7 @@
 import dayjs from "dayjs";
 import { activity } from "../types/activity.js";import { cache } from "../types/cache.js";
 import { getConfig } from "./getConfig.js";
+import { abbreviateNumber } from "js-abbreviation-number";
 
 const fire_streak = 10;
 
@@ -46,7 +47,7 @@ export function buildMessage(count:number|null, allEvents:activity[], cache:cach
 Immersion Streak - ${ newCache.immersionStreak + " report" + (newCache.immersionStreak != 1 ? "s" : "") + (newCache.immersionStreak > fire_streak ? "🔥" : "") }`
     
     if(getConfig().anki.enabled){
-        message += `\nTotal cards reviewed - ${newCache.cardsStudied}
+        message += `\nTotal cards reviewed - ${abbreviateNumber(newCache.cardsStudied)}
 Anki Streak - ${ newCache.ankiStreak + " report" + (newCache.ankiStreak != 1 ? "s" : "") + (newCache.ankiStreak > fire_streak ? "🔥" : "") }`
     }
 
