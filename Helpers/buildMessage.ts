@@ -28,7 +28,7 @@ export function buildMessage(count:number|null, allEvents:activity[], cache:cach
             message += `Anki not done since last report. Resetting streak.`
         }
         else{
-            message += `${count} cards studied on anki`
+            message += `Anki done ✅`
         }
     }
     
