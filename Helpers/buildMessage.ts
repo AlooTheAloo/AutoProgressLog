@@ -3,7 +3,7 @@ import { activity } from "../types/activity.js";import { cache } from "../types/
 import { getConfig } from "./getConfig.js";
 import { abbreviateNumber } from "js-abbreviation-number";
 
-const fire_streak = 10;
+const fire_streak = 100;
 
 export function buildMessage(count:number|null, allEvents:activity[], cache:cache, timeToAdd:number) {
     let message = `**Progress report #${cache.reportNo}**\n\n`
@@ -44,14 +44,15 @@ export function buildMessage(count:number|null, allEvents:activity[], cache:cach
     }
 
     message += `\n\nAll time stats :\nTotal immersion time - Approx. ${Math.round(newCache.totalSeconds / 3600)} hours
-Immersion Streak - ${ newCache.immersionStreak + " report" + (newCache.immersionStreak != 1 ? "s" : "") + (newCache.immersionStreak > fire_streak ? "🔥" : "") }`
+Immersion Streak - ${ newCache.immersionStreak + " report" + (newCache.immersionStreak != 1 ? "s" : "") + (newCache.immersionStreak >= fire_streak ? "🔥" : "") }`
     
     if(getConfig().anki.enabled){
-        message += `\nTotal cards reviewed - ${abbreviateNumber(newCache.cardsStudied)}
-Anki Streak - ${ newCache.ankiStreak + " report" + (newCache.ankiStreak != 1 ? "s" : "") + (newCache.ankiStreak > fire_streak ? "🔥" : "") }`
+        message += `\nTotal cards reviewed - ${abbreviateNumber(newCache.cardsStudied, 2)}
+Anki Streak - ${ newCache.ankiStreak + " report" + (newCache.ankiStreak != 1 ? "s" : "") + (newCache.ankiStreak >= fire_streak ? "🔥" : "") }`
     }
 
     message += "\n\n*ᴛʜɪs ᴘʀᴏɢʀᴇss ʀᴇᴘᴏʀᴛ ᴡᴀs ᴀᴜᴛᴏ-ɢᴇɴᴇʀᴀᴛᴇᴅ ʙʏ ᴀᴜᴛᴏᴘʀᴏɢʀᴇssʟᴏɢ. ɪ ᴡʟʟ ᴍᴀᴋᴇ ɪᴛ ᴏᴘᴇɴ sᴏᴜʀᴄᴇ ᴇᴠᴇɴᴛᴜᴀʟʟʏ ᴡʜᴇɴ ɪ ʜᴀᴠᴇ ᴛʜᴇ ᴛɪᴍᴇ*"
+    
     return {
         message: message,
         cache: newCache

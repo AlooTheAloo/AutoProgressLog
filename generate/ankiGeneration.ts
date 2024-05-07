@@ -10,6 +10,11 @@ export function ankiGeneration(){
         setTimeout(async () => {
             const prog = await proc("name", "Anki")
             process.kill(prog.filter(x => (x as any).bin.toLowerCase() == getConfig().anki.ankiProgramBinaryName?.toLowerCase())[0].pid); 
+            await new Promise((res, rej) => {
+                setTimeout(() => {
+                    res(null);
+                }, 2000);
+            })
             runGeneration();
         }, 5000);
     }

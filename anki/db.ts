@@ -11,6 +11,7 @@ export async function getAnkiCardReviewCount(startTime:Dayjs){
         // Create a database connection
         const db = new sqlite3.Database(getConfig().anki.ankiDB ?? "", (err) => {
             if (err) {
+                console.log(err);
                 res(null);
             } else {
             }
@@ -19,6 +20,8 @@ export async function getAnkiCardReviewCount(startTime:Dayjs){
         // Execute SQL query
         db.all('SELECT COUNT(*) as "reviews" FROM revlog WHERE id > ' + startTime.valueOf(), (err, rows:row[]) => {
             if (err) {
+                console.log(err);
+
                 res(null);
             } else {
                 // Process the results
@@ -29,6 +32,8 @@ export async function getAnkiCardReviewCount(startTime:Dayjs){
         // Close the database connection when done
         db.close((err) => {
             if (err) {
+                console.log(err);
+
                 res(null);
             } else {
             }
