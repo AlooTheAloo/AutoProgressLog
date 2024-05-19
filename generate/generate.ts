@@ -43,7 +43,12 @@ export async function runGeneration(){
 
     // Toggl stuff
     const entries:entry[] = await toggl.timeEntry.list();
-    const entriesAfterLastGen = entries.filter(x => dayjs(x.start).isAfter(lastGenerated))
+    const entriesAfterLastGen = entries.filter(x => {
+        if(x.stop == null){ 
+            return false;
+        }
+        return dayjs(x.start).isAfter(lastGenerated)
+    })
 
     const uniqueEvents:string[] = [...new Set(entriesAfterLastGen.map(x => x.description))]
     const allEvents = uniqueEvents.map(function(evt) {

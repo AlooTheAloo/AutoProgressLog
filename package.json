@@ -11,7 +11,7 @@
   "scripts": {
     "start:node": "node --loader ts-node/esm ./index.ts",
     "start:bun": "bun run index.ts",
-    "config": "node --loader ts-node/esm ./config/generate_config.ts"
+    "config": "node --loader ts-node/esm ./config/generateConfig.ts"
   },
   "type": "module",
   "dependencies": {
