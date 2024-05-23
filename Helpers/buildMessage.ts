@@ -50,9 +50,6 @@ Immersion Streak - ${ newCache.immersionStreak + " report" + (newCache.immersion
         message += `\nTotal cards reviewed - ${abbreviateNumber(newCache.cardsStudied, 2)}
 Anki Streak - ${ newCache.ankiStreak + " report" + (newCache.ankiStreak != 1 ? "s" : "") + (newCache.ankiStreak >= fire_streak ? "🔥" : "") }`
     }
-
-    message += "\n\n*ᴛʜɪs ᴘʀᴏɢʀᴇss ʀᴇᴘᴏʀᴛ ᴡᴀs ᴀᴜᴛᴏ-ɢᴇɴᴇʀᴀᴛᴇᴅ ʙʏ ᴀᴜᴛᴏᴘʀᴏɢʀᴇssʟᴏɢ. ɪ ᴡʟʟ ᴍᴀᴋᴇ ɪᴛ ᴏᴘᴇɴ sᴏᴜʀᴄᴇ ᴇᴠᴇɴᴛᴜᴀʟʟʏ ᴡʜᴇɴ ɪ ʜᴀᴠᴇ ᴛʜᴇ ᴛɪᴍᴇ*"
-    
     return {
         message: message,
         cache: newCache

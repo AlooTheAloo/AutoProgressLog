@@ -27,10 +27,9 @@ export const __dirname = path.dirname(__filename);
 
 async function runConfig() {
     console.log("Make sure to read the README.md file before going through the setup process")
-
     
     // General stuff
-    const runtime = await getAnswer<"Bun" | "Node">({
+    const runtime: "Bun" | "Node" = await getAnswer<"Bun" | "Node">({
         question: "What JS Runtime are you using?" + "(if you don't know just press enter)".yellow.bold,
         options: [{
             input: "Node",
@@ -156,13 +155,11 @@ async function runConfig() {
     }
 
     fs.writeFileSync(path.join(__dirname, "config.json"), JSON.stringify(config));
-
     const outDir = join(__dirname, "..", "output");
 
     if (outputEnabled && !fs.existsSync(outDir)) {
         fs.mkdirSync(outDir)
     }
-
 
     if (process.platform != "win32") {
         const pathRun = path.join(__dirname, "..", "run.sh");
@@ -170,7 +167,6 @@ async function runConfig() {
 cd ${__dirname} 
 npm run start:${runtime.toLowerCase()}`);
         fs.chmodSync(pathRun, 0o777);
-
         console.log("Configuration created! Run the 'run.sh' file to run the generator!".blue);
     }
     else {
