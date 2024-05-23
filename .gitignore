@@ -1,7 +1,6 @@
 # Based on https://raw.githubusercontent.com/github/gitignore/main/Node.gitignore
 
 # Logs
-
 logs
 _.log
 npm-debug.log_
@@ -12,7 +11,7 @@ lerna-debug.log*
 
 # Caches 
 
-.cache
+cache/*
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 
@@ -179,3 +178,5 @@ config/config.json
 output/
 
 cache/cache.json
+
+cache/
