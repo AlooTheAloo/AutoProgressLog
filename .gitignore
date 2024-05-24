@@ -180,3 +180,6 @@ output/
 cache/cache.json
 
 cache/
+
+run.bat
+run.sh

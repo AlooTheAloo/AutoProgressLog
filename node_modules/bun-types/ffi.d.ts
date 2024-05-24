@@ -597,7 +597,7 @@ declare module "bun:ffi" {
 	 * goes to Fabrice Bellard and TinyCC maintainers for making this possible.
 	 */
 	function dlopen<Fns extends Record<string, FFIFunction>>(
-		name: string,
+		name: string | import("bun").BunFile | URL,
 		symbols: Fns,
 	): Library<Fns>;
 
