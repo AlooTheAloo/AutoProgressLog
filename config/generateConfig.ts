@@ -26,7 +26,7 @@ export const __filename = fileURLToPath(import.meta.url);
 export const __dirname = path.dirname(__filename);
 
 async function runConfig() {
-    console.log("Make sure to read the README.md file before going through the setup process")
+    console.log("Make sure to read the README.md file before going through the setup process".yellow.bold)
     
     // General stuff
     const runtime: "Bun" | "Node" = await getAnswer<"Bun" | "Node">({
@@ -145,6 +145,10 @@ async function runConfig() {
         toggl: {
             togglToken: togglAPIKey
         },
+        serverOptions: (runType == "Server" && time != null) ? { 
+            generationTime: time
+        } : undefined
+        ,
         anki: (!isAnkiIntegration(anki)) ? {
             enabled: false
         } : anki,
