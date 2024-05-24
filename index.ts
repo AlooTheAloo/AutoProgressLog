@@ -2,7 +2,9 @@ import schedule from 'node-schedule';
 import { getConfig } from './Helpers/getConfig.js';
 import { ankiGeneration } from './generate/ankiGeneration.js';
 import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration.js';
 
+dayjs.extend(duration)
 
 const config = getConfig()
 
