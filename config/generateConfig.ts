@@ -8,6 +8,7 @@ import { createAnkiIntegration } from './configAnkiIntegration.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { convertCompilerOptionsFromJson } from 'typescript';
+import { cached } from 'sqlite3';
 
 const yesno = [
     {
@@ -163,6 +164,12 @@ async function runConfig() {
 
     if (outputEnabled && !fs.existsSync(outDir)) {
         fs.mkdirSync(outDir)
+    }
+
+
+    const cacheDir = join(__dirname, "..", "cache");
+    if(!fs.existsSync(cacheDir)){
+        fs.mkdirSync(cacheDir);
     }
 
     if (process.platform != "win32") {
