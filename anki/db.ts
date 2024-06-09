@@ -1,4 +1,4 @@
-import dayjs, { Dayjs } from 'dayjs';
+import { Dayjs } from 'dayjs';
 import sqlite3 from 'sqlite3'
 import { getConfig } from '../Helpers/getConfig.js';
 
@@ -9,6 +9,9 @@ interface row {
 export async function getAnkiCardReviewCount(startTime:Dayjs){
     return new Promise<number|null>((res, rej) => {
         // Create a database connection
+
+        new sqlite3.Database("/Users/philipanthony-davis/Library/Application Support/Anki2/User 1/collection.anki2");
+
         const db = new sqlite3.Database(getConfig().anki.ankiDB ?? "", (err) => {
             if (err) {
                 console.log(err);

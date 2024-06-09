@@ -183,3 +183,5 @@ cache/
 
 run.bat
 run.sh
+retry.bat
+retry.sh

@@ -7,8 +7,7 @@ import fs from "fs";
 import { createAnkiIntegration } from './configAnkiIntegration.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { convertCompilerOptionsFromJson } from 'typescript';
-import { cached } from 'sqlite3';
+import { cache_location } from '../Helpers/cache.js';
 
 const yesno = [
     {
@@ -23,10 +22,10 @@ const yesno = [
     }
 ];
 
-export const __filename = fileURLToPath(import.meta.url);
-export const __dirname = path.dirname(__filename);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-async function runConfig() {
+export async function runConfig() {
     console.log("Make sure to read the README.md file before going through the setup process".yellow.bold)
     
     // General stuff
@@ -60,10 +59,6 @@ async function runConfig() {
         }
         ]
     });
-
-    if (runType == "Server" && runtime == "Bun") {
-        console.log(colors.red.bold("It is STRONLY discouraged to use Bun as a server, as bun is known for segmentation faults. Use at your own risks."));
-    }
 
     let time: Time | null = null;
     if (runType == "Server") {
@@ -167,27 +162,13 @@ async function runConfig() {
     }
 
 
-    const cacheDir = join(__dirname, "..", "cache");
-    if(!fs.existsSync(cacheDir)){
-        fs.mkdirSync(cacheDir);
+    
+    if(!fs.existsSync(join(cache_location, ".."))){
+        fs.mkdirSync(join(cache_location, ".."));
     }
 
-    if (process.platform != "win32") {
-        const pathRun = path.join(__dirname, "..", "run.sh");
-        fs.writeFileSync(pathRun, `
-cd ${__dirname} 
-npm run start:${runtime.toLowerCase()}`);
-        fs.chmodSync(pathRun, 0o777);
-        console.log("Configuration created! Run the 'run.sh' file to run the generator!".blue);
-    }
-    else {
-        const pathRun = path.join(__dirname, "..", "run.bat");
-        fs.writeFileSync(pathRun,
-            `@echo off
-cd /d ${__dirname}
-npm run start:${runtime.toLowerCase()}`);
-        console.log("Configuration created! Run the 'run.bat' file to run the generator!".blue);
-    }
+    writeRun(runtime);
+    writeRetry(runtime);
 
     process.exit();
 }
@@ -210,4 +191,37 @@ function parseTime(ans: string): Time | null {
     }
 }
 
-runConfig();
+function writeRun(runtime:string){
+    if (process.platform != "win32") {
+        const pathRun = path.join(__dirname, "..", "run.sh");
+        fs.writeFileSync(pathRun, `cd ${__dirname} 
+npm run --silent start:${runtime.toLowerCase()}`);
+        fs.chmodSync(pathRun, 0o777);
+        console.log("Configuration created! Run the 'run.sh' file to run the generator!".blue);
+    }
+    else {
+        const pathRun = path.join(__dirname, "..", "run.bat");
+        fs.writeFileSync(pathRun, `@echo off
+cd /d ${__dirname}
+npm run --silent start:${runtime.toLowerCase()}`);
+        console.log("Configuration created! Run the 'run.bat' file to run the generator!".blue);
+    }
+}
+
+function writeRetry(runtime:string){
+    const pathRetry = path.join(__dirname, "..", process.platform == "win32" ? "run.bat" : "run.sh");
+    let content = "";
+    if (process.platform != "win32") {
+        content = `cd ${__dirname} 
+        npm run --silent retry`;
+        fs.chmodSync(pathRetry, 0o777);
+    }
+    else {
+        content = `@echo off
+        cd /d ${__dirname}
+        npm run --silent retry`
+    }
+
+    fs.writeFileSync(pathRetry, content);
+}
+

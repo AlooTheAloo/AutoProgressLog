@@ -2,16 +2,15 @@
 This projects aims to be a ressource for the [refold discord servers](https://refold.la/join/). Some people spend countless hours logging their immersion time, immersion streaks and anki streaks. This terminal-based utility aims to create an easy to use way to automate this process.
 ## Features
 
-⏰ Automatic immersion tracking and formatting with Toggl Track \
-⭐ Integration with Anki to keep track of total cards seen \
-🤖 Server "automatic" mode and manual mode \
-📄 Output to terminal and to file \
-🤓 Compatibility with [Bun](https://bun.sh/) and [NodeJS](https://nodejs.org/en)
-
+* ⏰ Automatic immersion tracking and formatting with Toggl Track
+* ⭐ Integration with Anki to keep track of total cards seen
+* 🤖 Server "automatic" mode and manual mode
+* 📄 Output to terminal and to file
+* 🤓 Compatibility with [Bun](https://bun.sh/) and [NodeJS](https://nodejs.org/en)
 
 ## Installation
 
-This project is compatible with [Bun](https://bun.sh/) and [NodeJS](https://nodejs.org/en). If you don't have any, NodeJS is strongly recommended for new users.
+This project is compatible with [Bun](https://bun.sh/) and [NodeJS](https://nodejs.org/en). If you don't have any, [NodeJS](https://nodejs.org/en) is strongly recommended for new users.
 
 
 #### If you're using NodeJS / npm (recommended)
@@ -29,6 +28,11 @@ cd AutoProgressLog
 bun i
 bun run config
 ```
+
+## Upgrading
+There is an automatic upgrade script available. 
+If you're upgrading from a previous version, simply place the `cache` folder in the new folder and run ```npm run upgrade```.
+
 
 ## Configuration
 
@@ -61,7 +65,7 @@ The database file will usually be named 'collection.anki2'
 #### Anki app path
 This is where your anki app is stored. 
 
-On Windows, you can find it by searching for the app in the windows search, right-clicking on the app and pressing "open file location" repeat this until you have the anki.exe app. This is the app path. 
+On Windows, you can find it by searching for the app in the windows search menu, right-clicking on the app and pressing "open file location" repeat this until you have the anki.exe app. This is the app path. 
 
 On MacOS, you can find it by searching for the app in spotlight search and pressing `⌘` + `Enter`. This will highlight the app.
 

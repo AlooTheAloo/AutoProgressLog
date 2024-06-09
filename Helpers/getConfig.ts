@@ -1,12 +1,12 @@
-import { fileURLToPath } from 'url';
-import { options } from "../types/options";
+import { options } from "../types/options.js";
 import fs from "fs";
 import path from "path"
+import {fileURLToPath} from "url"
 
 let config:options|null = null;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-export const __filename = fileURLToPath(import.meta.url);
-export const __dirname = path.dirname(__filename);
 
 export function getConfig():options{
     if(config == null){

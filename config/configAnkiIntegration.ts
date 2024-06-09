@@ -4,7 +4,6 @@ import fs from "fs";
 import sqlite3 from 'sqlite3';
 import { exec } from 'child_process';
 import proc from 'find-process';
-import Database from "bun:sqlite";
 
 export async function createAnkiIntegration():Promise<ankiIntegration>{
 
