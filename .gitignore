@@ -176,12 +176,8 @@ dist
 config/config.json
 
 output/
-
 cache/cache.json
-
 cache/
 
-run.bat
-run.sh
-retry.bat
-retry.sh
+*.bat
+*.sh
