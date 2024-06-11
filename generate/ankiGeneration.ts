@@ -15,7 +15,7 @@ export function ankiGeneration(){
             await new Promise((res, rej) => {
                 setTimeout(() => {
                     res(null);
-                }, 2000);
+                }, 5000);
             })
             runGeneration();
       }, getConfig().type == "Server" ? 20000 : 5000);
