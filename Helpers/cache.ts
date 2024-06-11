@@ -9,10 +9,9 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
 const __dirname = path.dirname(__filename); // get the name of the directory
 
-const appData = process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share")
-
-
-export const cache_location: string = path.join(appData, "/AutoProgressLog/cache.json");
+export const appData = process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share")
+export const APLData = path.join(appData, "/AutoProgressLog")
+export const cache_location: string = path.join(APLData, "/cache.json");
 
 export class CacheManager {
 

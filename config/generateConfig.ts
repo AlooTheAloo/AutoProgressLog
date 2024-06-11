@@ -7,7 +7,7 @@ import fs from "fs";
 import { createAnkiIntegration } from './configAnkiIntegration.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { cache_location } from '../Helpers/cache.js';
+import { APLData, appData, cache_location } from '../Helpers/cache.js';
 
 const yesno = [
     {
@@ -24,6 +24,8 @@ const yesno = [
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+export const configPath = path.join(APLData, "config.json") 
+
 
 export async function runConfig() {
     console.log("Make sure to read the README.md file before going through the setup process".yellow.bold)
@@ -154,19 +156,18 @@ export async function runConfig() {
         }
     }
 
-    fs.writeFileSync(path.join(__dirname, "config.json"), JSON.stringify(config));
     const outDir = join(__dirname, "..", "output");
-
     if (outputEnabled && !fs.existsSync(outDir)) {
         fs.mkdirSync(outDir)
     }
 
-
     
-    if(!fs.existsSync(join(cache_location, ".."))){
-        fs.mkdirSync(join(cache_location, ".."));
+    if(!fs.existsSync(join(APLData))){
+        fs.mkdirSync(join(APLData));
     }
 
+    fs.writeFileSync(configPath, JSON.stringify(config));
+    
     writeRun(runtime);
     writeRetry(runtime);
 
