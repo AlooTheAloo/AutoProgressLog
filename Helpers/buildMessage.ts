@@ -10,7 +10,7 @@ const fire_streak = 100;
 const fire = (time:number) => time > fire_streak ?  '🔥' : ''
 
 export function buildMessage(count:number|null, allEvents:activity[], cache:cache, timeToAdd:number) {
-    let message = `**Progress report #${cache.reportNo + 1}**\n\n`
+    let message = `**Progress report #${cache.reportNo + 1}**\n\n\`\`\``
 
     if(allEvents.length == 0){
         message += "No Immersion since last report. Resetting streak."
@@ -59,6 +59,7 @@ export function buildMessage(count:number|null, allEvents:activity[], cache:cach
             `\nAnki Streak - ${addS(newCache.ankiStreak, "report")} ${fire(newCache.ankiStreak)}`
         ].join("");
     }
+    message += "```"
     return {
         message: message,
         cache: newCache
