@@ -40,7 +40,7 @@ export function buildMessage(count:number|null, allEvents:activity[], cache:cach
 
     const newCache:cache = {
         totalSeconds: cache.totalSeconds + timeToAdd,
-        lastGenerated: dayjs().toISOString(),
+        lastGenerated: dayjs().toString(),
         cardsStudied: cache.cardsStudied + (count ?? 0),
         ankiStreak: count == null ? cache.ankiStreak : (count == 0 ? 0 : cache.ankiStreak + 1),
         immersionStreak: allEvents.length == 0 ? 0 : cache.immersionStreak + 1,
