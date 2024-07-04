@@ -47,7 +47,7 @@ export function buildMessage(count:ankiData, allEvents:activity[], cache:cache, 
 
     const newCache:cache = {
         totalSeconds: cache.totalSeconds + timeToAdd,
-        lastGenerated: dayjs().toISOString(),
+        lastGenerated: dayjs().toString(),
         cardsStudied: cache.cardsStudied + (count.reviewCount ?? 0),
         ankiStreak: count == null ? cache.ankiStreak : (count.reviewCount == 0 ? 0 : cache.ankiStreak + 1),
         immersionStreak: allEvents.length == 0 ? 0 : cache.immersionStreak + 1,
