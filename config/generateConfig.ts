@@ -8,6 +8,17 @@ import { createAnkiIntegration } from './configAnkiIntegration.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { APLData, appData, cache_location } from '../Helpers/cache.js';
+import { getConfig } from '../Helpers/getConfig.js';
+
+const cdIntoDir = process.platform != "win32" ?
+`SCRIPT_DIR=$( cd -- "$( dirname -- "\${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+cd $SCRIPT_DIR 
+` :
+`@echo off
+cd %CD%
+`  
+
+
 
 const yesno = [
     {
@@ -63,6 +74,7 @@ export async function runConfig() {
     });
 
     let time: Time | null = null;
+    let docker:boolean = false;
     if (runType == "Server") {
         let timeStr = await getAnswer({
             question: "At what time should the generation happen? [HH:MM] (default : 23:55)", verifFunc: (ans) => {
@@ -75,6 +87,12 @@ export async function runConfig() {
         });
         if (timeStr == "") timeStr = "23:55";
         time = parseTime(timeStr);
+
+        // D*cker
+        docker = await getAnswer({
+            question: "Do you want to run APL with Docker?",
+            options:yesno
+        });
     }
 
     // Toggl
@@ -116,7 +134,7 @@ export async function runConfig() {
     });
 
     if (ankiIntegrationEnabled && !(process.platform == "win32" || process.platform == "darwin")) {
-        console.log("Anki integration is not guaranteed to work on all Gnu/Linux systems. If you have any issues, don't hesitate to open an issue on GitHub.".red.bold)
+        console.log("Anki integration is not guaranteed to work on all GNU/Linux systems. If you have any issues, don't hesitate to open an issue on GitHub.".red.bold)
     }
 
     let anki: ankiIntegration | {} = {}
@@ -192,37 +210,23 @@ function parseTime(ans: string): Time | null {
     }
 }
 
-function writeRun(runtime:string){
-    if (process.platform != "win32") {
-        const pathRun = path.join(__dirname, "..", "run.sh");
-        fs.writeFileSync(pathRun, `cd ${__dirname} 
-npm run --silent start:${runtime.toLowerCase()}`);
-        fs.chmodSync(pathRun, 0o777);
-        console.log("Configuration created! Run the 'run.sh' file to run the generator!".blue);
-    }
-    else {
-        const pathRun = path.join(__dirname, "..", "run.bat");
-        fs.writeFileSync(pathRun, `@echo off
-cd /d ${__dirname}
-npm run --silent start:${runtime.toLowerCase()}`);
-        console.log("Configuration created! Run the 'run.bat' file to run the generator!".blue);
-    }
+export const writeRun = (runtime:string) => writeAndPerms(buildScriptPath('run'), buildContent(`start:${runtime}`));
+export const writeRetry = (runtime:string) => writeAndPerms(buildScriptPath('retry'), buildContent('retry'));
+
+
+function buildContent(funcName:string){
+    return `\n${cdIntoDir}
+    npm run --silent ${funcName}`
 }
 
-function writeRetry(runtime:string){
-    const pathRetry = path.join(__dirname, "..", process.platform == "win32" ? "run.bat" : "run.sh");
-    let content = "";
-    if (process.platform != "win32") {
-        content = `cd ${__dirname} 
-        npm run --silent retry`;
-        fs.chmodSync(pathRetry, 0o777);
-    }
-    else {
-        content = `@echo off
-        cd /d ${__dirname}
-        npm run --silent retry`
-    }
-
-    fs.writeFileSync(pathRetry, content);
+function buildScriptPath(filename:string){
+    const scriptPath = path.join(__dirname, "..", process.platform == "win32" ? `${filename}.bat` : `${filename}.sh`);
+    return scriptPath;
 }
 
+function writeAndPerms(path:string, content:string){
+    fs.writeFileSync(path, content);
+    if (process.platform != "win32") {
+        fs.chmodSync(path, 0o777);
+    }
+}

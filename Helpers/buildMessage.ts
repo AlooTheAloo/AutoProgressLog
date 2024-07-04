@@ -46,10 +46,11 @@ export function buildMessage(count:number|null, allEvents:activity[], cache:cach
         immersionStreak: allEvents.length == 0 ? 0 : cache.immersionStreak + 1,
         reportNo: cache.reportNo + 1
     }
-
+    const hoursNew = roundSecondsToHours(newCache.totalSeconds);
+    const hoursOld = roundSecondsToHours(cache.totalSeconds);
     message += [
         `\n\nAll time stats :`,
-        `\nTotal immersion time - Approx. ${addS(roundSecondsToHours(newCache.totalSeconds), 'hour')}`,
+        `\nTotal immersion time - Approx. ${addS(hoursNew, 'hour')} ${Math.floor(hoursNew / 100) > Math.floor(hoursOld / 100) ? `🎉 (${Math.floor(hoursNew / 100) * 100} hour milestone)` : ''}`,
         `\nImmersion Streak - ${addS(newCache.immersionStreak, "report")} ${fire(newCache.immersionStreak)}`
     ].join("");
     

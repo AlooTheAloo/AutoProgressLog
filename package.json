@@ -7,7 +7,9 @@
   },
   "pkg": {
     "scripts": "/**/*.ts",
-    "targets": [ "node20-macos-arm64" ],
+    "targets": [
+      "node20-macos-arm64"
+    ],
     "outputPath": "dist"
   },
   "peerDependencies": {
@@ -32,7 +34,7 @@
     "axios": "^1.7.2",
     "colors": "^1.4.0",
     "common-errors": "^1.2.0",
-    "dayjs": "^1.11.10",
+    "dayjs": "^1.11.11",
     "find-process": "^1.4.7",
     "js-abbreviation-number": "^1.4.0",
     "node-schedule": "^2.1.1",
