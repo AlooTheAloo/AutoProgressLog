@@ -1,24 +1,22 @@
-import { Dayjs } from 'dayjs';
-import sqlite3 from 'sqlite3'
+import dayjs, { Dayjs } from 'dayjs';
+import sqlite3, { Database } from 'sqlite3'
 import { getConfig } from '../Helpers/getConfig.js';
 
-interface row {
+interface reviewsrow {
     reviews:number
+}
+
+interface maturerow {
+    mature:number
 }
 
 export async function getAnkiCardReviewCount(startTime:Dayjs){
     return new Promise<number|null>((res, rej) => {
         // Create a database connection
-        const db = new sqlite3.Database(getConfig().anki.ankiDB ?? "", (err) => {
-            if (err) {
-                console.log(err);
-                res(null);
-            } else {
-            }
-        });
+        const db = open();
 
         // Execute SQL query
-        db.all('SELECT COUNT(*) as "reviews" FROM revlog WHERE id > ' + startTime.valueOf(), (err, rows:row[]) => {
+        db.all('SELECT COUNT(*) as "reviews" FROM revlog WHERE id > ' + startTime.valueOf(), (err, rows:reviewsrow[]) => {
             if (err) {
                 console.log(err);
 
@@ -29,16 +27,77 @@ export async function getAnkiCardReviewCount(startTime:Dayjs){
             }
         });
 
-        // Close the database connection when done
-        db.close((err) => {
+        close(db);
+    })
+}
+
+
+
+export async function getRetention(){
+    return new Promise<number|null>((res, rej) => {
+        // A month ago
+        const aMonthAgo = dayjs().subtract(1, "month").unix() * 1000;
+
+
+        // Create a database connection
+        const db = open();
+
+        // Execute SQL query
+        db.all('SELECT COUNT(*) as "reviews" FROM revlog WHERE id > ' + aMonthAgo, (err, allReviews:reviewsrow[]) => {
             if (err) {
                 console.log(err);
 
                 res(null);
             } else {
+
+                db.all('SELECT COUNT(*) as "reviews" FROM revlog WHERE id > ' + aMonthAgo + " AND ease >= 3;", (err, correctReviews:reviewsrow[]) => {
+                    res(correctReviews[0].reviews / allReviews[0].reviews * 100)
+                })
             }
         });
+
+        close(db);
+    })
+}
+
+
+
+
+export async function getMatureCards(){
+    return new Promise<number|null>((res, rej) => {
+        // Create a database connection
+        const db = open();
+        // Execute SQL query
+        db.all('SELECT COUNT(*) as "mature" from cards WHERE ivl >= 21;', (err, rows:maturerow[]) => {
+            if (err) {
+                console.log(err);
+                res(null);
+            } else {
+                // Process the results
+                res(rows[0].mature)
+            }
+        });
+        close(db);
     })
 
 
+}
+
+function open(){
+    return new sqlite3.Database(getConfig().anki.ankiDB ?? "", (err) => {
+        if (err) {
+            console.log(err);
+        } else {
+        }
+    });
+}
+
+//Returns true if everything is aok, returns false if not
+async function close(db:Database){
+    await new Promise((res, rej) => {
+        // Close the database connection when done
+        db.close((err) => {
+            res(err == null);
+        });
+    })
 }

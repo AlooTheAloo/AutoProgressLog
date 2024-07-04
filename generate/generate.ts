@@ -6,7 +6,7 @@ import { activity } from '../types/activity.js';
 import duration from "dayjs/plugin/duration.js";
 import { compareActivities } from '../Helpers/activityHelper.js';
 import { sumTime } from '../Helpers/entryHelper.js';
-import { getAnkiCardReviewCount } from "../anki/db.js";
+import { getAnkiCardReviewCount, getMatureCards, getRetention } from "../anki/db.js";
 import { buildMessage } from '../Helpers/buildMessage.js';
 import { getConfig } from '../Helpers/getConfig.js';
 import path from 'path';
@@ -57,16 +57,24 @@ export async function runGeneration(){
 
 
     let count:null|number = null;
+    let mature:null|number = null;
+    let retention:null|number = null;
 
     if(getConfig().anki.enabled){
         // Anki stuff
         count = await getAnkiCardReviewCount(lastGenerated);
+        mature = await getMatureCards();
+        retention = await getRetention();
     }    
        
     const timeToAdd = sumTime(entriesAfterLastGen)
 
     // Build message
-    const ans = buildMessage(count, allEvents, startCache, timeToAdd);
+    const ans = buildMessage({
+        reviewCount: count,
+        matureCount: mature,
+        retention: retention
+    }, allEvents, startCache, timeToAdd);
 
     // Output
     CacheManager.push(ans.cache)

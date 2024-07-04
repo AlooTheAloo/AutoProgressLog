@@ -6,7 +6,13 @@ export interface cache {
     cardsStudied:number,
     ankiStreak:number
     immersionStreak:number,
-    reportNo:number
+
+    //Useless for now but will use later
+    mature:number|null,
+    retention:number|null,
+
+
+    reportNo:number,
 }
 
 export type versionInfo = { version: Version }

@@ -17,6 +17,7 @@
   },
   "bin": "./entry/run.ts",
   "scripts": {
+    "dev" : "tsx ./entry/tests.ts",
     "start:node": "tsx ./entry/run.ts",
     "start:bun": "bun run ./entry/run.ts",
     "retry": "tsx ./entry/retry.ts",

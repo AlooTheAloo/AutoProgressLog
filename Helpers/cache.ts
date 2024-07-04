@@ -16,7 +16,7 @@ export const cache_location: string = path.join(APLData, "/cache.json");
 export class CacheManager {
 
     static SemVer = () => {
-        return new SemVer(this.get().version ?? "0.0.0");
+        return new SemVer(this.get(false).version ?? "0.0.0");
     }
 
     static verifyVersion = () => { 
@@ -34,7 +34,9 @@ export class CacheManager {
                     cardsStudied: 0,
                     ankiStreak: 0,
                     immersionStreak: 0,
-                    reportNo: 0
+                    reportNo: 0,
+                    mature: 0,
+                    retention: 0
                 },
             ]
         })
@@ -75,8 +77,8 @@ export class CacheManager {
         fs.writeFileSync(cache_location, JSON.stringify(cacheList));
     }
 
-    public static get = (): cacheList => {
-        if(!CacheManager.exists){
+    public static get = (createIfNull=true): cacheList => {
+        if(!CacheManager.exists && createIfNull){
             CacheManager.init();
         }
 
