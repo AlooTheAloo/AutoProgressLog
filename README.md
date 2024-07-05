@@ -1,6 +1,10 @@
 ![AutoProgressLog](Assets/Banner.png)
 
+## Introduction
 This projects aims to be a ressource for the [refold discord servers](https://refold.la/join/). Some people spend countless hours logging their immersion time, immersion streaks and anki streaks. This terminal-based utility aims to create an easy to use way to automate this process.
+
+As well as simplifying the process of logging, this tool gamifies the process of language learning by tracking your statistics as well as giving you a score for all of your hard work and time put into language learning.
+
 ## Features
 
 * ⏰ Automatic immersion tracking and formatting with Toggl Track
