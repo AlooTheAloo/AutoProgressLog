@@ -7,8 +7,7 @@ import fs from "fs";
 import { createAnkiIntegration } from './configAnkiIntegration.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { APLData, appData, cache_location } from '../Helpers/cache.js';
-import { getConfig } from '../Helpers/getConfig.js';
+import { APLData } from '../Helpers/cache.js';
 
 const cdIntoDir = process.platform != "win32" ?
 `SCRIPT_DIR=$( cd -- "$( dirname -- "\${BASH_SOURCE[0]}" )" &> /dev/null && pwd )

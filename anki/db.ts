@@ -41,16 +41,15 @@ export async function getRetention(){
 
         // Create a database connection
         const db = open();
-
         // Execute SQL query
-        db.all('SELECT COUNT(*) as "reviews" FROM revlog WHERE id > ' + aMonthAgo, (err, allReviews:reviewsrow[]) => {
+        db.all('SELECT COUNT(*) as "reviews" FROM revlog WHERE cid IN (SELECT id FROM cards WHERE ivl >= 21) AND id > ' + aMonthAgo, (err, allReviews:reviewsrow[]) => {
             if (err) {
                 console.log(err);
 
                 res(null);
             } else {
 
-                db.all('SELECT COUNT(*) as "reviews" FROM revlog WHERE id > ' + aMonthAgo + " AND ease >= 3;", (err, correctReviews:reviewsrow[]) => {
+                db.all('SELECT COUNT(*) as "reviews" FROM revlog WHERE cid IN (SELECT id FROM cards WHERE ivl >= 21) AND id > ' + aMonthAgo + " AND ease >= 3;", (err, correctReviews:reviewsrow[]) => {
                     res(correctReviews[0].reviews / allReviews[0].reviews * 100)
                 })
             }

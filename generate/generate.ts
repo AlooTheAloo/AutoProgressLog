@@ -26,7 +26,7 @@ export const toggl = new Toggl({
     },
 });
 
-const ignore = (tags:string[]) => ["aplignore", "ignore", "autoprogresslogignore"].some(x => tags.includes(x))
+const ignore = (tags:string[]) => ["aplignore", "ignore", "autoprogresslogignore"].some(x => tags.map(x => x.toLowerCase()).includes(x))
 
 export async function runGeneration(){
     const startCache = CacheManager.peek()
