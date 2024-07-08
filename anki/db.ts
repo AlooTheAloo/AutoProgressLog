@@ -36,20 +36,24 @@ export async function getAnkiCardReviewCount(startTime:Dayjs){
 export async function getRetention(){
     return new Promise<number|null>((res, rej) => {
         // A month ago
-        const aMonthAgo = dayjs().subtract(1, "month").unix() * 1000;
+        const aMonthAgo = dayjs().subtract(30, "days").unix() * 1000;
 
+        console.log(aMonthAgo);
 
         // Create a database connection
         const db = open();
+
         // Execute SQL query
-        db.all('SELECT COUNT(*) as "reviews" FROM revlog WHERE cid IN (SELECT id FROM cards WHERE ivl >= 21) AND id > ' + aMonthAgo, (err, allReviews:reviewsrow[]) => {
+        db.all('SELECT COUNT(*) as "reviews" FROM revlog WHERE lastIvl >= 21 AND id > ' + aMonthAgo, (err, allReviews:reviewsrow[]) => {
             if (err) {
                 console.log(err);
 
                 res(null);
             } else {
 
-                db.all('SELECT COUNT(*) as "reviews" FROM revlog WHERE cid IN (SELECT id FROM cards WHERE ivl >= 21) AND id > ' + aMonthAgo + " AND ease >= 3;", (err, correctReviews:reviewsrow[]) => {
+                db.all('SELECT COUNT(*) as "reviews" FROM revlog WHERE lastIvl >= 21 AND id > ' + aMonthAgo + " AND ((type = 1 AND ease >= 3));", (err, correctReviews:reviewsrow[]) => {
+                    console.log("total reviews " + allReviews[0].reviews);
+                    
                     res(correctReviews[0].reviews / allReviews[0].reviews * 100)
                 })
             }
