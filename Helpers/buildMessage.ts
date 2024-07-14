@@ -59,7 +59,7 @@ export function buildMessage(count:ankiData, allEvents:activity[], cache:cache, 
     const hoursOld = roundSecondsToHours(cache.totalSeconds);
     message += [
         `\n\nAll time stats :`,
-        `\nTotal immersion time - Approx. ${addS(hoursNew, 'hour')} ${Math.floor(hoursNew / 100) > Math.floor(hoursOld / 100) ? `🎉 (${Math.floor(hoursNew / 100) * 100} hour milestone)` : ''}`,
+        `\nTotal immersion time - Approx. ${addS(hoursNew, 'hour')} ${Math.floor(hoursNew / 100) > Math.floor(hoursOld / 100) ? `🎉 (${Math.floor(hoursNew / 100) * 100} hour milestone ! )` : ''}`,
         `\nImmersion Streak - ${addS(newCache.immersionStreak, "report")} ${fire(newCache.immersionStreak)}`
     ].join("");
     

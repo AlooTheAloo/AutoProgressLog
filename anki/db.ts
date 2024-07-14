@@ -60,6 +60,7 @@ export async function getRetention(){
         });
 
         close(db);
+
     })
 }
 
