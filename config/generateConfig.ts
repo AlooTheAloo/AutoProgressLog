@@ -36,7 +36,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 export const configPath = path.join(APLData, "config.json") 
 
-
 export async function runConfig() {
     console.log("Make sure to read the README.md file before going through the setup process".yellow.bold)
     
