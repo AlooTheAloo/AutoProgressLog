@@ -21,7 +21,7 @@ export function ankiGeneration(){
       }, getConfig().type == "Server" ? 20000 : 5000);
     }
     else{
-         runGeneration();
+        runGeneration();
     }
     
 }
