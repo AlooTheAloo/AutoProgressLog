@@ -59,11 +59,7 @@ export async function getRetention(retentionMode:retentionMode = "true_retention
         if(retentionMode == "true_retention"){
             db.all(`select
             sum(case when ease = 1 and type == 1 then 1 else 0 end) as "FLUNKED",
-            sum(case when ease > 1 and type == 1 then 1 else 0 end) as "PASSED", 
-            sum(case when ease > 1 and type == 1 and lastIvl >= 100 then 1 else 0 end) as "PASSED_SUPERMATURE", 
-            sum(case when ease = 1 and type == 1 and lastIvl >= 100 then 1 else 0 end) as "FLUNKED_SUPERMATURE", 
-            sum(case when ivl > 0 and type == 0 then 1 else 0 end) as "LEARNED", 
-            sum(case when ivl > 0 and type == 2 then 1 else 0 end) as "RELEARNED"
+            sum(case when ease > 1 and type == 1 then 1 else 0 end) as "PASSED"
             from revlog where id > ${aMonthAgo}`, (err, a:any[]) => {
                 const passed = a[0].PASSED;
                 const flunked = a[0].FLUNKED;

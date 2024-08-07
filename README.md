@@ -83,3 +83,6 @@ Once you provide this path, anki will launch. Once launched, the configuration s
 This has only been tested on Windows and MacOS, if you have issues on other operating systems, skill issue lmao.
 
 Anki integration will only work on computers with a graphical desktop environment, meaning you cannot run this on a CLI-only server (though a docker-compatible release is in the works).
+
+## Contributing
+We truly appreciate your interest in contributing! However, we encourage you to focus on spending your time on immersion and making progress. If you have a quick, simple suggestion or improvement, we’d love to hear it. Otherwise, leave the heavy lifting to us 💪 
