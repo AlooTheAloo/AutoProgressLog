@@ -8,9 +8,9 @@ As well as simplifying the process of logging, this tool gamifies the process of
 ## Features
 
 * ⏰ Automatic immersion tracking and formatting with Toggl Track
-* ⭐ Integration with Anki to keep track of total cards seen
+* ⭐ Integration with Anki to keep track of total reviews, retention rate, and mature cards !
+* 🔢 Compatibility with Default Anki Retention and TrueRetention 
 * 🤖 Server "automatic" mode and manual mode
-* 📄 Output to terminal and to file
 * 🤓 Compatibility with [Bun](https://bun.sh/) and [NodeJS](https://nodejs.org/en)
 
 ## Installation
