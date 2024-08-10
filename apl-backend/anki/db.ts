@@ -64,8 +64,8 @@ export async function getRetention(retentionMode:retentionMode = "true_retention
                 const passed = a[0].PASSED;
                 const flunked = a[0].FLUNKED;
                 try{
-                    let temp = passed/(passed+flunked)*100
-                    res(temp);
+                    let ret = passed/(passed+flunked)*100
+                    res(ret);
                 }
                 catch(err){
                     console.log(err)
@@ -106,7 +106,6 @@ function open(){
     return new sqlite3.Database(getConfig().anki.ankiDB ?? "", (err) => {
         if (err) {
             console.log(err);
-        } else {
         }
     });
 }

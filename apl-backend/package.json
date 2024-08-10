@@ -2,6 +2,7 @@
   "name": "autoprogresslog",
   "module": "index.ts",
   "devDependencies": {
+    "@types/diff": "^5.2.1",
     "bun-types": "latest",
     "ts-node": "^10.9.2"
   },
@@ -17,7 +18,7 @@
   },
   "bin": "./entry/run.ts",
   "scripts": {
-    "dev" : "tsx ./entry/tests.ts",
+    "dev": "tsx ./entry/tests.ts",
     "start:node": "tsx ./entry/run.ts",
     "start:bun": "bun run ./entry/run.ts",
     "retry": "tsx ./entry/retry.ts",
@@ -26,6 +27,7 @@
   },
   "type": "module",
   "dependencies": {
+    "@primno/dpapi": "^1.1.2",
     "@types/better-sqlite3": "^7.6.10",
     "@types/common-errors": "^1.0.5",
     "@types/node-schedule": "^2.1.7",
@@ -33,16 +35,27 @@
     "@types/sqlite3": "^3.1.11",
     "@yao-pkg/pkg": "^5.11.5",
     "axios": "^1.7.2",
+    "chrome-profile-list": "^1.1.0",
     "colors": "^1.4.0",
     "common-errors": "^1.2.0",
+    "crypto": "^1.0.1",
     "dayjs": "^1.11.11",
+    "diff": "^5.2.0",
     "find-process": "^1.4.7",
+    "int": "^0.2.0",
     "js-abbreviation-number": "^1.4.0",
+    "keytar": "^7.9.0",
     "node-schedule": "^2.1.1",
     "ordinal": "^1.0.3",
+    "request": "^2.88.2",
     "semver": "^7.6.2",
     "sqlite3": "^5.1.7",
+    "swap-case": "^3.0.3",
+    "tldjs": "^2.3.1",
     "toggl-track": "^0.8.0",
-    "tsx": "^4.15.1"
+    "tough-cookie": "^4.1.4",
+    "tsx": "^4.15.1",
+    "url": "^0.11.4",
+    "win-dpapi": "^1.1.0"
   }
 }

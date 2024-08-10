@@ -1,0 +1,51 @@
+{
+  "name": "chrome-cookies-secure",
+  "type": "module",
+  "version": "2.1.1",
+  "description": "Extract encrypted Google Chrome cookies for a url on a Mac, Linux or Windows",
+  "types": "index.d.ts",
+  "keywords": [
+    "google",
+    "chrome",
+    "cookies",
+    "encrypted",
+    "curl",
+    "decrypt",
+    "encrypt",
+    "extract"
+  ],
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha tests/index.test.js -t 5000"
+  },
+  "author": "Bertrand Fan <bert@bert.org> (https://bert.org/), Reece Daniels <rubengmurray@gmail.com>",
+  "license": "MIT",
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bertrandom/chrome-cookies-secure.git"
+  },
+  "dependencies": {
+    "int": "^0.2.0",
+    "request": "^2.88.0",
+    "sqlite3": "^5.0.7",
+    "tldjs": "^1.5.1",
+    "tough-cookie": "^2.3.4"
+  },
+  "optionalDependencies": {
+    "keytar": "^7.9.0",
+    "win-dpapi": "^1.1.0"
+  },
+  "devDependencies": {
+    "@types/joi": "^14.3.1",
+    "joi": "^14.3.1",
+    "mocha": "^8.0.0"
+  },
+  "engines": {
+    "node": ">=12.18.4"
+  }
+}
