@@ -1,4 +1,4 @@
-![AutoProgressLog](Assets/Banner.png)
+![AutoProgressLog](apl-assets/Banner.png)
 
 ## Introduction
 This projects aims to be a ressource for the [refold discord servers](https://refold.la/join/). Some people spend countless hours logging their immersion time, immersion streaks and anki streaks. This terminal-based utility aims to create an easy to use way to automate this process.
