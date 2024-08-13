@@ -9,11 +9,6 @@ import { CacheManager } from '../Helpers/cache.js';
 
 dayjs.extend(duration)
 
-const ver = CacheManager.verifyVersion()
-if(!ver){
-    console.log("Invalid cache! Please run 'npm run upgrade' to fix!".red);
-    process.exit(0);
-}
 
 const config = getConfig()
 

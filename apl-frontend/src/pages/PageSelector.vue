@@ -1,14 +1,11 @@
 <script setup lang="ts">
-
-    function sendToIPC() {
-        console.log('Send IPCMain')
-        window.ipcRenderer.invoke('open-win', 'www.youtube.com')
-        
-    }
+import { RouteLocationRaw, useRoute, useRouter } from 'vue-router';
+const router = useRouter()    
+window.ipcRenderer.invoke('PageSelect').then((route:RouteLocationRaw) => {
+  router.push(route);
+})
 </script>
 
 <template>
-  <div>
-    <button @click="sendToIPC"> Send IPCMain</button>
-  </div>
+
 </template>

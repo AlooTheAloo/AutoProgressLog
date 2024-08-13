@@ -186,8 +186,6 @@ export async function runConfig() {
     
     writeRun(runtime);
     writeRetry(runtime);
-
-    process.exit();
 }
 
 function isAnkiIntegration(ankiIntegration: ankiIntegration | {}): ankiIntegration is ankiIntegration {

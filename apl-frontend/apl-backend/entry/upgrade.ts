@@ -1,10 +1,10 @@
 import path, { join } from "path";
-import { APLData, CacheManager, cache_location } from "../Helpers/cache.ts";
-import { appVersion } from "../consts/versioning.ts";
-import { cacheList } from "../types/cache.ts";
+import { APLData, CacheManager, cache_location } from "../Helpers/cache";
+import { appVersion } from "../consts/versioning";
+import { cacheList } from "../types/cache";
 import colors from "colors" 
 import fs from "fs"
-import { v1_0_1 } from "../versioning/1_0_1.ts";
+import { v1_0_1 } from "../versioning/1_0_1";
 import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -13,12 +13,10 @@ const __dirname = path.dirname(__filename);
 export const appUpgrade = async (cacheList:cacheList) => {
     if(CacheManager.SemVer().compare(appVersion) == 0){
         console.log("Already up to date !".green)
-        process.exit(0)
     }
 
     await v1_0_1(cacheList);
     console.log(colors.green(`Upgrade complete! `))
-    process.exit(0);
 } 
 
 
