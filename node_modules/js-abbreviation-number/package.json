@@ -1,0 +1,49 @@
+{
+  "name": "js-abbreviation-number",
+  "version": "1.4.0",
+  "description": "Abbreviate numbers in javascript",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "test": "jest --config=jest.config.json --collectCoverage",
+    "build": "tsc",
+    "prepare": "tsc",
+    "lint": "eslint *.ts",
+    "prettier-write": "prettier --write \"*.ts\"",
+    "prettier-check": "prettier --check \"*.ts\"",
+    "codecov": "codecov -t 6fc5b4e4-4e80-42dd-b9ed-057a670de47a"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/moh3n9595/js-abbreviation-number.git"
+  },
+  "homepage": "https://github.com/moh3n9595/js-abbreviation-number#readme",
+  "keywords": [
+    "js",
+    "number",
+    "abbreviation",
+    "javascript"
+  ],
+  "author": {
+    "name": "Mohsen Madani",
+    "email": "mohsenando@gmail.com"
+  },
+  "files": [
+    "dist"
+  ],
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "@types/jest": "^25.1.0",
+    "@types/node": "^9.4.6",
+    "@typescript-eslint/eslint-plugin": "^5.5.0",
+    "@typescript-eslint/parser": "^2.18.0",
+    "codecov": "^3.6.5",
+    "eslint": "^8.4.0",
+    "eslint-plugin-import": "^2.19.1",
+    "jest": "^25.5.4",
+    "prettier": "1.19.1",
+    "ts-jest": "^22.4.1",
+    "typescript": "^3.7.5"
+  }
+}

@@ -3,6 +3,7 @@
 
     const router = useRouter()
     function NextPage(){
+        console.log("Next page");
         router.push('/setup/client-server-selection')
     }
 </script>
@@ -12,7 +13,7 @@
         <h2 class=" text-3xl font-extrabold w-full text-left">
             Get started using AutoProgressLog
         </h2>
-        <button class="w-fit font-extrabold" :onclick="NextPage()">
+        <button class="w-fit font-extrabold" :onclick="NextPage">
             Start :3
         </button>
     </div>
