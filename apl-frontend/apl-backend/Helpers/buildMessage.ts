@@ -13,8 +13,6 @@ interface ankiData {
 }
 
 
-const fire_streak = 100;
-const fire = (time:number) => time > fire_streak ?  '🔥' : ''
 
 export function buildMessage(count:ankiData, allEvents:activity[], cache:cache, timeToAdd:number) {
     let message = `**Progress report #${cache.reportNo + 1}**\n\n\`\`\``
@@ -60,13 +58,13 @@ export function buildMessage(count:ankiData, allEvents:activity[], cache:cache, 
     message += [
         `\n\nAll time stats :`,
         `\nTotal immersion time - Approx. ${addS(hoursNew, 'hour')} ${Math.floor(hoursNew / 100) > Math.floor(hoursOld / 100) ? `🎉 (${Math.floor(hoursNew / 100) * 100} hour milestone ! )` : ''}`,
-        `\nImmersion Streak - ${addS(newCache.immersionStreak, "report")} ${fire(newCache.immersionStreak)}`
+        `\nImmersion Streak - ${addS(newCache.immersionStreak, "report")}`
     ].join("");
     
     if(getConfig().anki.enabled){
         message += [
             `\nTotal cards reviewed - ${abbreviateNumber(newCache.cardsStudied, 2)}`,
-            `\nAnki Streak - ${addS(newCache.ankiStreak, "report")} ${fire(newCache.ankiStreak)}`
+            `\nAnki Streak - ${addS(newCache.ankiStreak, "report")}`
         ].join("");
     }
     message += "```"

@@ -39,7 +39,7 @@
                 </div>
             </div>
             <div class="w-1/2 flex-col flex justify-center">
-                <div class="w-full px-5 font-semibold h-[60px]"/>
+                <div class="w-full px-5 font-semibold "/>
                 <Graph :data="data"></Graph>
             </div>
         </div>

@@ -1,3 +1,5 @@
+import { activity } from "./activity";
+
 export type ReportData = {
     reportNo:number,
     time:string,
@@ -25,12 +27,6 @@ export type ReportData = {
 export type RelativeReportData = {
     value:number,
     reportNo:number
-}
-
-export type activity = {
-    activityTitle:string,
-    activityDurationHR:string,
-    activitySeconds:number
 }
 
 export type TPlusDelta<T> = {
