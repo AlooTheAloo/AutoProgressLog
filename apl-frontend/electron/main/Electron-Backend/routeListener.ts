@@ -3,7 +3,7 @@ import { getConfig } from "../../../apl-backend/Helpers/getConfig";
 import { RouteLocationRaw } from "vue-router";
 import { appUpgrade } from "../../../apl-backend/entry/upgrade";
 import { CacheManager } from "../../../apl-backend/Helpers/cache";
-
+import { shell } from "electron";
 
 export function routeListeners(){
     ipcMain.handle("PageSelect", (event, args) => {
@@ -18,4 +18,9 @@ export function routeListeners(){
              return "page2";
         }
      });
+
+     ipcMain.handle("OpenExternal", (event, args) => {
+        shell.openExternal(args);
+     });
+     
 }

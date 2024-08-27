@@ -1,10 +1,8 @@
-import { semver } from "bun";
-import { CacheManager } from "../Helpers/cache.ts";
-import { cache, cacheList } from "../types/cache.ts"
-import { SemVer } from "semver";
-import { writeRetry } from "../config/generateConfig.ts";
-import { getConfig } from "../Helpers/getConfig.ts";
-import { v1_0_0 } from "./1_0_0.ts";
+import { CacheManager } from "../Helpers/cache";
+import { cache, cacheList } from "../types/cache"
+import { writeRetry } from "../config/generateConfig";
+import { getConfig } from "../Helpers/getConfig";
+import { v1_0_0 } from "./1_0_0";
 
 export const v1_0_1 = async (cacheList:cacheList) => {
     // Assert that version is below

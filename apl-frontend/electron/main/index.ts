@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url'
 import registerEvents from "./Electron-Backend/";
 import path from 'node:path'
 import os from 'node:os'
+import { getAccounts } from '../../apl-backend/entry/FindAccounts';
 
 const require = createRequire(import.meta.url)
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -48,6 +49,8 @@ const indexHtml = path.join(RENDERER_DIST, 'index.html')
 
 async function createWindow() {
   win = new BrowserWindow({
+    minHeight: 600,
+    minWidth: 800,
     title: 'Main window',
     icon: path.join(process.env.VITE_PUBLIC, 'favicon.ico'),
     webPreferences: {
@@ -63,6 +66,7 @@ async function createWindow() {
 
   if (VITE_DEV_SERVER_URL) { // #298
     win.loadURL(VITE_DEV_SERVER_URL)
+    console.log("opening dev tools");
     // Open devTool if the app is not packaged
     win.webContents.openDevTools()
   } else {

@@ -16,6 +16,7 @@ import fs from 'fs';
 
 let ITERATIONS;
 let dbClosed = false;
+let dpapi;
 
 var	KEYLENGTH = 16,
 	SALT = 'saltysalt'
@@ -32,7 +33,7 @@ function decrypt(key, encryptedData) {
 		decoded,
 		final,
 		padding,
-		iv = new Buffer.from(new Array(KEYLENGTH + 1).join(' '), 'binary');
+		iv =  Buffer.from(new Array(KEYLENGTH + 1).join(' '), 'binary');
 
 	decipher = crypto.createDecipheriv('aes-128-cbc', key, iv);
 	decipher.setAutoPadding(false);
@@ -65,6 +66,7 @@ async function getDerivedKey(callback) {
 
 	if (process.platform === 'darwin') {
 		try{
+			// @ts-ignore
 			keytar = await import('keytar');
 			keytar.getPassword('Chrome Safe Storage', 'Chrome').then(function(chromePassword) {
 				crypto.pbkdf2(chromePassword, SALT, ITERATIONS, KEYLENGTH, 'sha1', (err, key) => {
@@ -87,6 +89,8 @@ async function getDerivedKey(callback) {
 	} else if (process.platform === 'win32') {
 
 		// On Windows, the crypto is managed entirely by the OS.  We never see the keys.
+
+		// @ts-ignore
 		dpapi = await import('win-dpapi');
 		callback(null, null);
 	}
@@ -360,6 +364,7 @@ export const getCookies = async (uri, format, callback, profileOrPath) => {
 	setIterations();
 	const path = getPath(profileOrPath);
 
+
 	if (path instanceof Error) {
 		const error = path;
 		return callback(error);
@@ -405,7 +410,7 @@ export const getCookies = async (uri, format, callback, profileOrPath) => {
 			
 			db.each(
 				"SELECT host_key, path, is_secure, expires_utc, name, value, encrypted_value, creation_utc, is_httponly, has_expires, is_persistent FROM cookies where host_key like '%" + domain + "' ORDER BY LENGTH(path) DESC, creation_utc ASC",
-				function (err, cookie) {
+				function (err, cookie:any) {
 
 					let encryptedValue;
 				
@@ -421,13 +426,14 @@ export const getCookies = async (uri, format, callback, profileOrPath) => {
 								cookie.value = dpapi.unprotectData(encryptedValue, null, 'CurrentUser').toString('utf-8');
 
 							} else if (encryptedValue[0] == 0x76 && encryptedValue[1] == 0x31 && encryptedValue[2] == 0x30 ){
-								localState = JSON.parse(fs.readFileSync(os.homedir() + '/AppData/Local/Google/Chrome/User Data/Local State'));
-								b64encodedKey = localState.os_crypt.encrypted_key;
-								encryptedKey = new Buffer.from(b64encodedKey,'base64');
-								key = dpapi.unprotectData(encryptedKey.slice(5, encryptedKey.length), null, 'CurrentUser');
-								nonce = encryptedValue.slice(3, 15);
-								tag = encryptedValue.slice(encryptedValue.length - 16, encryptedValue.length);
+								let localState = JSON.parse(fs.readFileSync(os.homedir() + '/AppData/Local/Google/Chrome/User Data/Local State').toString());
+								let b64encodedKey = localState.os_crypt.encrypted_key;
+								let encryptedKey = Buffer.from(b64encodedKey,'base64');
+								let key = dpapi.unprotectData(encryptedKey.slice(5, encryptedKey.length), null, 'CurrentUser');
+								let nonce = encryptedValue.slice(3, 15);
+								let tag = encryptedValue.slice(encryptedValue.length - 16, encryptedValue.length);
 								encryptedValue = encryptedValue.slice(15, encryptedValue.length - 16);
+								// @ts-ignore
 								cookie.value = decryptAES256GCM(key, encryptedValue, nonce, tag).toString('utf-8');
 							}
 						} else {

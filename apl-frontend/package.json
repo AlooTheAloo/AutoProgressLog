@@ -18,6 +18,7 @@
     "preview": "vite preview"
   },
   "devDependencies": {
+    "@types/semver": "^7.5.8",
     "@vitejs/plugin-vue": "^5.0.4",
     "autoprefixer": "^10.4.20",
     "electron": "^29.1.1",
@@ -32,16 +33,27 @@
     "vue-tsc": "^2.0.6"
   },
   "dependencies": {
+    "@primevue/themes": "^4.0.5",
     "@types/node": "^22.2.0",
+    "@vueuse/core": "^11.0.3",
     "colors": "^1.4.0",
     "dayjs": "^1.11.12",
     "find-process": "^1.4.7",
     "fs": "^0.0.1-security",
+    "int": "^0.2.0",
+    "keytar": "^7.9.0",
     "node-schedule": "^2.1.1",
     "path": "^0.12.7",
+    "primeicons": "^7.0.0",
+    "primevue": "^4.0.5",
+    "request": "^2.88.2",
     "sqlite3": "^5.1.7",
+    "tldjs": "^2.3.1",
     "toggl-track": "^0.8.0",
+    "tough-cookie": "^4.1.4",
+    "ts-node": "^10.9.2",
     "url": "^0.11.4",
-    "vue-router": "4"
+    "vue-router": "4",
+    "win-dpapi": "^1.1.0"
   }
 }

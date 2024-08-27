@@ -6,6 +6,7 @@ import colors from "colors"
 import fs from "fs"
 import { v1_0_1 } from "../versioning/1_0_1";
 import { fileURLToPath } from "url";
+import { registerRuntimeCompiler } from "vue";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -13,6 +14,7 @@ const __dirname = path.dirname(__filename);
 export const appUpgrade = async (cacheList:cacheList) => {
     if(CacheManager.SemVer().compare(appVersion) == 0){
         console.log("Already up to date !".green)
+        return;
     }
 
     await v1_0_1(cacheList);
