@@ -7,7 +7,6 @@ import { setAnkiIntegration } from "./SetupConfigBuilder";
 
 export function ankiListeners() {
     ipcMain.handle("anki-connect-start", async (event: any, arg: any) => {
-        return false;
         win.webContents.send("anki-connect-message", "Locating Anki Paths");
         const Paths = await getAnkiDBPaths();
 

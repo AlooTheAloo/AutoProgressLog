@@ -10,7 +10,7 @@
     })
 </script>
 <template>
-    <div class="flex bg-emerald-200 gap-5 items-center justify-between ">
+    <div class="flex gap-5 items-center justify-between ">
         <img :src="Logo" class=" w-12 h-12">
         <div class="flex gap-2 items-center justify-center" v-if="account !== undefined">
             <img :alt="account?.name" v-bind:src="account?.pfp_url" class="h-8 w-8 rounded-md min-w-8"/>
