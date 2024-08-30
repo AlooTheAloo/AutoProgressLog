@@ -70,7 +70,7 @@
                     </div>
 
                     <div class="flex flex-grow items-end justify-end">
-                        <Button style="width: 120px;" label="Continue" @click="ManualConnection()" v-bind:disabled="selectedAccount == undefined"/>
+                        <Button style="width: 120px;" label="Continue" @click="ManualConnection()"/>
                     </div>
                 </div>
                 <div v-else-if="togglAccounts.length == 1" class="flex flex-col flex-grow">
