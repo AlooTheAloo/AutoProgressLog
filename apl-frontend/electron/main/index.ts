@@ -43,7 +43,7 @@ if (!app.requestSingleInstanceLock()) {
   process.exit(0)
 }
 
-let win: BrowserWindow | null = null
+export let win: BrowserWindow | null = null
 const preload = path.join(__dirname, '../preload/index.mjs')
 const indexHtml = path.join(RENDERER_DIST, 'index.html')
 
@@ -51,6 +51,8 @@ async function createWindow() {
   win = new BrowserWindow({
     minHeight: 600,
     minWidth: 800,
+    width: 1920,
+    height: 1080,
     title: 'Main window',
     icon: path.join(process.env.VITE_PUBLIC, 'favicon.ico'),
     webPreferences: {
@@ -66,7 +68,6 @@ async function createWindow() {
 
   if (VITE_DEV_SERVER_URL) { // #298
     win.loadURL(VITE_DEV_SERVER_URL)
-    console.log("opening dev tools");
     // Open devTool if the app is not packaged
     win.webContents.openDevTools()
   } else {
@@ -84,6 +85,10 @@ async function createWindow() {
     return { action: 'deny' }
   })
   // win.webContents.on('will-navigate', (event, url) => { }) #344
+
+  win.webContents.once('did-finish-load', () => { 
+    console.log(win);
+  })
 }
 
 app.whenReady().then(createWindow)
@@ -109,4 +114,6 @@ app.on('activate', () => {
     createWindow()
   }
 })
+
+
 

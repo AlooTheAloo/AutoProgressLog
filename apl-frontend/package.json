@@ -14,7 +14,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc --noEmit && vite build && electron-builder",
+    "build": "vue-tsc && vite build && electron-builder",
     "preview": "vite preview"
   },
   "devDependencies": {
@@ -33,6 +33,7 @@
     "vue-tsc": "^2.0.6"
   },
   "dependencies": {
+    "@miniben90/x-win": "^1.10.2",
     "@primevue/themes": "^4.0.5",
     "@types/node": "^22.2.0",
     "@vueuse/core": "^11.0.3",
@@ -40,8 +41,10 @@
     "dayjs": "^1.11.12",
     "find-process": "^1.4.7",
     "fs": "^0.0.1-security",
+    "get-windows": "^9.2.0",
     "int": "^0.2.0",
     "keytar": "^7.9.0",
+    "node-mac-permissions": "2.3.0",
     "node-schedule": "^2.1.1",
     "path": "^0.12.7",
     "primeicons": "^7.0.0",
@@ -53,7 +56,9 @@
     "tough-cookie": "^4.1.4",
     "ts-node": "^10.9.2",
     "url": "^0.11.4",
-    "vue-router": "4",
+    "vue-router": "4"
+  },
+  "optionalDependencies": {
     "win-dpapi": "^1.1.0"
   }
 }

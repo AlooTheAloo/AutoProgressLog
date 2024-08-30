@@ -5,8 +5,8 @@
     import Button from 'primevue/button';
     import BackButton from '../../../components/Common/BackButton.vue';
     import { onMounted, ref } from 'vue';
-    import { TogglAccount } from '../../../../apl-backend/entry/FindAccounts';
     import ProgressSpinner from 'primevue/progressspinner';
+    import { TogglAccount } from '../../../../types/TogglAccount';
 
     const togglAccount = ref<TogglAccount|undefined>(undefined)
     const router = useRouter()
@@ -19,7 +19,7 @@
     })
 
     function NextPage(){
-
+        router.push('/setup/anki-home');
     }
 </script>
 

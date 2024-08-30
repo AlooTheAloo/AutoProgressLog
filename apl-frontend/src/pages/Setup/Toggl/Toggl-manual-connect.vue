@@ -29,9 +29,9 @@
                 <img :src="Logo" class=" w-12 h-12">
             </div>
             <div class="flex flex-col flex-grow pt-5 justify-start gap-2 text-left ">
-                <BackButton route="back"/>
+                <BackButton route="/setup/toggl-home"/>
                 <div class="font-semibold text-3xl text-white">
-                    Connect manually to your Toggl Track account
+                    Connect to your Toggl Track account manually
                 </div>
                 <div class="text-sm">
                     Please enter your Toggl Track API Token. This key can be found at the bottom of your profile page.

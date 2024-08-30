@@ -36,10 +36,6 @@
     "tldjs": "^1.5.1",
     "tough-cookie": "^2.3.4"
   },
-  "optionalDependencies": {
-    "keytar": "^7.9.0",
-    "win-dpapi": "^1.1.0"
-  },
   "devDependencies": {
     "@types/joi": "^14.3.1",
     "joi": "^14.3.1",

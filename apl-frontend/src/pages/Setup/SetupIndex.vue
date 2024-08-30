@@ -6,7 +6,9 @@
 
     const router = useRouter()
     function NextPage(){
-        router.push('/setup/client-server-selection')
+        window.ipcRenderer.invoke("find-next-page-permissions").then((res:any) => {
+            router.push(res)
+        })
     }
 </script>
 

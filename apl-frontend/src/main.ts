@@ -2,7 +2,6 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import { createMemoryHistory, createRouter, RouteRecordRaw } from 'vue-router'
 import './style.css'
-import './demos/ipc'
 import PageSelector from './pages/PageSelector.vue'
 import PrimeVue from 'primevue/config';
 import Aura from '@primevue/themes/aura';

@@ -12,7 +12,7 @@
     }
 
     function SelectServer(){    
-        
+        router.push('/setup/server-setup');
     }
 
     const { width, height } = useWindowSize()
@@ -28,7 +28,7 @@
                     <img :src="Logo" class=" w-12 h-12">
                 </div>
                 <div class="flex flex-col flex-grow  justify-center gap-2 text-left ">
-                    <div class="font-semibold text-4xl">
+                    <div class="font-semibold text-4xl text-white">
                         What will this device be?
                     </div>
                     <div class="text-gray-600 font-light mb-5 text-xs lg:text-sm">
@@ -44,7 +44,7 @@
                                 <div class="flex w-full justify-center items-center">
                                     <img :src="Client" class="w-1/4 aspect-square">
                                 </div>
-                                <div class=" mt-1 text-center text-2xl font-bold">
+                                <div class=" mt-1 text-center text-2xl font-bold text-white">
                                     Client
                                 </div>
                                 <div class=" font-semibold text-xs px-5 lg:text-[15px] lg:leading-5 text-center w-full">
@@ -59,7 +59,7 @@
                                 <div class="flex w-full justify-center items-center">
                                     <img :src="Server" class="w-1/4 aspect-square">
                                 </div>
-                                <div class="font-bold mt-1 text-center text-2xl">
+                                <div class="font-bold mt-1 text-center text-2xl text-white">
                                     Server
                                 </div>
                                 <div class=" font-semibold text-xs px-5 lg:text-[15px] lg:leading-5 text-center w-full">

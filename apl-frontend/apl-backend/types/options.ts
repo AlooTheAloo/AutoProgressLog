@@ -1,9 +1,7 @@
 export interface options {
     runtime: "Bun" | "Node",
     type : "Server" | "Manual"
-    serverOptions?:{
-        generationTime:Time
-    }
+    serverOptions?:ServerOptions
     toggl:{
         togglToken:string,
     }
@@ -19,8 +17,18 @@ export interface Time {
     minutes: number;
 }
 
+export interface ServerOptions {
+    generationTime: Time;
+    generationInterval: TimeInterval;
+}
+
+
+export interface TimeInterval {
+    intervalType: "Day" | "Week" | "Month",
+    intervalNumber: number
+}
+
 export interface ankiIntegration{
-    enabled:boolean
     ankiPath?:string,
     ankiDB?:string,
     ankiProgramBinaryName?:string

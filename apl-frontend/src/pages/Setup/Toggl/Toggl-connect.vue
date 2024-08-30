@@ -2,12 +2,11 @@
     import Logo from '../../../assets/Logo.png'
     import SetupBackground from '../../../components/Setup/SetupBackground.vue';
     import { onMounted, ref } from 'vue';
-    import { getAccounts, TogglAccount } from '../../../../apl-backend/entry/FindAccounts';
+    import { TogglAccount } from '../../../../types/TogglAccount';
     import ProgressSpinner from 'primevue/progressspinner';
     import Listbox from 'primevue/listbox';
     import Button from 'primevue/button';
     import { useRouter } from 'vue-router';
-import BackButton from '../../../components/Common/BackButton.vue';
     
     const togglAccounts = ref<TogglAccount[]|undefined>(undefined)
     const selectedAccount = defineModel<TogglAccount>()
@@ -16,6 +15,21 @@ import BackButton from '../../../components/Common/BackButton.vue';
     function ManualConnection(){
         router.push('/setup/toggl-manual-connect')
     }
+
+    function NextPage(){
+        let acc:TogglAccount;
+        if(selectedAccount.value == undefined){
+            acc = (togglAccounts.value ?? [])[0];
+        }
+        else
+            acc = selectedAccount.value;
+
+        window.ipcRenderer.invoke('toggl-api-key-set', acc.api_token).then(() => {
+            router.push('/setup/toggl-success');
+        })
+    }
+
+
 
 
     onMounted(async () => {
@@ -32,7 +46,6 @@ import BackButton from '../../../components/Common/BackButton.vue';
 
     <div class=" flex w-screen">
         <div class=" p-12 flex flex-col w-2/3  bg-black h-screen">
-
             <div>
                 <img :src="Logo" class=" w-12 h-12">
             </div>
@@ -48,11 +61,16 @@ import BackButton from '../../../components/Common/BackButton.vue';
                 </div>
             </div>
             <div  class="flex flex-col flex-grow py-10 justify-start gap-1 text-left " v-else>
-                <div v-if="togglAccounts.length == 0">
+                <div v-if="togglAccounts.length == 0" class="flex flex-col h-full">
                     <div class="font-semibold text-3xl">
                         No Toggl Track accounts found!
                     </div>
                     <div class="text-sm">
+                        Let's try connecting to your Toggl Track account manually.
+                    </div>
+
+                    <div class="flex flex-grow items-end justify-end">
+                        <Button style="width: 120px;" label="Continue" @click="ManualConnection()" v-bind:disabled="selectedAccount == undefined"/>
                     </div>
                 </div>
                 <div v-else-if="togglAccounts.length == 1" class="flex flex-col flex-grow">
@@ -74,7 +92,7 @@ import BackButton from '../../../components/Common/BackButton.vue';
                             <Button label="This is not my account" style="font-size: 12px; padding:0px;" link @click="ManualConnection"/>
                         </div>
                         <div>
-                            <Button style="width: 120px;" label="Continue" @click=""/>
+                            <Button style="width: 120px;" label="Continue" @click="NextPage"/>
                         </div>
                     </div>
                 </div>
@@ -104,7 +122,7 @@ import BackButton from '../../../components/Common/BackButton.vue';
                             <Button label="My account is not listed" style="font-size: 12px; padding:0px;" link @click="ManualConnection"/>
                         </div>
                         <div>
-                            <Button style="width: 120px;" label="Continue" @click="" v-bind:disabled="selectedAccount == undefined"/>
+                            <Button style="width: 120px;" label="Continue" @click="NextPage()" v-bind:disabled="selectedAccount == undefined"/>
                         </div>
                     </div>
                 </div>

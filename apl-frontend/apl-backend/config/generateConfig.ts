@@ -159,10 +159,10 @@ export async function runConfig() {
         toggl: {
             togglToken: togglAPIKey
         },
-        serverOptions: (runType == "Server" && time != null) ? { 
-            generationTime: time
-        } : undefined
-        ,
+        // serverOptions: (runType == "Server" && time != null) ? { 
+        //     generationTime: time
+        // } : undefined
+        // ,
         anki: (!isAnkiIntegration(anki)) ? {
             enabled: false
         } : anki,
