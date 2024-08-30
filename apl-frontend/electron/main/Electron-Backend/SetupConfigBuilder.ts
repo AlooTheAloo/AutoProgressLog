@@ -21,7 +21,6 @@ export function setupListeners() {
     })
 
     ipcMain.handle("set-server-options", (event: any, arg: ServerOptions) => {
-        console.log(arg);   
         config.server_options = arg;
     })
     
@@ -38,7 +37,6 @@ export function setupListeners() {
             },
         }).me.get();
         
-        console.log(me);
         if(typeof me !== "object"){
             return undefined;
         }

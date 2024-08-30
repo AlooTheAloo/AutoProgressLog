@@ -11,6 +11,7 @@
     const router = useRouter()
 
     function NextPage(){
+        router.push('/setup/anki-manual-connect')
     }
 </script>
 
@@ -21,13 +22,14 @@
     <div class=" flex w-screen">
         <div class=" p-12 flex flex-col w-2/3 bg-black h-screen">
             <AccountDisplay/>
-            <div class="flex flex-col flex-grow  gap-2 text-left font-semibold text-4xl">
-                <BackButton route="/setup/anki-connect"/>
+            <div class="flex flex-col flex-grow pt-5  gap-2 text-left font-semibold text-4xl">
+                <BackButton route="/setup/anki-home"/>
                 <div class="font-semibold text-white">
                     The connection failed.
                 </div>
                 <p class="text-sm">
                     You may have an older version of anki or some incompatible software installed on your machine.
+                    <br>
                     Let's try connecting manually.                
                 </p>
                 <div class="flex justify-center flex-grow items-center">
@@ -42,7 +44,7 @@
                         </div>
                     </div>
                 </div>
-                <Button label="Continue!" @click="NextPage" class=" absolute w-full bg-green-500 text-white font-semibold text-xl rounded-xl "/>
+                <Button label="Continue" @click="NextPage" class=" h-12 absolute w-full text-white text-xl rounded-xl "/>
 
             </div>
         </div>

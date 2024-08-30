@@ -12,7 +12,6 @@ const __dirname = path.dirname(__filename);
 export function getConfig():options|null{
     if(config == null){
         if(!fs.existsSync(configPath)) {
-            console.log("No configuration could be found! Please run 'npm run config' or 'bun run config' to get started!");
             return null;
         }
     

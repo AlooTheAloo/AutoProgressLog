@@ -20,7 +20,7 @@
     <div class=" flex w-screen">
         <div class=" p-12 flex flex-col w-2/3 bg-black h-screen">
             <AccountDisplay/>
-            <div class="flex flex-col flex-grow  gap-2 text-left font-semibold text-4xl">
+            <div class="flex flex-col flex-grow py-5 gap-2 text-left font-semibold text-4xl">
                 <BackButton route="/setup/toggl-home"/>
                 <div class="font-semibold text-white">
                     Time to connect to Anki.
@@ -42,7 +42,7 @@
                 </div>
                 
             </div>
-            <Button label="Let's go!" @click="NextPage" class="w-full bg-green-500 text-white font-semibold text-xl rounded-xl p-2 mt-10"/>
+            <Button label="Let's go!" @click="NextPage" class="h-12 w-full text-white font-semibold text-xl rounded-xl p-2 mt-10"/>
 
         </div>
     </div>

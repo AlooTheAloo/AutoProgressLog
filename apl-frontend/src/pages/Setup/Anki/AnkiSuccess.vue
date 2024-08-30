@@ -22,7 +22,7 @@
         <div class=" p-12 flex flex-col w-2/3 bg-black h-screen">
             <AccountDisplay/>
             <div class="flex flex-col flex-grow  gap-2 text-left font-semibold text-4xl">
-                <BackButton route="/setup/anki-connect"/>
+                <BackButton route="/setup/anki-home"/>
                 <div class="font-semibold text-white">
                     Connected!
                 </div>
@@ -42,7 +42,7 @@
                         
                     </div>
                 </div>
-                <Button label="Continue!" @click="NextPage" class=" absolute w-full bg-green-500 text-white font-semibold text-xl rounded-xl "/>
+                <Button label="Continue!" @click="NextPage" class=" h-12 absolute w-full text-white font-semibold text-xl rounded-xl "/>
             </div>
         </div>
     </div>

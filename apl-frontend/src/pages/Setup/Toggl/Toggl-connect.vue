@@ -35,7 +35,6 @@
     onMounted(async () => {
         window.ipcRenderer.invoke('Toggl-Connect').then((accounts:TogglAccount[]) => {
             togglAccounts.value = accounts;
-            console.log(accounts);
         })
     })
 </script>
@@ -46,7 +45,7 @@
 
     <div class=" flex w-screen">
         <div class=" p-12 flex flex-col w-2/3  bg-black h-screen">
-            <div>
+            <div class="">
                 <img :src="Logo" class=" w-12 h-12">
             </div>
             <div class="flex flex-col flex-grow py-10 justify-start gap-1 text-left " v-if="togglAccounts == undefined">
@@ -60,7 +59,7 @@
                     <ProgressSpinner />
                 </div>
             </div>
-            <div  class="flex flex-col flex-grow py-10 justify-start gap-1 text-left " v-else>
+            <div  class="flex flex-col flex-grow py-5 justify-start gap-1 text-left " v-else>
                 <div v-if="togglAccounts.length == 0" class="flex flex-col h-full">
                     <div class="font-semibold text-3xl">
                         No Toggl Track accounts found!

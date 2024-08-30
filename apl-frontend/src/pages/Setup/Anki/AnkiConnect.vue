@@ -16,7 +16,6 @@ import { ref } from 'vue';
     });
 
     window.ipcRenderer.invoke("anki-connect-start", ).then((worked) => {
-        console.log(worked);        
         if(worked){
             router.push('/setup/anki-success');
         }
@@ -40,7 +39,7 @@ import { ref } from 'vue';
         <div class=" p-12 flex flex-col w-2/3 bg-black h-screen">
             <AccountDisplay/>
             <div class="flex flex-col flex-grow  gap-2 text-left font-semibold text-4xl">
-                <div class="font-semibold text-white mt-10">
+                <div class="font-semibold text-white mt-16">
                     Connecting to Anki...
                 </div>
                 <p class="text-sm">
@@ -58,6 +57,7 @@ import { ref } from 'vue';
                         </div>
                     </div>
                 </div>
+                <div class=" h-12 "/>
                 
             </div>
         </div>

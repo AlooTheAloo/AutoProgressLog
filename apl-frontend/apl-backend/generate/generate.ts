@@ -60,12 +60,10 @@ export async function runGeneration(){
     let mature:null|number = null;
     let retention:null|number = null;
 
-    if(getConfig().anki.enabled){
-        // Anki stuff
-        count = await getAnkiCardReviewCount(lastGenerated);
-        mature = await getMatureCards();
-        retention = await getRetention();
-    }    
+    // Anki stuff
+    count = await getAnkiCardReviewCount(lastGenerated);
+    mature = await getMatureCards();
+    retention = await getRetention();
        
     const timeToAdd = sumTime(entriesAfterLastGen)
 
@@ -83,5 +81,4 @@ export async function runGeneration(){
         const outputPath = path.join(__dirname, "..", "output", `${(getConfig().outputOptions.outputFileName ?? "output")} #${startCache.reportNo + 1}.txt`)
         fs.writeFileSync(outputPath , ans.message);
     }
-    console.log(ans.message);
 }

@@ -32,10 +32,9 @@ export async function getAnkiDBPaths():Promise<ankiPaths>{
     }
     else if (process.platform == "win32"){
         AppPath = path.join(app.getPath("appData"), "Anki2");
-        console.log(path.join(app.getPath("appData"), "../", "Local", "Programs", "Anki", "anki.exe"));
     }
     else {
-
+        // TODO: Linux :(
     }
     
     await sleep(500);
@@ -91,6 +90,8 @@ export async function createAnkiIntegration(paths:ankiPaths):Promise<ankiIntegra
     }
 }
 
+
+// This function is pure hell. It's a mess.
 async function LaunchAnki(paths:ankiPaths){
         
     if(!fs.existsSync(paths.ankiPath)){
@@ -127,11 +128,11 @@ async function LaunchAnki(paths:ankiPaths){
                         clearInterval(intervalClose);
                     }
                     iterations++;
-                }, 100)
+                }, 500)
             }
 
             iterations++;
-        }, 100);
+        }, 500);
 
     })
 

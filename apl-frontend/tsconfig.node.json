@@ -1,5 +1,7 @@
 {
   "compilerOptions": {
+    "target": "es2015",
+    "downlevelIteration": true,
     "composite": true,
     "module": "ESNext",
     "moduleResolution": "Node",

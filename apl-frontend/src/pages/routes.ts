@@ -13,6 +13,7 @@ import AnkiConnect from "./Setup/Anki/AnkiConnect.vue";
 import AnkiSuccess from "./Setup/Anki/AnkiSuccess.vue";
 import AnkiFailure from "./Setup/Anki/AnkiFailure.vue";
 import MacosPermissions from "./Setup/Macos-permissions.vue";
+import AnkiManualConnect from "./Setup/Anki/AnkiManualConnect.vue";
 
 const routes:RouteRecordRaw[] = [
     { path: '/', component: PageSelector },
@@ -29,6 +30,7 @@ const routes:RouteRecordRaw[] = [
     { path: '/setup/anki-connect', component: AnkiConnect },
     { path: '/setup/anki-success', component: AnkiSuccess },
     { path: '/setup/anki-failure', component: AnkiFailure },
+    { path: "/setup/anki-manual-connect", component: AnkiManualConnect },
   ]
 
 export default routes;

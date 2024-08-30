@@ -87,7 +87,6 @@ async function createWindow() {
   // win.webContents.on('will-navigate', (event, url) => { }) #344
 
   win.webContents.once('did-finish-load', () => { 
-    console.log(win);
   })
 }
 

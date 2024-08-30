@@ -25,7 +25,7 @@
                 Get Started with AutoProgressLog
 
             </div>
-            <Button label="Let's go!" @click="NextPage" class="w-full bg-green-500 text-white font-semibold text-xl rounded-xl p-2 mt-10"/>
+            <Button label="Let's go!" @click="NextPage" class="w-full text-white font-semibold text-xl rounded-xl p-2 mt-10"/>
 
         </div>
     </div>

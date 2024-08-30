@@ -26,8 +26,6 @@
         if(min == undefined) return;
         const delta = max.matureCardCount - min.matureCardCount;
         const lineValue = Math.ceil(delta / bgGradient.length) 
-        console.log(lineValue);
-        console.log(sortedDataByMature);
 
         return ({
             lines : sortedDataByReport.value.map(x => {

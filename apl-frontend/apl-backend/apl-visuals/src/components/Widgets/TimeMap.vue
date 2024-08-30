@@ -18,10 +18,8 @@
     const cardData = computed(() => {
         const max = sortedDataByRelativeCount.value[0];
         const min = sortedDataByRelativeCount.value.at(-1);
-        console.log(props.data);
         if(min == undefined) return;
         const delta = max.value - min.value;
-        console.log(delta);
         return sortedDataByReport.value.map(x => {
             return {
                 reportNo: x.reportNo,

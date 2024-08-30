@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "target": "ESNext",
+    "downlevelIteration": true,
     "useDefineForClassFields": true,
     "module": "ESNext",
     "moduleResolution": "Node",

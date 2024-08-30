@@ -24,7 +24,7 @@
             <div>
                 <img :src="Logo" class=" w-12 h-12">
             </div>
-            <div class="flex flex-col flex-grow py-10 justify-start gap-1 text-left ">
+            <div class="flex flex-col flex-grow py-5 justify-start gap-1 text-left ">
                 <BackButton route="/setup/client-server-selection"/>
                 <div class="font-semibold text-3xl text-white">
                     Time to find and connect your Toggl Track account!
