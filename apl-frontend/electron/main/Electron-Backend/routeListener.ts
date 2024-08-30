@@ -30,7 +30,7 @@ export function routeListeners(){
 
 
     ipcMain.handle("PageSelect", (event, args) => {
-        if(getConfig() != null){
+        if(getConfig() === null){
             return "/setup/index";
         }
         else{

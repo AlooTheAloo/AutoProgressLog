@@ -40,9 +40,8 @@ if(!CacheManager.exists){
     else{
         console.log(colors.red(`No cache to upgrade found.`));
         console.log("If it's your first time using AutoProgressLog use 'npm run config' or 'bun run config'");
-        process.exit(0);
     }
     
 }
 
-appUpgrade(CacheManager.get(false))
+//appUpgrade(CacheManager.get(false))

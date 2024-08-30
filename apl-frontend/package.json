@@ -44,7 +44,7 @@
     "get-windows": "^9.2.0",
     "int": "^0.2.0",
     "keytar": "^7.9.0",
-    "node-mac-permissions": "2.3.0",
+    "node-mac-permissions": "^2.4.0",
     "node-schedule": "^2.1.1",
     "path": "^0.12.7",
     "primeicons": "^7.0.0",
