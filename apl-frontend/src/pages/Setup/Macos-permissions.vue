@@ -14,24 +14,25 @@
 
     <SetupBackground></SetupBackground>
 
-    <div class=" flex w-screen">
-        <div class=" p-12 flex flex-col w-2/3  bg-black h-screen">
-            <div>
-                <img :src="Logo" class=" w-12 h-12">
+    <div class="flex w-screen">
+    <div class="pl-[94px] p-12 flex flex-col w-[950px] bg-black h-screen">
+        <div class="mb-[36px]">
+            <img :src="Logo" class="w-[96px] h-[96px] p-1 bg-white rounded-xl justify-center items-center gap-1 inline-flex">
+        </div>
+        <div class="flex flex-col flex-grow justify-start mt-10 gap-y-[18px] text-left font-semibold text-5xl">
+            <div class="text-white">
+                It seems that your device is <br> running MacOS.
             </div>
-            <div class="flex flex-col flex-grow justify-start mt-10 gap-2 text-left font-semibold text-4xl">
-                <div>
-                    Hi i need perms idiot
-                </div>
-                <div class="text-gray-600 font-light mb-5 text-lg ">
-                    Lorem ipsum dolor sit amet consectur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                </div>
-
+            <div class="w-[740px] opacity-80 text-white text-2xl font-semibold">
+                To proceed with the setup, we need the screen and audio <br> recording permission for some operations during the setup.
             </div>
-            <Button label="Give perms" @click="NextPage" class="bg-green-500 text-white font-semibold text-xl rounded-xl p-2 mt-10"/>
-
+        </div>
+        <div class="w-full flex justify-end">
+            <Button label="Continue" rounded @click="NextPage" style="font-weight: bold;" class="w-[322.35px] h-[60.82px] bg-white flex items-center justify-center mr-[35px] font-bold text-[32.44px]"/>
+        </div>
         </div>
     </div>
+
     
 
 </template>
