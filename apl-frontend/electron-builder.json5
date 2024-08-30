@@ -11,6 +11,12 @@
     "dist",
     "dist-electron"
   ],
+  "dmg": {
+    "window": {
+      "width": 540,
+      "height": 380
+    },
+  },
   "mac": {
     "target": [
       "dmg"
