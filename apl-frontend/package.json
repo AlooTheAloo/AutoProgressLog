@@ -18,6 +18,7 @@
     "preview": "vite preview"
   },
   "devDependencies": {
+    "@types/pluralize": "^0.0.33",
     "@types/semver": "^7.5.8",
     "@vitejs/plugin-vue": "^5.0.4",
     "autoprefixer": "^10.4.20",
@@ -47,9 +48,11 @@
     "node-mac-permissions": "^2.4.0",
     "node-schedule": "^2.1.1",
     "path": "^0.12.7",
+    "pluralize": "^8.0.0",
     "primeicons": "^7.0.0",
     "primevue": "^4.0.5",
     "request": "^2.88.2",
+    "round-to": "^6.0.0",
     "sqlite3": "^5.1.7",
     "tldjs": "^2.3.1",
     "toggl-track": "^0.8.0",

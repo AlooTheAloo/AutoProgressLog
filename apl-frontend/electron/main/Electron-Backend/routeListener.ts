@@ -1,11 +1,10 @@
 import { ipcMain } from "electron";
 import { getConfig } from "../../../apl-backend/Helpers/getConfig";
-import { RouteLocationRaw } from "vue-router";
 import { appUpgrade } from "../../../apl-backend/entry/upgrade";
 import { CacheManager } from "../../../apl-backend/Helpers/cache";
 import { shell } from "electron";
-import { hasPerms } from "../../../apl-backend/entry/tests";
 import permissions from "node-mac-permissions";
+import { hasPerms } from "../../../apl-backend/Helpers/readWindows";
 
 export function routeListeners(){
 

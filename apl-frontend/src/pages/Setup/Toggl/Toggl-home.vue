@@ -26,7 +26,7 @@
             </div>
             <div class="flex flex-col flex-grow py-5 justify-start gap-1 text-left ">
                 <BackButton route="/setup/client-server-selection"/>
-                <div class="font-semibold text-3xl text-white">
+                <div class="font-semibold text-4xl text-white">
                     Time to find and connect your Toggl Track account!
                 </div>
                 <div class="text-sm">

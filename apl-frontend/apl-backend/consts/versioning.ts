@@ -1,2 +1,2 @@
-export const appVersion = "1.0.1"
+export const appVersion = "1.0.0"
 export type Version = string

@@ -7,7 +7,6 @@
     import BackButton from '../../../components/Common/BackButton.vue';
     import AnkiLogo from '../../../assets/AnkiLogo.png';
     import { ref } from 'vue';
-    const message = ref<string>();
     const router = useRouter()
 
     function NextPage(){
@@ -39,7 +38,7 @@
                             <i class="pi pi-times-circle text-red-300" style="font-size: 2rem"/>
                             <img :src="Logo" class=" w-14"/>
                         </div>
-                        <div class="text text-2xl text-center text-white">
+                        <div class="font-semibold text-2xl text-center text-white">
                             Failed to connect to Anki
                         </div>
                     </div>

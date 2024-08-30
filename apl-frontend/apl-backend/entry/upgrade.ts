@@ -4,7 +4,6 @@ import { appVersion } from "../consts/versioning";
 import { cacheList } from "../types/cache";
 import colors from "colors" 
 import fs from "fs"
-import { v1_0_1 } from "../versioning/1_0_1";
 import { fileURLToPath } from "url";
 import { registerRuntimeCompiler } from "vue";
 
@@ -17,7 +16,6 @@ export const appUpgrade = async (cacheList:cacheList) => {
         return;
     }
 
-    await v1_0_1(cacheList);
     console.log(colors.green(`Upgrade complete! `))
 } 
 

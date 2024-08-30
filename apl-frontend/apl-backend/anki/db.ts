@@ -1,6 +1,7 @@
 import dayjs, { Dayjs } from 'dayjs';
 import sqlite3, { Database } from 'sqlite3'
 import { getConfig } from '../Helpers/getConfig.js';
+import { ankiIntegration, RetentionMode } from '../types/options.js';
 
 interface reviewsrow {
     reviews:number
@@ -10,10 +11,10 @@ interface maturerow {
     mature:number
 }
 
-export async function getAnkiCardReviewCount(startTime:Dayjs){
+export async function getAnkiCardReviewCount(startTime:Dayjs, ankiIntegration:ankiIntegration){
     return new Promise<number|null>((res, rej) => {
         // Create a database connection
-        const db = open();
+        const db = open(ankiIntegration);
 
         // Execute SQL query
         db.all('SELECT COUNT(*) as "reviews" FROM revlog WHERE id > ' + startTime.valueOf(), (err, rows:reviewsrow[]) => {
@@ -31,16 +32,14 @@ export async function getAnkiCardReviewCount(startTime:Dayjs){
     })
 }
 
-export type retentionMode = "default_anki" | "true_retention"
 
-
-export async function getRetention(retentionMode:retentionMode = "true_retention"){
+export async function getRetention(retentionMode:RetentionMode = "true_retention", ankiIntegration:ankiIntegration){
     return new Promise<number|null>((res, rej) => {
         // A month ago
         const aMonthAgo = dayjs().subtract( retentionMode == "true_retention" ? 30 : 29, "days").unix() * 1000;
 
         // Create a database connection
-        const db = open();
+        const db = open(ankiIntegration);
 
         if(retentionMode == "default_anki"){
             // Execute SQL query
@@ -82,10 +81,10 @@ export async function getRetention(retentionMode:retentionMode = "true_retention
 
 
 
-export async function getMatureCards(){
+export async function getMatureCards(ankiIntegration:ankiIntegration){
     return new Promise<number|null>((res, rej) => {
         // Create a database connection
-        const db = open();
+        const db = open(ankiIntegration);
         // Execute SQL query
         db.all('SELECT COUNT(*) as "mature" from cards WHERE ivl >= 21;', (err, rows:maturerow[]) => {
             if (err) {
@@ -102,8 +101,8 @@ export async function getMatureCards(){
 
 }
 
-function open(){
-    return new sqlite3.Database(getConfig().anki.ankiDB ?? "", (err) => {
+function open(ankiIntegration:ankiIntegration){
+    return new sqlite3.Database(ankiIntegration.ankiDB ?? "", (err) => {
         if (err) {
             console.log(err);
         }

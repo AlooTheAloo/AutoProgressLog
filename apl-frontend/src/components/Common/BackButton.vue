@@ -17,7 +17,7 @@
 </script>
 
 <template>
-    <div class="w-fit ">
-        <Button style="padding: 7px 0px 7px 0px;" label="Go back" link="" icon="pi-angle-left pi" @click="Back" class="p-0 h-12"/>
+    <div class="w-fit h-8 ">
+        <Button style="padding: 0;" label="Go back" link="" icon="pi-angle-left pi" @click="Back" class="p-0 h-8"/>
     </div>
 </template>

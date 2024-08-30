@@ -7,8 +7,8 @@ import proc from 'find-process';
 import { app } from "electron";
 import path, { basename } from "path";
 import remote from "electron";
-import { readWindows } from "../entry/tests.js";
 import { kill } from "process";
+import { readWindows } from "../Helpers/readWindows.js";
 
 interface ankiPaths{
     ankiDB: string,

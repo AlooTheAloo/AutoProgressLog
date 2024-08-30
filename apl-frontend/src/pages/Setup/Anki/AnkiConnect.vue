@@ -38,8 +38,10 @@ import { ref } from 'vue';
     <div class=" flex w-screen">
         <div class=" p-12 flex flex-col w-2/3 bg-black h-screen">
             <AccountDisplay/>
-            <div class="flex flex-col flex-grow  gap-2 text-left font-semibold text-4xl">
-                <div class="font-semibold text-white mt-16">
+            <div class="flex flex-col flex-grow py-5 gap-2 text-left font-semibold text-4xl">
+                <div class="h-8">
+                </div>
+                <div class="font-semibold text-white">
                     Connecting to Anki...
                 </div>
                 <p class="text-sm">
@@ -52,7 +54,7 @@ import { ref } from 'vue';
                             <ProgressSpinner style="width: 50px; height: 50px"/>
                             <img :src="Logo" class=" w-14"/>
                         </div>
-                        <div class="text text-2xl text-center text-white">
+                        <div class="text-2xl text-center text-white">
                             {{ message }}...
                         </div>
                     </div>

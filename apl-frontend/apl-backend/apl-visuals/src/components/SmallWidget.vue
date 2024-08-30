@@ -11,7 +11,8 @@
         units?:string,
         condense?:boolean,
         image:string,
-        deltaOverride?:number
+        deltaOverride?:number,
+        hideDelta?:boolean
     }
 
     const hrValue = computed(() => {
@@ -23,7 +24,7 @@
 </script>
 
 <template>
-  <div class=" w-72 h-36 bg-black rounded-xl flex flex-grow items-center justify-center">
+  <div class="w-72 h-36 bg-black rounded-xl flex flex-grow items-center justify-center">
     <div class="h-36 w-72 flex justify-end pr-5 absolute">
         <div class=" mt-5 w-10">
             <img v-bind:src="image">
@@ -34,7 +35,7 @@
             <div class="font-normal tracking-wider">
                 {{ title }}
             </div>
-            <div class="font-extrabold text-3xl">
+            <div class="font-extrabold text-3xl" v-if="!hideDelta">
                 <div class=" flex flex-row">
                     <div>
                         {{ hrValue }} {{ units ?? "" }}

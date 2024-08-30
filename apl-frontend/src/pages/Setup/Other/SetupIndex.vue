@@ -1,7 +1,7 @@
 <script setup lang="ts">
-    import Logo from '../../assets/Logo.png'
+    import Logo from '../../../assets/Logo.png'
     import { useRoute, useRouter } from 'vue-router';
-    import SetupBackground from '../../components/Setup/SetupBackground.vue';
+    import SetupBackground from '../../../components/Setup/SetupBackground.vue';
     import Button from 'primevue/button';
 
     const router = useRouter()
@@ -21,7 +21,7 @@
             <div>
                 <img :src="Logo" class=" w-12 h-12">
             </div>
-            <div class="flex flex-col flex-grow  justify-center gap-2 text-left font-semibold text-4xl">
+            <div class="flex flex-col flex-grow text-white justify-center gap-2 text-left font-semibold text-4xl">
                 Get Started with AutoProgressLog
 
             </div>

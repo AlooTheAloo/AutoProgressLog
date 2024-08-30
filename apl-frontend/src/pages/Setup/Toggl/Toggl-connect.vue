@@ -48,20 +48,25 @@
             <div class="">
                 <img :src="Logo" class=" w-12 h-12">
             </div>
-            <div class="flex flex-col flex-grow py-10 justify-start gap-1 text-left " v-if="togglAccounts == undefined">
-                <div class="font-semibold text-3xl text-white">
+
+            <div class="flex flex-col flex-grow py-5 justify-start gap-1 text-left " v-if="togglAccounts == undefined">
+                <div class="h-8">
+                </div>
+                <div class="font-semibold text-4xl text-white">
                     Connecting to your Toggl Track account...
                 </div>
                 <div class="text-sm">
-                    You may be asked to give permission during this process.
+                    You may be asked to grant us permissions during this process.
                 </div>
                 <div class="flex flex-grow  items-center justify-between">
                     <ProgressSpinner />
                 </div>
             </div>
-            <div  class="flex flex-col flex-grow py-5 justify-start gap-1 text-left " v-else>
+            <div class="flex flex-col flex-grow py-5 justify-start gap-2 text-left " v-else>
+                <div class="h-8">
+                </div>
                 <div v-if="togglAccounts.length == 0" class="flex flex-col h-full">
-                    <div class="font-semibold text-3xl">
+                    <div class="font-semibold text-4xl">
                         No Toggl Track accounts found!
                     </div>
                     <div class="text-sm">
@@ -73,7 +78,7 @@
                     </div>
                 </div>
                 <div v-else-if="togglAccounts.length == 1" class="flex flex-col flex-grow">
-                    <div class="font-semibold text-3xl text-white">
+                    <div class="font-semibold text-4xl text-white">
                         We found your Toggl Track account!
                     </div>
                     <div class="flex flex-grow items-center">
@@ -96,7 +101,7 @@
                     </div>
                 </div>
                 <div v-else class="h-full flex flex-col">
-                    <div class="font-semibold text-3xl text-white">
+                    <div class="font-semibold text-4xl text-white">
                         We found {{togglAccounts.length}} Toggl Track accounts on your device.
                     </div>
                     <div class="text-sm">

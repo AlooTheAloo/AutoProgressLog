@@ -1,7 +1,7 @@
 import { RouteRecordRaw } from "vue-router";
 import PageSelector from "./PageSelector.vue";
-import SetupClientServerSelection from "./Setup/Setup-client-server-selection.vue";
-import SetupIndex from "./Setup/SetupIndex.vue";
+import SetupClientServerSelection from "./Setup/Other/Setup-client-server-selection.vue";
+import SetupIndex from "./Setup/Other/SetupIndex.vue";
 import TogglHome from "./Setup/Toggl/Toggl-home.vue";
 import TogglConnect from "./Setup/Toggl/Toggl-connect.vue";
 import TogglManualConnect from "./Setup/Toggl/Toggl-manual-connect.vue";
@@ -12,8 +12,11 @@ import AnkiHome from "./Setup/Anki/AnkiHome.vue";
 import AnkiConnect from "./Setup/Anki/AnkiConnect.vue";
 import AnkiSuccess from "./Setup/Anki/AnkiSuccess.vue";
 import AnkiFailure from "./Setup/Anki/AnkiFailure.vue";
-import MacosPermissions from "./Setup/Macos-permissions.vue";
+import MacosPermissions from "./Setup/Other/Macos-permissions.vue";
 import AnkiManualConnect from "./Setup/Anki/AnkiManualConnect.vue";
+import AnkiReading from "./Setup/Anki/AnkiReading.vue";
+import PickFilename from "./Setup/Other/Pick-Filename.vue";
+import SetupComplete from "./Setup/Other/SetupComplete.vue";
 
 const routes:RouteRecordRaw[] = [
     { path: '/', component: PageSelector },
@@ -31,6 +34,9 @@ const routes:RouteRecordRaw[] = [
     { path: '/setup/anki-success', component: AnkiSuccess },
     { path: '/setup/anki-failure', component: AnkiFailure },
     { path: "/setup/anki-manual-connect", component: AnkiManualConnect },
+    { path: "/setup/anki-reading", component: AnkiReading },
+    { path: "/setup/pick-filename", component: PickFilename },
+    { path: "/setup/complete", component: SetupComplete },
   ]
 
 export default routes;

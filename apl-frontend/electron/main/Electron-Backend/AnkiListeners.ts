@@ -1,32 +1,27 @@
 import { dialog, ipcMain } from "electron"
 import { createAnkiIntegration, getAnkiDBPaths, verifyAnkiPaths } from "../../../apl-backend/config/configAnkiIntegration";
 import { win } from "..";
-import { hasPerms, macOSRequirePerms } from "../../../apl-backend/entry/tests";
 import { ankiIntegration } from "../../../apl-backend/types/options";
-import { setAnkiIntegration } from "./SetupConfigBuilder";
+import { getSetupAnkiIntegration, setAnkiIntegration } from "./SetupConfigBuilder";
+import { getAnkiCardReviewCount, getMatureCards, getRetention } from "../../../apl-backend/anki/db";
+import { roundTo } from "round-to";
+import { hasPerms } from "../../../apl-backend/Helpers/readWindows";
 
 export function ankiListeners() {
+
+    ipcMain.handle("anki-read-data", async (event: any, arg: any) => {
+        const retention = await getRetention(arg, getSetupAnkiIntegration());
+        const matureCards = await getMatureCards(getSetupAnkiIntegration());
+        return {
+            retentionRate: roundTo(retention, 2),
+            matureCardCount: matureCards 
+        }
+    });
+
     ipcMain.handle("anki-connect-start", async (event: any, arg: any) => {
         win.webContents.send("anki-connect-message", "Locating Anki Paths");
         const Paths = await getAnkiDBPaths();
-
-        win.webContents.send("anki-connect-message", "Verifying validity of installation");
-        const verified = await verifyAnkiPaths(Paths);
-
-        let ankiIntegration:ankiIntegration|false = false;
-        if(process.platform == "darwin"){
-            ankiIntegration = await macOSAnki(Paths);
-        }
-        else {
-
-        }
-
-        if(ankiIntegration){
-            //setAnkiIntegration(ankiIntegration);
-        }
-
-        return !!ankiIntegration
-
+        return await connectFromPaths(Paths);
     });
 
 
@@ -35,16 +30,21 @@ export function ankiListeners() {
             ankiDB: dbPath,
             ankiPath: appPath
         }
+        return await connectFromPaths(Paths);
+        
+    });
 
+    async function connectFromPaths(Paths:any){
         win.webContents.send("anki-connect-message", "Verifying validity of installation");
         const verified = await verifyAnkiPaths(Paths);
+        if(!verified) return false;
 
         let ankiIntegration:ankiIntegration|false = false;
         if(process.platform == "darwin"){
             ankiIntegration = await macOSAnki(Paths);
         }
         else {
-
+            return await createAnkiIntegration(Paths);
         }
 
         if(ankiIntegration){
@@ -52,7 +52,8 @@ export function ankiListeners() {
         }
 
         return !!ankiIntegration;
-    });
+    }
+
 
 
     ipcMain.handle("SelectAppPath", async (event: any, arg: any) => {

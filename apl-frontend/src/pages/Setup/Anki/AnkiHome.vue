@@ -20,13 +20,13 @@
     <div class=" flex w-screen">
         <div class=" p-12 flex flex-col w-2/3 bg-black h-screen">
             <AccountDisplay/>
-            <div class="flex flex-col flex-grow py-5 gap-2 text-left font-semibold text-4xl">
-                <BackButton route="/setup/toggl-home"/>
-                <div class="font-semibold text-white">
+            <div class="flex flex-col flex-grow py-5 justify-start gap-2 text-left">
+                <BackButton route="/setup/toggl-success"/>
+                <div class="font-semibold text-white text-4xl">
                     Time to connect to Anki.
                 </div>
                 <p class="text-sm">
-                    Lorem ipsum dolor sit amet consectetur. Elementum malesuada posuere lacus in euismod vulputate volutpat. 
+                    Support for other Spaced Repetition Software (SRS) will be added in the future.
                 </p>
                 <div class="flex justify-center flex-grow items-center">
                     <div class="flex flex-col gap-2 items-center w-[30rem] ">
@@ -35,14 +35,20 @@
                             <i class="pi pi-link" style="font-size: 2rem"></i>
                             <img :src="Logo" class=" w-14"/>
                         </div>
-                        <div class="text-red-500 text-2xl text-center">
+                        <div class="text-red-500 text-2xl font-semibold text-center">
                             Please close all instances of Anki before continuing.
                         </div>
                     </div>
                 </div>
-                
+                <div class="flex justify-end">
+                    <Button 
+                    @click="NextPage"
+                    style="width: 120px;"
+                    label="Continue"
+                    />    
+                </div>
+                                
             </div>
-            <Button label="Let's go!" @click="NextPage" class="h-12 w-full text-white font-semibold text-xl rounded-xl p-2 mt-10"/>
 
         </div>
     </div>

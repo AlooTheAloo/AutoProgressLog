@@ -30,7 +30,6 @@ const locations = {
         `${process.env.LOCALAPPDATA}\\Google\\Chrome SxS\\User Data`,
         `${process.env.LOCALAPPDATA}\\Chromium\\User Data`
     ],
-    // TODO: consider the `~/.config` part can be overriden by $CHROME_VERSION_EXTRA or $XDG_CONFIG_HOME
     linux: [
         `${os.homedir()}/.config/google-chrome`,
         `${os.homedir()}/.config/google-chrome-beta`,

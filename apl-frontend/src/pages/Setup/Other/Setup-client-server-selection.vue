@@ -1,17 +1,20 @@
 <script setup lang="ts">
     import { useRoute, useRouter } from 'vue-router';
-    import SetupBackground from '../../components/Setup/SetupBackground.vue';
+    import SetupBackground from '../../../components/Setup/SetupBackground.vue';
     import Card from 'primevue/card';
-    import Server from "../../assets/Server.png";
-    import Client from "../../assets/Client.png";
+    import Server from "../../../assets/Server.png";
+    import Client from "../../../assets/Client.png";
     import { useWindowSize } from '@vueuse/core'
-    import Logo from '../../assets/Logo.png'
+    import Logo from '../../../assets/Logo.png'
+import BackButton from '../../../components/Common/BackButton.vue';
     const router = useRouter()
     function SelectClient(){
+        window.ipcRenderer.invoke("SetDeviceType", "Client");
         router.push('/setup/Toggl-home');
     }
 
     function SelectServer(){    
+        window.ipcRenderer.invoke("SetDeviceType", "Server");
         router.push('/setup/server-setup');
     }
 
@@ -24,14 +27,15 @@
 
         <div class=" flex w-screen">
             <div class=" p-12 flex flex-col w-2/3  bg-black h-screen">
-                <div class="absolute" v-if="height > 650">
+                <div class="" v-if="height > 650">
                     <img :src="Logo" class=" w-12 h-12">
                 </div>
-                <div class="flex flex-col flex-grow  justify-center gap-2 text-left ">
+                <div class="flex flex-col flex-grow py-5 gap-2 text-left ">
+                    <BackButton route="/setup/index"/>
                     <div class="font-semibold text-4xl text-white">
                         What will this device be?
                     </div>
-                    <div class="text-gray-600 font-light mb-5 text-xs lg:text-sm">
+                    <div class="font-light mb-5 text-xs lg:text-sm">
                         AutoProgressLog works on servers and home computers. If you are running this on your own computer, the client mode is strongly recommended. Select the server mode only if you know that your computer will always be turned on and connected to the internet.
                     </div>
                     <div class="flex gap-12 select-none ">

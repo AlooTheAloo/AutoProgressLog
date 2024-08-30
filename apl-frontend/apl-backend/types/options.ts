@@ -1,16 +1,24 @@
 export interface options {
-    runtime: "Bun" | "Node",
-    type : "Server" | "Manual"
+    type : "Server" | "Client"
     serverOptions?:ServerOptions
     toggl:{
         togglToken:string,
     }
-    anki:ankiIntegration
+    anki: {
+        ankiIntegration:ankiIntegration
+        options?: {
+            retentionMode: RetentionMode
+        }
+    }
     outputOptions:{
-        enabled:boolean
-        outputFileName?:string
+        outputFile:{
+            name:string,
+            extension: ".png" | ".jpg" | ".jpeg" | ".svg" | ".pdf"
+        }
     }
 }
+
+export type RetentionMode = "default_anki" | "true_retention"
 
 export interface Time {
     hours: number;

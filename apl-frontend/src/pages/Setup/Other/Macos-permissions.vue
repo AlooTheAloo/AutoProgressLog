@@ -1,7 +1,7 @@
 <script setup lang="ts">
-    import Logo from '../../assets/Logo.png'
+    import Logo from '../../../assets/Logo.png'
     import { useRoute, useRouter } from 'vue-router';
-    import SetupBackground from '../../components/Setup/SetupBackground.vue';
+    import SetupBackground from '../../../components/Setup/SetupBackground.vue';
     import Button from 'primevue/button';
 
     const router = useRouter()

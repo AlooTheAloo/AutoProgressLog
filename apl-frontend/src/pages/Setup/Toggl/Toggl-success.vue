@@ -32,9 +32,9 @@
             <img :src="Logo" class=" w-12 h-12">
         </div>
         <ProgressSpinner v-if="togglAccount === undefined" class="flex-grow w-full h-full"></ProgressSpinner>
-        <div v-else class="flex flex-col flex-grow pt-5 justify-start gap-2 text-left ">
+        <div v-else class="   flex flex-col flex-grow py-5 justify-start gap-2 text-left ">
             <BackButton route="/setup/toggl-home"/>
-            <div class="font-semibold text-3xl text-white">
+            <div class="font-semibold text-4xl text-white">
                 The account was successfully linked !
             </div>
             
