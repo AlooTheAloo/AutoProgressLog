@@ -1,14 +1,14 @@
 <script setup lang="ts">
     import Logo from '../../../assets/Logo.png'
-    import { useRoute, useRouter } from 'vue-router';
+    import { useRouter } from 'vue-router';
     import SetupBackground from '../../../components/Setup/SetupBackground.vue';
     import Button from 'primevue/button';
     import BackButton from '../../../components/Common/BackButton.vue';
     import InputText from 'primevue/inputtext';
     import { onMounted } from 'vue';
-import Dropdown from 'primevue/dropdown';
+    import Dropdown from 'primevue/dropdown';
 
-    const extensions = [".png", ".jpg", ".jpeg", ".svg", ".pdf"];
+    const extensions = [".png", ".jpg", ".jpeg", ".webp", ".pdf"];
 
     const selectedExtension = defineModel<string>('selectedExtension');
     const filename = defineModel<string>('filename');

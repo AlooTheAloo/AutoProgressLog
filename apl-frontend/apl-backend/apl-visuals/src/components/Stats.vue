@@ -45,9 +45,10 @@
         </div>
       </div>
     </div>
-    <div class="w-full ">
+    <div class="w-full">
       <TotalScore :data="reportData"></TotalScore>
     </div>
+    
   </div> 
   <!-- 
 

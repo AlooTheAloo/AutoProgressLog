@@ -118,6 +118,7 @@ async function LaunchAnki(paths:ankiPaths){
         
             const pid = targetProcesses[0].pid;
             if((await readWindows([pid])).length > 0){
+                await sleep(1000);
                 kill(pid);
                 clearInterval(intervalOpen);
                 var intervalClose = setInterval(async () => {

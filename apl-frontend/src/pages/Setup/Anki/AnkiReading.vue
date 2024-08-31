@@ -59,7 +59,7 @@
             <div class="flex flex-col flex-grow py-5 gap-2 text-left ">
                 <BackButton route="/setup/anki-home"/>
                 <div class="font-semibold text-white text-4xl">
-                    Now, let’s try to read some data.
+                    Now, let's try to read some data.
                 </div>
                 <p class="text-sm">
                     Now that anki is connected, here are some statistics. <br>Please also use this opportunity to select your desired retention algorithm.             
@@ -93,7 +93,7 @@
                             Total Mature Cards
                         </div>
                         <div class="font-extrabold text-3xl">
-                            <div class=" flex flex-row">
+                            <div class=" flex flex-row text-white">
                                 <div>
                                     {{ pluralize("cards", cardCount, true)}} 
                                 </div>
@@ -117,7 +117,7 @@
                             Retention rate
                         </div>
                         <div class="font-extrabold text-3xl">
-                            <div class=" flex flex-row">
+                            <div class=" flex flex-row text-white">
                                 <div>
                                     {{ retentionRate }}% 
                                 </div>

@@ -13,7 +13,7 @@ export interface options {
     outputOptions:{
         outputFile:{
             name:string,
-            extension: ".png" | ".jpg" | ".jpeg" | ".svg" | ".pdf"
+            extension: ".png" | ".jpg" | ".jpeg" | ".webp" | ".pdf"
         }
     }
 }

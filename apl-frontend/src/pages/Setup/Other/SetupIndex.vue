@@ -23,7 +23,6 @@
             </div>
             <div class="flex flex-col flex-grow text-white justify-center gap-2 text-left font-semibold text-4xl">
                 Get Started with AutoProgressLog
-
             </div>
             <Button label="Let's go!" @click="NextPage" class="w-full text-white font-semibold text-xl rounded-xl p-2 mt-10"/>
 

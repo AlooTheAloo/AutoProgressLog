@@ -2,6 +2,8 @@ import { ipcMain } from "electron"
 import { TogglAccount } from "../../../apl-backend/entry/FindAccounts"
 import { Tags, Toggl } from 'toggl-track';
 import { ankiIntegration, options, RetentionMode, ServerOptions, TimeInterval } from "../../../apl-backend/types/options";
+import { writeFileSync } from "fs";
+import { configPath } from "../../../apl-backend/Helpers/getConfig";
 
 let account:TogglAccount = undefined;
 const config:Partial<options> = {}
@@ -18,6 +20,12 @@ export function getSetupAnkiIntegration():ankiIntegration{
 
 
 export function setupListeners() {
+
+    ipcMain.handle("SaveConfig", (event: any, arg: any) => {
+        console.log(configPath)
+        writeFileSync(configPath, JSON.stringify(config));
+    })
+
     ipcMain.handle("SetOutputFile", (event: any, arg: any) => {
         config.outputOptions = {
             outputFile: arg

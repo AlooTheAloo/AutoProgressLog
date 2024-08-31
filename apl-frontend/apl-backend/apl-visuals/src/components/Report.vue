@@ -34,6 +34,9 @@ import reportdataurl from "/report-data.json?url"
               Generated on {{ dayjs(MY_JSON.time).format('DD/MM/YYYY [at] H:mm')  }}
             </h2>
             <Stats v-bind:reportData="MY_JSON"  />
+            <div class="flex justify-center items-center h-full text-[#727272]">
+              www.aplapp.dev • Made with ♥ by AlooTheAloo and Retexc 
+            </div>
           </div>
         </div> 
       </div>

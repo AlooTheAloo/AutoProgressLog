@@ -1,10 +1,11 @@
-import { app, BrowserWindow, shell, ipcMain } from 'electron'
+import { app, BrowserWindow, shell, ipcMain, Menu, MenuItem } from 'electron'
 import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
 import registerEvents from "./Electron-Backend/";
 import path from 'node:path'
 import os from 'node:os'
 import { getAccounts } from '../../apl-backend/entry/FindAccounts';
+import { buildMenu } from './Electron-App/MenuBuilder';
 
 const require = createRequire(import.meta.url)
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -66,6 +67,9 @@ async function createWindow() {
     },
   })
 
+  win.setMenuBarVisibility(false);
+
+
   if (VITE_DEV_SERVER_URL) { // #298
     win.loadURL(VITE_DEV_SERVER_URL)
     // Open devTool if the app is not packaged
@@ -89,6 +93,7 @@ async function createWindow() {
   win.webContents.once('did-finish-load', () => { 
   })
 }
+
 
 app.whenReady().then(createWindow)
 
@@ -115,4 +120,7 @@ app.on('activate', () => {
 })
 
 
+app.on("ready", async () => {
+  buildMenu(app);
+});
 

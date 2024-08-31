@@ -7,7 +7,7 @@ import PrimeVue from 'primevue/config';
 import Aura from '@primevue/themes/aura';
 import { definePreset } from '@primevue/themes'
 import Ripple from 'primevue/ripple';
-import routes from './pages/routes'
+import routes from './pages/routes/routes'
 import 'primeicons/primeicons.css'
 
 

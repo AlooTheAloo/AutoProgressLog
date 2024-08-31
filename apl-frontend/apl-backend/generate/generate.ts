@@ -76,7 +76,7 @@ export async function runGeneration(){
     }, allEvents, startCache, timeToAdd);
 
     // Output
-    CacheManager.push(ans.cache)
+    // CacheManager.push(ans.cache)
     // const outputPath = path.join(__dirname, "..", "output", `${(getConfig().outputOptions.outputFileName ?? "output")} #${startCache.reportNo + 1}.txt`)
     // fs.writeFileSync(outputPath , ans.message);
 }

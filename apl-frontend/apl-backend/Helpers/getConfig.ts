@@ -7,11 +7,12 @@ import electron from "electron";
 let config:options|null = null;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const configPath = path.join(electron.app.getPath("userData"), "config.json") 
+export const configPath = path.join(electron.app.getPath("userData"), "config.json") 
 
 
 export function getConfig():options|null{
     if(config == null){
+        console.log(configPath)
         if(!fs.existsSync(configPath)) {
             return null;
         }

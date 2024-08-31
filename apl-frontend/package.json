@@ -1,5 +1,5 @@
 {
-  "name": "apl-frontend",
+  "name": "autoprogresslog",
   "version": "1.0.0",
   "main": "dist-electron/main/index.js",
   "description": "The frontend and configuration interface for the APL desktop app. Based upon the work of Leo Wang's electron-vue-vite template.",
@@ -51,6 +51,7 @@
     "pluralize": "^8.0.0",
     "primeicons": "^7.0.0",
     "primevue": "^4.0.5",
+    "puppeteer": "^23.2.1",
     "request": "^2.88.2",
     "round-to": "^6.0.0",
     "sqlite3": "^5.1.7",

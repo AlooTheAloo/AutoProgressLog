@@ -37,7 +37,8 @@ export function routeListeners(){
             if(!ver){
                 appUpgrade(CacheManager.get(false));
             }
-             return "page2";
+            
+            return "/app/dashboard";
         }
      });
 
