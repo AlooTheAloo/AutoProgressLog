@@ -1,0 +1,309 @@
+{
+    "reportNo":"51",
+    "time":"2025-05-20T03:00:00.630Z",
+
+    "matureCards":[
+        {
+            "reportNo":51,
+            "matureCardCount": 5432
+        },
+        {
+            "reportNo":50,
+            "matureCardCount": 5430
+        },
+        {
+            "reportNo":49,
+            "matureCardCount": 5429
+        },
+        {
+            "reportNo":48,
+            "matureCardCount": 5427
+        },
+        {
+            "reportNo":47,
+            "matureCardCount": 5425
+        }
+    ],
+    "retentionRate": {
+        "current":96.4411111,
+        "delta":0.02
+    },
+    "totalReviews": {
+        "current":6250,
+        "delta": 230
+    },
+    "AnkiStreak": {
+        "current": 51,
+        "delta": 1
+    },
+    "AnkiData": [
+        {
+            "reportNo":27,
+            "value":100
+        },
+        {
+            "reportNo":28,
+            "value":100
+        },
+        {
+            "reportNo":29,
+            "value":100
+        },
+        {
+            "reportNo":30,
+            "value":100
+        },
+        {
+            "reportNo":32,
+            "value":100
+        },
+        {
+            "reportNo":33,
+            "value":100
+        },
+        {
+            "reportNo":34,
+            "value":100
+        },
+        {
+            "reportNo":35,
+            "value":100
+        },
+        {
+            "reportNo":36,
+            "value":100
+        },
+        {
+            "reportNo":37,
+            "value":100
+        },
+        {
+            "reportNo":38,
+            "value":100
+        },
+        {
+            "reportNo":39,
+            "value":100
+        },
+        {
+            "reportNo":40,
+            "value":100
+        },
+        {
+            "reportNo":41,
+            "value":100
+        },
+        {
+            "reportNo":42,
+            "value":100
+        },
+        {
+            "reportNo":43,
+            "value":100
+        },
+        {
+            "reportNo":44,
+            "value":100
+        },
+        {
+            "reportNo":45,
+            "value":100
+        },
+        {
+            "reportNo":46,
+            "value":100
+        },
+        {
+            "reportNo":47,
+            "value":100
+        },
+        {
+            "reportNo":48,
+            "value":100
+        },
+        {
+            "reportNo":49,
+            "value":100
+        },
+        {
+            "reportNo":50,
+            "value":100
+        },
+        {
+            "reportNo":51,
+            "value":230
+        }
+    ],
+    "ImmersionTime": {
+        "current":87,
+        "delta": 3
+    },
+    "AverageImmersionTime":{
+        "current":445444444,
+        "delta": 0
+    },
+    "ImmersionLog": [
+        {
+            "activityTitle": "Freiren 1",
+            "activityDurationHR":"00:01:00",
+            "activitySeconds":60
+        },
+        {
+            "activityTitle": "Freiren 2",
+            "activityDurationHR":"00:01:00",
+            "activitySeconds":60
+        },
+        {
+            "activityTitle": "Freiren 3",
+            "activityDurationHR":"00:01:00",
+            "activitySeconds":60
+        },
+        {
+            "activityTitle": "Freiren 4",
+            "activityDurationHR":"00:01:00",
+            "activitySeconds":60
+        },
+        {
+            "activityTitle": "Freiren 5",
+            "activityDurationHR":"00:01:00",
+            "activitySeconds":60
+        },
+        {
+            "activityTitle": "Freiren 6",
+            "activityDurationHR":"06:05:42",
+            "activitySeconds":60
+        },
+        {
+            "activityTitle": "Freiren 7",
+            "activityDurationHR":"06:05:42",
+            "activitySeconds":60
+        },
+        {
+            "activityTitle": "Freiren 8",
+            "activityDurationHR":"06:05:42",
+            "activitySeconds":60
+        },
+        {
+            "activityTitle": "Freiren 9",
+            "activityDurationHR":"0:01:00",
+            "activitySeconds":60
+        },
+        {
+            "activityTitle": "Freiren 10",
+            "activityDurationHR":"06:05:42",
+            "activitySeconds":60
+        }
+    ],
+    "ImmersionData": [
+        {
+            "reportNo":26,
+            "value":100
+        },
+        {
+            "reportNo":27,
+            "value":100
+        },
+        {
+            "reportNo":28,
+            "value":100
+        },
+        {
+            "reportNo":29,
+            "value":100
+        },
+        {
+            "reportNo":30,
+            "value":100
+        },
+        {
+            "reportNo":31,
+            "value":100
+        },
+        {
+            "reportNo":32,
+            "value":100
+        },
+        {
+            "reportNo":33,
+            "value":100
+        },
+        {
+            "reportNo":34,
+            "value":100
+        },
+        {
+            "reportNo":35,
+            "value":100
+        },
+        {
+            "reportNo":36,
+            "value":100
+        },
+        {
+            "reportNo":37,
+            "value":100
+        },
+        {
+            "reportNo":38,
+            "value":100
+        },
+        {
+            "reportNo":39,
+            "value":100
+        },
+        {
+            "reportNo":40,
+            "value":100
+        },
+        {
+            "reportNo":41,
+            "value":100
+        },
+        {
+            "reportNo":42,
+            "value":100
+        },
+        {
+            "reportNo":43,
+            "value":100
+        },
+        {
+            "reportNo":44,
+            "value":100
+        },
+        {
+            "reportNo":45,
+            "value":100
+        },
+        {
+            "reportNo":46,
+            "value":100
+        },
+        {
+            "reportNo":47,
+            "value":100
+        },
+        {
+            "reportNo":48,
+            "value":100
+        },
+        {
+            "reportNo":49,
+            "value":100
+        },
+        {
+            "reportNo":50,
+            "value":100
+        },
+        {
+            "reportNo":51,
+            "value":230
+        }
+    ],
+    "ImmersionScore":100,
+    "AnkiScore":100,
+    "StreakMultiplier":1,
+    "TotalScore":200,
+    "UserRanking":"51 out of 123",
+    "lastDaysPoints":[ 2, 3, 5, 7]
+}

@@ -1,21 +1,24 @@
 import { Tags, Toggl } from 'toggl-track';
 import { entry } from '../types/entry.js';
-import fs from "fs";
 import dayjs, { Dayjs } from 'dayjs';
 import { activity } from '../types/activity.js';
 import duration from "dayjs/plugin/duration.js";
 import { compareActivities } from '../Helpers/activityHelper.js';
 import { sumTime } from '../Helpers/entryHelper.js';
 import { getAnkiCardReviewCount, getMatureCards, getRetention } from "../anki/db.js";
-import { buildMessage } from '../Helpers/buildMessage.js';
+import { buildJSON, buildMessage } from '../Helpers/buildMessage.js';
 import { getConfig } from '../Helpers/getConfig.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { CacheManager } from '../Helpers/cache.js';
 import { HHMMSS } from '../consts/time.js';
-
+import { exec } from 'child_process';
+import proc from 'find-process';
+import advancedFormat from 'dayjs/plugin/advancedFormat' 
+import { LaunchAnki } from '../config/configAnkiIntegration.js';
 
 dayjs.extend(duration)
+dayjs.extend(advancedFormat)
 
 export const __filename = fileURLToPath(import.meta.url);
 export const __dirname = path.dirname(__filename);
@@ -29,8 +32,12 @@ export const toggl = new Toggl({
 const ignore = (tags:string[]) => ["aplignore", "ignore", "autoprogresslogignore"].some(x => tags.map(x => x.toLowerCase()).includes(x))
 
 export async function runGeneration(){
+
+    // Anki stuff
+    await LaunchAnki(getConfig().anki.ankiIntegration);
+    
     const startCache = CacheManager.peek()
-    const lastGenerated = dayjs(startCache.lastGenerated);
+    const generationTime = dayjs(startCache.generationTime);
 
     // Toggl stuff
     const entries:entry[] = await toggl.timeEntry.list();
@@ -40,7 +47,7 @@ export async function runGeneration(){
         if(ignore(formattedTags)) return false
         if(x.stop == null) return false;
 
-        return dayjs(x.stop).isAfter(lastGenerated)
+        return dayjs(x.stop).isAfter(generationTime)
     })
 
     const uniqueEvents:string[] = [...new Set(entriesAfterLastGen.map(x => x.description))]
@@ -62,18 +69,26 @@ export async function runGeneration(){
 
     // Anki stuff
     const config = getConfig();
-    count = await getAnkiCardReviewCount(lastGenerated, config.anki.ankiIntegration);
+    count = await getAnkiCardReviewCount(generationTime, config.anki.ankiIntegration);
     mature = await getMatureCards(config.anki.ankiIntegration);
     retention = await getRetention(config.anki.options?.retentionMode, config.anki.ankiIntegration);
        
     const timeToAdd = sumTime(entriesAfterLastGen)
 
     // Build message
-    const ans = buildMessage({
+    // const ans = buildMessage({
+    //     reviewCount: count,
+    //     matureCount: mature,
+    //     retention: retention
+    // }, allEvents, startCache, timeToAdd);
+
+    const json = buildJSON(
+    {
         reviewCount: count,
         matureCount: mature,
         retention: retention
-    }, allEvents, startCache, timeToAdd);
+    }, allEvents, CacheManager.getLastN(30), timeToAdd);
+    
 
     // Output
     // CacheManager.push(ans.cache)

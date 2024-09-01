@@ -3,6 +3,8 @@ import { cache } from "../types/cache.js";
 import path from "path"
 import puppeteer from 'puppeteer';  
 import { fileURLToPath } from "url";
+import { ReportData } from "../types/reportdata.js";
+import dayjs from "dayjs";
 
 interface ankiData {
     reviewCount:number|null,
@@ -14,7 +16,6 @@ export const __filename = fileURLToPath(import.meta.url);
 export const __dirname = path.dirname(__filename);
 
 export async function buildImage(){
-    
     const browser = await puppeteer.launch({
     headless: true,
     devtools: true,
@@ -53,6 +54,47 @@ export async function buildImage(){
     await browser.close();    
 }
 
+export function buildJSON(count:ankiData, allEvents:activity[], lastCaches:cache[], timeToAdd:number):ReportData{
+    const date = dayjs();
+    console.log(lastCaches);
+    const reportData:ReportData = {
+        reportNo: lastCaches[0].reportNo + 1,
+        time: `Generated on the ${date.format('Do')} of ${date.format('MMMM').toLowerCase()} ${date.format('YYYY')} at ${date.format('h:mm')}`,
+        matureCards: [],
+        retentionRate: {
+            current: 0,
+            delta: 0
+        },
+        totalReviews: {
+            current: 0,
+            delta: 0
+        },
+        AnkiStreak: {
+            current: 0,
+            delta: 0
+        },
+        AnkiData: [],
+        ImmersionTime: {
+            current: 0,
+            delta: 0
+        },
+        AverageImmersionTime: {
+            current: 0,
+            delta: 0
+        },
+        ImmersionLog: [],
+        ImmersionData: [],
+        ImmersionScore: 0,
+        AnkiScore: 0,
+        StreakMultiplier: 0,
+        TotalScore: 0,
+        UserRanking: "",
+        lastDaysPoints: []
+    }
+
+    return reportData;
+}
+
 
 export function buildMessage(count:ankiData, allEvents:activity[], cache:cache, timeToAdd:number) {
     return "when mom find the poop socks";
@@ -86,7 +128,7 @@ export function buildMessage(count:ankiData, allEvents:activity[], cache:cache, 
 
     // const newCache:cache = {
     //     totalSeconds: cache.totalSeconds + timeToAdd,
-    //     lastGenerated: dayjs().toString(),
+    //     generationTime: dayjs().toString(),
     //     cardsStudied: cache.cardsStudied + (count.reviewCount ?? 0),
     //     ankiStreak: count == null ? cache.ankiStreak : (count.reviewCount == 0 ? 0 : cache.ankiStreak + 1),
     //     immersionStreak: allEvents.length == 0 ? 0 : cache.immersionStreak + 1,

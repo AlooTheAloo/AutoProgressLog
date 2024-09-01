@@ -24,22 +24,8 @@ if(!CacheManager.exists){
     if(!fs.existsSync(join(cache_location, ".."))){
         fs.mkdirSync(join(cache_location, ".."));
     }
-    
-    const cacheLoc = join(__dirname, "../cache/cache.json");
-    const configLoc = join(__dirname, "../config/config.json");
 
-    if(fs.existsSync(cacheLoc) && fs.existsSync(configLoc)){
-        fs.cpSync(cacheLoc, join(APLData, "cache.json"));
-        fs.cpSync(configLoc, join(APLData, "config.json"));
-
-        fs.rmSync(configLoc); 
-        fs.rmSync(join(cacheLoc, ".."), {recursive: true});
-    }
-    else{
-        console.log(colors.red(`No cache to upgrade found.`));
-        console.log("If it's your first time using AutoProgressLog use 'npm run config' or 'bun run config'");
-    }
-    
+    CacheManager.init();
 }
 
 //appUpgrade(CacheManager.get(false))

@@ -5,12 +5,9 @@ import { SemVer, parse } from "semver";
 import { Version, appVersion } from "../consts/versioning.js";
 import path from "path"
 import { fileURLToPath } from 'url';
+import { app } from "electron";
 
-const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
-const __dirname = path.dirname(__filename); // get the name of the directory
-
-export const appData = process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share")
-export const APLData = path.join(appData, "/AutoProgressLog")
+export const APLData = path.join(app.getPath("userData")) 
 export const cache_location: string = path.join(APLData, "/cache.json");
 
 export class CacheManager {
@@ -30,7 +27,7 @@ export class CacheManager {
             list: [
                 {
                     totalSeconds: 0,
-                    lastGenerated: dayjs().startOf("day").toISOString(),
+                    generationTime: dayjs().startOf("day").toISOString(),
                     cardsStudied: 0,
                     ankiStreak: 0,
                     immersionStreak: 0,
@@ -49,6 +46,12 @@ export class CacheManager {
         }
 
         return top;
+    }
+
+
+    static getLastN = (n:number) => {
+        const cacheList = this.get();
+        return cacheList.list.slice(-n).reverse();
     }
 
     static pop = () => {
@@ -81,8 +84,6 @@ export class CacheManager {
         if(!CacheManager.exists && createIfNull){
             CacheManager.init();
         }
-
-
         return JSON.parse(fs.readFileSync(cache_location).toString())
     }
 }

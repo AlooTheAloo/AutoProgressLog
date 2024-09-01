@@ -2,7 +2,7 @@ import { Version } from "../consts/versioning.ts"
 
 export interface cache {
     totalSeconds:number,
-    lastGenerated:string,
+    generationTime:string,
     cardsStudied:number,
     ankiStreak:number
     immersionStreak:number,

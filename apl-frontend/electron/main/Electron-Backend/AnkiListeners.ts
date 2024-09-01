@@ -1,11 +1,11 @@
 import { dialog, ipcMain } from "electron"
-import { createAnkiIntegration, getAnkiDBPaths, verifyAnkiPaths } from "../../../apl-backend/config/configAnkiIntegration";
 import { win } from "..";
 import { ankiIntegration } from "../../../apl-backend/types/options";
 import { getSetupAnkiIntegration, setAnkiIntegration } from "./SetupConfigBuilder";
 import { getAnkiCardReviewCount, getMatureCards, getRetention } from "../../../apl-backend/anki/db";
 import { roundTo } from "round-to";
 import { hasPerms } from "../../../apl-backend/Helpers/readWindows";
+import { createAnkiIntegration, getAnkiDBPaths, verifyAnkiPaths } from "../../../apl-backend/config/configAnkiIntegration";
 
 export function ankiListeners() {
 

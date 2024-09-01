@@ -1,4 +1,3 @@
-import { getAnswer } from "../Helpers/configHelper.js";
 import { ankiIntegration } from "../types/options.js";
 import fs from "fs";
 import sqlite3 from 'sqlite3';
@@ -6,7 +5,6 @@ import { exec } from 'child_process';
 import proc from 'find-process';
 import { app } from "electron";
 import path, { basename } from "path";
-import remote from "electron";
 import { kill } from "process";
 import { readWindows } from "../Helpers/readWindows.js";
 
@@ -92,11 +90,17 @@ export async function createAnkiIntegration(paths:ankiPaths):Promise<ankiIntegra
 
 
 // This function is pure hell. It's a mess.
-async function LaunchAnki(paths:ankiPaths){
+export async function LaunchAnki(paths:ankiPaths|ankiIntegration){
         
     if(!fs.existsSync(paths.ankiPath)){
         console.log(`The file ${paths.ankiPath} does not exist. Please provide a valid path`.red);
         return false;
+    }
+
+    let shouldKill = true;
+
+    if("ankiProgramBinaryName" in paths){
+        shouldKill = !(await proc("name", "Anki")).some(x => x.cmd == paths.ankiProgramBinaryName)
     }
 
     const command = (process.platform == "darwin" ? "open " : "") + paths.ankiPath;
@@ -115,7 +119,6 @@ async function LaunchAnki(paths:ankiPaths){
                return base == "anki" || base == "anki.exe"
             });
             if(targetProcesses.length == 0) return;
-        
             const pid = targetProcesses[0].pid;
             if((await readWindows([pid])).length > 0){
                 await sleep(1000);
