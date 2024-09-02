@@ -28,7 +28,7 @@
           <TotalReviews :reviews="reportData.totalReviews"></TotalReviews>
         </div>
         <div class="flex-grow ">
-          <TimeMap :streak="reportData.AnkiStreak" :data="reportData.AnkiData" ></TimeMap>
+          <TimeMap title="Anki Streak" :streak="reportData.AnkiStreak" :data="reportData.AnkiData" ></TimeMap>
         </div>
       </div>
       <div class="w-0 h-full flex flex-col flex-grow">
@@ -41,7 +41,7 @@
         </div>
         
         <div class="flex-grow ">
-          <TimeMap :streak="reportData.AnkiStreak" :data="reportData.AnkiData" ></TimeMap>
+          <TimeMap title="Immersion Streak" :streak="reportData.AnkiStreak" :data="reportData.ImmersionData" ></TimeMap>
         </div>
       </div>
     </div>

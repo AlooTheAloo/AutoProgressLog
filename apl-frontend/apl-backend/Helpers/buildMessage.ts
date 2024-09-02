@@ -7,9 +7,9 @@ import { ReportData } from "../types/reportdata.js";
 import dayjs from "dayjs";
 
 interface ankiData {
-    reviewCount:number|null,
-    matureCount:number|null,
-    retention:number|null
+    reviewCount:number,
+    matureCount:number,
+    retention:number
 }
 
 export const __filename = fileURLToPath(import.meta.url);
@@ -54,47 +54,99 @@ export async function buildImage(){
     await browser.close();    
 }
 
-export function buildJSON(count:ankiData, allEvents:activity[], lastCaches:cache[], timeToAdd:number):ReportData{
+export function buildJSON(ankiData:ankiData, allEvents:activity[], lastCaches:cache[], timeToAdd:number):ReportData{
     const date = dayjs();
-    console.log(lastCaches);
+    const reportNo = lastCaches[0].reportNo + 1;
+
+    const ankiStreak = lastCaches[0].ankiStreak + (ankiData.reviewCount == 0 ? (-lastCaches[0].ankiStreak) : 1);
+    const immersionStreak = lastCaches[0].immersionStreak + (timeToAdd == 0 ? (-lastCaches[0].ankiStreak) : 1);
+
+
+    const lastSeven = lastCaches.slice(0, 7);
+    const oldAverage = lastSeven.reduce((a, b) => a + b.seconds, 0) / lastSeven.length
+    const newSeven = [...lastCaches.slice(0, 6).map(x => x.seconds), timeToAdd];
+    const newAverage = newSeven.reduce((a, b) => a + b, 0) / newSeven.length;
+
+
+
     const reportData:ReportData = {
-        reportNo: lastCaches[0].reportNo + 1,
-        time: `Generated on the ${date.format('Do')} of ${date.format('MMMM').toLowerCase()} ${date.format('YYYY')} at ${date.format('h:mm')}`,
-        matureCards: [],
+        reportNo: reportNo,
+        time: `Generated on the ${date.format('Do')} of ${date.format('MMMM').toLowerCase()} ${date.format('YYYY')} at ${date.format('HH:mm')}`,
+        matureCards: [
+            {
+                reportNo: reportNo,
+                matureCardCount: ankiData.matureCount
+            },
+            ...lastCaches.slice(0, 4).filter(x => x.reportNo != 0).map(x => {
+                return {
+                    reportNo: x.reportNo,
+                    matureCardCount: x.mature
+                }
+            })
+        ],
         retentionRate: {
-            current: 0,
-            delta: 0
+            current: ankiData.retention,
+            delta: ankiData.retention - lastCaches[0].retention
         },
         totalReviews: {
-            current: 0,
-            delta: 0
+            current: ankiData.reviewCount + lastCaches[0].totalCardsStudied,
+            delta: ankiData.reviewCount
         },
         AnkiStreak: {
-            current: 0,
-            delta: 0
+            current: ankiStreak,
+            delta: ankiStreak - lastCaches[0].ankiStreak
         },
-        AnkiData: [],
+        AnkiData: [
+            {
+                reportNo: reportNo,
+                value: ankiData.reviewCount
+            },
+            ...lastCaches.slice(0, 24).filter(x => x.reportNo != 0).map(x => {
+                return {
+                    reportNo: x.reportNo,
+                    value: x.cardsStudied,
+                }
+            }),
+        ],
         ImmersionTime: {
-            current: 0,
-            delta: 0
+            current: timeToAdd + lastCaches[0].totalSeconds,
+            delta: timeToAdd
         },
         AverageImmersionTime: {
-            current: 0,
-            delta: 0
+            current: newAverage,
+            delta: newAverage - oldAverage
         },
-        ImmersionLog: [],
-        ImmersionData: [],
-        ImmersionScore: 0,
-        AnkiScore: 0,
-        StreakMultiplier: 0,
+        ImmersionLog: allEvents,
+        ImmersionData: [
+            {
+                reportNo: reportNo,
+                value: timeToAdd
+            },
+            ...lastCaches.slice(0, 24).filter(x => x.reportNo != 0).map(x => {
+                return {
+                    reportNo: x.reportNo,
+                    value: x.seconds,
+                }
+            })  
+        ],
+        ImmersionStreak: immersionStreak,
+        ImmersionScore: timeToAdd,
+        AnkiScore: ankiData.reviewCount,
+        StreakMultiplier: 1 + (mapStreak(ankiStreak) + mapStreak(immersionStreak)),
         TotalScore: 0,
         UserRanking: "",
         lastDaysPoints: []
     }
 
+    console.log(reportData);
+
     return reportData;
 }
 
+
+function mapStreak(streak: number): number {
+    return Math.min((streak / 100) * 0.5, 0.5);
+}
 
 export function buildMessage(count:ankiData, allEvents:activity[], cache:cache, timeToAdd:number) {
     return "when mom find the poop socks";
@@ -129,7 +181,7 @@ export function buildMessage(count:ankiData, allEvents:activity[], cache:cache, 
     // const newCache:cache = {
     //     totalSeconds: cache.totalSeconds + timeToAdd,
     //     generationTime: dayjs().toString(),
-    //     cardsStudied: cache.cardsStudied + (count.reviewCount ?? 0),
+    //     totalCardsStudied: cache.totalCardsStudied + (count.reviewCount ?? 0),
     //     ankiStreak: count == null ? cache.ankiStreak : (count.reviewCount == 0 ? 0 : cache.ankiStreak + 1),
     //     immersionStreak: allEvents.length == 0 ? 0 : cache.immersionStreak + 1,
     //     reportNo: cache.reportNo + 1,
@@ -146,7 +198,7 @@ export function buildMessage(count:ankiData, allEvents:activity[], cache:cache, 
     
     // if(getConfig().anki.enabled){
     //     message += [
-    //         `\nTotal cards reviewed - ${abbreviateNumber(newCache.cardsStudied, 2)}`,
+    //         `\nTotal cards reviewed - ${abbreviateNumber(newCache.totalCardsStudied, 2)}`,
     //         `\nAnki Streak - ${addS(newCache.ankiStreak, "report")}`
     //     ].join("");
     // }

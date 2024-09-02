@@ -7,23 +7,26 @@
     import Delta from "../Delta.vue"
     
     interface TimeMapProps{
+        title:string;
         data: RelativeReportData[];
         streak:TPlusDelta<number>;
     }
     
     const props = defineProps<TimeMapProps>();
-    const sortedDataByReport = ref(props.data.sort((a, b) => b.reportNo - a.reportNo));
-    const sortedDataByRelativeCount = ref(props.data.sort((a, b) => b.value - a.value));
+    const sortedDataByReport = ref(props.data.slice(0, 24).sort((a, b) => b.reportNo - a.reportNo));
+    const sortedDataByRelativeCount = ref(props.data.slice(0, 24).sort((a, b) => b.value - a.value));
     
     const cardData = computed(() => {
         const max = sortedDataByRelativeCount.value[0];
         const min = sortedDataByRelativeCount.value.at(-1);
         if(min == undefined) return;
         const delta = max.value - min.value;
+        console.log(delta);
+
         return sortedDataByReport.value.map(x => {
             return {
                 reportNo: x.reportNo,
-                color: colorGradient( (x.value - min.value) / delta)
+                color: delta == 0 ? colorGradient(1) : colorGradient( (x.value - min.value) / delta)
             }
         })
     });
@@ -40,7 +43,7 @@
                         <div class="flex items-center">
                             <div class="flex-grow">
                                 <div class="font-normal tracking-wider">
-                                    Anki Streak
+                                    {{ title }}
                                 </div>
                                 <div class="font-extrabold text-3xl">
                                     <div class="flex flex-row">
@@ -61,10 +64,13 @@
                         </div>
                         <div class="mt-3"></div>
                         <div class="flex flex-wrap gap-5 pb-6" :style="{ gap: '20px 15px'}">
-                            <div class=" font-semibold flex w-[76.7px] h-[46px] rounded-lg justify-center items-center" v-for="(item, index) in cardData" :key="index" :style="{ backgroundColor: item.color }">
+                            <div class=" font-semibold flex w-[76.7px] h-[46px] rounded-lg justify-center items-center" v-for="(_, n) in 24" :style="{ backgroundColor: (((cardData ?? [])[n] ?? {}).color ?? '#A9A9A9') }">
                                 {{ 
-                                    item.reportNo
+                                    ((cardData ?? [])[n] ?? {}).reportNo ?? ''
                                 }}
+                                {{  
+                                    n
+                                 }}
                             </div>
                         </div>
                     </div>

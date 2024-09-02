@@ -1,18 +1,19 @@
-import { Version } from "../consts/versioning.ts"
+import { Version } from "../consts/versioning"
 
 export interface cache {
-    totalSeconds:number,
+    reportNo:number,
     generationTime:string,
-    cardsStudied:number,
-    ankiStreak:number
-    immersionStreak:number,
+    
+    seconds:number,
+    totalSeconds:number,
 
-    //Useless for now but will use later
+    cardsStudied:number,
+    totalCardsStudied:number,
     mature:number|null,
     retention:number|null,
-
-
-    reportNo:number,
+    
+    ankiStreak:number
+    immersionStreak:number,
 }
 
 export type versionInfo = { version: Version }
