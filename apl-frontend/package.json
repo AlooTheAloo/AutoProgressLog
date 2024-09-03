@@ -1,5 +1,5 @@
 {
-  "name": "autoprogresslog",
+  "name": "aplwindowsversion",
   "version": "1.0.0",
   "main": "dist-electron/main/index.js",
   "description": "The frontend and configuration interface for the APL desktop app. Based upon the work of Leo Wang's electron-vue-vite template.",
@@ -36,8 +36,10 @@
   "dependencies": {
     "@miniben90/x-win": "^1.10.2",
     "@primevue/themes": "^4.0.5",
+    "@primno/dpapi": "^1.1.2",
     "@types/node": "^22.2.0",
     "@vueuse/core": "^11.0.3",
+    "chrome-cookies-secure": "^2.1.1",
     "colors": "^1.4.0",
     "dayjs": "^1.11.12",
     "find-process": "^1.4.7",
@@ -45,7 +47,6 @@
     "get-windows": "^9.2.0",
     "int": "^0.2.0",
     "keytar": "^7.9.0",
-    "node-mac-permissions": "^2.4.0",
     "node-schedule": "^2.1.1",
     "path": "^0.12.7",
     "pluralize": "^8.0.0",
@@ -63,6 +64,6 @@
     "vue-router": "4"
   },
   "optionalDependencies": {
-    "win-dpapi": "^1.1.0"
+    "node-mac-permissions": "^2.4.0"
   }
 }

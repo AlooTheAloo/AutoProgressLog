@@ -3,7 +3,6 @@
  * Copyrights licensed under the MIT License.
  * See the accompanying LICENSE file for terms.
  */
-
 import sqlite3 from 'sqlite3';
 import tld from 'tldjs';
 import tough from 'tough-cookie';
@@ -15,6 +14,8 @@ import os from 'os';
 import fs from 'fs';
 import { safeStorage } from 'electron';
 
+
+let dpapi;
 let ITERATIONS;
 let dbClosed = false;
 
@@ -87,8 +88,7 @@ async function getDerivedKey(callback) {
 		crypto.pbkdf2(chromePassword, SALT, ITERATIONS, KEYLENGTH, 'sha1', callback);
 
 	} else if (process.platform === 'win32') {
-
-		// On Windows, the crypto is managed entirely by the OS.  We never see the keys.
+		dpapi =	((await import("@primno/dpapi")).Dpapi);
 
 		callback(null, null);
 	}
@@ -410,6 +410,7 @@ export const getCookies = async (uri, format, callback, profileOrPath) => {
 				"SELECT host_key, path, is_secure, expires_utc, name, value, encrypted_value, creation_utc, is_httponly, has_expires, is_persistent FROM cookies where host_key like '%" + domain + "' ORDER BY LENGTH(path) DESC, creation_utc ASC",
 				function (err, cookie:any) {
 
+					console.log(cookie);
 					let encryptedValue;
 				
 					if (err) {
@@ -421,19 +422,32 @@ export const getCookies = async (uri, format, callback, profileOrPath) => {
 
 						if (process.platform === 'win32') {
 							if (encryptedValue[0] == 0x01 && encryptedValue[1] == 0x00 && encryptedValue[2] == 0x00 && encryptedValue[3] == 0x00){
-								cookie.value = safeStorage.decryptString(encryptedValue);
+
+								// @ts-ignore
+								cookie.value = Dpapi.unprotectData(encryptedValue, null, 'CurrentUser').toString();
+
 
 							} else if (encryptedValue[0] == 0x76 && encryptedValue[1] == 0x31 && encryptedValue[2] == 0x30 ){
+
 								let localState = JSON.parse(fs.readFileSync(os.homedir() + '/AppData/Local/Google/Chrome/User Data/Local State').toString());
+
 								let b64encodedKey = localState.os_crypt.encrypted_key;
+
 								let encryptedKey = Buffer.from(b64encodedKey,'base64');
-								let key = safeStorage.decryptString(encryptedKey.slice(5, encryptedKey.length));
+
+								// @ts-ignore
+								let key = Dpapi.unprotectData(encryptedKey.slice(5, encryptedKey.length), null, 'CurrentUser');
+
 								let nonce = encryptedValue.slice(3, 15);
+
 								let tag = encryptedValue.slice(encryptedValue.length - 16, encryptedValue.length);
+
 								encryptedValue = encryptedValue.slice(15, encryptedValue.length - 16);
+
 								cookie.value = decryptAES256GCM(key, encryptedValue, nonce, tag).toString();
+
 							}
-						} else {
+						}else {
 							cookie.value = decrypt(derivedKey, encryptedValue);
 						}
 

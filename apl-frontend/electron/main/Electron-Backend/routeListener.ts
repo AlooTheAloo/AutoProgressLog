@@ -3,13 +3,12 @@ import { getConfig } from "../../../apl-backend/Helpers/getConfig";
 import { appUpgrade } from "../../../apl-backend/entry/upgrade";
 import { CacheManager } from "../../../apl-backend/Helpers/cache";
 import { shell } from "electron";
-import permissions from "node-mac-permissions";
-import { hasPerms } from "../../../apl-backend/Helpers/readWindows";
+import { hasPerms, macOSRequirePerms } from "../../../apl-backend/Helpers/readWindows";
 
 export function routeListeners(){
 
     ipcMain.handle("request-permissions", async (event, args) => {
-        permissions.askForScreenCaptureAccess();
+        macOSRequirePerms();
     });
 
     ipcMain.handle("find-next-page-permissions", async (event, args) => {
