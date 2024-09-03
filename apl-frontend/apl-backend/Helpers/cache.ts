@@ -26,8 +26,10 @@ export class CacheManager {
         this.set({
             list: [
                 {
+                    seconds: 0,
                     totalSeconds: 0,
                     generationTime: dayjs().startOf("day").toISOString(),
+                    totalCardsStudied: 0,
                     cardsStudied: 0,
                     ankiStreak: 0,
                     immersionStreak: 0,

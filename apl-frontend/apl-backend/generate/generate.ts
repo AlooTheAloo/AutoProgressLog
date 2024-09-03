@@ -23,16 +23,22 @@ dayjs.extend(advancedFormat)
 export const __filename = fileURLToPath(import.meta.url);
 export const __dirname = path.dirname(__filename);
 
-export const toggl = new Toggl({
-    auth: {
-        token: getConfig().toggl.togglToken ?? "",
-    },
-});
+
 
 const ignore = (tags:string[]) => ["aplignore", "ignore", "autoprogresslogignore"].some(x => tags.map(x => x.toLowerCase()).includes(x))
 
-export async function runGeneration(){
+export let toggl:Toggl|undefined = undefined;
 
+export async function runGeneration(){
+    if(toggl != undefined) {
+        toggl = new Toggl({
+            auth: {
+                token: getConfig().toggl.togglToken ?? "",
+            },
+        });
+    }
+
+    
     // Anki stuff
     await LaunchAnki(getConfig().anki.ankiIntegration);
     
@@ -40,14 +46,15 @@ export async function runGeneration(){
     const generationTime = dayjs(startCache.generationTime);
 
     // Toggl stuff
-    const entries:entry[] = await toggl.timeEntry.list();
+    const entries:entry[] = await toggl.timeEntry.list(
+        {
+            since: dayjs(startCache.generationTime).unix().toString()
+        }
+    );
+
     const entriesAfterLastGen = entries.filter(x => {
         const formattedTags = x.tags.map(x => (x as string).toLowerCase());
-        
-        if(ignore(formattedTags)) return false
-        if(x.stop == null) return false;
-
-        return dayjs(x.stop).isAfter(generationTime)
+        return !ignore(formattedTags);
     })
 
     const uniqueEvents:string[] = [...new Set(entriesAfterLastGen.map(x => x.description))]
@@ -74,6 +81,7 @@ export async function runGeneration(){
     retention = await getRetention(config.anki.options?.retentionMode, config.anki.ankiIntegration);
        
     const timeToAdd = sumTime(entriesAfterLastGen)
+
 
     // Build message
     // const ans = buildMessage({
