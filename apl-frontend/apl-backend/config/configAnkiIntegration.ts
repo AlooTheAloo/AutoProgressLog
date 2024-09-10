@@ -7,22 +7,91 @@ import { app } from "electron";
 import path, { basename } from "path";
 import { kill } from "process";
 import { readWindows } from "../Helpers/readWindows.js";
+import { getSetupAnkiIntegration } from "../../electron/main/Electron-Backend/SetupConfigBuilder.js";
 
 interface ankiPaths{
     ankiDB: string,
     ankiPath: string,
 }
 
-export async function getAnkiDBPaths():Promise<ankiPaths>{
-    const prefsDBPath = path.join(app.getPath("appData"), "anki2", "prefs21.db");
+interface deck {
+    name: string,
+    cardCount: number,
+    id: number
+}
+
+export async function getDecksCards():Promise<deck[]>{
+
+    const prefsDB = new sqlite3.Database(getSetupAnkiIntegration().ankiDB, (err) => {});
+    return await new Promise((res, rej) => {
+            prefsDB.all(`SELECT COUNT(*) as "cardCount", did FROM cards group by did;`, async (err, rowsTop:{cardCount: number, did: number}[]) => {
+            
+            const ret = await Promise.all(rowsTop.map(async (row) => {
+                return await new Promise<deck>((res, rej) => {
+                    prefsDB.all(`SELECT name FROM decks WHERE id = ${row.did};`, (err, rows:any) => {
+                        res(
+                        {
+                            cardCount: row.cardCount,
+                            name: rows[0].name,
+                            id: row.did
+                        });
+                    });
+                })
+            }))
+            res(ret);
+            
+        });
+    });
+}
+
+export async function getDecks(chosenProfile?:string):Promise<string[]>{
+    const prefsDBPath = path.join(app.getPath("appData"), "anki2", chosenProfile, "collection.anki2");
     const prefsDB = new sqlite3.Database(prefsDBPath, (err) => {});
-    const profiles:any[] = await new Promise((res, rej) => {
-        prefsDB.all("SELECT name FROM profiles WHERE name NOT IN ('_global', 'fix')", (err, rows:any[]) => {
+    
+    const decks:string[] = await new Promise((res, rej) => {
+        prefsDB.all("SELECT * FROM decks", (err, rows:any[]) => {
             res(rows);
         });
     });
 
-    const ankiDB = path.join(prefsDBPath, "../", profiles[0].name, "collection.anki2");
+    prefsDB.close();
+   return decks;
+}
+
+export async function getProfileDecks():Promise<{name: string, deckCount: number}[]>{
+    const profiles = await getAnkiProfiles();
+    const ret:{name: string, deckCount: number}[] = [];
+    await Promise.all(profiles.map(async (profile) => {
+        const decks = await getDecks(profile.name);
+        ret.push({
+            name: profile.name,
+            deckCount: decks.length
+        })
+    }))
+    
+
+    return ret;
+}
+
+
+export async function getAnkiProfiles():Promise<{name: string}[]>{
+    const prefsDBPath = path.join(app.getPath("appData"), "anki2", "prefs21.db");
+    const prefsDB = new sqlite3.Database(prefsDBPath, (err) => {});
+    console.log(prefsDBPath);
+    const profiles:{name: string}[] = await new Promise((res, rej) => {
+        prefsDB.all("SELECT name FROM profiles WHERE name NOT IN ('_global')", (err, rows:any[]) => {
+            res(rows);
+        });
+    });
+
+   return profiles;
+}
+
+export let getAnkiProfileCount = async () => (await getAnkiProfiles()).length;
+
+export async function getAnkiDBPaths(chosenProfile?:string):Promise<ankiPaths>{
+
+    const prefsDBPath = path.join(app.getPath("appData"), "anki2", chosenProfile, "collection.anki2");
     let AppPath = "";
 
     if(process.platform == "darwin"){
@@ -38,7 +107,7 @@ export async function getAnkiDBPaths():Promise<ankiPaths>{
     await sleep(500);
 
     return {
-        ankiDB: ankiDB,
+        ankiDB: prefsDBPath,
         ankiPath: AppPath
     };
 }
@@ -150,4 +219,4 @@ export async function LaunchAnki(paths:ankiPaths|ankiIntegration){
 
 
 
-const sleep = (ms:number) => new Promise<void>((res, rej) => setTimeout(() => { res() }, ms));
+export const sleep = (ms:number) => new Promise<void>((res, rej) => setTimeout(() => { res() }, ms));

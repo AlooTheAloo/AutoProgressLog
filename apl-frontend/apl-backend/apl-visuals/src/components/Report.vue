@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import Stats from './Stats.vue';
-import dayjs from 'dayjs';
 import { ReportData } from '../types/report-data';
 import { Ref, ref } from 'vue';
 import reportdataurl from "/report-data.json?url"
@@ -31,7 +30,7 @@ import reportdataurl from "/report-data.json?url"
               </p>
             </h1>
             <h2 class=" text-[#8E8E8E] text-lg -mt-4 mb-10">
-              Generated on {{ dayjs(MY_JSON.time).format('DD/MM/YYYY [at] H:mm')  }}
+              {{ MY_JSON.time }}
             </h2>
             <Stats v-bind:reportData="MY_JSON"  />
             <div class="flex justify-center items-center h-full text-[#727272]">

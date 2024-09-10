@@ -5,6 +5,8 @@ import puppeteer from 'puppeteer';
 import { fileURLToPath } from "url";
 import { ReportData } from "../types/reportdata.js";
 import dayjs from "dayjs";
+import { roundTo } from "round-to";
+import { outputOptions } from "../types/options.js";
 
 interface ankiData {
     reviewCount:number,
@@ -15,7 +17,7 @@ interface ankiData {
 export const __filename = fileURLToPath(import.meta.url);
 export const __dirname = path.dirname(__filename);
 
-export async function buildImage(){
+export async function buildImage(options:outputOptions){
     const browser = await puppeteer.launch({
     headless: true,
     devtools: true,
@@ -38,11 +40,11 @@ export async function buildImage(){
         .on('response', response =>
         console.log(`${response.status()} ${response.url()}`))
 
-    await page.goto(`file:${path.join(__dirname, "..", "apl-visuals", "dist", "index.html")}`);
+    await page.goto(`file:${path.join(__dirname, "..", "..", "apl-backend", "apl-visuals", "visuals", "index.html")}`);
     await page.waitForNetworkIdle();
 
     await page.screenshot({
-    path: 'report.png',
+    path: `${options.outputFile.name}${options.outputFile.extension}`,
     type: "png",
     clip: {
         width: 1586,
@@ -67,6 +69,9 @@ export function buildJSON(ankiData:ankiData, allEvents:activity[], lastCaches:ca
     const newSeven = [...lastCaches.slice(0, 6).map(x => x.seconds), timeToAdd];
     const newAverage = newSeven.reduce((a, b) => a + b, 0) / newSeven.length;
 
+    const ImmersionScore = timeToAdd;
+    const AnkiScore = ankiData.reviewCount;
+    const TotalScore = (timeToAdd + ankiData.reviewCount);
 
 
     const reportData:ReportData = {
@@ -109,8 +114,8 @@ export function buildJSON(ankiData:ankiData, allEvents:activity[], lastCaches:ca
             }),
         ],
         ImmersionTime: {
-            current: timeToAdd + lastCaches[0].totalSeconds,
-            delta: timeToAdd
+            current: Math.floor((timeToAdd + lastCaches[0].totalSeconds) / 3600),
+            delta: Math.floor((timeToAdd + lastCaches[0].totalSeconds) / 3600) - Math.floor(lastCaches[0].totalSeconds / 3600)
         },
         AverageImmersionTime: {
             current: newAverage,
@@ -129,23 +134,20 @@ export function buildJSON(ankiData:ankiData, allEvents:activity[], lastCaches:ca
                 }
             })  
         ],
-        ImmersionStreak: immersionStreak,
-        ImmersionScore: timeToAdd,
-        AnkiScore: ankiData.reviewCount,
-        StreakMultiplier: 1 + (mapStreak(ankiStreak) + mapStreak(immersionStreak)),
-        TotalScore: 0,
+        ImmersionStreak: {
+            current: immersionStreak,
+            delta: immersionStreak - lastCaches[0].immersionStreak
+        },
+        ImmersionScore: ImmersionScore,
+        AnkiScore: AnkiScore,
+        TotalScore: TotalScore,
         UserRanking: "",
-        lastDaysPoints: []
+        lastDaysPoints: [
+            TotalScore,
+            ...lastCaches.slice(0, 9).filter(x => x.reportNo != 0).map(x => x.score)
+        ]
     }
-
-    console.log(reportData);
-
     return reportData;
-}
-
-
-function mapStreak(streak: number): number {
-    return Math.min((streak / 100) * 0.5, 0.5);
 }
 
 export function buildMessage(count:ankiData, allEvents:activity[], cache:cache, timeToAdd:number) {

@@ -21,6 +21,13 @@ export function getSetupAnkiIntegration():ankiIntegration{
 
 export function setupListeners() {
 
+    ipcMain.handle("anki-deck-select", async (event: any, arg: number[]) => {
+        config.anki.options = {};
+        
+        
+        config.anki.options.trackedDecks = arg;
+    });
+
     ipcMain.handle("SaveConfig", (event: any, arg: any) => {
         console.log(configPath)
         writeFileSync(configPath, JSON.stringify(config));
@@ -52,9 +59,7 @@ export function setupListeners() {
     })
 
     ipcMain.handle("SetRetentionMode", (event: any, arg: RetentionMode) => {
-        config.anki.options = {
-            retentionMode: arg
-        }
+        config.anki.options.retentionMode = arg;
     })
 
     ipcMain.handle("toggl-account-get", async (event: any, arg: any) => {

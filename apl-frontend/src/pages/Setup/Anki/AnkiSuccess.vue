@@ -11,7 +11,7 @@
     const router = useRouter()
 
     function NextPage(){
-        router.push('/setup/anki-reading');
+        router.push('/setup/anki-decks');
     }
 </script>
 

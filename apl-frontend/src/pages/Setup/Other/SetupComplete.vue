@@ -5,9 +5,10 @@
     import Button from 'primevue/button';
 import { onMounted } from 'vue';
 
-    const router = useRouter()
-    function NextPage(){
+    const router = useRouter();
 
+    function NextPage(){
+        router.push('/app/dashboard');
     }
 
     
@@ -30,7 +31,7 @@ import { onMounted } from 'vue';
                 <br>
                 Enjoy using AutoProgressLog!
             </div>
-            <Button label="Go to dashboard" @click="" class="w-full text-white font-semibold text-xl rounded-xl p-2 mt-10"/>
+            <Button label="Go to dashboard" @click="NextPage" class="w-full text-white font-semibold text-xl rounded-xl p-2 mt-10"/>
 
         </div>
     </div>

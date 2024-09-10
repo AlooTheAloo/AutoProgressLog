@@ -1,4 +1,4 @@
-import { app, BrowserWindow, shell, ipcMain, Menu, MenuItem } from 'electron'
+import { app, BrowserWindow, shell, ipcMain, Menu, MenuItem, dialog } from 'electron'
 import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
 import registerEvents from "./Electron-Backend/";
@@ -120,7 +120,9 @@ app.on('activate', () => {
 })
 
 
+import electronUpdater, { type AppUpdater } from 'electron-updater';
+
 app.on("ready", async () => {
   buildMenu(app);
+  await electronUpdater.autoUpdater.checkForUpdatesAndNotify();
 });
-

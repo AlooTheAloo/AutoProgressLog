@@ -3,8 +3,8 @@ import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import Button from "primevue/button";
 
-const router = useRouter();
 
+const router = useRouter();
 function GenerateReport(){
     window.ipcRenderer.invoke("GenerateReport").then((data) => {
         console.log(data);

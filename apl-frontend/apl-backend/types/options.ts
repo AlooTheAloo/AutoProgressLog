@@ -7,14 +7,17 @@ export interface options {
     anki: {
         ankiIntegration:ankiIntegration
         options?: {
-            retentionMode: RetentionMode
+            retentionMode?: RetentionMode,
+            trackedDecks?: number[]
         }
     }
-    outputOptions:{
-        outputFile:{
-            name:string,
-            extension: ".png" | ".jpg" | ".jpeg" | ".webp" | ".pdf"
-        }
+    outputOptions:outputOptions
+}
+
+export type outputOptions = {
+    outputFile:{
+        name:string,
+        extension:".png" | ".jpg" | ".jpeg" | ".webp" | ".pdf"
     }
 }
 

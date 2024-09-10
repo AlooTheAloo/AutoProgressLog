@@ -5,7 +5,8 @@ import { getSetupAnkiIntegration, setAnkiIntegration } from "./SetupConfigBuilde
 import { getAnkiCardReviewCount, getMatureCards, getRetention } from "../../../apl-backend/anki/db";
 import { roundTo } from "round-to";
 import { hasPerms } from "../../../apl-backend/Helpers/readWindows";
-import { createAnkiIntegration, getAnkiDBPaths, verifyAnkiPaths } from "../../../apl-backend/config/configAnkiIntegration";
+import { createAnkiIntegration, getAnkiDBPaths, getAnkiProfileCount, getAnkiProfiles, getDecks, getDecksCards, getProfileDecks, sleep, verifyAnkiPaths } from "../../../apl-backend/config/configAnkiIntegration";
+import { basename, join } from "path";
 
 export function ankiListeners() {
 
@@ -18,10 +19,41 @@ export function ankiListeners() {
         }
     });
 
+    ipcMain.handle("anki-decks-list", async (event: any, arg: any) => {
+        const decksCards = await getDecksCards();
+        console.log(decksCards)
+        return decksCards;
+    });
+    
+
+
+    ipcMain.handle("anki-profile-select", async (event: any, profile: string) => {
+        const Paths = await getAnkiDBPaths(profile);
+        return await connectFromPaths(Paths);
+    });
+
     ipcMain.handle("anki-connect-start", async (event: any, arg: any) => {
         win.webContents.send("anki-connect-message", "Locating Anki Paths");
-        const Paths = await getAnkiDBPaths();
-        return await connectFromPaths(Paths);
+        await sleep(500)
+
+        const profileCount = await getAnkiProfileCount();
+
+        console.log(profileCount);
+        if(profileCount == 0)
+        {
+            return false;
+        }
+        else if(profileCount > 1)
+        {
+            const profiles = await getProfileDecks();
+            win.webContents.send("anki-multiple-profiles-detected", profiles);
+            return null;
+        }
+        else 
+        {
+            const Paths = await getAnkiDBPaths((await getAnkiProfiles())[0].name);
+            return await connectFromPaths(Paths);
+        }
     });
 
 

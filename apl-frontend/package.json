@@ -15,6 +15,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc && vite build && electron-builder",
+    "release": "vue-tsc && vite build && electron-builder -mwl",
     "preview": "vite preview"
   },
   "devDependencies": {
@@ -42,6 +43,7 @@
     "chrome-cookies-secure": "^2.1.1",
     "colors": "^1.4.0",
     "dayjs": "^1.11.12",
+    "electron-updater": "^6.3.4",
     "find-process": "^1.4.7",
     "fs": "^0.0.1-security",
     "get-windows": "^9.2.0",

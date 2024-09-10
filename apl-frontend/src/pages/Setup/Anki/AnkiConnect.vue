@@ -6,26 +6,45 @@
     import AccountDisplay from '../../../components/Common/AccountDisplay.vue';
     import BackButton from '../../../components/Common/BackButton.vue';
     import AnkiLogo from '../../../assets/AnkiLogo.png';
-import ProgressSpinner from 'primevue/progressspinner';
-import { ref } from 'vue';
+    import ProgressSpinner from 'primevue/progressspinner';
+    import { ref } from 'vue';
+import Listbox from 'primevue/listbox';
+    
+
     const message = ref<string>();
     const router = useRouter()
+    const profiles = ref<{name: string, deckCount: number; }[]>([]);
+    const selectedProfile = defineModel<{name: string, deckCount: number; }>();
 
-    window.ipcRenderer.on("anki-connect-message", (sender, m: any) => {
-        message.value = m;
-    });
 
-    window.ipcRenderer.invoke("anki-connect-start", ).then((worked) => {
+    const handleWorked = (worked:boolean) => {
+        if(worked == null) return;
         if(worked){
             router.push('/setup/anki-success');
         }
         else {
             router.push('/setup/anki-failure');
         }
-    })
+    }
+
+    window.ipcRenderer.on("anki-multiple-profiles-detected", (sender, p: {name: string; deckCount: number; }[]) => {
+        profiles.value = p;
+    });
+
+    window.ipcRenderer.on("anki-connect-message", (sender, m: any) => {
+        message.value = m;
+    });
+
+    window.ipcRenderer.invoke("anki-connect-start").then(handleWorked);
 
 
+    function SelectProfile(){
+        window.ipcRenderer.invoke("anki-profile-select", selectedProfile.value?.name).then(handleWorked);
+        profiles.value = [];
+        selectedProfile.value = undefined;
+    }
 
+   
 
     function NextPage(){
     }
@@ -38,7 +57,7 @@ import { ref } from 'vue';
     <div class=" flex w-screen">
         <div class=" p-12 flex flex-col w-2/3 bg-black h-screen">
             <AccountDisplay/>
-            <div class="flex flex-col flex-grow py-5 gap-2 text-left font-semibold text-4xl">
+            <div class="flex flex-col flex-grow py-5 gap-2 text-left font-semibold text-4xl" v-if="profiles.length == 0">
                 <div class="h-8">
                 </div>
                 <div class="font-semibold text-white">
@@ -61,6 +80,39 @@ import { ref } from 'vue';
                 </div>
                 <div class=" h-12 "/>
                 
+            </div>
+            <div v-else class="flex flex-col flex-grow py-5 gap-2  text-left font-semibold text-4xl">
+               
+                <div class="h-8">
+                </div>
+                <div class="font-semibold text-white">
+                    We found multiple Anki profiles.
+                </div>
+                <p class="text-sm">
+                    Please select the profile you would like to connect to.
+                </p>
+                <div class="flex flex-grow items-center w-full ">
+                    <Listbox
+                    scroll-height="none"
+                    v-model="selectedProfile" :options="profiles" style="gap: 2px;" class=" w-full">
+                        <template #option="slotProps:{option: {name: string, deckCount: number; }, index: number}">
+                            <div class="w-full flex flex-col">
+                                <div class="flex flex-col jusitfy-center h-full">
+                                    <div class="font-semibold text-xl">
+                                        {{slotProps.option.name}}
+                                    </div>
+                                    <div class="text-sm">
+                                        {{ 
+                                            slotProps.option.deckCount 
+                                        }} decks
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </Listbox>
+                </div>
+                
+                <Button fluid="" label="Select Profile" @click="SelectProfile" class=" h-12" :disabled="selectedProfile == null"  />
             </div>
         </div>
     </div>

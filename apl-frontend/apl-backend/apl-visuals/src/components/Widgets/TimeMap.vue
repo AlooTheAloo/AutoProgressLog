@@ -64,13 +64,10 @@
                         </div>
                         <div class="mt-3"></div>
                         <div class="flex flex-wrap gap-5 pb-6" :style="{ gap: '20px 15px'}">
-                            <div class=" font-semibold flex w-[76.7px] h-[46px] rounded-lg justify-center items-center" v-for="(_, n) in 24" :style="{ backgroundColor: (((cardData ?? [])[n] ?? {}).color ?? '#A9A9A9') }">
+                            <div class=" font-semibold flex w-[76.7px] h-[46px] rounded-lg justify-center items-center" v-for="(_, n) in 24" :style="{ backgroundColor: (((cardData ?? [])[n] ?? {}).color ?? '#454545') }">
                                 {{ 
                                     ((cardData ?? [])[n] ?? {}).reportNo ?? ''
                                 }}
-                                {{  
-                                    n
-                                 }}
                             </div>
                         </div>
                     </div>

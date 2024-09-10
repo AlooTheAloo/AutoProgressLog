@@ -6,22 +6,6 @@
         {
             "reportNo":51,
             "matureCardCount": 5432
-        },
-        {
-            "reportNo":50,
-            "matureCardCount": 5430
-        },
-        {
-            "reportNo":49,
-            "matureCardCount": 5429
-        },
-        {
-            "reportNo":48,
-            "matureCardCount": 5427
-        },
-        {
-            "reportNo":47,
-            "matureCardCount": 5425
         }
     ],
     "retentionRate": {
