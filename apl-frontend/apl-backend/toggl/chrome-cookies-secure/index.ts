@@ -88,6 +88,7 @@ async function getDerivedKey(callback) {
 		crypto.pbkdf2(chromePassword, SALT, ITERATIONS, KEYLENGTH, 'sha1', callback);
 
 	} else if (process.platform === 'win32') {
+		// @ts-ignore
 		dpapi =	((await import("@primno/dpapi")).Dpapi);
 
 		callback(null, null);
@@ -409,8 +410,6 @@ export const getCookies = async (uri, format, callback, profileOrPath) => {
 			db.each(
 				"SELECT host_key, path, is_secure, expires_utc, name, value, encrypted_value, creation_utc, is_httponly, has_expires, is_persistent FROM cookies where host_key like '%" + domain + "' ORDER BY LENGTH(path) DESC, creation_utc ASC",
 				function (err, cookie:any) {
-
-					console.log(cookie);
 					let encryptedValue;
 				
 					if (err) {

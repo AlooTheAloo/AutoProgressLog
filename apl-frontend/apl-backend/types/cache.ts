@@ -14,6 +14,8 @@ export interface cache {
     
     ankiStreak:number
     immersionStreak:number,
+
+    score:number
 }
 
 export type versionInfo = { version: Version }

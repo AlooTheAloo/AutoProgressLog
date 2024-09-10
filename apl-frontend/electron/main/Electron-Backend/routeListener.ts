@@ -29,7 +29,7 @@ export function routeListeners(){
 
     ipcMain.handle("PageSelect", (event, args) => {
         if(getConfig() === null){
-            return "/setup/index";
+            return "/setup/pick-survey";
         }
         else{
             const ver = CacheManager.verifyVersion();

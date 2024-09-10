@@ -19,7 +19,6 @@
                 <div class="flex flex-col divide-y divide-[#989898]">
                     <ScoreRow v-bind:title="`Immersion`" v-bind:value="data.ImmersionScore"/>
                     <ScoreRow v-bind:title="`Anki`" v-bind:value="data.AnkiScore"/>
-                    <ScoreRow v-bind:title="`Streak Multiplier`" v-bind:value="data.StreakMultiplier" isMultiplier/>
                     <ScoreRow v-bind:title="`Total`" v-bind:value="data.TotalScore" isTotal/>
                 </div>
                 <div class="flex font-semibold text-2xl" v-if="data.UserRanking">
@@ -36,6 +35,9 @@
                            <img v-bind:src="rewarded">
                        </div>   
                     </div>
+                </div>
+                <div class="h-[4.5rem]" v-else>
+
                 </div>
             </div>
             <div class="w-1/2 flex-col flex justify-center">

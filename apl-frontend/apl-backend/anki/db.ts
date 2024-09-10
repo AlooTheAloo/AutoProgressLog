@@ -49,7 +49,9 @@ export async function getRetention(retentionMode:RetentionMode = "true_retention
                     res(null);
                 } else {
                     db.all('SELECT COUNT(*) as "reviews" FROM revlog WHERE lastIvl >= 21 AND id > ' + aMonthAgo + " AND ((type = 1 AND ease >= 2));", (err, correctReviews:reviewsrow[]) => {
-                        res(correctReviews[0].reviews / allReviews[0].reviews * 100)
+                        let ret = correctReviews[0].reviews / allReviews[0].reviews * 100
+                        if(Number.isNaN(ret)) ret = 0;
+                        res(ret)
                     })
                 }
             });
@@ -64,6 +66,7 @@ export async function getRetention(retentionMode:RetentionMode = "true_retention
                 const flunked = a[0].FLUNKED;
                 try{
                     let ret = passed/(passed+flunked)*100
+                    if(Number.isNaN(ret)) ret = 0;
                     res(ret);
                 }
                 catch(err){
@@ -72,7 +75,6 @@ export async function getRetention(retentionMode:RetentionMode = "true_retention
             });
 
         }
-       
         
         close(db);
     })

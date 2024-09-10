@@ -14,11 +14,10 @@ export type ReportData = {
     AverageImmersionTime:TPlusDelta<number>,
     ImmersionLog:activity[],
     ImmersionData:RelativeReportData[],
-    ImmersionStreak:number,
+    ImmersionStreak:TPlusDelta<number>,
 
     ImmersionScore:number,
     AnkiScore:number,
-    StreakMultiplier:number,
     TotalScore:number
 
     UserRanking:string,

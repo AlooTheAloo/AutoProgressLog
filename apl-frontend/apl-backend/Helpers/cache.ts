@@ -35,7 +35,8 @@ export class CacheManager {
                     immersionStreak: 0,
                     reportNo: 0,
                     mature: 0,
-                    retention: 0
+                    retention: 0,
+                    score: 0
                 },
             ]
         })

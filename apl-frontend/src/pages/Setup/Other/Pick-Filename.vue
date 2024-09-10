@@ -7,6 +7,7 @@
     import InputText from 'primevue/inputtext';
     import { onMounted } from 'vue';
     import Dropdown from 'primevue/dropdown';
+import AccountDisplay from '../../../components/Common/AccountDisplay.vue';
 
     const extensions = [".png", ".jpg", ".jpeg", ".webp", ".pdf"];
 
@@ -24,7 +25,7 @@
             name: filename.value,
             extension: selectedExtension.value
         });
-        router.push('/setup/complete');
+        router.push('/setup/pick-survey');
     }
 </script>
 
@@ -35,7 +36,7 @@
     <div class=" flex w-screen">
         <div class=" p-12 flex flex-col w-2/3  bg-black h-screen">
             <div>
-                <img :src="Logo" class=" w-12 h-12">
+                <AccountDisplay/>
             </div>
             <div class="flex flex-col flex-grow py-5 justify-start gap-2 text-left">
                 <BackButton route="/setup/anki-home"/>

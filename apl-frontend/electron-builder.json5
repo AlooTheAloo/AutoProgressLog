@@ -19,9 +19,14 @@
   },
   "mac": {
     "target": [
-      "dmg"
+      "default"
     ],
-    "artifactName": "${productName}-Mac-${version}-Installer.${ext}"
+    "artifactName": "${productName}_MacOS_${version}_Installer.${ext}",
+    "mac": {
+    "entitlements": "build/entitlements.mac.plist",
+    "entitlementsInherit": "build/entitlements.mac.plist",
+    "hardenedRuntime": true,
+  },
   },
   "win": {
     "target": [
@@ -45,5 +50,12 @@
       "AppImage"
     ],
     "artifactName": "${productName}-Linux-${version}.${ext}"
-  }
+  },
+  "publish": [
+    {
+      "provider": "github",
+      "owner": "727apps",
+      "repo": "AutoUpdateTest"
+    }
+  ]
 }

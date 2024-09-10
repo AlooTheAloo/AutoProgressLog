@@ -11,6 +11,7 @@ export const configPath = path.join(electron.app.getPath("userData"), "config.js
 
 
 export function getConfig():options|null{
+    console.log(configPath);
     if(config == null){
         console.log(configPath)
         if(!fs.existsSync(configPath)) {

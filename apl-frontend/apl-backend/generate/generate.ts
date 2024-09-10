@@ -6,7 +6,7 @@ import duration from "dayjs/plugin/duration.js";
 import { compareActivities } from '../Helpers/activityHelper.js';
 import { sumTime } from '../Helpers/entryHelper.js';
 import { getAnkiCardReviewCount, getMatureCards, getRetention } from "../anki/db.js";
-import { buildJSON, buildMessage } from '../Helpers/buildMessage.js';
+import { buildImage, buildJSON, buildMessage } from '../Helpers/buildMessage.js';
 import { getConfig } from '../Helpers/getConfig.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -16,6 +16,7 @@ import { exec } from 'child_process';
 import proc from 'find-process';
 import advancedFormat from 'dayjs/plugin/advancedFormat' 
 import { LaunchAnki } from '../config/configAnkiIntegration.js';
+import { writeFileSync } from 'fs';
 
 dayjs.extend(duration)
 dayjs.extend(advancedFormat)
@@ -30,7 +31,7 @@ const ignore = (tags:string[]) => ["aplignore", "ignore", "autoprogresslogignore
 export let toggl:Toggl|undefined = undefined;
 
 export async function runGeneration(){
-    if(toggl != undefined) {
+    if(toggl == undefined) {
         toggl = new Toggl({
             auth: {
                 token: getConfig().toggl.togglToken ?? "",
@@ -82,21 +83,18 @@ export async function runGeneration(){
        
     const timeToAdd = sumTime(entriesAfterLastGen)
 
-
-    // Build message
-    // const ans = buildMessage({
-    //     reviewCount: count,
-    //     matureCount: mature,
-    //     retention: retention
-    // }, allEvents, startCache, timeToAdd);
-
     const json = buildJSON(
     {
         reviewCount: count,
         matureCount: mature,
         retention: retention
     }, allEvents, CacheManager.getLastN(30), timeToAdd);
+
+    const p = path.join(__dirname, "..", "..", "apl-backend", "apl-visuals", "visuals", "report-data.json")
     
+    writeFileSync(p, JSON.stringify(json));
+    console.log(config.outputOptions)
+    buildImage(config.outputOptions);
 
     // Output
     // CacheManager.push(ans.cache)

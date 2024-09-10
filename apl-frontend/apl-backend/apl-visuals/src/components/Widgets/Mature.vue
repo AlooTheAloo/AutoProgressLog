@@ -4,6 +4,7 @@
     import {TPlusDelta, matureCardData } from "../../types/report-data"
     import { ComputedRef, computed, ref } from "vue";
     import pluralize from "pluralize";
+    
     interface MatureProps{
         data: matureCardData[];
     }
@@ -16,7 +17,7 @@
         const cur = sortedDataByReport.value[0].matureCardCount;
         return {
             current: cur,
-            delta: cur - sortedDataByReport.value[1].matureCardCount
+            delta: sortedDataByMature.value.length < 2 ? 0 : cur - sortedDataByReport.value[1].matureCardCount
         }
     })
 
@@ -25,34 +26,33 @@
         const min = sortedDataByMature.value.at(-1);
         if(min == undefined) return;
         const delta = max.matureCardCount - min.matureCardCount;
-        const lineValue = Math.ceil(delta / bgGradient.length) 
+        let lineValue = Math.ceil(delta / bgGradient.length) 
+        lineValue = lineValue == 0 ? 1 : lineValue;
 
         return ({
             lines : sortedDataByReport.value.map(x => {
+                const lineNumber = Math.ceil((x.matureCardCount - (min.matureCardCount - lineValue)) / lineValue);
                 return {
                     reportNo: x.reportNo,
-                    lineNumber: Math.ceil((x.matureCardCount - (min.matureCardCount - lineValue)) / lineValue)
+                    lineNumber: lineNumber == 0 ? 1 : lineNumber
                 }
             }),
             graphMinVal : min.matureCardCount - lineValue,
             graphMaxVal : (min.matureCardCount - lineValue) + bgGradient.length * lineValue,
             lineValue : lineValue  
         });
-        
-
     });
-
 
     const bgGradient = ["#61BC50", "#65C454", "#69CD57", "#6ED45B", "#6DD65A", "#73E35F", "#7AE968", "#7FF16C", "#8CFF79"]
 
 </script>
 
 <template>
-   <div class="rounded-xl flex w-full bg-black max-h-fit">
+   <div class="rounded-xl flex w-full bg-black h-[20.7rem]">
         <div class="w-full flex justify-center ">
             <div class="pl-1 flex flex-col w-[91.7%] pt-5 ">
-                <div class="flex">
-                    <div class=" flex flex-col  ">
+                <div class="flex flex-grow ">
+                    <div class=" flex flex-col">
                         <div class="flex flex-col  ">
                             <div class="font-normal tracking-wider">
                                 Total mature cards
@@ -70,10 +70,10 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="flex flex-col my-3 w-[108%]  ">
-                            <div class="divide-y divide-[#283B2C]">
+                        <div class="flex flex-col my-3 flex-grow w-[111.5%]  ">
+                            <div class="divide-y divide-[#283B2C] flex-grow">
                                 <div v-for="(item, index) in lineData?.lines" :key="index" class="h-[35px] flex flex-col ">
-                                    <div class=" justify-center gap-2 flex flex-grow items-center font-bold text-sm">
+                                    <div class="justify-center gap-2 flex flex-grow items-center font-bold text-sm">
                                         <div>
                                             {{ 
                                                 item.reportNo
@@ -90,15 +90,17 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="text-[#68565F] text-xs mt-5 text-center bg-black">
+                            <div class="text-[#68565F] text-xs mt-5 text-center " v-if="(lineData?.lines.length ?? 0) > 1">
                                 Every bar represents {{ pluralize("mature card", lineData?.lineValue, true) }}
                                 <br>
                                 Chart represents {{ lineData?.graphMinVal }} → {{ pluralize("card", lineData?.graphMaxVal, true) }} 
                             </div>
                         </div>
                     </div>
-                    <div class="w-10">
-                        <img v-bind:src="MatureCards">
+                    <div class="w-16 h-[4.5rem] flex flex-col items-end justify-center">
+                        <div class="w-10 ml-5">
+                            <img v-bind:src="MatureCards">
+                        </div>
                     </div>
                 </div>                
             </div>

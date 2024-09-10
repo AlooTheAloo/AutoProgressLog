@@ -1,8 +1,13 @@
 import xwin, { openWindows, openWindowsAsync, subscribeActiveWindow, WindowInfo } from '@miniben90/x-win';
 import electron, { shell } from 'electron';
+import permissions from 'node-mac-permissions';
+
+let nodeMacPermissions = undefined;
+
 export async function hasPerms(){
   // @ts-ignore
-  return (await import("node-mac-permissions")).getAuthStatus("screen") == "authorized";
+  nodeMacPermissions = nodeMacPermissions ?? (await import("node-mac-permissions")).default;
+  return nodeMacPermissions.getAuthStatus("screen") == "authorized";
 }
 
 
@@ -14,5 +19,6 @@ export async function readWindows(pids:number[]) {
 
 export async function macOSRequirePerms() {
   // @ts-ignore
-  return (await import("node-mac-permissions")).askForScreenCaptureAccess();
+  nodeMacPermissions = nodeMacPermissions ?? (await import("node-mac-permissions")).default;
+  return await nodeMacPermissions.askForScreenCaptureAccess();
 }
