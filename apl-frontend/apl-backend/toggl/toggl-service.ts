@@ -1,0 +1,55 @@
+import dayjs from "dayjs";
+import { activity } from "../apl-visuals/src/types/report-data";
+import { entry } from "../types/entry";
+import { HHMMSS } from "../consts/time";
+import { sumTime } from "../Helpers/entryHelper";
+import { compareActivities } from "../Helpers/activityHelper";
+import { Toggl } from "toggl-track";
+import { getConfig } from "../Helpers/getConfig";
+
+const ignore = (tags:string[]) => ["aplignore", "ignore", "autoprogresslogignore"].some(x => tags.map(x => x.toLowerCase()).includes(x))
+
+
+export let toggl:Toggl|undefined = undefined;
+
+
+export async function getTimeEntries(since:string|number){
+
+
+    if(toggl == undefined) {
+        toggl = new Toggl({
+            auth: {
+                token: getConfig().toggl.togglToken ?? "",
+            },
+        });
+    }
+
+
+    const entries:entry[] = await toggl.timeEntry.list(
+        {
+            since: dayjs(since).unix().toString()
+        }
+    );
+
+
+    const entriesAfterLastGen = entries.filter(x => {
+        const formattedTags = x.tags.map(x => (x as string).toLowerCase());
+        return !ignore(formattedTags) && dayjs(x.start).isAfter(dayjs(since));
+    })
+
+    console.log(entriesAfterLastGen);
+
+    const uniqueEvents:string[] = [...new Set(entriesAfterLastGen.map(x => x.description))]
+    const allEvents = uniqueEvents.map(function(evt) {
+        const correspondingEntries = entriesAfterLastGen.filter(x => x.description == evt)
+        const activityTime = sumTime(correspondingEntries)
+        const ret:activity = {
+            activityTitle: evt,
+            activityDurationHR: dayjs.duration(activityTime, 'second').format(HHMMSS) + "",
+            activitySeconds: activityTime
+        }
+        return ret;
+    }).sort(compareActivities).reverse()
+
+    return {entriesAfterLastGen, allEvents};
+}

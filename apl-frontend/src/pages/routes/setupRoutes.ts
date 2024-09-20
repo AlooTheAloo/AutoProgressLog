@@ -2,6 +2,8 @@
 export const surveyRoutes = [
     { path: "/survey/index", component: () => import("../Survey/SurveyIndex.vue") },
     { path: "/survey/refold", component: () => import("../Survey/SurveyRefold.vue") },
+    { path: "/survey/learning", component: () => import("../Survey/SurveyLearning.vue") },
+    { path: "/survey/apps", component: () => import("../Survey/SurveyApps.vue") },
 ];
 
 

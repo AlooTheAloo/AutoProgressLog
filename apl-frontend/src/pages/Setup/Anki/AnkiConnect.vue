@@ -8,7 +8,7 @@
     import AnkiLogo from '../../../assets/AnkiLogo.png';
     import ProgressSpinner from 'primevue/progressspinner';
     import { ref } from 'vue';
-import Listbox from 'primevue/listbox';
+    import Listbox from 'primevue/listbox';
     
 
     const message = ref<string>();

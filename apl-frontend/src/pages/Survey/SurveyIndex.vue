@@ -13,12 +13,12 @@ import { useRouter } from 'vue-router';
         { label: '🤔 Other', value: 'other' },
     ];
 
-    const selectedOption = defineModel<string>();
+    const selectedOption = defineModel<{ label: string; value: string; } | undefined>("track");
 
 
     const router = useRouter();
     function NextPage(){
-        window.ipcRenderer.invoke("answer-survey-track", selectedOption.value).then((res:any) => {
+        window.ipcRenderer.invoke("answer-survey-track", selectedOption.value?.value).then((res:any) => {
             router.push('/survey/refold');
         })
     }

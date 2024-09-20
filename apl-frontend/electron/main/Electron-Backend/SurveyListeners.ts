@@ -9,31 +9,37 @@ interface surveyAnswer {
     years?:number,
     language?:string,
     appsUsing?:string[],
-    rating?:number
 }
 
 
 const surveyAnswer:surveyAnswer = {};
 
 export async function surveyListeners() {
+
     ipcMain.handle("answer-survey-track", async (event, args) => {
-        console.log("MEOW");
         surveyAnswer.track = args;
+    })
+
+    ipcMain.handle("get-track-answer", async (event, args) => {
+        return surveyAnswer.track;
     })
 
     ipcMain.handle("answer-survey-refold", async (event, args) => {
         surveyAnswer.refoldData = args;
     })
 
-    ipcMain.handle("answer-survey-years", async (event, args) => {
-        surveyAnswer.years = args;
+    ipcMain.handle("answer-survey-language", async (event, lang, years) => {
+        surveyAnswer.language = lang;
+        surveyAnswer.years = years;
     })
 
-    ipcMain.handle("answer-survey-language", async (event, args) => {
-        surveyAnswer.language = args;
+    ipcMain.handle("answer-survey-apps", async (event, args) => {
+        surveyAnswer.appsUsing = args;
+        sendSurveyAnswer();
     })
 
-    ipcMain.handle("answer-survey-rating", async (event, args) => {
-        surveyAnswer.rating = args;
-    })
+
+}
+
+function sendSurveyAnswer() {
 }

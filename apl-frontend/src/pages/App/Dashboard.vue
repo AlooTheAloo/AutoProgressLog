@@ -10,6 +10,11 @@ function GenerateReport(){
         console.log(data);
     })
 }
+function RandomButton(){
+    window.ipcRenderer.invoke("Sync").then((data) => {
+        console.log(data);
+    })
+}
 
 onMounted(() => {
 
@@ -22,6 +27,7 @@ onMounted(() => {
         <div class="flex flex-col flex-grow w-full h-full">
             <div class="flex flex-col flex-grow w-full h-full">
                 <Button label="Generate Report" @click="GenerateReport"/>
+                <Button label="Random button" @click="RandomButton"/>
             </div>
         </div>
     </div>

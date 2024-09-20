@@ -3,7 +3,9 @@ import { TogglAccount } from "../../../apl-backend/entry/FindAccounts"
 import { Tags, Toggl } from 'toggl-track';
 import { ankiIntegration, options, RetentionMode, ServerOptions, TimeInterval } from "../../../apl-backend/types/options";
 import { writeFileSync } from "fs";
-import { configPath } from "../../../apl-backend/Helpers/getConfig";
+import { configPath, syncDataPath } from "../../../apl-backend/Helpers/getConfig";
+import sqlite3 from "sqlite3";
+import { CreateDB } from "../../../apl-backend/Helpers/DataBase/CreateDB";
 
 let account:TogglAccount = undefined;
 const config:Partial<options> = {}
@@ -29,8 +31,12 @@ export function setupListeners() {
     });
 
     ipcMain.handle("SaveConfig", (event: any, arg: any) => {
-        console.log(configPath)
         writeFileSync(configPath, JSON.stringify(config));
+        let db = new sqlite3.Database(syncDataPath, 
+            sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, 
+            (err) => { 
+                CreateDB(db);
+            });
     })
 
     ipcMain.handle("SetOutputFile", (event: any, arg: any) => {

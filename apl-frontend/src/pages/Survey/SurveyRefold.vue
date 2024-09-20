@@ -6,7 +6,6 @@
     import RadioButton from 'primevue/radiobutton';
     import { onMounted } from 'vue';
     import SelectButton from 'primevue/selectbutton';
-import { text } from 'stream/consumers';
 
     const hasSeenRefold = defineModel<boolean|undefined>("refold");
     const selectedStage = defineModel<string | undefined>("stage");
@@ -44,33 +43,42 @@ import { text } from 'stream/consumers';
         },
         {
             label: "3B",
-            description: "You are ready for Stage 3B when output is no longer a source of anxiety for you. You will start refining your output through corrections.",
+            description: "Output is no longer a source of anxiety for you. You are refining your output through corrections.",
             value: '3B'
         },
         {
             label: "3C",
-            description: "At this stage, you are continuing to refine your output ability through corrections and feedback. You are also approaching Level 6 comprehension in your strongest domain.",
+            description: "You are continuing to refine your output ability through corrections and feedback. You are also approaching Level 6 comprehension in your strongest domain.",
             value: '3C'
         },
         {
             label: "4",
-            description: "You are ready for Stage 4 when you can have comfortable and confident conversations with native speakers about every day topics. You are able to carry on conversations for at least an hour without stumbling over your words.",
+            description: "You can have comfortable and confident conversations with native speakers about every day topics. You are able to carry on conversations for at least an hour without stumbling over your words.",
             value: '4'
         },
 
     ];
 
     onMounted(() => {   
+        console.log("mounted");
         selectedStage.value = undefined;
         hasSeenRefold.value = undefined;
+
+        window.ipcRenderer.invoke("get-track-answer").then((data) => {
+            console.log(data);
+            if(data == "discord"){
+                hasSeenRefold.value = true;
+            }
+            console.log(hasSeenRefold.value);
+        })
     })
 
 
     const router = useRouter();
     function NextPage(){
 
-        window.ipcRenderer.invoke("answer-survey-track").then((res:any) => {
-            router.push('/survey/');
+        window.ipcRenderer.invoke("answer-survey-refold", hasSeenRefold.value, selectedStage.value).then((res:any) => {
+            router.push('/survey/learning');
         })
     }
 
@@ -145,7 +153,7 @@ import { text } from 'stream/consumers';
                                 
             </div>
             
-            <Button :disabled="selectedStage == null && (hasSeenRefold == true || hasSeenRefold == undefined)" label="Continue" @onclick="NextPage" ></Button>
+            <Button :disabled="selectedStage == null && (hasSeenRefold == true || hasSeenRefold == undefined)" label="Continue" @click="NextPage" ></Button>
         </div>
         
     </div>
