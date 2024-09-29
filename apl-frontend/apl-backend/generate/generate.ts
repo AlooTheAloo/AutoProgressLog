@@ -5,7 +5,7 @@ import { activity } from '../types/activity.js';
 import duration from "dayjs/plugin/duration.js";
 import { sumTime } from '../Helpers/entryHelper.js';
 import { getAnkiCardReviewCount, getMatureCards, getRetention } from "../anki/db.js";
-import { buildImage, buildJSON, buildMessage } from '../Helpers/buildMessage.js';
+import { buildImage, buildJSON, buildMessage, buildNewCache } from '../Helpers/buildMessage.js';
 import { getConfig } from '../Helpers/getConfig.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -35,6 +35,7 @@ export async function runGeneration(){
     const startCache = CacheManager.peek()
     const generationTime = dayjs(startCache.generationTime);
 
+
     // Toggl stuff
     const { entriesAfterLastGen, allEvents } = await getTimeEntries(startCache.generationTime);
 
@@ -46,9 +47,10 @@ export async function runGeneration(){
     const config = getConfig();
     count = await getAnkiCardReviewCount(generationTime, config.anki.ankiIntegration);
     mature = await getMatureCards(config.anki.ankiIntegration);
-    retention = await getRetention(config.anki.options?.retentionMode, config.anki.ankiIntegration);
+    retention = await getRetention(config.anki.options.retentionMode, config.anki.ankiIntegration);
        
     const timeToAdd = sumTime(entriesAfterLastGen)
+
 
     const json = buildJSON(
     {
@@ -60,11 +62,8 @@ export async function runGeneration(){
     const p = path.join(__dirname, "..", "..", "apl-backend", "apl-visuals", "visuals", "report-data.json")
     
     writeFileSync(p, JSON.stringify(json));
-    console.log(config.outputOptions)
     buildImage(config.outputOptions);
 
     // Output
-    // CacheManager.push(ans.cache)
-    // const outputPath = path.join(__dirname, "..", "output", `${(getConfig().outputOptions.outputFileName ?? "output")} #${startCache.reportNo + 1}.txt`)
-    // fs.writeFileSync(outputPath , ans.message);
+    CacheManager.push(buildNewCache(json, startCache, timeToAdd));
 }

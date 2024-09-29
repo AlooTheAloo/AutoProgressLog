@@ -6,9 +6,9 @@ export interface options {
     }
     anki: {
         ankiIntegration:ankiIntegration
-        options?: {
-            retentionMode?: RetentionMode,
-            trackedDecks?: number[]
+        options: {
+            retentionMode: RetentionMode,
+            trackedDecks: number[]
         }
     }
     outputOptions:outputOptions

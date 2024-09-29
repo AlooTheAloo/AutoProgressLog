@@ -41,7 +41,7 @@
         </div>
         
         <div class="flex-grow ">
-          <TimeMap title="Immersion Streak" :streak="reportData.AnkiStreak" :data="reportData.ImmersionData" ></TimeMap>
+          <TimeMap title="Immersion Streak" :streak="reportData.ImmersionStreak" :data="reportData.ImmersionData" ></TimeMap>
         </div>
       </div>
     </div>

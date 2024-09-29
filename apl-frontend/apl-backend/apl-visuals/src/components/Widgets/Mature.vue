@@ -50,9 +50,9 @@
 <template>
    <div class="rounded-xl flex w-full bg-black h-[20.7rem]">
         <div class="w-full flex justify-center ">
-            <div class="pl-1 flex flex-col w-[91.7%] pt-5 ">
-                <div class="flex flex-grow ">
-                    <div class=" flex flex-col">
+            <div class="pl-1 flex flex-col w-[91.7%]   pt-5 ">
+                <div class="flex flex-grow">
+                    <div class=" flex flex-col ">
                         <div class="flex flex-col  ">
                             <div class="font-normal tracking-wider">
                                 Total mature cards
@@ -97,8 +97,8 @@
                             </div>
                         </div>
                     </div>
-                    <div class="w-16 h-[4.5rem] flex flex-col items-end justify-center">
-                        <div class="w-10 ml-5">
+                    <div class="h-[4.5rem] flex flex-col ">
+                        <div class="w-10 ml-[0.65rem] ">
                             <img v-bind:src="MatureCards">
                         </div>
                     </div>

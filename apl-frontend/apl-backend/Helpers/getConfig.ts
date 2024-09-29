@@ -7,9 +7,12 @@ import electron from "electron";
 let config:options|null = null;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-export const configPath = path.join(electron.app.getPath("userData"), "config.json") 
-export const syncDataPath = path.join(electron.app.getPath("userData"), "syncData.db") 
 
+const environment:"electron"|"node" = electron.app != null ? "electron" : "node";
+console.log(environment);
+export const configPath = environment == "electron" ? path.join(electron.app.getPath("userData"), "config.json"): process.env.CONFIG_PATH; //
+export const syncDataPath = "cock" //path.join(electron.app.getPath("userData"), "syncData.db") 
+console.log(process.env);
 
 export function getConfig():options|null{
     if(config == null){

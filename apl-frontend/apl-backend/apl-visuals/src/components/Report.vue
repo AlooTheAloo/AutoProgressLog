@@ -1,19 +1,49 @@
 <script setup lang="ts">
-import Stats from './Stats.vue';
-import { ReportData } from '../types/report-data';
-import { Ref, ref } from 'vue';
-import reportdataurl from "/report-data.json?url"
+  import Stats from './Stats.vue';
+  import { ReportData } from '../types/report-data';
+  import { Ref, ref } from 'vue';
+  import reportdataurl from "/report-data.json?url"
+  import color from "color";
 
   const reportdata = await fetch(reportdataurl)
   const json = await reportdata.json();
   let MY_JSON:Ref<ReportData> = ref(json);
+  let gradient:string[] = [];
+  try{
+    const input = [[[255, 0, 0], [213,122,255], [116, 180, 255]][Math.floor(Math.random() * 3)], "N", "N"]
+    console.log("input is " + input[0]);
+    const ans = await fetch("http://colormind.io/api/", {
+      method: "POST",
+      body: JSON.stringify({
+        "model": "ui",
+        "input": input
+      })
+    });
+    console.log(ans.body?.toString());
+
+    const colors: number[][] = (await ans.json()).result
+    gradient = colors.map(x => color(x).hex()).slice(0, 3);
+    console.log(gradient);
+  }
+  catch(err){
+    console.log(err);
+    gradient = ["#FF0000", "#D57AFF", "#74B4FF"]
+  }
+
+
 </script>
 
 
 
 <template>
     <div>
-      <div class="w-[1586px] h-[1718px] bg-gradient-to-br from-[#FF0000] via-[#D57AFF] to-[#74B4FF] pt-[54px] pl-[52px] ">
+      <div 
+      :style="
+      {
+        'background-image': `linear-gradient(to bottom right, ${gradient})`
+      }
+      "
+      class="w-[1586px] h-[1718px] pt-[54px] pl-[52px] ">
         <div :style="{
           boxShadow: '0px 24px 4rem rgba(0, 0, 0, 0.5)'
         }"

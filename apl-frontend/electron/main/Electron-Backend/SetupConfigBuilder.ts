@@ -13,6 +13,10 @@ const config:Partial<options> = {}
 export function setAnkiIntegration(anki:ankiIntegration){
     config.anki = {
         ankiIntegration: anki,
+        options: { 
+            trackedDecks: [],
+            retentionMode: "true_retention"
+        }
     }
 }
 
@@ -23,10 +27,7 @@ export function getSetupAnkiIntegration():ankiIntegration{
 
 export function setupListeners() {
 
-    ipcMain.handle("anki-deck-select", async (event: any, arg: number[]) => {
-        config.anki.options = {};
-        
-        
+    ipcMain.handle("anki-deck-select", async (event: any, arg: number[]) => {        
         config.anki.options.trackedDecks = arg;
     });
 

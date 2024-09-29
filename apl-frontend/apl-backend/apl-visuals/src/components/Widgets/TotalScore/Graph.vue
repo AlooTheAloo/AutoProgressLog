@@ -23,6 +23,7 @@
             at the 10th report
         </p>
     </div>
+
     <ApexCharts
         class="mt-[3.75rem]"    
         v-else

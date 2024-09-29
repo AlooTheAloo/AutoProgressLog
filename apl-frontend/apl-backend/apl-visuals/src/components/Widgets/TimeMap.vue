@@ -21,17 +21,16 @@
         const min = sortedDataByRelativeCount.value.at(-1);
         if(min == undefined) return;
         const delta = max.value - min.value;
-        console.log(delta);
 
         return sortedDataByReport.value.map(x => {
             return {
                 reportNo: x.reportNo,
-                color: delta == 0 ? colorGradient(1) : colorGradient( (x.value - min.value) / delta)
+                color: x.value == 0 ? "#222222" : (delta == 0 ? colorGradient(1) : colorGradient( (x.value - min.value) / delta))
             }
         })
     });
 
-    const colorGradient = interpolateLab("#7000FF", "#32F3FF");
+    const colorGradient = interpolateLab("#05006e", "#9c96ff");
 </script>
 
 <template>
@@ -58,8 +57,8 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="w-10 ">
-                                <img v-bind:src="MatureCards">
+                            <div class="w-10">
+                                <img class="ml-2" v-bind:src="MatureCards">
                             </div>
                         </div>
                         <div class="mt-3"></div>

@@ -1,225 +1,282 @@
 {
-    "reportNo":"51",
-    "time":"2025-05-20T03:00:00.630Z",
-
-    "matureCards":[
+    "reportNo": 137,
+    "time": "Generated on the 27th of september 2024 at 21:08",
+    "matureCards": [
         {
-            "reportNo":51,
-            "matureCardCount": 5432
+            "reportNo": 137,
+            "matureCardCount": 2778
+        },
+        {
+            "reportNo": 136,
+            "matureCardCount": 2778
+        },
+        {
+            "reportNo": 135,
+            "matureCardCount": 2774
+        },
+        {
+            "reportNo": 134,
+            "matureCardCount": 2773
+        },
+        {
+            "reportNo": 133,
+            "matureCardCount": 2764
         }
     ],
     "retentionRate": {
-        "current":96.4411111,
-        "delta":0.02
+        "current": 71.55844155844156,
+        "delta": -1.8344155844155807
     },
     "totalReviews": {
-        "current":6250,
-        "delta": 230
+        "current": 23776,
+        "delta": 96
     },
     "AnkiStreak": {
-        "current": 51,
+        "current": 19,
         "delta": 1
     },
     "AnkiData": [
         {
-            "reportNo":27,
-            "value":100
+            "reportNo": 137,
+            "value": 96
         },
         {
-            "reportNo":28,
-            "value":100
+            "reportNo": 136,
+            "value": 130
         },
         {
-            "reportNo":29,
-            "value":100
+            "reportNo": 135,
+            "value": 298
         },
         {
-            "reportNo":30,
-            "value":100
+            "reportNo": 134,
+            "value": 607
         },
         {
-            "reportNo":32,
-            "value":100
+            "reportNo": 133,
+            "value": 143
         },
         {
-            "reportNo":33,
-            "value":100
+            "reportNo": 132,
+            "value": 5
         },
         {
-            "reportNo":34,
-            "value":100
+            "reportNo": 131,
+            "value": 0
+        },
+        {
+            "reportNo": 130,
+            "value": 0
+        },
+        {
+            "reportNo": 129,
+            "value": 270
+        },
+        {
+            "reportNo": 128,
+            "value": 265
+        },
+        {
+            "reportNo": 127,
+            "value": 226
+        },
+        {
+            "reportNo": 126,
+            "value": 40
+        },
+        {
+            "reportNo": 125,
+            "value": 241
+        },
+        {
+            "reportNo": 124,
+            "value": 243
+        },
+        {
+            "reportNo": 123,
+            "value": 212
+        },
+        {
+            "reportNo": 122,
+            "value": 150
+        },
+        {
+            "reportNo": 121,
+            "value": 138
+        },
+        {
+            "reportNo": 120,
+            "value": 195
+        },
+        {
+            "reportNo": 119,
+            "value": 229
+        },
+        {
+            "reportNo": 118,
+            "value": 0
+        },
+        {
+            "reportNo": 117,
+            "value": 182
+        },
+        {
+            "reportNo": 116,
+            "value": 336
+        },
+        {
+            "reportNo": 115,
+            "value": 14
+        },
+        {
+            "reportNo": 114,
+            "value": 329
+        },
+        {
+            "reportNo": 113,
+            "value": 6
         }
     ],
     "ImmersionTime": {
-        "current":87,
-        "delta": 3
+        "current": 268,
+        "delta": 1
     },
-    "AverageImmersionTime":{
-        "current":445444444,
-        "delta": 0
+    "AverageImmersionTime": {
+        "current": 3462.5714285714284,
+        "delta": 771
     },
     "ImmersionLog": [
         {
-            "activityTitle": "Freiren 1",
-            "activityDurationHR":"00:01:00",
-            "activitySeconds":60
+            "activityTitle": "im watching all of one piece. wish me luck idiots.",
+            "activityDurationHR": "01:04:04",
+            "activitySeconds": 3844
         },
         {
-            "activityTitle": "Freiren 2",
-            "activityDurationHR":"00:01:00",
-            "activitySeconds":60
-        },
-        {
-            "activityTitle": "Freiren 3",
-            "activityDurationHR":"00:01:00",
-            "activitySeconds":60
-        },
-        {
-            "activityTitle": "Freiren 4",
-            "activityDurationHR":"00:01:00",
-            "activitySeconds":60
-        },
-        {
-            "activityTitle": "Freiren 5",
-            "activityDurationHR":"00:01:00",
-            "activitySeconds":60
-        },
-        {
-            "activityTitle": "Freiren 6",
-            "activityDurationHR":"06:05:42",
-            "activitySeconds":60
-        },
-        {
-            "activityTitle": "Freiren 7",
-            "activityDurationHR":"06:05:42",
-            "activitySeconds":60
-        },
-        {
-            "activityTitle": "Freiren 8",
-            "activityDurationHR":"06:05:42",
-            "activitySeconds":60
-        },
-        {
-            "activityTitle": "Freiren 9",
-            "activityDurationHR":"0:01:00",
-            "activitySeconds":60
-        },
-        {
-            "activityTitle": "Freiren 10",
-            "activityDurationHR":"06:05:42",
-            "activitySeconds":60
+            "activityTitle": "rewatching old anime",
+            "activityDurationHR": "00:25:53",
+            "activitySeconds": 1553
         }
     ],
     "ImmersionData": [
         {
-            "reportNo":26,
-            "value":100
+            "reportNo": 137,
+            "value": 5397
         },
         {
-            "reportNo":27,
-            "value":100
+            "reportNo": 136,
+            "value": 4894
         },
         {
-            "reportNo":28,
-            "value":100
+            "reportNo": 135,
+            "value": 2003
         },
         {
-            "reportNo":29,
-            "value":100
+            "reportNo": 134,
+            "value": 11944
         },
         {
-            "reportNo":30,
-            "value":100
+            "reportNo": 133,
+            "value": 0
         },
         {
-            "reportNo":31,
-            "value":100
+            "reportNo": 132,
+            "value": 0
         },
         {
-            "reportNo":32,
-            "value":100
+            "reportNo": 131,
+            "value": 0
         },
         {
-            "reportNo":33,
-            "value":100
+            "reportNo": 130,
+            "value": 0
         },
         {
-            "reportNo":34,
-            "value":100
+            "reportNo": 129,
+            "value": 6432
         },
         {
-            "reportNo":35,
-            "value":100
+            "reportNo": 128,
+            "value": 2711
         },
         {
-            "reportNo":36,
-            "value":100
+            "reportNo": 127,
+            "value": 14591
         },
         {
-            "reportNo":37,
-            "value":100
+            "reportNo": 126,
+            "value": 8432
         },
         {
-            "reportNo":38,
-            "value":100
+            "reportNo": 125,
+            "value": 6987
         },
         {
-            "reportNo":39,
-            "value":100
+            "reportNo": 124,
+            "value": 5818
         },
         {
-            "reportNo":40,
-            "value":100
+            "reportNo": 123,
+            "value": 4815
         },
         {
-            "reportNo":41,
-            "value":100
+            "reportNo": 122,
+            "value": 11168
         },
         {
-            "reportNo":42,
-            "value":100
+            "reportNo": 121,
+            "value": 6633
         },
         {
-            "reportNo":43,
-            "value":100
+            "reportNo": 120,
+            "value": 5730
         },
         {
-            "reportNo":44,
-            "value":100
+            "reportNo": 119,
+            "value": 11289
         },
         {
-            "reportNo":45,
-            "value":100
+            "reportNo": 118,
+            "value": 21922
         },
         {
-            "reportNo":46,
-            "value":100
+            "reportNo": 117,
+            "value": 3150
         },
         {
-            "reportNo":47,
-            "value":100
+            "reportNo": 116,
+            "value": 10466
         },
         {
-            "reportNo":48,
-            "value":100
+            "reportNo": 115,
+            "value": 0
         },
         {
-            "reportNo":49,
-            "value":100
+            "reportNo": 114,
+            "value": 6823
         },
         {
-            "reportNo":50,
-            "value":100
-        },
-        {
-            "reportNo":51,
-            "value":230
+            "reportNo": 113,
+            "value": 614
         }
     ],
-    "ImmersionScore":100,
-    "AnkiScore":100,
-    "StreakMultiplier":1,
-    "TotalScore":200,
-    "UserRanking":"51 out of 123",
-    "lastDaysPoints":[ 2, 3, 5, 7]
+    "ImmersionStreak": {
+        "current": 4,
+        "delta": 1
+    },
+    "ImmersionScore": 5397,
+    "AnkiScore": 96,
+    "TotalScore": 5493,
+    "UserRanking": "",
+    "lastDaysPoints": [
+        5493,
+        10517,
+        12818,
+        25369,
+        25512,
+        25517,
+        25517,
+        25517,
+        32219,
+        35195
+    ]
 }

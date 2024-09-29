@@ -59,7 +59,7 @@
                      
                     </div>
                     <div class="w-10">
-                        <img v-bind:src="MatureCards">
+                        <img class="ml-[0.35rem]" v-bind:src="MatureCards">
                     </div>
                 </div>                
             </div>

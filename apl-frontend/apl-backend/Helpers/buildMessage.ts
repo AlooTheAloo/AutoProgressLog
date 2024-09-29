@@ -33,13 +33,6 @@ export async function buildImage(options:outputOptions){
     height: 1718,
     deviceScaleFactor: 1
     })    
-    page
-        .on('console', message =>
-        console.log(`${message.type().substr(0, 3).toUpperCase()} ${message.text()} ${JSON.stringify(message.stackTrace())}`))
-        .on('pageerror', ({ message }) => console.log(message))
-        .on('response', response =>
-        console.log(`${response.status()} ${response.url()}`))
-
     await page.goto(`file:${path.join(__dirname, "..", "..", "apl-backend", "apl-visuals", "visuals", "index.html")}`);
     await page.waitForNetworkIdle();
 
@@ -56,17 +49,20 @@ export async function buildImage(options:outputOptions){
     await browser.close();    
 }
 
+const MOVING_AVERAGE_SIZE = 7;
+
 export function buildJSON(ankiData:ankiData, allEvents:activity[], lastCaches:cache[], timeToAdd:number):ReportData{
     const date = dayjs();
     const reportNo = lastCaches[0].reportNo + 1;
 
     const ankiStreak = lastCaches[0].ankiStreak + (ankiData.reviewCount == 0 ? (-lastCaches[0].ankiStreak) : 1);
-    const immersionStreak = lastCaches[0].immersionStreak + (timeToAdd == 0 ? (-lastCaches[0].ankiStreak) : 1);
+    const immersionStreak = lastCaches[0].immersionStreak + (timeToAdd == 0 ? (-lastCaches[0].immersionStreak) : 1);
 
 
-    const lastSeven = lastCaches.slice(0, 7);
-    const oldAverage = lastSeven.reduce((a, b) => a + b.seconds, 0) / lastSeven.length
-    const newSeven = [...lastCaches.slice(0, 6).map(x => x.seconds), timeToAdd];
+    let lastnElements = lastCaches.slice(0, MOVING_AVERAGE_SIZE);
+    const oldAverage = lastnElements.reduce((a, b) => a + b.seconds, 0) / lastnElements.length
+
+    const newSeven = [...lastCaches.slice(0, MOVING_AVERAGE_SIZE - 1).map(x => (x.seconds)), timeToAdd];
     const newAverage = newSeven.reduce((a, b) => a + b, 0) / newSeven.length;
 
     const ImmersionScore = timeToAdd;
@@ -109,7 +105,7 @@ export function buildJSON(ankiData:ankiData, allEvents:activity[], lastCaches:ca
             ...lastCaches.slice(0, 24).filter(x => x.reportNo != 0).map(x => {
                 return {
                     reportNo: x.reportNo,
-                    value: x.cardsStudied,
+                    value: x.cardsStudied ?? 0,
                 }
             }),
         ],
@@ -130,7 +126,7 @@ export function buildJSON(ankiData:ankiData, allEvents:activity[], lastCaches:ca
             ...lastCaches.slice(0, 24).filter(x => x.reportNo != 0).map(x => {
                 return {
                     reportNo: x.reportNo,
-                    value: x.seconds,
+                    value: x.seconds ?? 0,
                 }
             })  
         ],
@@ -142,12 +138,38 @@ export function buildJSON(ankiData:ankiData, allEvents:activity[], lastCaches:ca
         AnkiScore: AnkiScore,
         TotalScore: TotalScore,
         UserRanking: "",
-        lastDaysPoints: [
+        lastDaysPoints: cumulativeSum([
             TotalScore,
             ...lastCaches.slice(0, 9).filter(x => x.reportNo != 0).map(x => x.score)
-        ]
+        ].reverse())
     }
     return reportData;
+}
+
+function cumulativeSum<T extends number>(arr: T[]): T[] {
+    return arr.reduce((acc: T[], curr: T, index: number) => {
+        const sum = index === 0 ? curr : (acc[index - 1] + curr as T);
+        acc.push(sum);
+        return acc;
+    }, []);
+}
+
+export function buildNewCache(reportData:ReportData, startCache:cache, timeToAdd:number){
+
+    const newCache:cache = {
+        totalSeconds: startCache.totalSeconds + timeToAdd,
+        generationTime: dayjs().toISOString(),
+        totalCardsStudied: reportData.totalReviews.current,
+        ankiStreak: reportData.AnkiStreak.current,
+        immersionStreak: reportData.ImmersionStreak.current,
+        reportNo: reportData.reportNo,
+        mature: reportData.matureCards[0].matureCardCount,
+        retention : reportData.retentionRate.current,
+        score: reportData.TotalScore,
+        seconds: timeToAdd,
+        cardsStudied: reportData.totalReviews.delta,
+    }
+    return newCache;
 }
 
 export function buildMessage(count:ankiData, allEvents:activity[], cache:cache, timeToAdd:number) {
@@ -180,16 +202,6 @@ export function buildMessage(count:ankiData, allEvents:activity[], cache:cache, 
     // }
     
 
-    // const newCache:cache = {
-    //     totalSeconds: cache.totalSeconds + timeToAdd,
-    //     generationTime: dayjs().toString(),
-    //     totalCardsStudied: cache.totalCardsStudied + (count.reviewCount ?? 0),
-    //     ankiStreak: count == null ? cache.ankiStreak : (count.reviewCount == 0 ? 0 : cache.ankiStreak + 1),
-    //     immersionStreak: allEvents.length == 0 ? 0 : cache.immersionStreak + 1,
-    //     reportNo: cache.reportNo + 1,
-    //     mature: count.matureCount ?? cache.mature,
-    //     retention : count.retention ?? cache.retention
-    // }
     // const hoursNew = roundSecondsToHours(newCache.totalSeconds);
     // const hoursOld = roundSecondsToHours(cache.totalSeconds);
     // message += [

@@ -14,6 +14,10 @@
     })
 
     const hrDelta = computed(() => {
+        if(props.time.delta == undefined || Math.abs(props.time.delta) < 1) {
+            console.log("return 0")
+            return 0;
+        }
         return dayjs.duration(props.time.delta, "second").format("HH:mm:ss");
     })
 
@@ -25,7 +29,7 @@
 
 <template>
     <SmallWidget title="Average immersion time" 
-    v-bind:deltaOverride="props.time.delta == 0 ? 0 : 1"
+    v-bind:deltaOverride="hrDelta == 0 ? 0 : 1"
     :image="AverageTime" :value="{ 
         current:hrCurrent,
         delta:hrDelta,

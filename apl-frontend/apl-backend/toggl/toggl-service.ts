@@ -33,11 +33,11 @@ export async function getTimeEntries(since:string|number){
 
 
     const entriesAfterLastGen = entries.filter(x => {
+        console.log(x);
         const formattedTags = x.tags.map(x => (x as string).toLowerCase());
-        return !ignore(formattedTags) && dayjs(x.start).isAfter(dayjs(since));
+        return !ignore(formattedTags) && dayjs(x.start).isAfter(dayjs(since)) && x.server_deleted_at == null;
     })
 
-    console.log(entriesAfterLastGen);
 
     const uniqueEvents:string[] = [...new Set(entriesAfterLastGen.map(x => x.description))]
     const allEvents = uniqueEvents.map(function(evt) {

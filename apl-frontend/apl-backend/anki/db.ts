@@ -11,13 +11,18 @@ interface maturerow {
     mature:number
 }
 
+function JoinTrackedDecks(table_primary_key:string = "revlog.cid"){
+    const trackedDecks = getConfig().anki.options.trackedDecks.map(x => x.toString());
+    return `JOIN cards c ON c.id = ${table_primary_key} WHERE c.did IN (${trackedDecks.join(",")})`;
+
+}
+
 export async function getAnkiCardReviewCount(startTime:Dayjs, ankiIntegration:ankiIntegration){
     return new Promise<number|null>((res, rej) => {
         // Create a database connection
         const db = open(ankiIntegration);
-
         // Execute SQL query
-        db.all('SELECT COUNT(*) as "reviews" FROM revlog WHERE id > ' + startTime.valueOf(), (err, rows:reviewsrow[]) => {
+        db.all(`SELECT COUNT(*) as "reviews" FROM revlog ${JoinTrackedDecks()} AND revlog.id > ?`, startTime.valueOf(), (err, rows:reviewsrow[]) => {
             if (err) {
                 console.log(err);
 
@@ -42,13 +47,14 @@ export async function getRetention(retentionMode:RetentionMode = "true_retention
         const db = open(ankiIntegration);
 
         if(retentionMode == "default_anki"){
+
             // Execute SQL query
-            db.all('SELECT COUNT(*) as "reviews" FROM revlog WHERE lastIvl >= 21 AND id > ' + aMonthAgo, (err, allReviews:reviewsrow[]) => {
+            db.all(`SELECT COUNT(*) as "reviews" FROM revlog ${JoinTrackedDecks()} AND revlog.lastIvl >= 21 AND revlog.id > ?`, aMonthAgo, (err, allReviews:reviewsrow[]) => {
                 if (err) {
                     console.log(err);
                     res(null);
                 } else {
-                    db.all('SELECT COUNT(*) as "reviews" FROM revlog WHERE lastIvl >= 21 AND id > ' + aMonthAgo + " AND ((type = 1 AND ease >= 2));", (err, correctReviews:reviewsrow[]) => {
+                    db.all(`SELECT COUNT(*) as "reviews" FROM revlog r ${JoinTrackedDecks("r.cid")} AND r.lastIvl >= 21 AND r.id > ? AND ((r.type = 1 AND r.ease >= 2))`, aMonthAgo, (err, correctReviews:reviewsrow[]) => {
                         let ret = correctReviews[0].reviews / allReviews[0].reviews * 100
                         if(Number.isNaN(ret)) ret = 0;
                         res(ret)
@@ -59,9 +65,15 @@ export async function getRetention(retentionMode:RetentionMode = "true_retention
 
         if(retentionMode == "true_retention"){
             db.all(`select
-            sum(case when ease = 1 and type == 1 then 1 else 0 end) as "FLUNKED",
-            sum(case when ease > 1 and type == 1 then 1 else 0 end) as "PASSED"
-            from revlog where id > ${aMonthAgo}`, (err, a:any[]) => {
+            sum(case when ease = 1 and revlog.type == 1 then 1 else 0 end) as "FLUNKED",
+            sum(case when ease > 1 and revlog.type == 1 then 1 else 0 end) as "PASSED"
+            from revlog ${JoinTrackedDecks()} AND revlog.id > ${aMonthAgo}`, (err, a:any[]) => {
+                if(err){
+                    console.log(err)
+                    res(null);
+                    return;
+                }
+
                 const passed = a[0].PASSED;
                 const flunked = a[0].FLUNKED;
                 try{
@@ -88,7 +100,7 @@ export async function getMatureCards(ankiIntegration:ankiIntegration){
         // Create a database connection
         const db = open(ankiIntegration);
         // Execute SQL query
-        db.all('SELECT COUNT(*) as "mature" from cards WHERE ivl >= 21;', (err, rows:maturerow[]) => {
+        db.all(`SELECT COUNT(*) as "mature" from cards ${JoinTrackedDecks('cards.id')} AND cards.ivl >= 21;`, (err, rows:maturerow[]) => {
             if (err) {
                 console.log(err);
                 res(null);

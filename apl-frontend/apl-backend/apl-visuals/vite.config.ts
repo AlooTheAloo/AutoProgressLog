@@ -7,6 +7,14 @@ export default defineConfig({
   base: "./",
   publicDir: 'public',
   build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'apexcharts': ['apexcharts']
+        }
+      }
+    },
+    chunkSizeWarningLimit: 1000,
     outDir: './visuals',
   }
 

@@ -56,7 +56,7 @@ export const chartOptions = (data:ReportData) => {
         strokeDashArray: 10,
     },
     xaxis: {
-        categories: range(data.reportNo - data.lastDaysPoints.length, data.reportNo),
+        categories: range(data.reportNo - data.lastDaysPoints.length + 1, data.reportNo),
         labels: {
             rotate: 0,
             rotateAlways: false,
