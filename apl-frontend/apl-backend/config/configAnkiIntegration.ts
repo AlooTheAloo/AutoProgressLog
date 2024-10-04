@@ -208,7 +208,6 @@ export async function LaunchAnki(paths:ankiPaths|ankiIntegration){
         }, 500);
 
     })
-
     if(resp == null)
     {
         return false;

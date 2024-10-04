@@ -1,34 +1,46 @@
 <script setup lang="ts">
     import MatureCards from "/Icons/MatureCards.png"
-    import { activity } from "../../types/report-data"
     import { computed } from "vue";
     import dayjs from "dayjs";
+    import { relativeActivity } from "../../types/report-data";
 
     const limit = 6;
 
     interface ImmersionLogProps{
-        log: activity[];
+        log: relativeActivity[]
     }
     const props =defineProps<ImmersionLogProps>();
 
 
     const hrTotal = computed(() => {
-        console.log(props.log.reduce((a, b) => a + b.activitySeconds, 0));
-        return dayjs.duration(props.log.reduce((a, b) => a + b.activitySeconds, 0), "second").format("HH:mm:ss");
+        return dayjs.duration(props.log.reduce((a, b) => a + b.relativeValue, 0), "second").format("HH:mm:ss");
     })
     const sortedActivities = computed(() => {
-        const sorted = [...props.log].sort((a, b) => b.activitySeconds - a.activitySeconds);
+        const sorted = [...props.log].sort((a, b) => b.relativeValue - a.relativeValue);
 
-        if (sorted.length <= limit) return sorted;
+        if (sorted.length <= limit) return sorted.map((x) => {
+            return {
+                name: x.name,
+                relativeValue: x.relativeValue,
+                hr : dayjs.duration(x.relativeValue, "second").format("HH:mm:ss")
+            }
+        });
 
-        const bottomActivitiesSeconds = sorted.slice(limit).reduce((a, b) => a + b.activitySeconds, 0);
-        const othersActivity = {
-            activityTitle: `${sorted.length - limit} others`,
-            activityDurationHR: dayjs.duration(bottomActivitiesSeconds, "s").format("HH:mm:ss"),
-            activitySeconds: bottomActivitiesSeconds
+        const bottomActivitiesSeconds = sorted.slice(limit).reduce((a, b) => a + b.relativeValue, 0);
+        const othersActivity:relativeActivity = {
+            name: `${sorted.length - limit} others`,
+            relativeValue: bottomActivitiesSeconds
         };
 
-        return [...sorted.slice(0, limit), othersActivity];
+        return [...sorted.slice(0, limit), othersActivity].map((x) => {
+            return {
+                name: x.name,
+                relativeValue: x.relativeValue,
+                hr : dayjs.duration(x.relativeValue, "second").format("HH:mm:ss")
+            }
+        });
+
+        
     });
 
 
@@ -69,13 +81,13 @@
                         <div class="gap-2 flex flex-grow items-center w-full font-bold text-sm">
                             <div class="flex-grow">
                                 {{ 
-                                    item.activityTitle
+                                    item.name
                                 }}
                             </div>
                             <div>
                                 {{ 
-                                    item.activityDurationHR
-                                 }}
+                                    item.hr
+                                }}
                             </div>
                         </div>
                     </div>

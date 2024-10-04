@@ -4,7 +4,6 @@ import { fileURLToPath } from 'node:url'
 import registerEvents from "./Electron-Backend/";
 import path from 'node:path'
 import os from 'node:os'
-import { getAccounts } from '../../apl-backend/entry/FindAccounts';
 import { buildMenu } from './Electron-App/MenuBuilder';
 
 const require = createRequire(import.meta.url)
@@ -55,7 +54,7 @@ async function createWindow() {
     width: 1920,
     height: 1080,
     title: 'Main window',
-    icon: path.join(process.env.VITE_PUBLIC, 'favicon.ico'),
+    icon: path.join(process.env.VITE_PUBLIC, ''),
     webPreferences: {
       preload,
       // Warning: Enable nodeIntegration and disable contextIsolation is not secure in production

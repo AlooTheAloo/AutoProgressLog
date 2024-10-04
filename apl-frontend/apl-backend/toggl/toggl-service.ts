@@ -24,19 +24,20 @@ export async function getTimeEntries(since:string|number){
         });
     }
 
-
     const entries:entry[] = await toggl.timeEntry.list(
         {
             since: dayjs(since).unix().toString()
         }
     );
+    console.log(entries);
 
 
     const entriesAfterLastGen = entries.filter(x => {
-        console.log(x);
         const formattedTags = x.tags.map(x => (x as string).toLowerCase());
-        return !ignore(formattedTags) && dayjs(x.start).isAfter(dayjs(since)) && x.server_deleted_at == null;
+        return !ignore(formattedTags) && dayjs(x.stop).isAfter(dayjs(since)) && x.server_deleted_at == null && x.stop != null;
     })
+
+    console.log("After last gen", entriesAfterLastGen);
 
 
     const uniqueEvents:string[] = [...new Set(entriesAfterLastGen.map(x => x.description))]
@@ -50,6 +51,8 @@ export async function getTimeEntries(since:string|number){
         }
         return ret;
     }).sort(compareActivities).reverse()
+
+    console.log("Allevents", allEvents);
 
     return {entriesAfterLastGen, allEvents};
 }

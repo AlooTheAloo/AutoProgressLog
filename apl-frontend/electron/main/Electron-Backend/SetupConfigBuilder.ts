@@ -42,9 +42,12 @@ export function setupListeners() {
 
     ipcMain.handle("SetOutputFile", (event: any, arg: any) => {
         config.outputOptions = {
-            outputFile: arg
+            outputFile: arg,
+            outputQuality: 3
         }
     })
+
+    
 
     ipcMain.handle("SetDeviceType", (event: any, arg: "Server" | "Client") => {
         config.type = arg;
@@ -54,9 +57,16 @@ export function setupListeners() {
         }
     })
 
-    ipcMain.handle("toggl-api-key-set", (event: any, arg: any) => {
+    ipcMain.handle("toggl-api-key-set", async (event: any, arg: any) => {
+        const me = await new Toggl({
+            auth: {
+                token: arg
+            },
+        }).me.get();
+        
         config.toggl = {
-            togglToken: arg
+            togglToken: arg,
+            userName: me.fullname
         }
     })
 

@@ -1,3 +1,4 @@
+export type SyncType = "Silent" | "Full";
 
 export interface SyncData {
     id: number;
@@ -7,6 +8,7 @@ export interface SyncData {
     cardsStudied: number;
     mature: number;
     retention: number;
+    type: SyncType;
 }
 
 export interface ImmersionActivity {

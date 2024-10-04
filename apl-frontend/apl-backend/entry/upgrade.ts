@@ -1,11 +1,12 @@
 import path, { join } from "path";
-import { APLData, CacheManager, cache_location } from "../Helpers/cache";
+import { CacheManager } from "../Helpers/cache";
 import { appVersion } from "../consts/versioning";
 import { cacheList } from "../types/cache";
 import colors from "colors" 
 import fs from "fs"
 import { fileURLToPath } from "url";
 import { registerRuntimeCompiler } from "vue";
+import { cache_location } from "../Helpers/getConfig";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

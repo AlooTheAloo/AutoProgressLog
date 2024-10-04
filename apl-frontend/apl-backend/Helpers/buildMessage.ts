@@ -1,4 +1,4 @@
-import { activity } from "../types/activity.js";
+import { activity, relativeActivity } from "../types/activity.js";
 import { cache } from "../types/cache.js";
 import path from "path"
 import puppeteer from 'puppeteer';  
@@ -29,9 +29,9 @@ export async function buildImage(options:outputOptions){
     });
     const page = await browser.newPage();
     page.setViewport({
-    width: 2000,
+    width: 2000 * options.outputQuality,
     height: 1718,
-    deviceScaleFactor: 1
+    deviceScaleFactor: options.outputQuality
     })    
     await page.goto(`file:${path.join(__dirname, "..", "..", "apl-backend", "apl-visuals", "visuals", "index.html")}`);
     await page.waitForNetworkIdle();
@@ -51,7 +51,7 @@ export async function buildImage(options:outputOptions){
 
 const MOVING_AVERAGE_SIZE = 7;
 
-export function buildJSON(ankiData:ankiData, allEvents:activity[], lastCaches:cache[], timeToAdd:number):ReportData{
+export function buildJSON(ankiData:ankiData, allEvents:relativeActivity[], lastCaches:cache[], timeToAdd:number):ReportData{
     const date = dayjs();
     const reportNo = lastCaches[0].reportNo + 1;
 
@@ -170,56 +170,4 @@ export function buildNewCache(reportData:ReportData, startCache:cache, timeToAdd
         cardsStudied: reportData.totalReviews.delta,
     }
     return newCache;
-}
-
-export function buildMessage(count:ankiData, allEvents:activity[], cache:cache, timeToAdd:number) {
-    return "when mom find the poop socks";
-    // let message = `**Progress report #${cache.reportNo + 1}**\n\n\`\`\``
-
-    // if(allEvents.length == 0){
-    //     message += "No Immersion since last report. Resetting streak."
-    // }
-    // else{
-    //     message += "Immersion report :\n";
-    //     allEvents.forEach(element => {
-    //         message += "- " + element.activityTitle + " - " + element.activityDurationHR + "\n";
-    //     });
-    
-    //     message += "Total immersion time since last report : " + dayjs.duration(timeToAdd * 1000).format(HHMMSS)    
-    // }
-
-    // if(getConfig().anki.enabled){
-    //     message += "\n\n";
-    //     if(count == null){
-    //         message += "Anki stats could not be loaded. Freezing streak for now."
-    //     }
-    //     else if (count.reviewCount == 0){
-    //         message += `Anki not done since last report. Resetting streak.`
-    //     }
-    //     else{
-    //         message += `Anki done ✅`
-    //     }
-    // }
-    
-
-    // const hoursNew = roundSecondsToHours(newCache.totalSeconds);
-    // const hoursOld = roundSecondsToHours(cache.totalSeconds);
-    // message += [
-    //     `\n\nAll time stats :`,
-    //     `\nTotal immersion time - Approx. ${addS(hoursNew, 'hour')} ${Math.floor(hoursNew / 100) > Math.floor(hoursOld / 100) ? `🎉 (${Math.floor(hoursNew / 100) * 100} hour milestone ! )` : ''}`,
-    //     `\nImmersion Streak - ${addS(newCache.immersionStreak, "report")}`
-    // ].join("");
-    
-    // if(getConfig().anki.enabled){
-    //     message += [
-    //         `\nTotal cards reviewed - ${abbreviateNumber(newCache.totalCardsStudied, 2)}`,
-    //         `\nAnki Streak - ${addS(newCache.ankiStreak, "report")}`
-    //     ].join("");
-    // }
-    // message += "```"
-    // return {
-    //     message: message,
-    //     cache: newCache
-    // }  
-
 }

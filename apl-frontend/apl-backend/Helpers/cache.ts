@@ -6,9 +6,8 @@ import { Version, appVersion } from "../consts/versioning.js";
 import path from "path"
 import { fileURLToPath } from 'url';
 import { app } from "electron";
+import { cache_location } from "./getConfig.js";
 
-export const APLData = path.join(app.getPath("userData")) 
-export const cache_location: string = path.join(APLData, "/cache.json");
 
 export class CacheManager {
 

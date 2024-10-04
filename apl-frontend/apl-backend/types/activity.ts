@@ -3,3 +3,8 @@ export interface activity{
     activityDurationHR:string,
     activitySeconds:number
 }
+
+export interface relativeActivity {
+    name: string;
+    relativeValue: number;
+}

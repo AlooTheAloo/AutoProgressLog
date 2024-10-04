@@ -11,12 +11,13 @@ export function CreateDB(db:sqlite3.Database){
             totalCardsStudied INTEGER, 
             cardsStudied INTEGER,
             mature INTEGER, 
-            retention REAL
+            retention REAL,
+            type STRING
         )
     `, () => {
-        db.run(`INSERT INTO syncData (generationTime, totalSeconds, totalCardsStudied, cardsStudied, mature, retention) VALUES (
-                $generationTime, $totalSeconds, $totalCardsStudied, $cardsStudied, $mature, $retention)`,
-            dayjs().startOf("day").valueOf(), 0, 0, 0, 0, 0
+        db.run(`INSERT INTO syncData (generationTime, totalSeconds, totalCardsStudied, cardsStudied, mature, retention, type) VALUES (
+                $generationTime, $totalSeconds, $totalCardsStudied, $cardsStudied, $mature, $retention, $type)`,
+            dayjs().startOf("day").valueOf(), 0, 0, 0, 0, 0, "Full"
         );
     });
     

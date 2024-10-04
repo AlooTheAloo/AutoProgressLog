@@ -10,7 +10,7 @@ export type ReportData = {
 
     ImmersionTime:TPlusDelta<number>,
     AverageImmersionTime:TPlusDelta<number>,
-    ImmersionLog:activity[],
+    ImmersionLog:relativeActivity[],
     ImmersionStreak:TPlusDelta<number>,
     ImmersionData:RelativeReportData[],    
 
@@ -27,12 +27,10 @@ export type RelativeReportData = {
     reportNo:number
 }
 
-export type activity = {
-    activityTitle:string,
-    activityDurationHR:string,
-    activitySeconds:number
+export interface relativeActivity {
+    name: string;
+    relativeValue: number;
 }
-
 export type TPlusDelta<T> = {
     current:T,
     delta:T

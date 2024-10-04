@@ -1,4 +1,4 @@
-import { activity } from "./activity";
+import { activity, relativeActivity } from "./activity";
 
 export type ReportData = {
     reportNo:number,
@@ -12,7 +12,7 @@ export type ReportData = {
 
     ImmersionTime:TPlusDelta<number>,
     AverageImmersionTime:TPlusDelta<number>,
-    ImmersionLog:activity[],
+    ImmersionLog:relativeActivity[],
     ImmersionData:RelativeReportData[],
     ImmersionStreak:TPlusDelta<number>,
 

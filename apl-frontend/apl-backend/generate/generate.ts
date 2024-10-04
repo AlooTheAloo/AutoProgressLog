@@ -5,7 +5,7 @@ import { activity } from '../types/activity.js';
 import duration from "dayjs/plugin/duration.js";
 import { sumTime } from '../Helpers/entryHelper.js';
 import { getAnkiCardReviewCount, getMatureCards, getRetention } from "../anki/db.js";
-import { buildImage, buildJSON, buildMessage, buildNewCache } from '../Helpers/buildMessage.js';
+import { buildImage, buildJSON, buildNewCache } from '../Helpers/buildMessage.js';
 import { getConfig } from '../Helpers/getConfig.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -17,6 +17,8 @@ import advancedFormat from 'dayjs/plugin/advancedFormat'
 import { LaunchAnki } from '../config/configAnkiIntegration.js';
 import { writeFileSync } from 'fs';
 import { getTimeEntries } from '../toggl/toggl-service.js';
+import { GetImmersionSourcesSince, GetImmersionTimeSince } from '../Helpers/DataBase/SearchDB.js';
+import { runSync } from './sync.js';
 
 dayjs.extend(duration)
 dayjs.extend(advancedFormat)
@@ -27,17 +29,14 @@ export const __dirname = path.dirname(__filename);
 
 export async function runGeneration(){
 
-
-    
-    // Anki stuff
-    await LaunchAnki(getConfig().anki.ankiIntegration);
+    runSync();
     
     const startCache = CacheManager.peek()
     const generationTime = dayjs(startCache.generationTime);
 
 
     // Toggl stuff
-    const { entriesAfterLastGen, allEvents } = await getTimeEntries(startCache.generationTime);
+    const events = await GetImmersionSourcesSince(generationTime);
 
     let count:null|number = null;
     let mature:null|number = null;
@@ -49,7 +48,7 @@ export async function runGeneration(){
     mature = await getMatureCards(config.anki.ankiIntegration);
     retention = await getRetention(config.anki.options.retentionMode, config.anki.ankiIntegration);
        
-    const timeToAdd = sumTime(entriesAfterLastGen)
+    const timeToAdd = sumTime(events)
 
 
     const json = buildJSON(
@@ -57,7 +56,7 @@ export async function runGeneration(){
         reviewCount: count,
         matureCount: mature,
         retention: retention
-    }, allEvents, CacheManager.getLastN(30), timeToAdd);
+    }, events, CacheManager.getLastN(30), timeToAdd);
 
     const p = path.join(__dirname, "..", "..", "apl-backend", "apl-visuals", "visuals", "report-data.json")
     

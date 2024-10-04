@@ -14,19 +14,18 @@
   "dmg": {
     "window": {
       "width": 540,
-      "height": 380
+      "height": 540
     },
+  
   },
   "mac": {
     "target": [
       "default"
     ],
     "artifactName": "${productName}_MacOS_${version}_Installer.${ext}",
-    "mac": {
     "entitlements": "build/entitlements.mac.plist",
     "entitlementsInherit": "build/entitlements.mac.plist",
     "hardenedRuntime": true,
-  },
   },
   "win": {
     "target": [

@@ -10,7 +10,9 @@ import Ripple from 'primevue/ripple';
 import routes from './pages/routes/routes'
 import 'primeicons/primeicons.css'
 import Tooltip from 'primevue/tooltip';
-
+import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration';
+import relativeTime from 'dayjs/plugin/relativeTime';
 
 
 const router = createRouter({
@@ -66,7 +68,8 @@ const Noir = definePreset(Aura, {
   }
 });
 
-
+dayjs.extend(duration);
+dayjs.extend(relativeTime);
 
 createApp(App)
   .use(router)

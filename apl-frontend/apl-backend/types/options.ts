@@ -3,6 +3,7 @@ export interface options {
     serverOptions?:ServerOptions
     toggl:{
         togglToken:string,
+        userName:string
     }
     anki: {
         ankiIntegration:ankiIntegration
@@ -18,7 +19,8 @@ export type outputOptions = {
     outputFile:{
         name:string,
         extension:".png" | ".jpg" | ".jpeg" | ".webp" | ".pdf"
-    }
+    },
+    outputQuality:number
 }
 
 export type RetentionMode = "default_anki" | "true_retention"

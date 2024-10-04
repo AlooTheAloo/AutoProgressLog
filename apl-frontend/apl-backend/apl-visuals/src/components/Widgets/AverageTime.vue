@@ -13,12 +13,17 @@
         return dayjs.duration(props.time.current, "second").format("HH:mm:ss");
     })
 
+    const negative = computed(() => {
+        return props.time.delta < 0;
+    })
+
     const hrDelta = computed(() => {
+        console.log(props.time.delta)
         if(props.time.delta == undefined || Math.abs(props.time.delta) < 1) {
             console.log("return 0")
             return 0;
         }
-        return dayjs.duration(props.time.delta, "second").format("HH:mm:ss");
+        return dayjs.duration(Math.abs(props.time.delta), "second").format("HH:mm:ss");
     })
 
     interface AverageTimeProps{
@@ -29,7 +34,7 @@
 
 <template>
     <SmallWidget title="Average immersion time" 
-    v-bind:deltaOverride="hrDelta == 0 ? 0 : 1"
+    v-bind:deltaOverride="(negative) ? -1 : (hrDelta == 0 ? 0 : 1)"
     :image="AverageTime" :value="{ 
         current:hrCurrent,
         delta:hrDelta,
