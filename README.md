@@ -15,39 +15,25 @@ As well as simplifying the process of logging, this tool gamifies the process of
 
 ## Installation
 
-This project is compatible with [Bun](https://bun.sh/) and [NodeJS](https://nodejs.org/en). If you don't have any, [NodeJS](https://nodejs.org/en) is strongly recommended for new users.
+### Windows guidelines
+It is recommended to close your browser during the setup process. While fetching your toggl track token, there may be accessibility conflicts within the cookies database.
 
+### MacOS guidelines
+You will be required to authorize APL access to your screen. This is used to track the synchronisation process with anki.
+If you're on MacOS 15 Sequoia or later, you will need to revalidate this every month.
 
-#### If you're using NodeJS / npm (recommended)
-```bash
-git clone https://github.com/AlooTheAloo/AutoProgressLog
-cd AutoProgressLog
-npm i
-npm run config
-```
-
-#### If you're using bun
-```bash
-git clone https://github.com/AlooTheAloo/AutoProgressLog
-cd AutoProgressLog
-bun i
-bun run config
-```
-
-## Upgrading
-There is an automatic upgrade script available. 
-If you're upgrading from a previous version, simply place the `cache` folder in the new folder and run ```npm run upgrade```.
-
+### Linux guidelines
+Most of the automagic connections will not work on linux or will only work on very few distros.
 
 ## Configuration
 
 #### What's the difference between manual and server modes?
-Manual mode will run the logger every time you run the program. It will generate one report and then close itself. This is useful when you are running the logger on your own home computer.
+Manual mode will create a new report every time you ask it to. It will generate one report and then close itself. This is useful when you are running the logger on your own home computer.
+Server mode will create a new report at a specified interval at a certain time. This is useful when you are running the logger on a home server.
 
-Server mode will run the logger at a specified time of the day every day. The program will run and be on standby until the time of day specified, run the logger, and then go back to being on standby. This is useful when you are running the logger on a home server.
+The decision you make is not final and it is very easy to change between the two in the settings.
 
 #### Getting your toggl Track token
-If you don't already have an account, [please make one before proceeding](https://toggl.com/). \
 Your API key is available at the bottom of [your profile page](https://track.toggl.com/profile)
 
 #### Anki database path
@@ -82,7 +68,7 @@ Once you provide this path, anki will launch. Once launched, the configuration s
 ## Limitations
 This has only been tested on Windows and MacOS, if you have issues on other operating systems, skill issue lmao.
 
-Anki integration will only work on computers with a graphical desktop environment, meaning you cannot run this on a CLI-only server (though a docker-compatible release is in the works).
+This app will only work on computers with a graphical desktop environment, meaning you cannot run this on a CLI-only server.
 
 ## Contributing
 We truly appreciate your interest in contributing! However, we encourage you to focus on spending your time on immersion and making progress. If you have a quick, simple suggestion or improvement, we’d love to hear it. Otherwise, leave the heavy lifting to us 💪 
