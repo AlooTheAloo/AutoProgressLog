@@ -1,4 +1,4 @@
-# Quasar App (quasar-project)
+# APL-Website (quasar-project)
 
 Website for APL
 
