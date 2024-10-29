@@ -27,16 +27,19 @@
     "pluralize": "^8.0.0",
     "radix-vue": "^1.9.3",
     "round-to": "^6.0.0",
+    "shuffle-array": "^1.0.1",
     "tailwind-merge": "^2.4.0",
     "tailwindcss-animate": "^1.0.7",
     "vue": "^3.4.29",
     "vue3-apexcharts": "^1.5.3",
-    "vue3-radial-progress": "^1.1.1"
+    "vue3-radial-progress": "^1.1.1",
+    "vuedraggable": "^4.1.0"
   },
   "devDependencies": {
     "@types/chroma-js": "^2.4.4",
     "@types/color": "^3.0.6",
     "@types/pluralize": "^0.0.33",
+    "@types/shuffle-array": "^1.0.5",
     "@vitejs/plugin-vue": "^5.0.5",
     "autoprefixer": "^10.4.19",
     "postcss": "^8.4.39",

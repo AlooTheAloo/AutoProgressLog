@@ -41,10 +41,9 @@ export function routeListeners(){
         }
      });
 
-     ipcMain.handle("OpenExternal", (event, args) => {
-        shell.openExternal(args);
-     });
-     
+    ipcMain.handle("OpenExternal", (event, args) => {
+    shell.openExternal(args);
+    });
 }
 
 

@@ -6,13 +6,13 @@ import { getConfig, syncDataPath } from "../../../apl-backend/Helpers/getConfig"
 import { runSync } from "../../../apl-backend/generate/sync";
 import { CacheManager } from "../../../apl-backend/Helpers/cache";
 import { DashboardDTO } from "./types/Dashboard";
-import { GetImmersionSourcesSince, GetImmersionTimeSince, GetLastEntry } from "../../../apl-backend/Helpers/DataBase/SearchDB";
+import { GetImmersionSourcesSince, GetImmersionTimeBetween, GetImmersionTimeSince, GetLastEntry } from "../../../apl-backend/Helpers/DataBase/SearchDB";
 import dayjs from "dayjs";
+import { roundTo } from "round-to";
 
 export function DashboardListeners() {
     ipcMain.handle("GenerateReport", async (event: any) => {
-        
-        runGeneration();
+        return await runGeneration();
     });
 
     ipcMain.handle("Sync", async (event: any) => {
@@ -26,23 +26,34 @@ export function DashboardListeners() {
 }
 
 export async function CreateDTO(){
-
     const lastEntry = await GetLastEntry();
     const lastReport = await CacheManager.peek();
 
-    console.log(lastEntry);
-    const DTO:DashboardDTO = {
+    const thisMonth = await GetImmersionTimeSince(dayjs().startOf("month"));
+    const lastMonth = await GetImmersionTimeBetween(dayjs().subtract(1, "month").startOf("month"), dayjs().subtract(1, "month"));
+
+    const DTO:DashboardDTO = {    
         userName: getConfig().toggl.userName,
         lastSyncTime: dayjs(lastEntry.generationTime).toISOString(),
         lastReportTime: lastReport.generationTime,
-        immersionSinceLastReport: await GetImmersionTimeSince(dayjs(lastReport.generationTime)),
-        totalImmersion: lastEntry.totalSeconds,
-        retentionRate: lastEntry.retention,
-        totalReviews: lastEntry.totalCardsStudied,
-        immersionSources: await GetImmersionSourcesSince(dayjs().subtract(1, "month")),
-        monthlyScore: 0
+        ankiDTO: getConfig().anki.enabled ? {
+            retentionRate: lastEntry.anki.retention,
+            retentionRateDelta: roundTo(roundTo(lastEntry.anki.retention, 2) - roundTo(lastReport.retention, 2), 2),
+    
+            totalReviews: lastEntry.anki.totalCardsStudied,
+            reviewsDelta: lastEntry.anki.totalCardsStudied - lastReport.totalCardsStudied,
+        } : undefined,
+        immersionDTO: {
+            totalImmersion: lastEntry.toggl.totalSeconds,
+            immersionSinceLastReport: await GetImmersionTimeSince(dayjs(lastReport.generationTime)),
+            monthlyImmersion: thisMonth,
+            monthlyImmersionLastMonth: lastMonth,
+            immersionSources: await GetImmersionSourcesSince(dayjs().subtract(1, "month")),
+        },
+        monthlyScore: 0,
     }
 
+    console.log(DTO);
     return DTO;
 }
 

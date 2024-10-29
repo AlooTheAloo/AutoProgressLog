@@ -14,7 +14,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "bun run build-v && vue-tsc && vite build && electron-builder",
+    "build": "bun run build-v && bun run build-e && vue-tsc && vite build && electron-builder",
     "release": "vue-tsc && vite build && electron-builder -mwl",
     "preview": "vite preview",
     "play": "bun --watch ./apl-backend/entry/tests.ts",
@@ -58,6 +58,7 @@
     "keytar": "^7.9.0",
     "node-schedule": "^2.1.1",
     "path": "^0.12.7",
+    "pickleparser": "^0.2.1",
     "pluralize": "^8.0.0",
     "primeicons": "^7.0.0",
     "primevue": "^4.0.5",

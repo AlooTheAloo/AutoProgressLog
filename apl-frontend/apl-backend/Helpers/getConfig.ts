@@ -3,6 +3,7 @@ import fs from "fs";
 import path from "path"
 import {fileURLToPath} from "url"
 import electron from "electron";
+import { syncProps } from "../generate/sync.js";
 
 let config:options|null = null;
 const __filename = fileURLToPath(import.meta.url);
@@ -16,8 +17,6 @@ const environment:"electron"|"node" = electron.app != null ? "electron" : "node"
 export const configPath = getFileInAPLData("config.json"); 
 export const syncDataPath = getFileInAPLData("syncData.db");
 export const cache_location= getFileInAPLData("cache.json");
-
-
 
 export function getConfig():options|null{
     if(config == null){
@@ -33,4 +32,11 @@ export function getConfig():options|null{
     }
 
     return config;
+}
+
+export function getSyncProps():syncProps{
+    return {
+        syncAnki: getConfig().anki.enabled,
+        syncToggl: true // TODO : Maybe add a toggle for toggl later (i thought this was funny)
+    }    
 }

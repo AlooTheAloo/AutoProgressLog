@@ -10,13 +10,8 @@ import { getConfig } from '../Helpers/getConfig.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { CacheManager } from '../Helpers/cache.js';
-import { HHMMSS } from '../consts/time.js';
-import { exec } from 'child_process';
-import proc from 'find-process';
 import advancedFormat from 'dayjs/plugin/advancedFormat' 
-import { LaunchAnki } from '../config/configAnkiIntegration.js';
 import { writeFileSync } from 'fs';
-import { getTimeEntries } from '../toggl/toggl-service.js';
 import { GetImmersionSourcesSince, GetImmersionTimeSince } from '../Helpers/DataBase/SearchDB.js';
 import { runSync } from './sync.js';
 
@@ -29,7 +24,7 @@ export const __dirname = path.dirname(__filename);
 
 export async function runGeneration(){
 
-    runSync();
+    await runSync();
     
     const startCache = CacheManager.peek()
     const generationTime = dayjs(startCache.generationTime);
@@ -65,4 +60,5 @@ export async function runGeneration(){
 
     // Output
     CacheManager.push(buildNewCache(json, startCache, timeToAdd));
+    return await runSync(true);
 }

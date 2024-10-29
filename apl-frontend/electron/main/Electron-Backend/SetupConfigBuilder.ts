@@ -10,8 +10,16 @@ import { CreateDB } from "../../../apl-backend/Helpers/DataBase/CreateDB";
 let account:TogglAccount = undefined;
 const config:Partial<options> = {}
 
-export function setAnkiIntegration(anki:ankiIntegration){
+export function setAnkiIntegration(anki:ankiIntegration|false){
+    if(!anki){
+        config.anki = {
+            enabled: false
+        }
+        return;
+    }
+
     config.anki = {
+        enabled: true,
         ankiIntegration: anki,
         options: { 
             trackedDecks: [],
@@ -21,7 +29,18 @@ export function setAnkiIntegration(anki:ankiIntegration){
 }
 
 export function getSetupAnkiIntegration():ankiIntegration{
+    console.log(config.anki);
     return config.anki.ankiIntegration;
+}
+
+export function getSetupAnki():{
+    ankiIntegration:ankiIntegration
+    options: {
+        retentionMode: RetentionMode,
+        trackedDecks: number[]
+    }
+}{
+    return config.anki;
 }
 
 
@@ -72,7 +91,6 @@ export function setupListeners() {
 
     ipcMain.handle("set-server-options", (event: any, arg: ServerOptions) => {
         config.serverOptions = arg;
-        console.log(JSON.stringify(config))
     })
 
     ipcMain.handle("SetRetentionMode", (event: any, arg: RetentionMode) => {

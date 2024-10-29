@@ -66,7 +66,7 @@
                 <div class="h-8">
                 </div>
                 <div v-if="togglAccounts.length == 0" class="flex flex-col h-full">
-                    <div class="font-semibold text-4xl">
+                    <div class="font-semibold text-4xl text-white">
                         No Toggl Track accounts found!
                     </div>
                     <div class="text-sm">

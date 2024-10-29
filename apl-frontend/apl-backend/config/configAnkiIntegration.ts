@@ -1,5 +1,5 @@
 import { ankiIntegration } from "../types/options.js";
-import fs from "fs";
+import fs, { existsSync } from "fs";
 import sqlite3 from 'sqlite3';
 import { exec } from 'child_process';
 import proc from 'find-process';
@@ -9,9 +9,10 @@ import { kill } from "process";
 import { readWindows } from "../Helpers/readWindows.js";
 import { getSetupAnkiIntegration } from "../../electron/main/Electron-Backend/SetupConfigBuilder.js";
 
-interface ankiPaths{
+export interface ankiPaths{
     ankiDB: string,
     ankiPath: string,
+    profile: string
 }
 
 interface deck {
@@ -45,7 +46,7 @@ export async function getDecksCards():Promise<deck[]>{
 }
 
 export async function getDecks(chosenProfile?:string):Promise<string[]>{
-    const prefsDBPath = path.join(app.getPath("appData"), "anki2", chosenProfile, "collection.anki2");
+    const prefsDBPath = path.join(getAnkiBase(), chosenProfile, "collection.anki2");
     const prefsDB = new sqlite3.Database(prefsDBPath, (err) => {});
     
     const decks:string[] = await new Promise((res, rej) => {
@@ -65,7 +66,7 @@ export async function getProfileDecks():Promise<{name: string, deckCount: number
         const decks = await getDecks(profile.name);
         ret.push({
             name: profile.name,
-            deckCount: decks.length
+            deckCount: decks.length,
         })
     }))
     
@@ -74,8 +75,18 @@ export async function getProfileDecks():Promise<{name: string, deckCount: number
 }
 
 
+const getAnkiBase = () => {
+    if(process.platform == "darwin" || process.platform == "win32"){
+        return path.join(app.getPath("appData"), "anki2");
+    }
+    else {
+        // TODO: Linux
+        return path.join(app.getPath("home"), ".local", "share", "Anki2");
+    }
+} 
+
 export async function getAnkiProfiles():Promise<{name: string}[]>{
-    const prefsDBPath = path.join(app.getPath("appData"), "anki2", "prefs21.db");
+    const prefsDBPath = path.join(getAnkiBase(), "prefs21.db");
     const prefsDB = new sqlite3.Database(prefsDBPath, (err) => {});
     console.log(prefsDBPath);
     const profiles:{name: string}[] = await new Promise((res, rej) => {
@@ -91,24 +102,29 @@ export let getAnkiProfileCount = async () => (await getAnkiProfiles()).length;
 
 export async function getAnkiDBPaths(chosenProfile?:string):Promise<ankiPaths>{
 
-    const prefsDBPath = path.join(app.getPath("appData"), "anki2", chosenProfile, "collection.anki2");
+    const prefsDBPath = path.join(getAnkiBase(), chosenProfile, "collection.anki2");
     let AppPath = "";
 
     if(process.platform == "darwin"){
         AppPath = path.join("/", "Applications", "Anki.app");
     }
     else if (process.platform == "win32"){
-        AppPath = path.join(app.getPath("appData"), "Anki2");
+        // TODO : Windows
     }
     else {
-        // TODO: Linux :(
+        // TODO : Maybe there's a local in the path 
+        AppPath = path.join("/", "usr", "bin", "anki");
+        if(!existsSync(AppPath)){
+            AppPath = path.join("/", "usr", "bin", "local", "anki");
+        }
     }
     
     await sleep(500);
 
     return {
         ankiDB: prefsDBPath,
-        ankiPath: AppPath
+        ankiPath: AppPath,
+        profile: chosenProfile
     };
 }
 
@@ -146,14 +162,16 @@ export async function verifyAnkiPaths(paths:ankiPaths):Promise<boolean>{
 
 
 export async function createAnkiIntegration(paths:ankiPaths):Promise<ankiIntegration|false>{
+    console.log("Were here idiots !!!")
     const worked = await LaunchAnki(paths);
-    if(worked == false) { 
+    if(worked.at(0) == false) { 
         return false;
     }
     return {
         ankiDB: paths.ankiDB,
         ankiPath: paths.ankiPath,
-        ankiProgramBinaryName: worked[1] as string
+        ankiProgramBinaryName: worked[1] as string,
+        profile: paths.profile
     }
 }
 
@@ -163,31 +181,26 @@ export async function LaunchAnki(paths:ankiPaths|ankiIntegration){
         
     if(!fs.existsSync(paths.ankiPath)){
         console.log(`The file ${paths.ankiPath} does not exist. Please provide a valid path`.red);
-        return false;
+        return [false, null];
     }
 
-    let shouldKill = true;
+    const isOpened = (await getAnkiProcesses()).length > 0;
+    const openCommand = (process.platform == "darwin" ? "open " : "") + paths.ankiPath;
 
-    if("ankiProgramBinaryName" in paths){
-        shouldKill = !(await proc("name", "Anki")).some(x => x.cmd == paths.ankiProgramBinaryName)
+    console.log(isOpened);
+
+    if(!isOpened){
+        exec(openCommand);    
     }
-
-    const command = (process.platform == "darwin" ? "open " : "") + paths.ankiPath;
-    exec(command);
-
+    
     let iterations = 0;
 
     const resp = await new Promise<string|null>(async (res, rej) => {
         var intervalOpen = setInterval(async () => {
             if(iterations > 500) res(null);
-            const processes = await proc("name", "Anki")
-            if(processes.length == 0) return;
-
-            const targetProcesses = processes.filter(x => {
-               const base = basename(x.cmd).toLowerCase();
-               return base == "anki" || base == "anki.exe"
-            });
+            const targetProcesses = await getAnkiProcesses();
             if(targetProcesses.length == 0) return;
+
             const pid = targetProcesses[0].pid;
             if((await readWindows([pid])).length > 0){
                 await sleep(1000);
@@ -197,8 +210,12 @@ export async function LaunchAnki(paths:ankiPaths|ankiIntegration){
                     if(iterations > 500) res(null);
                     const remainingProcesses = await proc("name", "Anki")
                     if(remainingProcesses.filter(x => x.pid == pid).length == 0){
-                        res(processes.filter(x => x.pid == pid)[0].cmd);
+                        res(targetProcesses.filter(x => x.pid == pid)[0].cmd);
                         clearInterval(intervalClose);
+
+                        if(isOpened){
+                            exec(openCommand);    
+                        }
                     }
                     iterations++;
                 }, 500)
@@ -208,12 +225,31 @@ export async function LaunchAnki(paths:ankiPaths|ankiIntegration){
         }, 500);
 
     })
-    if(resp == null)
+    if(typeof(resp) == null)
     {
-        return false;
+        return [false, null];
     }
     
     return [true, resp];
+}
+
+
+export async function getAnkiProcesses():Promise<{
+    pid: number;
+    ppid?: number;
+    uid?: number;
+    gid?: number;
+    name: string;
+    cmd: string;
+}[]>{
+    const winDarProcesses = await proc("name",  "Anki")
+    const linuxProcesses = await proc("name", "anki")
+    const processes = winDarProcesses.concat(linuxProcesses);
+    const targetProcesses = processes.filter(x => {
+        const base = basename(x.cmd).toLowerCase();
+        return base == "anki" || base == "anki.exe"
+     });
+     return targetProcesses
 }
 
 

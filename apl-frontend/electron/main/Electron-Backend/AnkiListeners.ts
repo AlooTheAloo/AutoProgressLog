@@ -5,23 +5,27 @@ import { getSetupAnkiIntegration, setAnkiIntegration } from "./SetupConfigBuilde
 import { getAnkiCardReviewCount, getMatureCards, getRetention } from "../../../apl-backend/anki/db";
 import { roundTo } from "round-to";
 import { hasPerms } from "../../../apl-backend/Helpers/readWindows";
-import { createAnkiIntegration, getAnkiDBPaths, getAnkiProfileCount, getAnkiProfiles, getDecks, getDecksCards, getProfileDecks, sleep, verifyAnkiPaths } from "../../../apl-backend/config/configAnkiIntegration";
-import { basename, join } from "path";
+import { ankiPaths, createAnkiIntegration, getAnkiDBPaths, getAnkiProfileCount, getAnkiProfiles, getDecks, getDecksCards, getProfileDecks, sleep, verifyAnkiPaths } from "../../../apl-backend/config/configAnkiIntegration";
+import path, { basename, join } from "path";
 
 export function ankiListeners() {
 
     ipcMain.handle("anki-read-data", async (event: any, arg: any) => {
-        const retention = await getRetention(arg, getSetupAnkiIntegration());
-        const matureCards = await getMatureCards(getSetupAnkiIntegration());
+        const int = getSetupAnkiIntegration() 
+        const retention = await getRetention(arg, int);
+        const matureCards = await getMatureCards(int);
         return {
             retentionRate: roundTo(retention, 2),
             matureCardCount: matureCards 
         }
     });
 
+    ipcMain.handle("SkipAnki", async (event: any, arg: any) => {
+        setAnkiIntegration(false);
+    });
+    
     ipcMain.handle("anki-decks-list", async (event: any, arg: any) => {
         const decksCards = await getDecksCards();
-        console.log(decksCards)
         return decksCards;
     });
     
@@ -35,10 +39,8 @@ export function ankiListeners() {
     ipcMain.handle("anki-connect-start", async (event: any, arg: any) => {
         win.webContents.send("anki-connect-message", "Locating Anki Paths");
         await sleep(500)
-
         const profileCount = await getAnkiProfileCount();
 
-        console.log(profileCount);
         if(profileCount == 0)
         {
             return false;
@@ -58,15 +60,16 @@ export function ankiListeners() {
 
 
     ipcMain.handle("anki-manual-connect-start", async (event: any, appPath: string, dbPath: string) => {
-        const Paths = {
+        const Paths:ankiPaths = {
             ankiDB: dbPath,
-            ankiPath: appPath
+            ankiPath: appPath,
+            profile: path.basename(path.join(dbPath, ".."))
         }
         return await connectFromPaths(Paths);
         
     });
 
-    async function connectFromPaths(Paths:any){
+    async function connectFromPaths(Paths:ankiPaths){
         win.webContents.send("anki-connect-message", "Verifying validity of installation");
         const verified = await verifyAnkiPaths(Paths);
         if(!verified) return false;
@@ -76,7 +79,10 @@ export function ankiListeners() {
             ankiIntegration = await macOSAnki(Paths);
         }
         else {
-            return await createAnkiIntegration(Paths);
+            ankiIntegration = await createAnkiIntegration(Paths);
+            if(ankiIntegration != false){
+                setAnkiIntegration(ankiIntegration);
+            }
         }
 
         if(ankiIntegration){

@@ -9,5 +9,5 @@
     "allowSyntheticDefaultImports": true,
     "outDir": "./dist" 
   },
-  "include": ["vite.config.ts", "package.json", "electron", "apl-backend"]
+  "include": ["vite.config.ts", "package.json", "electron", "apl-backend"],
 }

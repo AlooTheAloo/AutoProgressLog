@@ -5,31 +5,69 @@ import { getConfig, syncDataPath } from "../Helpers/getConfig";
 import { getTimeEntries } from "../toggl/toggl-service";
 import sqlite3 from "sqlite3";
 import { entry } from "../types/entry";
-import { getAnkiCardReviewCount, getMatureCards, getRetention } from "../anki/db";
+import { getAnkiCardReviewCount, getMatureCards, getRetention, hasSyncEnabled } from "../anki/db";
 import dayjs from "dayjs";
 import { sumTime } from "../Helpers/entryHelper";
 import { CreateDTO } from "../../electron/main/Electron-Backend/DashboardListeners";
+import { SyncData } from "../types/sync";
 
-
-export async function runSilentSync(){    
-    syncToggl();
+export interface AnkiSyncData {
+    cardReview: number;
+    matureCards: number;
+    retention: number;
 }
 
-export async function runSync(){
-    const lastEntry = await GetLastEntry();
+export interface syncProps {
+    syncAnki: boolean;
+    syncToggl: boolean;
+}
 
-    await LaunchAnki(getConfig().anki.ankiIntegration);
-    const toggl = await syncToggl();
-    const anki = await syncAnki();
-    const time = sumTime(toggl);
+const DEFAULT:syncProps = {
+    syncAnki: true,
+    syncToggl: true
+}
+
+export async function runSync(silent = false, props:syncProps = DEFAULT){
+    
+    let toggl:entry[] = [];
+    let anki:AnkiSyncData = null;
+
+    const [t, a] = await Promise.all([
+        props.syncToggl ? syncToggl() : null,
+        new Promise<AnkiSyncData>(async (res, rej) => {
+            if(props.syncAnki == false) return res(null);
+            if(hasSyncEnabled(getConfig().anki.ankiIntegration.profile) && !silent){
+                await LaunchAnki(getConfig().anki.ankiIntegration);
+            }
+            syncAnki().then(res).catch(rej);
+        })
+    ])
+
+    let lastEntry:SyncData|null = null;
+    let time:number|null = null;
+    
+    toggl = t;
+    anki = a;
+
+    if(props.syncToggl)
+    {
+        lastEntry = await GetLastEntry();
+        time = sumTime(toggl);
+    }
+   
+
     await WriteSyncData({
         id: 0,
         generationTime: dayjs().valueOf(),
-        totalSeconds: lastEntry.totalSeconds + time,
-        totalCardsStudied: lastEntry.totalCardsStudied + anki.cardReview,
-        cardsStudied: anki.cardReview,
-        mature: anki.matureCards,
-        retention: anki.retention,
+        toggl: {
+            totalSeconds: lastEntry.toggl.totalSeconds + time,
+        },
+        anki: {
+            totalCardsStudied: lastEntry.anki.totalCardsStudied + anki.cardReview,
+            cardsStudied: anki.cardReview,
+            mature: anki.matureCards,
+            retention: anki.retention,
+        },
         type: "Full"
     }, toggl);
 

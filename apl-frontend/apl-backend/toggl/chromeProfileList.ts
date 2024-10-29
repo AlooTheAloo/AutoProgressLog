@@ -23,7 +23,7 @@ const locations = {
     macOS: [
         `${os.homedir()}/Library/Application Support/Google/Chrome`,
         `${os.homedir()}/Library/Application Support/Google/Chrome Canary`,
-        `${os.homedir()}/Library/Application Support/Chromium`
+        `${os.homedir()}/Library/Application Support/Chromium`,
     ],
     windows: [
         `${process.env.LOCALAPPDATA}\\Google\\Chrome\\User Data`,
@@ -38,15 +38,23 @@ const locations = {
 };
 
 export const ListProfiles = function (variant = variations.CHROME) {
-    return fs.readdirSync(locations[osType][variant])
-        .filter(f => f !== 'System Profile' && fsExistsSync(path.join(locations[osType][variant], f, 'Preferences')))
+    return locations[osType].
+    filter(f => fsExistsSync(f))
+    .map(variant => {
+        console.log("variant is " + variant);
+        return fs.readdirSync(variant)
+        .filter(f => f !== 'System Profile' && fsExistsSync(path.join(variant, f, 'Preferences')))
         .map(p => {
-            let profileInfo = JSON.parse(fs.readFileSync((path.join(locations[osType][variant], p, 'Preferences'))).toString());
+            let profileInfo = JSON.parse(fs.readFileSync((path.join(variant, p, 'Preferences'))).toString());
+            console.log("found profile " + p);
             return {
                 displayName: profileInfo.profile.name,
                 profileDirName: p,
-                profileDirPath: path.join(locations[osType][variant], p),
+                profileDirPath: path.join(variant, p),
                 profilePictureUrl: profileInfo.profile.gaia_info_picture_url || null
             };
         });
-};
+    }).flat();
+
+}
+    

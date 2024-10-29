@@ -7,6 +7,7 @@ import { ReportData } from "../types/reportdata.js";
 import dayjs from "dayjs";
 import { roundTo } from "round-to";
 import { outputOptions } from "../types/options.js";
+import { arithmeticWeightedMean } from "./util.js";
 
 interface ankiData {
     reviewCount:number,
@@ -59,14 +60,14 @@ export function buildJSON(ankiData:ankiData, allEvents:relativeActivity[], lastC
     const immersionStreak = lastCaches[0].immersionStreak + (timeToAdd == 0 ? (-lastCaches[0].immersionStreak) : 1);
 
 
-    let lastnElements = lastCaches.slice(0, MOVING_AVERAGE_SIZE);
-    const oldAverage = lastnElements.reduce((a, b) => a + b.seconds, 0) / lastnElements.length
+    let lastnElements = lastCaches.slice(0, MOVING_AVERAGE_SIZE).map(x => x.seconds);
+    const oldAverage = arithmeticWeightedMean(lastnElements)
 
-    const newSeven = [...lastCaches.slice(0, MOVING_AVERAGE_SIZE - 1).map(x => (x.seconds)), timeToAdd];
-    const newAverage = newSeven.reduce((a, b) => a + b, 0) / newSeven.length;
+    const newnElements = [timeToAdd, ...lastnElements.slice(0, lastnElements.length - 1), ];
+    const newAverage = arithmeticWeightedMean(newnElements);
 
     const ImmersionScore = timeToAdd;
-    const AnkiScore = ankiData.reviewCount;
+    const AnkiScore = ankiData.reviewCount + (Math.max(ankiData.matureCount - lastCaches[0].mature, 0) * 100);
     const TotalScore = (timeToAdd + ankiData.reviewCount);
 
 

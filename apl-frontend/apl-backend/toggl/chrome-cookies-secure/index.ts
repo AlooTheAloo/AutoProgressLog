@@ -411,7 +411,6 @@ export const getCookies = async (uri, format, callback, profileOrPath) => {
 				"SELECT host_key, path, is_secure, expires_utc, name, value, encrypted_value, creation_utc, is_httponly, has_expires, is_persistent FROM cookies where host_key like '%" + domain + "' ORDER BY LENGTH(path) DESC, creation_utc ASC",
 				function (err, cookie:any) {
 					let encryptedValue;
-				
 					if (err) {
 						return callback(err);
 					}

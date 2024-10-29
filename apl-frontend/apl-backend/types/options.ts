@@ -6,8 +6,9 @@ export interface options {
         userName:string
     }
     anki: {
-        ankiIntegration:ankiIntegration
-        options: {
+        enabled: boolean,
+        ankiIntegration?:ankiIntegration
+        options?: {
             retentionMode: RetentionMode,
             trackedDecks: number[]
         }
@@ -44,5 +45,6 @@ export interface TimeInterval {
 export interface ankiIntegration{
     ankiPath?:string,
     ankiDB?:string,
-    ankiProgramBinaryName?:string
+    ankiProgramBinaryName?:string,
+    profile?:string
 }

@@ -11,6 +11,11 @@
     function NextPage(){
         router.push('/setup/anki-connect');
     }
+
+    function SkipAnki(){
+        window.ipcRenderer.invoke("SkipAnki");
+        router.push('/setup/pick-filename');
+    }
 </script>
 
 <template>
@@ -40,7 +45,9 @@
                         </div>
                     </div>
                 </div>
-                <div class="flex justify-end">
+                <div class="flex justify-between">
+                    <Button label="I don't use anki" style="font-size: 12px; padding:0px;" link @click="SkipAnki"/>
+
                     <Button 
                     @click="NextPage"
                     style="width: 120px;"

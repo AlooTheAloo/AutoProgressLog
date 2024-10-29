@@ -17,7 +17,7 @@
         const cur = sortedDataByReport.value[0].matureCardCount;
         return {
             current: cur,
-            delta: sortedDataByMature.value.length < 2 ? 0 : cur - sortedDataByReport.value[1].matureCardCount
+            delta: sortedDataByMature.value.length < 2 ? cur : cur - sortedDataByReport.value[1].matureCardCount
         }
     })
 

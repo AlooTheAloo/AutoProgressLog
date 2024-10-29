@@ -1,17 +1,29 @@
 <script setup lang="ts">
-  import Stats from './Stats.vue';
   import { ReportData } from '../types/report-data';
   import { Ref, ref } from 'vue';
   import reportdataurl from "/report-data.json?url"
   import color from "color";
+  import Test from './Test.vue';
+
+  const seedList = [
+    [255, 0, 0], 
+    [97, 250, 151], 
+    [116, 180, 255],
+    [0, 0, 255],
+    [12, 255, 15],
+    [0, 100, 200],
+    [0, 255, 0],
+    [255, 165, 0]
+  ]
 
   const reportdata = await fetch(reportdataurl)
   const json = await reportdata.json();
   let MY_JSON:Ref<ReportData> = ref(json);
   let gradient:string[] = [];
   try{
-    const input = [[[255, 0, 0], [213,122,255], [116, 180, 255]][Math.floor(Math.random() * 3)], "N", "N"]
-    console.log("input is " + input[0]);
+    const r = Math.random() * seedList.length;
+    const seed = Math.floor(r);
+    const input = [seedList[seed], "N", "N"]
     const ans = await fetch("http://colormind.io/api/", {
       method: "POST",
       body: JSON.stringify({
@@ -19,11 +31,8 @@
         "input": input
       })
     });
-    console.log(ans.body?.toString());
-
     const colors: number[][] = (await ans.json()).result
     gradient = colors.map(x => color(x).hex()).slice(0, 3);
-    console.log(gradient);
   }
   catch(err){
     console.log(err);
@@ -62,7 +71,9 @@
             <h2 class=" text-[#8E8E8E] text-lg -mt-4 mb-10">
               {{ MY_JSON.time }}
             </h2>
-            <Stats v-bind:reportData="MY_JSON"  />
+            <Test v-bind:reportData="MY_JSON"/>
+
+            <!-- <Stats v-bind:reportData="MY_JSON"  /> -->
             <div class="flex justify-center items-center h-full text-[#727272]">
               www.aplapp.dev • Made with ♥ by AlooTheAloo and Retexc 
             </div>

@@ -7,14 +7,17 @@ import { appPath } from "../routes/appRoutes";
 import ProgressSpinner from "primevue/progressspinner";
 import dayjs from "dayjs";
 import { DashboardDTO } from "../../../types/DTO";
-import AppSmallWidget from "../../components/Dashboard/AppSmallWidget.vue";
-import Time from "../../assets/Icons/time.png";
-import formatTime from "../../util/timeFormat";
+import DashboardBody from "../../components/Dashboard/DashboardBody.vue";
 
+const timeUpdateInterval = 30000;
 const router = useRouter();
+
+
 function GenerateReport(){
+    syncing.value = true;
     window.ipcRenderer.invoke("GenerateReport").then((data) => {
-        console.log(data);
+        syncing.value = false;
+        dto.value = data;
     })
 }
 function Sync(){
@@ -33,7 +36,7 @@ let interval:Timer;
 onMounted(() => {
     window.ipcRenderer.invoke("Get-Dashboard-DTO").then((data) => {
         dto.value = data;
-        setIntervalAndExecute(onDTO, 10000)
+        setIntervalAndExecute(onDTO, timeUpdateInterval)
     }
 )})
 
@@ -80,8 +83,8 @@ function setIntervalAndExecute(fn:()=>void, t:number) {
                                     <p class="font-semibold text-[#00E0FF]">
                                         Sync Now
                                     </p>
-                                    <div v-if="syncing" class="pi pi-spinner pi-spin text-[#00E0FF]"></div>
-                                    <div v-else class="pi pi-sync text-[#00E0FF]"></div>
+                                    <div v-if="syncing" class="pi pi-spinner pi-spin text-[#00E0FF]"/>
+                                    <div v-else class="pi pi-sync text-[#00E0FF]"/>
                                 </Button>
                             </div>
                         </div>
@@ -96,21 +99,8 @@ function setIntervalAndExecute(fn:()=>void, t:number) {
                     </div>
                     
                 </div>
-                <div class="flex w-full items-center px-10 bg-blue-100 ">
-                    <div class="flex-grow flex w-full bg-red-100">
-                        <AppSmallWidget
-                        units="hours"
-                        :condense="true"
-                        :value="{
-                            current: dayjs.duration(dto.totalImmersion, 's').asHours(),
-                            delta: formatTime(dto.immersionSinceLastReport),
-                        }"
-                        title="Total Immersion Time"
-                        :image="Time"
-                        :direction="dto.immersionSinceLastReport"
-                        
-                        />
-                    </div>
+                <div class="flex w-full items-center px-10 ">
+                    <DashboardBody :dto="dto"/>
                 </div>
                 
             </div>

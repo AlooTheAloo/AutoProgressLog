@@ -2,6 +2,9 @@ import dayjs, { Dayjs } from 'dayjs';
 import sqlite3, { Database } from 'sqlite3'
 import { getConfig } from '../Helpers/getConfig.js';
 import { ankiIntegration, RetentionMode } from '../types/options.js';
+import { getSetupAnki } from '../../electron/main/Electron-Backend/SetupConfigBuilder.js';
+import { Parser } from 'pickleparser';
+import path from 'path';
 
 interface reviewsrow {
     reviews:number
@@ -11,8 +14,15 @@ interface maturerow {
     mature:number
 }
 
+function getAnki(){
+    const conf = getConfig();
+    if(conf == undefined || conf == null) return getSetupAnki();
+    else return conf.anki;
+}
+
+
 function JoinTrackedDecks(table_primary_key:string = "revlog.cid"){
-    const trackedDecks = getConfig().anki.options.trackedDecks.map(x => x.toString());
+    const trackedDecks = getAnki().options.trackedDecks.map(x => x.toString());
     return `JOIN cards c ON c.id = ${table_primary_key} WHERE c.did IN (${trackedDecks.join(",")})`;
 
 }
@@ -41,7 +51,7 @@ export async function getAnkiCardReviewCount(startTime:Dayjs, ankiIntegration:an
 export async function getRetention(retentionMode:RetentionMode = "true_retention", ankiIntegration:ankiIntegration){
     return new Promise<number|null>((res, rej) => {
         // A month ago
-        const aMonthAgo = dayjs().subtract( retentionMode == "true_retention" ? 30 : 29, "days").unix() * 1000;
+        const aMonthAgo = dayjs().startOf("day").subtract( retentionMode == "true_retention" ? 30 : 29, "days").unix() * 1000;
 
         // Create a database connection
         const db = open(ankiIntegration);
@@ -73,7 +83,7 @@ export async function getRetention(retentionMode:RetentionMode = "true_retention
                     res(null);
                     return;
                 }
-
+            
                 const passed = a[0].PASSED;
                 const flunked = a[0].FLUNKED;
                 try{
@@ -131,4 +141,28 @@ async function close(db:Database){
             res(err == null);
         });
     })
+}
+
+
+export function hasSyncEnabled(profileName:string) {
+    return new Promise<boolean>((res, rej) => {
+        const prefsDB = path.join(getConfig().anki.ankiIntegration.ankiDB, "..", "..", "prefs21.db");
+        let db = new sqlite3.Database(prefsDB, sqlite3.OPEN_READWRITE, (err) => {
+            if(err) rej(err);
+        });
+    
+        res(new Promise<boolean>((res, rej) => {
+
+            db.all(`SELECT cast(data as blob) AS "profileData" FROM profiles where name = "${profileName}"`, (err, rows) => {
+                if(err) rej(err);
+                if(rows.length == 0) {
+                    res(false);
+                    return;
+                }
+                res((new Parser().parse((rows[0] as any).profileData) as any).syncKey != null);
+            })
+        }))
+       
+    })
+   
 }

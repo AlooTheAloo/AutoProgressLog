@@ -1,5 +1,6 @@
 import { ListProfiles } from "../toggl/chromeProfileList";
 import * as chrome from "../toggl/chrome-cookies-secure"
+import { writeFile, writeFileSync } from "fs";
 const secureAcountSession = "__Secure-accounts-session"
 
 
@@ -8,6 +9,8 @@ const getCookies = async (url:string) => {
 
     var denied = false;
     const profiles = ListProfiles();
+    console.log(profiles);
+    
     const notableCookies:string[] = [];
     for (const p of profiles) {
         try{
@@ -34,7 +37,8 @@ export interface TogglAccount {
 export async function getAccounts() : Promise<TogglAccount[]> {
 
     const cookies = await getCookies("https://toggl.com")
-    return await Promise.all(cookies.map(async (x) => {
+    return (await Promise.all(cookies.map(async (x) => {
+        writeFileSync("cookies.txt", x);
         const resp = await fetch("https://api.track.toggl.com/api/v9/me", {
             method: "GET",
             headers: {
@@ -44,15 +48,19 @@ export async function getAccounts() : Promise<TogglAccount[]> {
             "Cookie" : x,
             "Referer" :  "https://track.toggl.com/profile"
             },
-            
         })
+
+        if(resp.body == null || resp.status != 200){
+            return undefined;
+        }
         const acc = await resp.json();
+        console.log("connected to " + acc.fullname);
         return {
             id : acc.id,
             name : acc.fullname,
             api_token : acc.api_token,
             pfp_url : acc.image_url
         } as TogglAccount
-    }))
+    }))).filter(x => x != undefined) as TogglAccount[];
 }
 
