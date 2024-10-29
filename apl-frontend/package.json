@@ -14,8 +14,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "bun run build-v && bun run build-e && vue-tsc && vite build && electron-builder",
-    "release": "vue-tsc && vite build && electron-builder -mwl",
+    "build": "bun run build-v && vue-tsc && vite build && electron-builder",
+    "release": "bun run build-v && vue-tsc && vite build && electron-builder build -wl",
     "preview": "vite preview",
     "play": "bun --watch ./apl-backend/entry/tests.ts",
     "build-v": "cd ./apl-backend/apl-visuals && vue-tsc -b && vite build"
@@ -46,6 +46,7 @@
     "axios": "^1.7.7",
     "bun": "^1.1.29",
     "chrome-cookies-secure": "^2.1.1",
+    "color": "^4.2.3",
     "colors": "^1.4.0",
     "country-flag-icons": "^1.5.13",
     "dayjs": "^1.11.12",

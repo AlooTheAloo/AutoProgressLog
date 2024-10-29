@@ -5,15 +5,18 @@ export interface options {
         togglToken:string,
         userName:string
     }
-    anki: {
-        enabled: boolean,
-        ankiIntegration?:ankiIntegration
-        options?: {
-            retentionMode: RetentionMode,
-            trackedDecks: number[]
-        }
-    }
+    anki: ankiOptions
     outputOptions:outputOptions
+}
+
+
+export interface ankiOptions {
+    enabled: boolean,
+    ankiIntegration?:ankiIntegration
+    options?: {
+        retentionMode: RetentionMode,
+        trackedDecks: number[]
+    }
 }
 
 export type outputOptions = {

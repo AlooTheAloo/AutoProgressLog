@@ -43,11 +43,6 @@
         profiles.value = [];
         selectedProfile.value = undefined;
     }
-
-   
-
-    function NextPage(){
-    }
 </script>
 
 <template>
@@ -112,7 +107,7 @@
                     </Listbox>
                 </div>
                 
-                <Button fluid="" label="Select Profile" @click="SelectProfile" class=" h-12" :disabled="selectedProfile == null"  />
+                <Button label="Select Profile" @click="SelectProfile" class=" h-12" :disabled="selectedProfile == null"  />
             </div>
         </div>
     </div>

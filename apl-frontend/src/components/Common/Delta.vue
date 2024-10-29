@@ -4,7 +4,7 @@ import { computed } from 'vue';
     const props = defineProps<DeltaProps>()
 
     interface DeltaProps{
-        delta:string,
+        delta:string|number,
         direction:number
     }
 

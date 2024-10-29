@@ -88,7 +88,6 @@ const getAnkiBase = () => {
 export async function getAnkiProfiles():Promise<{name: string}[]>{
     const prefsDBPath = path.join(getAnkiBase(), "prefs21.db");
     const prefsDB = new sqlite3.Database(prefsDBPath, (err) => {});
-    console.log(prefsDBPath);
     const profiles:{name: string}[] = await new Promise((res, rej) => {
         prefsDB.all("SELECT name FROM profiles WHERE name NOT IN ('_global')", (err, rows:any[]) => {
             res(rows);
@@ -112,7 +111,6 @@ export async function getAnkiDBPaths(chosenProfile?:string):Promise<ankiPaths>{
         // TODO : Windows
     }
     else {
-        // TODO : Maybe there's a local in the path 
         AppPath = path.join("/", "usr", "bin", "anki");
         if(!existsSync(AppPath)){
             AppPath = path.join("/", "usr", "bin", "local", "anki");
@@ -162,7 +160,6 @@ export async function verifyAnkiPaths(paths:ankiPaths):Promise<boolean>{
 
 
 export async function createAnkiIntegration(paths:ankiPaths):Promise<ankiIntegration|false>{
-    console.log("Were here idiots !!!")
     const worked = await LaunchAnki(paths);
     if(worked.at(0) == false) { 
         return false;
@@ -173,6 +170,27 @@ export async function createAnkiIntegration(paths:ankiPaths):Promise<ankiIntegra
         ankiProgramBinaryName: worked[1] as string,
         profile: paths.profile
     }
+}
+
+export async function KillAnkiIfOpen(){
+    const targetProcesses = await getAnkiProcesses();
+    if(targetProcesses.length == 0) return;
+    const pid = targetProcesses[0].pid;
+    kill(pid);
+    let iterations = 0;
+    return new Promise<void>(async (res, rej) => {
+        var intervalClose = setInterval(async () => {
+            if(iterations > 500) res(null);
+            const remainingProcesses = await proc("name", "Anki")
+            if(remainingProcesses.filter(x => x.pid == pid).length == 0){
+                res();
+                clearInterval(intervalClose);
+            }
+            iterations++;
+        }, 500)
+    });
+   
+
 }
 
 
@@ -187,7 +205,6 @@ export async function LaunchAnki(paths:ankiPaths|ankiIntegration){
     const isOpened = (await getAnkiProcesses()).length > 0;
     const openCommand = (process.platform == "darwin" ? "open " : "") + paths.ankiPath;
 
-    console.log(isOpened);
 
     if(!isOpened){
         exec(openCommand);    
@@ -199,12 +216,16 @@ export async function LaunchAnki(paths:ankiPaths|ankiIntegration){
         var intervalOpen = setInterval(async () => {
             if(iterations > 500) res(null);
             const targetProcesses = await getAnkiProcesses();
-            if(targetProcesses.length == 0) return;
-
+            if(targetProcesses.length == 0 && !isOpened) return;
             const pid = targetProcesses[0].pid;
-            if((await readWindows([pid])).length > 0){
-                await sleep(1000);
-                kill(pid);
+            if((await readWindows([pid])).length > 0 || isOpened){
+                if(!isOpened) await sleep(1000);
+                try{
+                    kill(pid);                    
+                }
+                catch(e){
+                    console.log(e);
+                }
                 clearInterval(intervalOpen);
                 var intervalClose = setInterval(async () => {
                     if(iterations > 500) res(null);

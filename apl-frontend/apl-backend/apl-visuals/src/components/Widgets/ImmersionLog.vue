@@ -49,7 +49,7 @@
 </script>
 
 <template>
-   <div class="rounded-xl flex w-full bg-black h-[360px]">
+   <div class="rounded-xl flex w-full bg-black  h-[20.7rem]">
         <div class="w-full flex items-center px-7 flex-col ">
             <div class="pl-1 flex flex-col w-full pt-5 ">
                 <div class="flex">
@@ -77,7 +77,7 @@
             </div>
             <div class="w-full flex-grow">
                 <div class="divide-y divide-[#283B2C] w-full flex flex-col">
-                    <div v-for="(item, index) in sortedActivities" :key="index" class="h-[2.3rem] flex flex-col ">
+                    <div v-for="(item, index) in sortedActivities" :key="index" class="h-[2.1rem] flex flex-col ">
                         <div class="gap-2 flex flex-grow items-center w-full font-bold text-sm">
                             <div class="flex-grow">
                                 {{ 

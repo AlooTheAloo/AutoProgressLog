@@ -1,20 +1,21 @@
-import { LaunchAnki } from "../config/configAnkiIntegration";
-import { GetLastEntry } from "../Helpers/DataBase/SearchDB";
-import { WriteEntries, WriteSyncData } from "../Helpers/DataBase/WriteDB";
+import { KillAnkiIfOpen, LaunchAnki } from "../config/configAnkiIntegration";
+import { GetActivitiesBetween, GetLastEntry } from "../Helpers/DataBase/SearchDB";
+import { DeleteActivity, ModifyActivityByID, WriteEntries, WriteSyncData } from "../Helpers/DataBase/WriteDB";
 import { getConfig, syncDataPath } from "../Helpers/getConfig";
-import { getTimeEntries } from "../toggl/toggl-service";
-import sqlite3 from "sqlite3";
+import { getTimeEntries, toggl } from "../toggl/toggl-service";
 import { entry } from "../types/entry";
-import { getAnkiCardReviewCount, getMatureCards, getRetention, hasSyncEnabled } from "../anki/db";
+import { getAnkiCardReviewCount, getLastUpdate, getMatureCards, getRetention, hasSyncEnabled } from "../anki/db";
 import dayjs from "dayjs";
 import { sumTime } from "../Helpers/entryHelper";
 import { CreateDTO } from "../../electron/main/Electron-Backend/DashboardListeners";
 import { SyncData } from "../types/sync";
+import { CacheManager } from "../Helpers/cache";
 
 export interface AnkiSyncData {
     cardReview: number;
     matureCards: number;
     retention: number;
+    lastUpdate: number;
 }
 
 export interface syncProps {
@@ -29,7 +30,10 @@ const DEFAULT:syncProps = {
 
 export async function runSync(silent = false, props:syncProps = DEFAULT){
     
-    let toggl:entry[] = [];
+    let toggl:{
+        entries : entry[]
+        delta: number
+    };
     let anki:AnkiSyncData = null;
 
     const [t, a] = await Promise.all([
@@ -37,8 +41,12 @@ export async function runSync(silent = false, props:syncProps = DEFAULT){
         new Promise<AnkiSyncData>(async (res, rej) => {
             if(props.syncAnki == false) return res(null);
             if(hasSyncEnabled(getConfig().anki.ankiIntegration.profile) && !silent){
+                console.log("launching anki");
                 await LaunchAnki(getConfig().anki.ankiIntegration);
             }
+            if(silent)
+                await KillAnkiIfOpen();
+
             syncAnki().then(res).catch(rej);
         })
     ])
@@ -52,46 +60,90 @@ export async function runSync(silent = false, props:syncProps = DEFAULT){
     if(props.syncToggl)
     {
         lastEntry = await GetLastEntry();
-        time = sumTime(toggl);
+        time = sumTime(toggl.entries) + toggl.delta;
     }
    
-
     await WriteSyncData({
-        id: 0,
         generationTime: dayjs().valueOf(),
-        toggl: {
+        toggl: props.syncToggl ? {
             totalSeconds: lastEntry.toggl.totalSeconds + time,
-        },
-        anki: {
+        } : null,
+        anki: props.syncAnki ? {
             totalCardsStudied: lastEntry.anki.totalCardsStudied + anki.cardReview,
             cardsStudied: anki.cardReview,
             mature: anki.matureCards,
             retention: anki.retention,
-        },
-        type: "Full"
-    }, toggl);
+            lastAnkiUpdate: anki.lastUpdate,
+        } : null,
+        type: "Full",
+    }, toggl.entries);
 
     return CreateDTO();
 }
 
 
-export async function syncAnki() {
+export async function syncAnki():Promise<AnkiSyncData> {
     const anki = getConfig().anki;
     const lastEntry = await GetLastEntry("Full");
-    const cardReview = await getAnkiCardReviewCount(dayjs(lastEntry.generationTime), anki.ankiIntegration);
+    console.log("since" + lastEntry.anki.lastAnkiUpdate);
+
+    const cardReview = await getAnkiCardReviewCount(dayjs(lastEntry.anki?.lastAnkiUpdate ?? lastEntry.generationTime), anki.ankiIntegration);
     const matureCards = await getMatureCards(anki.ankiIntegration);
     const retention = await getRetention(anki.options.retentionMode, anki.ankiIntegration);
+    const lastUpdate = await getLastUpdate(anki.ankiIntegration);
+    console.log(anki.ankiIntegration);
+    console.log(lastUpdate);
+    
     return {
         cardReview: cardReview,
         matureCards: matureCards,
-        retention: retention
+        retention: retention,
+        lastUpdate: lastUpdate
     }
 }
 
-export async function syncToggl():Promise<entry[]>{
+export async function VerifyPreviousActivities(from:dayjs.Dayjs, to:dayjs.Dayjs, togglEntries:entry[] = []):Promise<number>{
+    let delta = 0;
+    const dbEntries = await GetActivitiesBetween(from, to);
+
+    const dbIDs = dbEntries.map(x => x.id);
+    const togglIDs = togglEntries.map(x => x.id);
+
+    // Modified
+    togglEntries.filter(x => dbIDs.includes(x.id)).forEach(entry => {
+        const dbEntry = dbEntries.find(x => x.id == entry.id);
+        if([() => dbEntry.time !== dayjs(entry.stop).unix(),
+            () => dbEntry.seconds !== entry.duration,
+            () => dbEntry.activityName !== entry.description].some(check => check())){
+            delta += entry.duration - dbEntry.seconds;
+            ModifyActivityByID(entry.id, entry);
+        }
+    })
+
+    // Added
+    const toAdd = togglEntries.filter(x => !dbIDs.includes(x.id) && dayjs(x.stop).unix() > from.unix() && dayjs(x.stop).unix() < to.unix());
+    await WriteEntries(toAdd);
+
+    delta += toAdd.reduce((acc, x) => acc + x.duration, 0);
+
+
+    // Removed
+    const toRemove = dbEntries.filter(x => !togglIDs.includes(x.id));
+    await Promise.all(toRemove.map(x => DeleteActivity(x.id)));
+    delta -= toRemove.reduce((acc, x) => acc + x.seconds, 0);
+    return delta;
+} 
+
+
+export async function syncToggl():Promise<{entries: entry[], delta:number}>{
+    const lastReportTime = await CacheManager.peek().generationTime;
     const startSync = await GetLastEntry();
-    const entries = await getTimeEntries(startSync.generationTime);
-    return entries.entriesAfterLastGen;
+    const entries = await getTimeEntries(lastReportTime);
+    const delta = await VerifyPreviousActivities(dayjs(lastReportTime), dayjs(startSync.generationTime), entries.entriesAfterLastGen);
+    return {
+        entries: entries.entriesAfterLastGen.filter(x => dayjs(x.stop).isAfter(startSync.generationTime)),
+        delta: delta
+    }
 }
 
 

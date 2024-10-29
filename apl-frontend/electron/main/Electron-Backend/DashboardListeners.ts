@@ -2,11 +2,11 @@ import { ipcMain } from "electron";
 import { runGeneration } from "../../../apl-backend/generate/generate";
 import sqlite3 from "sqlite3";
 import { CreateDB } from "../../../apl-backend/Helpers/DataBase/CreateDB";
-import { getConfig, syncDataPath } from "../../../apl-backend/Helpers/getConfig";
+import { getConfig, getSyncProps, syncDataPath } from "../../../apl-backend/Helpers/getConfig";
 import { runSync } from "../../../apl-backend/generate/sync";
 import { CacheManager } from "../../../apl-backend/Helpers/cache";
 import { DashboardDTO } from "./types/Dashboard";
-import { GetImmersionSourcesSince, GetImmersionTimeBetween, GetImmersionTimeSince, GetLastEntry } from "../../../apl-backend/Helpers/DataBase/SearchDB";
+import { GetImmersionSourcesSince, GetImmersionTimeBetween, GetImmersionTimeSince, GetLastEntry, GetSyncCount } from "../../../apl-backend/Helpers/DataBase/SearchDB";
 import dayjs from "dayjs";
 import { roundTo } from "round-to";
 
@@ -15,8 +15,8 @@ export function DashboardListeners() {
         return await runGeneration();
     });
 
-    ipcMain.handle("Sync", async (event: any) => {
-        return await runSync();
+    ipcMain.handle("Sync", async (event: any, alternative: boolean) => {
+        return await runSync(alternative, getSyncProps());
     });
 
     ipcMain.handle("Get-Dashboard-DTO", async (event: any) => {
@@ -51,9 +51,8 @@ export async function CreateDTO(){
             immersionSources: await GetImmersionSourcesSince(dayjs().subtract(1, "month")),
         },
         monthlyScore: 0,
+        syncCount: await GetSyncCount(),
     }
-
-    console.log(DTO);
     return DTO;
 }
 

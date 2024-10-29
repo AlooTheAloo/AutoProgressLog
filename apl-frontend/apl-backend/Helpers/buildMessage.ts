@@ -8,6 +8,8 @@ import dayjs from "dayjs";
 import { roundTo } from "round-to";
 import { outputOptions } from "../types/options.js";
 import { arithmeticWeightedMean } from "./util.js";
+import { getConfig } from "./getConfig.js";
+import color from "color";
 
 interface ankiData {
     reviewCount:number,
@@ -18,7 +20,7 @@ interface ankiData {
 export const __filename = fileURLToPath(import.meta.url);
 export const __dirname = path.dirname(__filename);
 
-export async function buildImage(options:outputOptions){
+export async function buildImage(options:outputOptions, height:number = 1718){
     const browser = await puppeteer.launch({
     headless: true,
     devtools: true,
@@ -34,6 +36,11 @@ export async function buildImage(options:outputOptions){
     height: 1718,
     deviceScaleFactor: options.outputQuality
     })    
+
+    page.on("console", (message) => { 
+        console.log(`Page said: ${message.text()}`); 
+    });
+
     await page.goto(`file:${path.join(__dirname, "..", "..", "apl-backend", "apl-visuals", "visuals", "index.html")}`);
     await page.waitForNetworkIdle();
 
@@ -42,7 +49,7 @@ export async function buildImage(options:outputOptions){
     type: "png",
     clip: {
         width: 1586,
-        height: 1718,
+        height: height,
         x : 0,
         y : 0
     }
@@ -145,6 +152,64 @@ export function buildJSON(ankiData:ankiData, allEvents:relativeActivity[], lastC
         ].reverse())
     }
     return reportData;
+}
+
+const LAYOUT_FULL = [
+    ["mature", "ankidata", "ankistreak"],
+    ["immersiondata", "immersionlog", "immersionstreak"]
+]
+
+const LAYOUT_ANKILESS = [
+    ["immersionlog", "immersiondata"],
+    ["immersiondata", "immersionstreak"]
+]
+
+
+export async function buildLayout(){
+    let gradient:string[] = [];
+    try
+    {
+        const seedList = [
+            [255, 0, 0], 
+            [97, 250, 151], 
+            [116, 180, 255],
+            [0, 0, 255],
+            [12, 255, 15],
+            [0, 100, 200],
+            [0, 255, 0],
+            [255, 165, 0]
+        ]
+        const r = Math.random() * seedList.length;
+        const seed = Math.floor(r);
+        const input = [seedList[seed], "N", "N"]
+        const ans = await fetch("http://colormind.io/api/", {
+            method: "POST",
+            body: JSON.stringify({
+            "model": "ui",
+            "input": input
+            })
+        });
+        const colors: number[][] = (await ans.json()).result
+        gradient = colors.map(x => color(x).hex()).slice(0, 3);
+    }
+    catch(err){
+        console.log(err);
+        gradient = ["#FF0000", "#D57AFF", "#74B4FF"]
+    }
+
+
+    if(getConfig().anki.enabled){
+        return {
+            layout: LAYOUT_FULL,
+            gradient: gradient
+        }
+    }
+    else {
+        return {
+            layout: LAYOUT_ANKILESS,
+            gradient: gradient
+        }
+    }
 }
 
 function cumulativeSum<T extends number>(arr: T[]): T[] {

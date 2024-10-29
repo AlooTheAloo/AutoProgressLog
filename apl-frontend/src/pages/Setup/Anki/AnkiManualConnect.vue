@@ -79,7 +79,7 @@
                 </div>
                 <div class="text-sm">
                     Please refer to the README or the 
-                    <Button link="" style=" padding:0%; color:aqua; font-size: 0.875rem;" label="official anki documentation" @click="OpenAnkiDocs" class="p-0"/>
+                    <Button style=" padding:0%; color:aqua; font-size: 0.875rem;" label="official anki documentation" @click="OpenAnkiDocs" class="p-0"/>
                     for instructions on how to find the Database path and App path.
                 </div>
                 <div class="text-lg flex-grow flex justify-center flex-col gap-5">

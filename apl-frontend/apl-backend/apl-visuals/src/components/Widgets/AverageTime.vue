@@ -17,7 +17,6 @@
     const hrDelta = computed(() => {
         console.log(props.time.delta)
         if(props.time.delta == undefined || Math.abs(props.time.delta) < 1) {
-            console.log("return 0")
             return 0;
         }
         return dayjs.duration(Math.abs(props.time.delta), "second").format("HH:mm:ss");

@@ -13,6 +13,7 @@ export interface AnkiSyncData {
     cardsStudied: number;
     mature: number;
     retention: number;
+    lastAnkiUpdate: number;
 }
 
 export interface TogglSyncData {
@@ -21,6 +22,7 @@ export interface TogglSyncData {
 
 
 export interface ImmersionActivity {
+    id: number;
     syncDataId: number;
     time: number;
     seconds: number;

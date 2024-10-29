@@ -1,7 +1,7 @@
 import { ipcMain } from "electron"
 import { TogglAccount } from "../../../apl-backend/entry/FindAccounts"
 import { Tags, Toggl } from 'toggl-track';
-import { ankiIntegration, options, RetentionMode, ServerOptions, TimeInterval } from "../../../apl-backend/types/options";
+import { ankiIntegration, ankiOptions, options, RetentionMode, ServerOptions, TimeInterval } from "../../../apl-backend/types/options";
 import { writeFileSync } from "fs";
 import { configPath, syncDataPath } from "../../../apl-backend/Helpers/getConfig";
 import sqlite3 from "sqlite3";
@@ -33,13 +33,7 @@ export function getSetupAnkiIntegration():ankiIntegration{
     return config.anki.ankiIntegration;
 }
 
-export function getSetupAnki():{
-    ankiIntegration:ankiIntegration
-    options: {
-        retentionMode: RetentionMode,
-        trackedDecks: number[]
-    }
-}{
+export function getSetupAnki():ankiOptions{
     return config.anki;
 }
 

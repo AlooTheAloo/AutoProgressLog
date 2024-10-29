@@ -1,1 +1,284 @@
-{"reportNo":149,"time":"Generated on the 10th of october 2024 at 00:19","matureCards":[{"reportNo":149,"matureCardCount":2866},{"reportNo":148,"matureCardCount":2858},{"reportNo":147,"matureCardCount":2843},{"reportNo":146,"matureCardCount":2833},{"reportNo":145,"matureCardCount":2823}],"retentionRate":{"current":73.83052659716654,"delta":0.03302460407591923},"totalReviews":{"current":25722,"delta":161},"AnkiStreak":{"current":31,"delta":1},"AnkiData":[{"reportNo":149,"value":161},{"reportNo":148,"value":158},{"reportNo":147,"value":162},{"reportNo":146,"value":184},{"reportNo":145,"value":166},{"reportNo":144,"value":163},{"reportNo":143,"value":172},{"reportNo":142,"value":113},{"reportNo":141,"value":141},{"reportNo":140,"value":141},{"reportNo":139,"value":210},{"reportNo":138,"value":175},{"reportNo":137,"value":96},{"reportNo":136,"value":130},{"reportNo":135,"value":298},{"reportNo":134,"value":607},{"reportNo":133,"value":143},{"reportNo":132,"value":5},{"reportNo":131,"value":5},{"reportNo":130,"value":8},{"reportNo":129,"value":270},{"reportNo":128,"value":265},{"reportNo":127,"value":226},{"reportNo":126,"value":40},{"reportNo":125,"value":241}],"ImmersionTime":{"current":300,"delta":4},"AverageImmersionTime":{"current":9107.82142857143,"delta":1460.5714285714294},"ImmersionLog":[{"name":"IM TRYING TAKAGI SAN AGAIN","relativeValue":4067},{"name":"haikyuu s2","relativeValue":6412},{"name":"nigewaka","relativeValue":2701}],"ImmersionData":[{"reportNo":149,"value":13180},{"reportNo":148,"value":8061},{"reportNo":147,"value":5827},{"reportNo":146,"value":12043},{"reportNo":145,"value":7294},{"reportNo":144,"value":2404},{"reportNo":143,"value":10396},{"reportNo":142,"value":5339},{"reportNo":141,"value":10266},{"reportNo":140,"value":9076},{"reportNo":139,"value":12970},{"reportNo":138,"value":13353},{"reportNo":137,"value":7526},{"reportNo":136,"value":4894},{"reportNo":135,"value":2003},{"reportNo":134,"value":11944},{"reportNo":133,"value":0},{"reportNo":132,"value":0},{"reportNo":131,"value":0},{"reportNo":130,"value":0},{"reportNo":129,"value":6432},{"reportNo":128,"value":2711},{"reportNo":127,"value":14591},{"reportNo":126,"value":8432},{"reportNo":125,"value":6987}],"ImmersionStreak":{"current":16,"delta":1},"ImmersionScore":13180,"AnkiScore":961,"TotalScore":13341,"UserRanking":"","lastDaysPoints":[9217,19624,25076,35644,38211,45671,57898,63887,72106,85447]}
+{
+    "reportNo": 158,
+    "time": "Generated on the 18th of october 2024 at 23:30",
+    "matureCards": [
+        {
+            "reportNo": 158,
+            "matureCardCount": 2897
+        },
+        {
+            "reportNo": 157,
+            "matureCardCount": 2895
+        },
+        {
+            "reportNo": 156,
+            "matureCardCount": 2896
+        },
+        {
+            "reportNo": 155,
+            "matureCardCount": 2894
+        },
+        {
+            "reportNo": 154,
+            "matureCardCount": 2886
+        }
+    ],
+    "retentionRate": {
+        "current": 73.86638046686342,
+        "delta": -0.3400745878178384
+    },
+    "totalReviews": {
+        "current": 27225,
+        "delta": 182
+    },
+    "AnkiStreak": {
+        "current": 40,
+        "delta": 1
+    },
+    "AnkiData": [
+        {
+            "reportNo": 158,
+            "value": 182
+        },
+        {
+            "reportNo": 157,
+            "value": 185
+        },
+        {
+            "reportNo": 156,
+            "value": 164
+        },
+        {
+            "reportNo": 155,
+            "value": 150
+        },
+        {
+            "reportNo": 154,
+            "value": 166
+        },
+        {
+            "reportNo": 153,
+            "value": 154
+        },
+        {
+            "reportNo": 152,
+            "value": 157
+        },
+        {
+            "reportNo": 151,
+            "value": 168
+        },
+        {
+            "reportNo": 150,
+            "value": 177
+        },
+        {
+            "reportNo": 149,
+            "value": 161
+        },
+        {
+            "reportNo": 148,
+            "value": 158
+        },
+        {
+            "reportNo": 147,
+            "value": 162
+        },
+        {
+            "reportNo": 146,
+            "value": 184
+        },
+        {
+            "reportNo": 145,
+            "value": 166
+        },
+        {
+            "reportNo": 144,
+            "value": 163
+        },
+        {
+            "reportNo": 143,
+            "value": 172
+        },
+        {
+            "reportNo": 142,
+            "value": 113
+        },
+        {
+            "reportNo": 141,
+            "value": 141
+        },
+        {
+            "reportNo": 140,
+            "value": 141
+        },
+        {
+            "reportNo": 139,
+            "value": 210
+        },
+        {
+            "reportNo": 138,
+            "value": 175
+        },
+        {
+            "reportNo": 137,
+            "value": 96
+        },
+        {
+            "reportNo": 136,
+            "value": 130
+        },
+        {
+            "reportNo": 135,
+            "value": 298
+        },
+        {
+            "reportNo": 134,
+            "value": 607
+        }
+    ],
+    "ImmersionTime": {
+        "current": 323,
+        "delta": 3
+    },
+    "AverageImmersionTime": {
+        "current": 9856.214285714286,
+        "delta": 672.6785714285725
+    },
+    "ImmersionLog": [
+        {
+            "name": "CHAT IM READING",
+            "relativeValue": 3706
+        },
+        {
+            "name": "Youtube",
+            "relativeValue": 990
+        },
+        {
+            "name": "im watching all of one piece. wish me luck idiots.",
+            "relativeValue": 6857
+        }
+    ],
+    "ImmersionData": [
+        {
+            "reportNo": 158,
+            "value": 11553
+        },
+        {
+            "reportNo": 157,
+            "value": 9283
+        },
+        {
+            "reportNo": 156,
+            "value": 12000
+        },
+        {
+            "reportNo": 155,
+            "value": 5939
+        },
+        {
+            "reportNo": 154,
+            "value": 7424
+        },
+        {
+            "reportNo": 153,
+            "value": 8448
+        },
+        {
+            "reportNo": 152,
+            "value": 16481
+        },
+        {
+            "reportNo": 151,
+            "value": 2461
+        },
+        {
+            "reportNo": 150,
+            "value": 11618
+        },
+        {
+            "reportNo": 149,
+            "value": 13180
+        },
+        {
+            "reportNo": 148,
+            "value": 8061
+        },
+        {
+            "reportNo": 147,
+            "value": 5827
+        },
+        {
+            "reportNo": 146,
+            "value": 12043
+        },
+        {
+            "reportNo": 145,
+            "value": 7294
+        },
+        {
+            "reportNo": 144,
+            "value": 2404
+        },
+        {
+            "reportNo": 143,
+            "value": 10396
+        },
+        {
+            "reportNo": 142,
+            "value": 5339
+        },
+        {
+            "reportNo": 141,
+            "value": 10266
+        },
+        {
+            "reportNo": 140,
+            "value": 9076
+        },
+        {
+            "reportNo": 139,
+            "value": 12970
+        },
+        {
+            "reportNo": 138,
+            "value": 13353
+        },
+        {
+            "reportNo": 137,
+            "value": 7526
+        },
+        {
+            "reportNo": 136,
+            "value": 4894
+        },
+        {
+            "reportNo": 135,
+            "value": 2003
+        },
+        {
+            "reportNo": 134,
+            "value": 11944
+        }
+    ],
+    "ImmersionStreak": {
+        "current": 25,
+        "delta": 1
+    },
+    "ImmersionScore": 11553,
+    "AnkiScore": 382,
+    "TotalScore": 11735,
+    "UserRanking": "",
+    "lastDaysPoints": [
+        13341,
+        25136,
+        27765,
+        44403,
+        53005,
+        60595,
+        66684,
+        78848,
+        88316,
+        100051
+    ]
+}

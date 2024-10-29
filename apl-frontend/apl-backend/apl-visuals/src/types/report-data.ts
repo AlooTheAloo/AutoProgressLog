@@ -22,6 +22,11 @@ export type ReportData = {
     lastDaysPoints:number[]
 }
 
+export type Layout = {
+    layout:string[][],
+    gradient:string[]
+}
+
 export type RelativeReportData = {
     value:number,
     reportNo:number

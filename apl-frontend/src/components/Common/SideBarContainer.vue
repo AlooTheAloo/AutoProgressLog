@@ -3,7 +3,17 @@
     import { useRoute, useRouter } from "vue-router";
     import Logo from "../../assets/Logo.png"
     import { appPath as AppPath, appRoutes } from "../../pages/routes/appRoutes";
-import { onMounted } from "vue";
+    import { onMounted } from "vue";
+
+    import Overview from "../../assets/Icons/Sidebar/Overview.svg"
+    import Reports from "../../assets/Icons/Sidebar/Reports.svg"
+    import Achievements from "../../assets/Icons/Sidebar/Achievements.svg"
+    import Statistics from "../../assets/Icons/Sidebar/Statistics.svg"
+    
+    import Settings from '../../assets/Icons/Sidebar/Settings.svg'
+    import Help from '../../assets/Icons/Sidebar/Help.svg'
+    
+    const HELP_PAGE_URL = "https://www.aplapp.dev/#/"
     const router = useRouter();
 
     interface route {
@@ -15,27 +25,34 @@ import { onMounted } from "vue";
     const routes:route[] = [
         {
             path: "/app/dashboard",
-            image: Logo,
+            image: Overview,
             name: "Overview",
         },
         {
-            image: Logo,
+            path: "/app/reports",
+            image: Reports,
             name: "Reports",
         },
         {
-            image: Logo,
+            image: Achievements,
             name: "Achievements",
         },
         {
-            image: Logo,
+            image: Statistics,
             name: "Statistics",
         }
     ]
 
     const handleClick = (path: string | undefined) => {
         if (!path) return;
+        if(path == router.currentRoute.value.path) return;
+        console.log("moving to " + path);
         router.push(path);
     };
+
+    const openHelpCenter = () => {
+        window.ipcRenderer.invoke("OpenExternal", HELP_PAGE_URL);
+    }
 
     const props = defineProps<{
         currentRoute: AppPath;
@@ -50,7 +67,7 @@ import { onMounted } from "vue";
 
 <template>
 
-    <div class="h-screen w-screen absolute overflow-hidden">
+    <div class="h-screen w-screen absolute overflow-hidden pointer-events-none">
         
         <div class="flex absolute w-full h-full  items-end justify-end">
             <div
@@ -81,7 +98,7 @@ import { onMounted } from "vue";
                 <!-- Navigation  -->
             <div
             
-            class="flex flex-col gap-4 w-full mt-20 select-none flex-grow">
+            class="flex flex-col gap-4 w-full mt-20 flex-grow cursor-pointer">
                 <div v-for="route in routes"
                 :style="{
                     cursor: route.path != null ? 'pointer' : 'default',
@@ -89,30 +106,30 @@ import { onMounted } from "vue";
                     backgroundColor: route.path == props.currentRoute ? '#24CAFF' : '',
                 }"
                 
-                :key="route.path" class="xl:justify-start justify-center rounded-lg p-2 flex items-center gap-2 w-full"
-                    v-on:click="(e) => handleClick(route.path)"
+                :key="route.path" class="xl:justify-start justify-center rounded-lg p-2 flex items-center gap-2 w-full h-12"
+                    v-on:click="(e) => handleClick(route.path)" @click.stop
                 >
-                    <img :src="route.image" class="w-8 h-8"/>
+                    <img :src="route.image" class="w-6 h-6"/>
                     <div class="font-semibold text-white xl:block hidden">
-                        {{ route.name }}
-                        
+                        {{ route.name 
+                        }}
                     </div>
                 </div>
             </div>
             <!-- Settings and help  -->
             <div class="flex flex-col gap-4 w-full justify-end  flex-grow">
                 <router-link to="/app/settings" class="flex items-center gap-2 w-full">
-                    <img :src="Logo" class="w-8 h-8"/>
+                    <img :src="Settings" class="w-6 h-6"/>
                     <div class="font-semibold text-white xl:block hidden">
                         Settings
                     </div>
                 </router-link>
-                <router-link to="/app/settings" class="flex items-center gap-2 w-full">
-                    <img :src="Logo" class="w-8 h-8"/>
+                <button :onclick="openHelpCenter" class="flex items-center gap-2 w-full">
+                    <img :src="Help" class="w-6 h-6"/>
                     <div class="font-semibold text-white xl:block hidden ">
                         Help center
                     </div>
-                </router-link>
+                </button>
             </div>
         </div>
         <div class="flex-grow"> <!-- App here -->
@@ -123,6 +140,7 @@ import { onMounted } from "vue";
 
 <style scoped>
     .glow {
+        pointer-events: none;
         animation-name: breathe;
         animation-duration: 10s;
         animation-iteration-count: infinite;

@@ -10,8 +10,8 @@
     }
     
     const props = defineProps<MatureProps>();
-    const sortedDataByReport = ref(props.data.sort((a, b) => b.reportNo - a.reportNo));
-    const sortedDataByMature = ref(props.data.sort((a, b) => b.matureCardCount - a.matureCardCount));
+    const sortedDataByReport = ref(props.data.toSorted((a, b) => b.reportNo - a.reportNo));
+    const sortedDataByMature = ref(props.data.toSorted((a, b) => b.matureCardCount - a.matureCardCount));
     
     const value:ComputedRef<TPlusDelta<number>> = computed(() => {
         const cur = sortedDataByReport.value[0].matureCardCount;

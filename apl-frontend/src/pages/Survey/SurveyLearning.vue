@@ -9,7 +9,6 @@
     import Button from 'primevue/button';
     import { useRouter } from 'vue-router';
     import { onMounted, ref, watch } from 'vue';
-    import countries from 'country-flag-icons'
     import SelectButton from 'primevue/selectbutton';
     import { useWindowSize } from '@vueuse/core'
 

@@ -7,10 +7,10 @@
     const props = defineProps<{data: ReportData}>();
 
     const series:ApexAxisChartSeries[] = [
-       {
-           name: 'series-1',
-           data: props.data.lastDaysPoints,
-       } as any // workaround for ApexCharts
+        {
+            name: 'series-1',
+            data: props.data.lastDaysPoints,
+        } as any // workaround for ApexCharts
     ];
 
 

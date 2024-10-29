@@ -7,6 +7,7 @@ export function CreateDB(db:sqlite3.Database){
         (
             id INTEGER PRIMARY KEY, 
             generationTime INTEGER, 
+            lastAnkiUpdate INTEGER,
             totalSeconds INTEGER, 
             totalCardsStudied INTEGER, 
             cardsStudied INTEGER,

@@ -3,14 +3,13 @@
     import { useRoute, useRouter } from 'vue-router';
     import SetupBackground from '../../../components/Setup/SetupBackground.vue';
     import Button from 'primevue/button';
-import { onMounted } from 'vue';
+    import { onMounted } from 'vue';
 
     const router = useRouter();
 
     function NextPage(){
         router.push('/app/dashboard');
     }
-
     
     onMounted(() => {
         window.ipcRenderer.invoke("SaveConfig");

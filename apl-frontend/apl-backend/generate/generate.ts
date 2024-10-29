@@ -5,8 +5,8 @@ import { activity } from '../types/activity.js';
 import duration from "dayjs/plugin/duration.js";
 import { sumTime } from '../Helpers/entryHelper.js';
 import { getAnkiCardReviewCount, getMatureCards, getRetention } from "../anki/db.js";
-import { buildImage, buildJSON, buildNewCache } from '../Helpers/buildMessage.js';
-import { getConfig } from '../Helpers/getConfig.js';
+import { buildImage, buildJSON, buildLayout, buildNewCache } from '../Helpers/buildMessage.js';
+import { getConfig, getSyncProps } from '../Helpers/getConfig.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { CacheManager } from '../Helpers/cache.js';
@@ -24,7 +24,7 @@ export const __dirname = path.dirname(__filename);
 
 export async function runGeneration(){
 
-    await runSync();
+    await runSync(false, getSyncProps());
     
     const startCache = CacheManager.peek()
     const generationTime = dayjs(startCache.generationTime);
@@ -39,13 +39,14 @@ export async function runGeneration(){
 
     // Anki stuff
     const config = getConfig();
-    count = await getAnkiCardReviewCount(generationTime, config.anki.ankiIntegration);
-    mature = await getMatureCards(config.anki.ankiIntegration);
-    retention = await getRetention(config.anki.options.retentionMode, config.anki.ankiIntegration);
+
+    if(config.anki.enabled){
+        count = await getAnkiCardReviewCount(generationTime, config.anki.ankiIntegration);
+        mature = await getMatureCards(config.anki.ankiIntegration);
+        retention = await getRetention(config.anki.options.retentionMode, config.anki.ankiIntegration);
+    }
        
     const timeToAdd = sumTime(events)
-
-
     const json = buildJSON(
     {
         reviewCount: count,
@@ -53,12 +54,20 @@ export async function runGeneration(){
         retention: retention
     }, events, CacheManager.getLastN(30), timeToAdd);
 
-    const p = path.join(__dirname, "..", "..", "apl-backend", "apl-visuals", "visuals", "report-data.json")
+    const layout = await buildLayout();
+    console.log(layout);
+    const p = path.join(__dirname, "..", "..", "apl-backend", "apl-visuals", "visuals");
+
+    // Report Data
+    const reportPath = path.join(p, "report-data.json")
+    writeFileSync(reportPath, JSON.stringify(json));
+
+    const layoutPath = path.join(p, "report-layout.json")
+    writeFileSync(layoutPath, JSON.stringify(layout));
     
-    writeFileSync(p, JSON.stringify(json));
-    buildImage(config.outputOptions);
+    buildImage(config.outputOptions, config.anki.enabled ? 1718 : 1300);
 
     // Output
     CacheManager.push(buildNewCache(json, startCache, timeToAdd));
-    return await runSync(true);
+    return await runSync(true, getSyncProps());
 }

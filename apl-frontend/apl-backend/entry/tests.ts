@@ -1,4 +1,5 @@
-import { getAnkiProcesses, LaunchAnki } from "../config/configAnkiIntegration";
+import { config } from "process";
+import { getLastUpdate } from "../anki/db";
 import { getConfig } from "../Helpers/getConfig";
 
-getAnkiProcesses();
+getLastUpdate(getConfig().anki.ankiIntegration).then(console.log);
