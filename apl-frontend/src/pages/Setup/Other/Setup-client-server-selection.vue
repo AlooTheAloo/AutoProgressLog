@@ -10,7 +10,7 @@ import BackButton from '../../../components/Common/BackButton.vue';
     const router = useRouter()
     function SelectClient(){
         window.ipcRenderer.invoke("SetAutoGen", false);
-        router.push('/setup/Toggl-home');
+        router.push('/setup/toggl-manual-connect');
     }
 
     function SelectServer(){    
