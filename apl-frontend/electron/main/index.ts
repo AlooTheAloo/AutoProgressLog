@@ -1,14 +1,22 @@
-import { app, BrowserWindow, shell, ipcMain, Menu, MenuItem, dialog, crashReporter } from 'electron'
-import { createRequire } from 'node:module'
-import { fileURLToPath } from 'node:url'
+import {
+  app,
+  BrowserWindow,
+  shell,
+  ipcMain,
+  Menu,
+  MenuItem,
+  dialog,
+  crashReporter,
+} from "electron";
+import { createRequire } from "node:module";
+import { fileURLToPath } from "node:url";
 import registerEvents from "./Electron-Backend/";
-import path from 'node:path'
-import os from 'node:os'
-import { buildMenu } from './Electron-App/MenuBuilder';
+import path from "node:path";
+import os from "node:os";
+import { buildMenu } from "./Electron-App/MenuBuilder";
 
-const require = createRequire(import.meta.url)
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
-
+const require = createRequire(import.meta.url);
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 registerEvents();
 
@@ -22,30 +30,31 @@ registerEvents();
 // ├─┬ dist
 // │ └── index.html    > Electron-Renderer
 //
-process.env.APP_ROOT = path.join(__dirname, '../..')
+process.env.APP_ROOT = path.join(__dirname, "../..");
 
-export const MAIN_DIST = path.join(process.env.APP_ROOT, 'dist-electron')
-export const RENDERER_DIST = path.join(process.env.APP_ROOT, 'dist')
-export const VITE_DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL
+export const MAIN_DIST = path.join(process.env.APP_ROOT, "dist-electron");
+export const RENDERER_DIST = path.join(process.env.APP_ROOT, "dist");
+export const VITE_DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL;
 
 process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL
-  ? path.join(process.env.APP_ROOT, 'public')
-  : RENDERER_DIST
+  ? path.join(process.env.APP_ROOT, "public")
+  : RENDERER_DIST;
 
 // Disable GPU Acceleration for Windows 7
-if (os.release().startsWith('6.1')) app.disableHardwareAcceleration()
+if (os.release().startsWith("6.1")) app.disableHardwareAcceleration();
 
 // Set application name for Windows 10+ notifications
-if (process.platform === 'win32') app.setAppUserModelId(app.getName())
+if (process.platform === "win32") app.setAppUserModelId(app.getName());
 
-if (!app.requestSingleInstanceLock()) {
-  app.quit()
-  process.exit(0)
-}
+// TODO : fix idk
+// if (!app.requestSingleInstanceLock()) {
+//   app.quit();
+//   process.exit(0);
+// }
 
-export let win: BrowserWindow | null = null
-const preload = path.join(__dirname, '../preload/index.mjs')
-const indexHtml = path.join(RENDERER_DIST, 'index.html')
+export let win: BrowserWindow | null = null;
+const preload = path.join(__dirname, "../preload/index.mjs");
+const indexHtml = path.join(RENDERER_DIST, "index.html");
 
 export async function createWindow() {
   console.log("Creating window");
@@ -54,8 +63,8 @@ export async function createWindow() {
     minWidth: 900,
     width: 1920,
     height: 1080,
-    title: 'Main window',
-    icon: path.join(process.env.VITE_PUBLIC, ''),
+    title: "Main window",
+    icon: path.join(process.env.VITE_PUBLIC, ""),
     webPreferences: {
       preload,
       // Warning: Enable nodeIntegration and disable contextIsolation is not secure in production
@@ -65,77 +74,73 @@ export async function createWindow() {
       // Read more on https://www.electronjs.org/docs/latest/tutorial/context-isolation
       // contextIsolation: false,
     },
-  })
+  });
 
   win.setMenuBarVisibility(false);
 
-
-  if (VITE_DEV_SERVER_URL) { // #298
-    win.loadURL(VITE_DEV_SERVER_URL)
+  if (VITE_DEV_SERVER_URL) {
+    // #298
+    win.loadURL(VITE_DEV_SERVER_URL);
     // Open devTool if the app is not packaged
-    win.webContents.openDevTools()
+    win.webContents.openDevTools();
   } else {
-    win.loadFile(indexHtml)
+    win.loadFile(indexHtml);
   }
 
   // Test actively push message to the Electron-Renderer
-  win.webContents.on('did-finish-load', () => {
-    win?.webContents.send('main-process-message', new Date().toLocaleString())
-  })
+  win.webContents.on("did-finish-load", () => {
+    win?.webContents.send("main-process-message", new Date().toLocaleString());
+  });
 
   // Make all links open with the browser, not with the application
   win.webContents.setWindowOpenHandler(({ url }) => {
-    if (url.startsWith('https:')) shell.openExternal(url)
-    return { action: 'deny' }
-  })
+    if (url.startsWith("https:")) shell.openExternal(url);
+    return { action: "deny" };
+  });
   // win.webContents.on('will-navigate', (event, url) => { }) #344
 
-  win.webContents.once('did-finish-load', () => { 
-  })
+  win.webContents.once("did-finish-load", () => {});
 }
-
 
 app.whenReady().then(createWindow).then(createAppBackend);
 
-app.on('window-all-closed', () => {
-  if(process.platform == "darwin"){
+app.on("window-all-closed", () => {
+  if (process.platform == "darwin") {
     app.dock.hide();
-  }
-  else if(process.platform == "win32"){
+  } else if (process.platform == "win32") {
     win.setSkipTaskbar(true);
-  }
-  else {
+  } else {
     app.quit();
-  } 
+  }
   buildContextMenu();
+});
 
-})
-
-app.on('second-instance', () => {
+app.on("second-instance", () => {
   if (win) {
     // Focus on the main window if the user tried to open another
-    if (win.isMinimized()) win.restore()
-    win.focus()
+    if (win.isMinimized()) win.restore();
+    win.focus();
   }
-})
+});
 
-app.on('activate', () => {
-  const allWindows = BrowserWindow.getAllWindows()
+app.on("activate", () => {
+  const allWindows = BrowserWindow.getAllWindows();
   if (allWindows.length) {
-    allWindows[0].focus()
+    allWindows[0].focus();
   } else {
-    createWindow()
+    createWindow();
   }
-})
+});
 
-import electronUpdater, { type AppUpdater } from 'electron-updater';
-import { buildContextMenu, createAppBackend } from './Electron-Backend/appBackend';
-import { createAutoReport } from './Electron-Backend/Reports/AutoReportGenerator';
+import electronUpdater, { type AppUpdater } from "electron-updater";
+import {
+  buildContextMenu,
+  createAppBackend,
+} from "./Electron-Backend/appBackend";
+import { createAutoReport } from "./Electron-Backend/Reports/AutoReportGenerator";
 
 app.on("ready", async () => {
   buildMenu(app);
   createAutoReport();
   await electronUpdater.autoUpdater.checkForUpdatesAndNotify();
 });
-
-

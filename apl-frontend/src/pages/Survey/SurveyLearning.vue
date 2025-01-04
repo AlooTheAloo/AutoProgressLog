@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { ES, JP, US, FR, DE, KR, CN, RU, IT, NE, PR, CZ, SA, HK, PH, PS, NO, ID, TH, AQ } from 'country-flag-icons/string/3x2'
+    import { ES, JP, US, FR, DE, KR, CN, RU, IT, NE, PR, CZ, SA, HK, PH, PS, NO, ID, TH, AQ, PT, NL, AL, AG, DZ } from 'country-flag-icons/string/3x2'
     import Listbox from 'primevue/listbox';
     import Accordion from 'primevue/accordion';
     import AccordionPanel from 'primevue/accordionpanel';
@@ -104,13 +104,13 @@
         },
         {
             label: "Dutch",
-            value : 'ne',
-            flag: NE
+            value : 'nl',
+            flag: NL
         },
         {
             label: "Portugese",
-            value : 'pr',
-            flag: PR
+            value : 'pt',
+            flag: PT
         },
         {
             label: "Czech",
@@ -119,8 +119,8 @@
         },
         {
             label: "Arabic",
-            value : 'sa',
-            flag: SA
+            value : 'dz',
+            flag: DZ
         },
         {
             label: "Cantonese",
