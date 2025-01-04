@@ -2,8 +2,6 @@ export type DashboardDTO = {
     userName: string,
     lastSyncTime: string,
     lastReportTime: string,
-
-    
     immersionDTO:ImmersionDTO,
     ankiDTO?:AnkiDTO
     monthlyScore: number,
