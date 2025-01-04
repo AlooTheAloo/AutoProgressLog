@@ -89,13 +89,13 @@ onMounted(async () => {
     const data: DashboardDTO = await window.ipcRenderer.invoke("Get-Dashboard-DTO");
     dto.value = data;
 
-    if(data.syncCount == 0){
+    if(data.syncCount == 1){
       firstDialog.value = true;
     }
 
 
     // Full sync if no syncs have been done
-    await sync(data.syncCount !== 0);
+    await sync(data.syncCount !== 1);
     const s = await window.ipcRenderer.invoke("isSyncing");
     syncing.value = s;
   } catch (error) {
@@ -199,11 +199,11 @@ const closeFirstDialog = () => {
                     <i class="pi pi-plus-circle text-white mr-2" />
                     <span class="text-white font-bold">Generate Report</span>
                   </Button>
-                  <div :class="`flex  h-8 rounded-full text-black bg-white overflow-hidden ${syncing ? 'opacity-50' : ''}`">
+                  <div :class="`flex  h-8 rounded-full text-black bg-white overflow-hidden ${syncing ? 'opacity-50' : ''}`" v-if="config?.general.autogen.enabled">
                     <div class="bg-[#70bbf3] p-2">
                       <img :src="Report" class="w-full h-full"/>
                     </div>
-                    <div :class="`flex items-center px-2 font-bold`" v-if="config?.general.autogen.enabled">
+                    <div :class="`flex items-center px-2 font-bold`" >
                       <div>
                         Next report : {{ dto.nextReport }}
                       </div>
