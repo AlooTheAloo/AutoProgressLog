@@ -111,7 +111,7 @@ function openReport(id:string){
                 </div>
                 <div class="flex w-full px-10 flex-grow">
                     <div class="flex w-full px-2 py-2 bg-[#18181b] h-fit rounded-lg">
-                        <DataView :value="reports" class="w-full rounded-lg" :paginator="reports.length > rows" :rows="rows" v-on:page="pageChanged" :first="first">
+                        <DataView dataKey="" :value="reports" class="w-full rounded-lg" :paginator="reports.length > rows" :rows="rows" v-on:page="pageChanged" :first="first">
                             <template #list="slotProps">
                                 <div class="flex flex-col">
                                     <div v-for="(item, index) in slotProps.items as ListReport[]" :key="index">

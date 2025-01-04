@@ -1,60 +1,50 @@
 // @see https://www.electron.build/configuration/configuration
 {
-  "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
-  "appId": "727.AlooTheAloo.727",
-  "asar": true,
-  "productName": "AutoProgressLog",
-  "directories": {
-    "output": "release/${version}"
+  $schema: "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
+  appId: "727.AlooTheAloo.727",
+  asar: false,
+  productName: "AutoProgressLog",
+  directories: {
+    output: "release/${version}",
   },
-  "files": [
-    "dist",
-    "dist-electron"
-  ],
-  "dmg": {
-    "window": {
-      "width": 540,
-      "height": 540
+  files: ["dist", "dist-electron"],
+  dmg: {
+    window: {
+      width: 540,
+      height: 540,
     },
-  
   },
-  "mac": {
-    "target": [
-      "default"
-    ],
-    "artifactName": "${productName}_MacOS_${version}_Installer.${ext}",
-    "entitlements": "build/entitlements.mac.plist",
-    "entitlementsInherit": "build/entitlements.mac.plist",
-    "hardenedRuntime": true,
+  mac: {
+    target: ["default"],
+    artifactName: "${productName}_MacOS_${version}_Installer.${ext}",
+    entitlements: "build/entitlements.mac.plist",
+    entitlementsInherit: "build/entitlements.mac.plist",
+    hardenedRuntime: true,
   },
-  "win": {
-    "target": [
+  win: {
+    target: [
       {
-        "target": "nsis",
-        "arch": [
-          "x64"
-        ]
-      }
+        target: "nsis",
+        arch: ["x64"],
+      },
     ],
-    "artifactName": "${productName}-Windows-${version}-Setup.${ext}"
+    artifactName: "${productName}-Windows-${version}-Setup.${ext}",
   },
-  "nsis": {
-    "oneClick": false,
-    "perMachine": false,
-    "allowToChangeInstallationDirectory": true,
-    "deleteAppDataOnUninstall": false
+  nsis: {
+    oneClick: false,
+    perMachine: false,
+    allowToChangeInstallationDirectory: true,
+    deleteAppDataOnUninstall: false,
   },
-  "linux": {
-    "target": [
-      "AppImage"
-    ],
-    "artifactName": "${productName}-Linux-${version}.${ext}"
+  linux: {
+    target: ["AppImage"],
+    artifactName: "${productName}-Linux-${version}.${ext}",
   },
-  "publish": [
+  publish: [
     {
-      "provider": "github",
-      "owner": "727apps",
-      "repo": "AutoUpdateTest"
-    }
-  ]
+      provider: "github",
+      owner: "727apps",
+      repo: "AutoUpdateTest",
+    },
+  ],
 }
