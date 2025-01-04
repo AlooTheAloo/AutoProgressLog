@@ -74,7 +74,14 @@ export function setupListeners() {
 
     
 
-    ipcMain.handle("SetDeviceType", (event: any, arg: boolean) => {
+    ipcMain.handle("SetAutoGen", (event: any, arg: boolean) => {
+
+        config.general = {
+            autogen: {
+                enabled: arg
+            }
+        }
+
         config.general.autogen.enabled = arg;
 
         if(!config.general.autogen.enabled){

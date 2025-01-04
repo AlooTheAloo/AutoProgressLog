@@ -33,10 +33,10 @@ import BackButton from '../../../components/Common/BackButton.vue';
                 <div class="flex flex-col flex-grow py-5 gap-2 text-left ">
                     <BackButton route="/setup/index"/>
                     <div class="font-semibold text-4xl text-white">
-                        What will this device be?
+                        How do you want to generate reports?
                     </div>
                     <div class="font-light mb-5 text-xs lg:text-sm">
-                        AutoProgressLog works on servers and home computers. If you are running this on your own computer, the client mode is strongly recommended. Select the server mode only if you know that your computer will always be turned on and connected to the internet.
+                        APL can generate reports automatically for you. Select automatic generation only if you know that your computer will always be turned on and connected to the internet.
                     </div>
                     <div class="flex gap-12 select-none ">
                         <div v-ripple class="bg-[#18181B] rounded-xl w-72 aspect-square flex-shrin cursor-pointer" @click="SelectClient">
@@ -49,11 +49,10 @@ import BackButton from '../../../components/Common/BackButton.vue';
                                     <img :src="Client" class="w-1/4 aspect-square">
                                 </div>
                                 <div class=" mt-1 text-center text-2xl font-bold text-white">
-                                    Client
+                                    Manually
                                 </div>
                                 <div class=" font-semibold text-xs px-5 lg:text-[15px] lg:leading-5 text-center w-full">
-                                    Reports will have to be manually 
-                                    generated
+                                    Reports will have to be manually generated
                                 </div>
                             </div>
                         </div>
@@ -64,7 +63,7 @@ import BackButton from '../../../components/Common/BackButton.vue';
                                     <img :src="Server" class="w-1/4 aspect-square">
                                 </div>
                                 <div class="font-bold mt-1 text-center text-2xl text-white">
-                                    Server
+                                    Automatically
                                 </div>
                                 <div class=" font-semibold text-xs px-5 lg:text-[15px] lg:leading-5 text-center w-full">
                                     Reports will be generated automatically at a specific time interval

@@ -130,13 +130,11 @@ app.on('activate', () => {
 
 import electronUpdater, { type AppUpdater } from 'electron-updater';
 import { buildContextMenu, createAppBackend } from './Electron-Backend/appBackend';
+import { createAutoReport } from './Electron-Backend/Reports/AutoReportGenerator';
 
 app.on("ready", async () => {
-
-
-
-
   buildMenu(app);
+  createAutoReport();
   await electronUpdater.autoUpdater.checkForUpdatesAndNotify();
 });
 

@@ -18,7 +18,6 @@ export async function hasNotifPerms(){
 
 
 export async function readWindows(pids:number[]) {
-  console.log("Reading windows");
   const windows = xwin.openWindows();
   return windows.filter(x => pids.includes(x.info.processId));
 }

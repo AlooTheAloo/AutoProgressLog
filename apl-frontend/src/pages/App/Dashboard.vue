@@ -13,7 +13,10 @@ import { Maybe } from "../../../types/Maybe"
 import Skeleton from "primevue/skeleton";
 import Dialog from "primevue/dialog";
 import GrainyColor from "../../assets/GrainyColor.png";
+import Report from "../../assets/Report.png";
+
 import Logo from "../../assets/Logo.png";
+import { options } from "../../../apl-backend/types/options";
 
 const TIME_SYNC_INTERVAL = 60 * 1000;
 const THIRTY_MINUTES = 30 * 60 * 1000;
@@ -23,7 +26,7 @@ const { shift } = useMagicKeys();
 const syncing = ref<boolean>(false);
 const dto = ref<DashboardDTO>();
 const lastSyncTime = ref<string>('');
-
+const config = ref<options>();
 
 
 onUnmounted(() => {
@@ -77,6 +80,11 @@ onUnmounted(() => {
 
 
 onMounted(async () => {
+
+  window.ipcRenderer.invoke("GetConfig").then((data:options) => {
+    config.value = data;
+  })
+
   try {
     const data: DashboardDTO = await window.ipcRenderer.invoke("Get-Dashboard-DTO");
     dto.value = data;
@@ -124,40 +132,35 @@ const closeFirstDialog = () => {
 
       <Dialog v-model:visible="firstDialog" modal  :style="{ width: '25rem' }"
       :dismissableMask="true">
-      <template #container="{ closeCallback }">
-        <div class="w-full relative">
-          <img :src="GrainyColor" class="rounded-lg w-full h-full">
-          <div class="absolute inset-0 flex items-center justify-center text-3xl font-bold gap-5">
-            <img :src="Logo" class="w-14 h-14 mr-2 bg-black">
-            <div>
-              Hey! ✌️
+        <template #container="{ closeCallback }">
+          <div class="w-full relative">
+            <img :src="GrainyColor" class="rounded-lg w-full h-full">
+            <div class="absolute inset-0 flex items-center justify-center text-3xl font-bold gap-5">
+              <img :src="Logo" class="w-14 h-14 mr-2 bg-black">
+              <div>
+                Hey! ✌️
+              </div>
             </div>
           </div>
-        </div>
-        <div class="font-bold flex flex-col gap-4 py-6 px-5   bg-black rounded-b-[1rem]">
-          <div class="text-2xl">
-            Hey! Good to have you here!
-          </div>
-          <div class="text-sm text-gray-400 flex flex-col gap-2"> 
-            This app is in very early beta and is in continuous development.
-            <div class="">
-              If you have any issues, bugs or feedback, please let us know on the <a class="text-blue-200 underline" href="https://github.com/AlooTheAloo/AutoProgressLog" target="_blank">GitHub</a>.
+          <div class="font-bold flex flex-col gap-4 py-6 px-5   bg-black rounded-b-[1rem]">
+            <div class="text-2xl">
+              Hey! Good to have you here!
             </div>
-            We're super excited to see what your learning journey looks like!
-          </div>
-          <Button severity="info" v-on:click="closeFirstDialog" >
-            <div class="text-white">
-              Understood!
+            <div class="text-sm text-gray-400 flex flex-col gap-2"> 
+              This app is in very early beta and is in continuous development.
+              <div class="">
+                If you have any issues, bugs or feedback, please let us know on the <a class="text-blue-200 underline" href="https://github.com/AlooTheAloo/AutoProgressLog" target="_blank">GitHub</a>.
+              </div>
+              We're super excited to see what your learning journey looks like!
             </div>
-          </Button>
-        </div>        
-        
-        
-    </template>
-
+            <Button severity="info" v-on:click="closeFirstDialog" >
+              <div class="text-white">
+                Understood!
+              </div>
+            </Button>
+          </div>            
+        </template>
       </Dialog>
-
-
       <div v-if="!dto" class="flex flex-col w-full h-full items-center justify-center">
           <ProgressSpinner />
       </div>
@@ -191,13 +194,26 @@ const closeFirstDialog = () => {
                         </Button>
                     </div>
                 </div>
-                <Button severity="info" @click="generateReport" :disabled="syncing">
+                <div class=" flex flex-col items-end gap-2">
+                  <Button severity="info" @click="generateReport" :disabled="syncing">
                     <i class="pi pi-plus-circle text-white mr-2" />
                     <span class="text-white font-bold">Generate Report</span>
-                </Button>
+                  </Button>
+                  <div :class="`flex  h-8 rounded-full text-black bg-white overflow-hidden ${syncing ? 'opacity-50' : ''}`">
+                    <div class="bg-[#70bbf3] p-2">
+                      <img :src="Report" class="w-full h-full"/>
+                    </div>
+                    <div :class="`flex items-center px-2 font-bold`" v-if="config?.general.autogen.enabled">
+                      <div>
+                        Next report : {{ dto.nextReport }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
               </div>
               <div class="flex w-full px-10 flex-grow">
-                  <DashboardBody :dto="dto" :syncing="syncing" />
+                <DashboardBody :dto="dto" :syncing="syncing" />
               </div>
           </div>
       </div>

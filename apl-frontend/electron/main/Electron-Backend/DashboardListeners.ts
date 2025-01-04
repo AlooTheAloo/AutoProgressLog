@@ -52,6 +52,24 @@ export async function runChecks():Promise<boolean>{
     }
 }
 
+function getNextReportTime(){
+    if(!getConfig().general.autogen.enabled) return "";
+    const time = getConfig().general.autogen.options.generationTime;
+    const now = dayjs();
+
+    // Create a dayjs instance for today with the given time
+    let reportTime = now.hour(time.hours).minute(time.minutes).second(0);
+
+    // If the time has already passed today, move to the next day
+    if (reportTime.isBefore(now)) {
+        reportTime = reportTime.add(1, 'day');
+    }
+
+    // Format the time as "MMM D, YYYY at h:mm A"
+    return reportTime.format("MMM D, YYYY [at] h:mm A");
+}
+
+
 export async function CreateDTO(){
     const lastEntry = await GetLastEntry();
     const lastReport = await CacheManager.peek();
@@ -78,6 +96,7 @@ export async function CreateDTO(){
         },
         monthlyScore: 0,
         syncCount: await GetSyncCount(),
+        nextReport: getNextReportTime()
     }
     return DTO;
 }

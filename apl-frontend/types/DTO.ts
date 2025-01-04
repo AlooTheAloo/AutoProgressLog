@@ -6,6 +6,7 @@ export type DashboardDTO = {
   ankiDTO?: AnkiDTO;
   monthlyScore: number;
   syncCount: number;
+  nextReport: string;
 };
 
 export type AnkiDTO = {

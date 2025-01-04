@@ -22,15 +22,9 @@ You will be required to authorize APL access to your screen. This is used to tra
 If you're on MacOS 15 Sequoia or later, you will need to revalidate this every month.
 
 ### Linux guidelines
-Most of the automagic connections will not work on linux or will only work on very few distros.
+Most of the automagic connections will not work on linux or will only work on very few distros, you will have to manually connect to anki and toggl.
 
 ## Configuration
-
-#### What's the difference between manual and server modes?
-Manual mode will create a new report every time you ask it to. It will generate one report and then close itself. This is useful when you are running the logger on your own home computer.
-Server mode will create a new report at a specified interval at a certain time. This is useful when you are running the logger on a home server.
-
-The decision you make is not final and it is very easy to change between the two in the settings.
 
 #### Getting your toggl Track token
 Your API key is available at the bottom of [your profile page](https://track.toggl.com/profile)

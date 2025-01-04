@@ -224,7 +224,6 @@ export async function LaunchAnki(paths:ankiPaths|ankiIntegration){
     const resp = await new Promise<string|null>(async (res, rej) => {
         var intervalOpen = setInterval(async () => {
             if(iterations > 500) res(null);
-        console.log("iterations: " + iterations);
             const targetProcesses = await getAnkiProcesses();
             if(targetProcesses.length == 0 && !isOpened) return;
             const pid = targetProcesses[0].pid;

@@ -19,7 +19,7 @@ export function reportsListeners() {
 ipcMain.handle('Get-Reports', async (event, args) => {
     try {
         const reports = await Promise.all(
-            CacheManager.get().list.reverse().map(async (x, i) => {
+            CacheManager.get().list.filter(x => x.reportNo != 0).reverse().map(async (x, i) => {
                 const fileExists = await fsPromises.access(x.path).then(() => true).catch(() => false);
                 
                 // Create the report object
@@ -57,7 +57,7 @@ ipcMain.handle('Get-Reports', async (event, args) => {
   ipcMain.handle('Get-Images', async (event, start, end) => {
     const scaleFactor = 0.1;
     const images = await Promise.all(
-        CacheManager.get().list.reverse().slice(start, end).map(async (x, i) => {
+        CacheManager.get().list.filter(x => x.reportNo != 0).reverse().slice(start, end).map(async (x, i) => {
             const fileExists = await fsPromises.access(x.path).then(() => true).catch(() => false);
             let resizedBase64:string = "";
             if(fileExists){

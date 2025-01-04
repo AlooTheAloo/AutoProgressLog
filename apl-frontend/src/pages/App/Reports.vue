@@ -91,10 +91,10 @@ function openReport(id:string){
                 <div class="flex w-full h-full items-center px-10 my-5 justify-center flex-col">
                     <div class="flex flex-col">
                         <h1 class="bg-gradient-to-r bg-clip-text text-4xl font-extrabold text-transparent from-[#89BDFF] to-[#40ffff]">
-                            No reports have been generated yet!
+                            No reports have been generated yet
                         </h1>
                         <h2 class="text-xl text-center w-full my-2">
-                            Create a report and come back :3!
+                            Create a report and come back to see your progress!
                         </h2>
                     </div>
                 </div>

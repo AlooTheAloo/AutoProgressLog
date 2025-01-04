@@ -20,9 +20,7 @@
 </script>
 
 <template>
-
     <SetupBackground></SetupBackground>
-
     <div class=" flex w-screen">
         <div class=" p-12 flex flex-col w-2/3  bg-black h-screen">
             <div>
@@ -62,6 +60,4 @@
             </div>
         </div>
     </div>
-    
-
 </template>

@@ -7,7 +7,8 @@ export type DashboardDTO = {
     immersionDTO:ImmersionDTO,
     ankiDTO?:AnkiDTO
     monthlyScore: number,
-    syncCount: number
+    syncCount: number,
+    nextReport: string
 }
 
 export type AnkiDTO = {
