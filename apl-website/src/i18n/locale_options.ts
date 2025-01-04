@@ -1,5 +1,5 @@
-export default {
-  'en-US': 'English',
-  'fr-CA': 'Français',
-  'ja-JP': '日本語',
-};
+export default [
+  { value: 'en-US', label: 'English' },
+  { value: 'fr-CA', label: 'Français' },
+  { label: '日本語', value: 'ja-JP' },
+];
