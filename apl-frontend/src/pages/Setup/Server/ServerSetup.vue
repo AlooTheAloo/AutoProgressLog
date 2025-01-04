@@ -27,7 +27,7 @@
                 minutes: dayjsTime.minute()
             },
         }).then(() => {
-            router.push('/setup/toggl-home');
+            router.push('/setup/client-server-selection');
         })
     }
 </script>
@@ -43,7 +43,7 @@
                 <img :src="Logo" class=" w-12 h-12">
             </div>
             <div class="flex flex-col flex-grow pt-5 justify-start gap-2 text-left  ">
-                <BackButton route="/setup/toggl-home"/>
+                <BackButton route="/setup/client-server-selection"/>
                 <div class="font-semibold text-4xl text-white">
                     At what time will the reports be generated ?
                 </div>
@@ -67,7 +67,7 @@
                 
 
                 <div class="flex justify-end mt-5 w-full ">
-                    <Button label="Confirm" @click="Confirm" fluid=""/>
+                    <Button label="Confirm" @click="Confirm" />
                 </div>
             </div>
         </div>
