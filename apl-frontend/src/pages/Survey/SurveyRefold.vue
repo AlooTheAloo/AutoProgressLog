@@ -60,16 +60,13 @@
     ];
 
     onMounted(() => {   
-        console.log("mounted");
         selectedStage.value = undefined;
         hasSeenRefold.value = undefined;
 
         window.ipcRenderer.invoke("get-track-answer").then((data) => {
-            console.log(data);
             if(data == "discord"){
                 hasSeenRefold.value = true;
             }
-            console.log(hasSeenRefold.value);
         })
     })
 

@@ -25,7 +25,6 @@
 
     onMounted(() => {
         selectedAlgorithm.value = retentionAlgorithms[0].key;
-        console.log(selectedAlgorithm.value);
         window.ipcRenderer.invoke("anki-read-data", selectedAlgorithm.value).then((data) => {
             cardCount.value = data.matureCardCount;
             retentionRate.value = data.retentionRate;

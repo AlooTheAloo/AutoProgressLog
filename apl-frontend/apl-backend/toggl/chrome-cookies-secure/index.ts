@@ -29,12 +29,11 @@ var userKey = undefined;
 // Inspired by https://www.npmjs.org/package/chrome-cookies
 
 function decrypt(key, encryptedData) {
-
 	var decipher,
 		decoded,
 		final,
 		padding,
-		iv =  Buffer.from(new Array(KEYLENGTH + 1).join(' '), 'binary');
+		iv = Buffer.from(new Array(KEYLENGTH + 1).join(' '), 'binary');
 
 	decipher = crypto.createDecipheriv('aes-128-cbc', key, iv);
 	decipher.setAutoPadding(false);
@@ -45,13 +44,26 @@ function decrypt(key, encryptedData) {
 
 	final = decipher.final();
 	final.copy(decoded, decoded.length - 1);
-
 	padding = decoded[decoded.length - 1];
 	if (padding) {
 		decoded = decoded.slice(0, decoded.length - padding);
 	}
 
-	return decoded.toString('utf8');
+	const d = decoded.toString('utf8');
+	return d;
+}
+
+
+function newEncryptionFormat(string:string):boolean{
+	// Iterate through each character in the string
+	for (let i = 0; i < string.length; i++) {
+		const charCode = string.charCodeAt(i);
+		// Check if the character is outside the printable ASCII range (32–126)
+		if (charCode < 32 || charCode > 126) {
+			return true; // Binary data detected
+		}
+	}
+	return false; // No binary data found
 }
 
 async function getDerivedKey(callback) {
@@ -305,9 +317,12 @@ function convertRawToPuppeteerState(cookies) {
 
 function convertRawToObject(cookies) {
 
-	let out = {};
+		let out = {};
 
 	cookies.forEach(function (cookie) {
+		if(newEncryptionFormat(cookie.value)){ // because chrome
+			cookie.value = (cookie.value as string).slice(29);
+		}
 		out[cookie.name] = cookie.value;
 	});
 
@@ -410,48 +425,57 @@ export const getCookies = async (uri, format, callback, profileOrPath) => {
 			db.each(
 				"SELECT host_key, path, is_secure, expires_utc, name, value, encrypted_value, creation_utc, is_httponly, has_expires, is_persistent FROM cookies where host_key like '%" + domain + "' ORDER BY LENGTH(path) DESC, creation_utc ASC",
 				function (err, cookie:any) {
+
+
 					let encryptedValue;
 					if (err) {
 						return callback(err);
 					}
 
-					if (cookie.value === '' && cookie.encrypted_value.length > 0) {
-						encryptedValue = cookie.encrypted_value;
 
-						if (process.platform === 'win32') {
-							if (encryptedValue[0] == 0x01 && encryptedValue[1] == 0x00 && encryptedValue[2] == 0x00 && encryptedValue[3] == 0x00){
-
-								// @ts-ignore
-								cookie.value = Dpapi.unprotectData(encryptedValue, null, 'CurrentUser').toString();
-
-
-							} else if (encryptedValue[0] == 0x76 && encryptedValue[1] == 0x31 && encryptedValue[2] == 0x30 ){
-
-								let localState = JSON.parse(fs.readFileSync(os.homedir() + '/AppData/Local/Google/Chrome/User Data/Local State').toString());
-
-								let b64encodedKey = localState.os_crypt.encrypted_key;
-
-								let encryptedKey = Buffer.from(b64encodedKey,'base64');
-
-								// @ts-ignore
-								let key = Dpapi.unprotectData(encryptedKey.slice(5, encryptedKey.length), null, 'CurrentUser');
-
-								let nonce = encryptedValue.slice(3, 15);
-
-								let tag = encryptedValue.slice(encryptedValue.length - 16, encryptedValue.length);
-
-								encryptedValue = encryptedValue.slice(15, encryptedValue.length - 16);
-
-								cookie.value = decryptAES256GCM(key, encryptedValue, nonce, tag).toString();
-
+					try{
+						if (cookie.value === '' && cookie.encrypted_value.length > 0) {
+							encryptedValue = cookie.encrypted_value;
+	
+	
+							if (process.platform === 'win32') {
+								if (encryptedValue[0] == 0x01 && encryptedValue[1] == 0x00 && encryptedValue[2] == 0x00 && encryptedValue[3] == 0x00){
+	
+									// @ts-ignore
+									cookie.value = Dpapi.unprotectData(encryptedValue, null, 'CurrentUser').toString();
+	
+	
+								} else if (encryptedValue[0] == 0x76 && encryptedValue[1] == 0x31 && encryptedValue[2] == 0x30 ){
+	
+									let localState = JSON.parse(fs.readFileSync(os.homedir() + '/AppData/Local/Google/Chrome/User Data/Local State').toString());
+	
+									let b64encodedKey = localState.os_crypt.encrypted_key;
+	
+									let encryptedKey = Buffer.from(b64encodedKey,'base64');
+	
+									// @ts-ignore
+									let key = Dpapi.unprotectData(encryptedKey.slice(5, encryptedKey.length), null, 'CurrentUser');
+	
+									let nonce = encryptedValue.slice(3, 15);
+	
+									let tag = encryptedValue.slice(encryptedValue.length - 16, encryptedValue.length);
+	
+									encryptedValue = encryptedValue.slice(15, encryptedValue.length - 16);
+	
+									cookie.value = decryptAES256GCM(key, encryptedValue, nonce, tag).toString();
+	
+								}
+							}else {
+								cookie.value = decrypt(derivedKey, encryptedValue);
 							}
-						}else {
-							cookie.value = decrypt(derivedKey, encryptedValue);
+	
+							delete cookie.encrypted_value;		
 						}
-
-						delete cookie.encrypted_value;
 					}
-
+					catch(e){
+						console.log(e);
+					}
+					
 					cookies.push(cookie);
 				},
 				function () {
@@ -476,6 +500,7 @@ export const getCookies = async (uri, format, callback, profileOrPath) => {
 
 					return true;
 				});
+
 
 				let filteredCookies = [];
 				let keys = {};

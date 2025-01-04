@@ -48,7 +48,7 @@
 </script>
 
 <template>
-   <div class="rounded-xl flex w-full bg-black h-[20.7rem]">
+   <div class="rounded-xl flex w-full bg-black h-[23rem]">
         <div class="w-full flex justify-center ">
             <div class="pl-1 flex flex-col w-[91.7%]   pt-5 ">
                 <div class="flex flex-grow">

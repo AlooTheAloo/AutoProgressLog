@@ -1,4 +1,4 @@
-import { app, BrowserWindow, shell, ipcMain, Menu, MenuItem, dialog } from 'electron'
+import { app, BrowserWindow, shell, ipcMain, Menu, MenuItem, dialog, crashReporter } from 'electron'
 import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
 import registerEvents from "./Electron-Backend/";
@@ -47,10 +47,11 @@ export let win: BrowserWindow | null = null
 const preload = path.join(__dirname, '../preload/index.mjs')
 const indexHtml = path.join(RENDERER_DIST, 'index.html')
 
-async function createWindow() {
+export async function createWindow() {
+  console.log("Creating window");
   win = new BrowserWindow({
     minHeight: 600,
-    minWidth: 800,
+    minWidth: 900,
     width: 1920,
     height: 1080,
     title: 'Main window',
@@ -94,11 +95,20 @@ async function createWindow() {
 }
 
 
-app.whenReady().then(createWindow)
+app.whenReady().then(createWindow).then(createAppBackend);
 
 app.on('window-all-closed', () => {
-  win = null
-  if (process.platform !== 'darwin') app.quit()
+  if(process.platform == "darwin"){
+    app.dock.hide();
+  }
+  else if(process.platform == "win32"){
+    win.setSkipTaskbar(true);
+  }
+  else {
+    app.quit();
+  } 
+  buildContextMenu();
+
 })
 
 app.on('second-instance', () => {
@@ -118,10 +128,16 @@ app.on('activate', () => {
   }
 })
 
-
 import electronUpdater, { type AppUpdater } from 'electron-updater';
+import { buildContextMenu, createAppBackend } from './Electron-Backend/appBackend';
 
 app.on("ready", async () => {
+
+
+
+
   buildMenu(app);
   await electronUpdater.autoUpdater.checkForUpdatesAndNotify();
 });
+
+

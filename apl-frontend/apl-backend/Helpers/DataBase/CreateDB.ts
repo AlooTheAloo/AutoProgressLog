@@ -1,7 +1,8 @@
 import dayjs from "dayjs";
 import sqlite3 from "sqlite3";
+import { getTimeEntries } from "../../toggl/toggl-service";
 
-export function CreateDB(db:sqlite3.Database){
+export async function CreateDB(db:sqlite3.Database){
     db.run(`
         CREATE TABLE IF NOT EXISTS syncData 
         (
@@ -22,6 +23,8 @@ export function CreateDB(db:sqlite3.Database){
         );
     });
     
+    
+
     db.run(`CREATE TABLE IF NOT EXISTS immersionActivity
         (
             id INTEGER PRIMARY KEY,
@@ -31,6 +34,17 @@ export function CreateDB(db:sqlite3.Database){
             activityName TEXT
         )`
     );
+
+    const entries = await getTimeEntries(dayjs().startOf("month").subtract(1, "month").valueOf());
+    await db.run(`INSERT INTO immersionActivity (id, syncDataId, time, seconds, activityName) VALUES 
+        ${
+            entries.entriesAfterLastGen.map((x) => {
+                return `(${x.id}, ${dayjs().startOf("day").valueOf()}, '${dayjs(x.stop).unix()}', ${x.duration}, '${x.description}')`
+            }).join(", \n")
+        }`
+    );
+
+    
 
 
 }

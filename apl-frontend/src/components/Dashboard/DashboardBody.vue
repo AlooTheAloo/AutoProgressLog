@@ -7,24 +7,29 @@ import Brain from "../../assets/Icons/brain.png";
 import Calendar from "../../assets/Icons/calendar.png";
 
 import AppSmallWidget from './AppSmallWidget.vue';
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { DashboardDTO } from '../../../types/DTO';
+import pluralize, { plural } from 'pluralize';
+import ImmersionSources from './ImmersionSources.vue';
+import Skeleton from 'primevue/skeleton';
+import { useWindowSize } from '@vueuse/core';
+import Dialog from 'primevue/dialog';
 
 const props = defineProps<{
     dto: DashboardDTO;
+    syncing: boolean;
 }>();
 
+const {width, height} = useWindowSize();
 
 const bottomText = computed(() => {
-
     const dto = props.dto.immersionDTO;
     // Diff as percentage
     let difference = (dto.monthlyImmersion - dto.monthlyImmersionLastMonth);
-    
+
     // No text to display if difference is 0
     if(difference == 0)
         return ``;
-
 
     // Round
     difference = Math.round(dayjs.duration(difference, "s").asHours() * 100) / 100;
@@ -32,73 +37,102 @@ const bottomText = computed(() => {
     // Choose direction
     const direction = difference > 0;
     
-    
-
     // Build html
     return `
-    <div style=\"color: ${direction ? '#5FFFB2' : 'FE7D7D'}; font-size:small; \"> 
-        <b> ${difference} hours ${direction ? 'more' : 'less'} </b> 
+    <div style=\"color: ${direction ? '#5FFFB2' : '#FE7D7D'}; font-size:small; \"> 
+        <b> ${Math.abs(difference) >= 1 ? pluralize("hour", Math.abs(difference), true) : pluralize("minute", Math.ceil(Math.abs(difference * 60)), true) } ${direction ? 'more' : 'less'} </b> 
         than last month at this time
     </div>`
-
-})
-
-
-
+});
 </script>
 <template>
-    <div class="flex-grow flex-wrap justify-center flex w-96 gap-3 ">
-        <AppSmallWidget
-        title="Immersion time this month"
-        units="hours"
-        :condense="true"
-        :value="{
-            current: dayjs.duration(dto.immersionDTO.monthlyImmersion, 's').asHours(),
-            delta: formatTime(dto.immersionDTO.monthlyImmersionLastMonth),
-        }"
-        :image="Calendar"
-        :direction="0"
-        :hideDelta="true"
-        :bottomText="bottomText"
-        />
+    <div v-if="syncing" class="flex flex-col flex-grow items-center">
         
-        <AppSmallWidget
-        title="Total Immersion Time"
-        units="hours"
-        :condense="true"
-        :value="{
-            current: dayjs.duration(dto.immersionDTO.totalImmersion, 's').asHours(),
-            delta: formatTime(dto.immersionDTO.immersionSinceLastReport),
-        }"
-        :image="Time"
-        :direction="dto.immersionDTO.immersionSinceLastReport"
-        :hideDelta="dto.immersionDTO.immersionSinceLastReport === 0"
-        />
 
-        <AppSmallWidget v-if="dto.ankiDTO != null"
-        title="Retention rate"
-        units="%"
-        :condense="true"
-        :value="{
-            current: dto.ankiDTO.retentionRate,
-            delta: dto.ankiDTO.retentionRateDelta,
-        }"
-        :image="Brain"
-        :direction="dto.ankiDTO.retentionRateDelta"
-        :hideDelta="dto.ankiDTO.retentionRateDelta === 0"
-        />
 
-        <AppSmallWidget v-if="dto.ankiDTO != null"
-        title="Total Cards Reviewed"
-        units="cards"
-        :condense="true"
-        :value="{
-            current: dto.ankiDTO.totalReviews,
-            delta: dto.ankiDTO.reviewsDelta,
-        }"
-        :image="Eye"
-        :direction="dto.ankiDTO.reviewsDelta"
-        :hideDelta="dto.ankiDTO.reviewsDelta === 0"
-        />
+        <!-- Main Container -->
+        <div class="flex flex-col justify-center gap-3 h-fit w-fit items-center">
+            <!-- First Row -->
+            <div class="flex flex-wrap gap-3 justify-center">
+            <!-- Small Widgets Row -->
+            <div class="flex flex-row gap-3 w-[45rem]">
+                <Skeleton width="50%" height="9rem"  />
+                <Skeleton width="50%" height="9rem"  />
+            </div>
+            <!-- Second Row -->
+            <div class="flex flex-row gap-3 w-[45rem]">
+                <Skeleton width="50%" height="9rem"  />
+                <Skeleton width="50%" height="9rem"  />
+            </div>
+            </div>
+            <!-- Immersion Sources Section -->
+            <div class="flex-grow flex justify-start w-[45rem] 1820:w-full">
+            <Skeleton :height="width > 1820 ? '40rem' : '24rem'" />
+            </div>
+        </div>
     </div>
-</template>w
+    <div v-else class="flex flex-col flex-grow items-center">
+        <div class=" flex-col justify-center gap-3 flex h-fit w-fit items-center">
+            <div class="flex flex-wrap gap-3 justify-center">
+                <div class="flex flex-row gap-3 w-[45rem]  ">
+                    <AppSmallWidget
+                    title="Immersion time this month"
+                    units="hours"
+                    :condense="true"
+                    :value="{
+                        current: dayjs.duration(dto.immersionDTO.monthlyImmersion, 's').asHours(),
+                        delta: formatTime(dto.immersionDTO.monthlyImmersionLastMonth),
+                    }"
+                    :image="Calendar"
+                    :direction="0"
+                    :hideDelta="true"
+                    :bottomText="bottomText"
+                    />
+                    
+                    <AppSmallWidget
+                    title="Total Immersion Time"
+                    units="hours"
+                    :condense="true"
+                    :value="{
+                        current: dayjs.duration(dto.immersionDTO.totalImmersion, 's').asHours(),
+                        delta: formatTime(dto.immersionDTO.immersionSinceLastReport),
+                    }"
+                    :image="Time"
+                    :direction="dto.immersionDTO.immersionSinceLastReport"
+                    :hideDelta="dto.immersionDTO.immersionSinceLastReport === 0"
+                    />
+                </div>
+                <div class="flex flex-row gap-3 w-[45rem]">
+                    <AppSmallWidget v-if="dto.ankiDTO != null"
+                    title="Retention rate"
+                    units="%"
+                    :value="{
+                        current: dto.ankiDTO.retentionRate.toFixed(2),
+                        delta: dto.ankiDTO.retentionRateDelta.toString(),
+                    }"
+                    :image="Brain"
+                    :direction="dto.ankiDTO.retentionRateDelta"
+                    :hideDelta="dto.ankiDTO.retentionRateDelta === 0"
+                    />
+            
+                    <AppSmallWidget v-if="dto.ankiDTO != null"
+                    title="Total Cards Reviewed"
+                    units="cards"
+                    :condense="true"
+                    :value="{
+                        current: dto.ankiDTO.totalReviews,
+                        delta: dto.ankiDTO.reviewsDelta,
+                    }"
+                    :image="Eye"
+                    :direction="dto.ankiDTO.reviewsDelta"
+                    :hideDelta="dto.ankiDTO.reviewsDelta === 0"
+                    /> 
+                </div>
+            </div>
+            <div class="flex-grow flex justify-start 1820:w-full w-[45rem]">
+                <ImmersionSources :sources="dto.immersionDTO.immersionSources"/>
+            </div>
+        </div>
+    </div>
+    
+</template>

@@ -78,35 +78,13 @@ import BackButton from '../../../components/Common/BackButton.vue';
                             At what time and how often will the reports be generated ?
                         </div>
                         <div class="text-gray-600 font-light mb-5 text-xs lg:text-sm">
-                            Reports will be generated automatically at a predetermined specific time interval. If your computer is turned off or disconnected from the internet, the reports will not be generated.
+                            Reports will be generated automatically at a predetermined time. If your computer is turned off or disconnected from the internet, the reports will not be generated.
                             You can change this in the settings later.
                         </div>
                         <div class="flex flex-col gap-4 max-w-[35rem] w-full">
                             <div class="flex gap-2 items-center ">
                                 <div class="text-lg font-semibold">
-                                    Every
-                                </div>
-                                <div class="text-lg font-semibold flex-grow">
-                                    <InputNumber class=" h-12" v-model="selectedNumber" :min="1" :max="30" inputId="integeronly" fluid showButtons>
-                                        
-                                    </InputNumber>
-                                </div>
-                                <div class="text-lg font-semibold">
-                                    <Dropdown class=" h-12" v-model="selectedtimeOption" :options="timeOptions">
-                                        <template #option="slotProps">
-                                            <div class="flex align-items-center">
-                                                {{ slotProps.option.label }}{{ (selectedNumber ?? 1) > 1 ? 's' : '' }}
-                                            </div>
-                                        </template>
-    
-                                        <template #value="slotProps">
-                                            <div v-if="slotProps.value != undefined">
-                                                {{ slotProps.value.label }}{{ (selectedNumber ?? 1) > 1 ? 's' : '' }}
-                                            </div>
-                                        </template>
-    
-    
-                                    </Dropdown>
+                                    Generate a report every day
                                 </div>
                             </div>
                             <div class="items-center gap-2 flex">

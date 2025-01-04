@@ -5,23 +5,39 @@
     import Button from 'primevue/button';
     import BackButton from '../../../components/Common/BackButton.vue';
     import InputText from 'primevue/inputtext';
-    import { onMounted } from 'vue';
+    import { onMounted, ref } from 'vue';
     import Dropdown from 'primevue/dropdown';
-import AccountDisplay from '../../../components/Common/AccountDisplay.vue';
-
+    import AccountDisplay from '../../../components/Common/AccountDisplay.vue';
+    import Panel from 'primevue/panel';
+    
     const extensions = [".png", ".jpg", ".jpeg", ".webp", ".pdf"];
 
     const selectedExtension = defineModel<string>('selectedExtension');
     const filename = defineModel<string>('filename');
+    const filePath = ref("")
 
     onMounted(() => {
+
+        window.ipcRenderer.invoke("GetPath", "userData").then(path => {
+            filePath.value = path;
+        })
+        
         filename.value = "Progress Report";
         selectedExtension.value = extensions.at(0);
     })
 
+    function chooseFilePath(){
+        window.ipcRenderer.invoke("OpenPathDialog", filePath.value).then(path => {
+            console.log(path);
+            if(path.length == 0) return;
+            filePath.value = path[0];
+        })
+    }
+
     const router = useRouter()
     function NextPage(){
         window.ipcRenderer.invoke("SetOutputFile", {
+            path: filePath.value,
             name: filename.value,
             extension: selectedExtension.value
         });
@@ -41,16 +57,30 @@ import AccountDisplay from '../../../components/Common/AccountDisplay.vue';
             <div class="flex flex-col flex-grow py-5 justify-start gap-2 text-left">
                 <BackButton route="/setup/anki-home"/>
                 <div class="font-semibold text-white text-4xl">
-                    Please choose a filename.
+                    Please choose a path.
                 </div>
                 <p class="text-sm">
                     Your progress reports will be saved under this name with a number suffix. For example, if you choose "MyReport.png", your reports will be saved as "MyReport 1.png", "MyReport 2.png", etc.
-                </p>
-                <div class="flex gap-2 mt-2 flex-grow">
+                </p>    
+                <div class="flex gap-2 mt-2 h-12">
+                    <Button class= w-full @click="chooseFilePath">
+                       <div class="flex flex-col w-full " style="direction: rtl;">
+                        <div class="text-sm text-ellipsis overflow-hidden whitespace-nowrap ">
+                            {{ 
+                                filePath
+                            }}
+                        </div>
+                        <div class="text-xs">
+                            (Click to edit)
+                        </div>
+                       </div> 
+                    </Button>
                     <InputText v-model="filename" class="w-full text-white font-semibold  rounded-xl p-2 h-12 "/>
                     <Dropdown v-model="selectedExtension" :options="extensions" class="w-1/4 text-white font-semibold text-lg rounded-xl h-12 "/>
                 </div>
-                <div class="flex justify-end">
+
+                
+                <div class="flex flex-grow justify-end items-end">
                     <Button 
                     @click="NextPage"
                     style="width: 120px;"

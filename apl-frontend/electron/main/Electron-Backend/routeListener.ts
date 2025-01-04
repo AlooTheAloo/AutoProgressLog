@@ -1,9 +1,9 @@
-import { ipcMain } from "electron";
+import { ipcMain, Notification } from "electron";
 import { getConfig } from "../../../apl-backend/Helpers/getConfig";
 import { appUpgrade } from "../../../apl-backend/entry/upgrade";
 import { CacheManager } from "../../../apl-backend/Helpers/cache";
 import { shell } from "electron";
-import { hasPerms, macOSRequirePerms } from "../../../apl-backend/Helpers/readWindows";
+import { hasPerms, macOSRequireNotification, macOSRequirePerms } from "../../../apl-backend/Helpers/readWindows";
 
 export function routeListeners(){
 
@@ -29,6 +29,9 @@ export function routeListeners(){
 
     ipcMain.handle("PageSelect", (event, args) => {
         if(getConfig() === null){
+            if(process.platform === "darwin"){
+                macOSRequireNotification();
+            }
             return "/setup/index";
         }
         else{
@@ -41,9 +44,7 @@ export function routeListeners(){
         }
      });
 
-    ipcMain.handle("OpenExternal", (event, args) => {
-    shell.openExternal(args);
-    });
+
 }
 
 

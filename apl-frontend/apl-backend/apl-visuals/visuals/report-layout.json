@@ -1,12 +1,1 @@
-[
-    [
-        "mature",
-        "ankidata",
-        "ankistreak"
-    ],
-    [
-        "immersiondata",
-        "immersionlog",
-        "immersionstreak"
-    ]
-]
+{"layout":[["mature","ankidata","ankistreak"],["immersiondata","immersionlog","immersionstreak"]],"gradient":["#E92C27","#A97A69","#B93D3D"]}

@@ -1,18 +1,12 @@
 
 <script setup lang="ts">
-    import { useRoute, useRouter } from "vue-router";
+    import { useRouter } from "vue-router";
     import Logo from "../../assets/Logo.png"
-    import { appPath as AppPath, appRoutes } from "../../pages/routes/appRoutes";
-    import { onMounted } from "vue";
-
-    import Overview from "../../assets/Icons/Sidebar/Overview.svg"
-    import Reports from "../../assets/Icons/Sidebar/Reports.svg"
-    import Achievements from "../../assets/Icons/Sidebar/Achievements.svg"
-    import Statistics from "../../assets/Icons/Sidebar/Statistics.svg"
-    
-    import Settings from '../../assets/Icons/Sidebar/Settings.svg'
-    import Help from '../../assets/Icons/Sidebar/Help.svg'
-    
+    import { appPath as AppPath } from "../../pages/routes/appRoutes";
+    import { ref } from "vue";
+    import Dialog from "primevue/dialog";
+    import { Overview, Reports, Competitions, Statistics, Settings, Help } from "../../assets/Icons/Sidebar/Icons"
+    import UserDialog from "../../../types/UserDialog"
     const HELP_PAGE_URL = "https://www.aplapp.dev/#/"
     const router = useRouter();
 
@@ -34,8 +28,8 @@
             name: "Reports",
         },
         {
-            image: Achievements,
-            name: "Achievements",
+            image: Competitions,
+            name: "Competitions",
         },
         {
             image: Statistics,
@@ -46,7 +40,6 @@
     const handleClick = (path: string | undefined) => {
         if (!path) return;
         if(path == router.currentRoute.value.path) return;
-        console.log("moving to " + path);
         router.push(path);
     };
 
@@ -58,47 +51,52 @@
         currentRoute: AppPath;
     }>();
 
-
-    onMounted(() => {
-        console.log(props.currentRoute);
+    window.ipcRenderer.on("ShowDialog", (evt, args:UserDialog) => {
+        dialog.value = args;
+        visible.value = true;     
     })
+
+
+    const dialog = ref<UserDialog>();
+    const visible = ref(false);
 
 </script>
 
 <template>
-
+    <Dialog
+    :header="dialog?.header"
+    :footer="dialog?.footer"
+    v-model:visible="visible"
+    :modal="true"
+    :dismissableMask="true"
+    >
+     {{dialog?.content}}
+    </Dialog>
     <div class="h-screen w-screen absolute overflow-hidden pointer-events-none">
-        
-        <div class="flex absolute w-full h-full  items-end justify-end">
+        <div class="flex absolute w-full h-full items-end justify-end">
             <div
             style="filter: blur(75px);"
             class="glow glow-delay w-96 h-96 absolute rounded-full bg-[#24CAFF] z-0 -mr-64 -mb-64 ">
     
             </div>
         </div>
-
-
-
-        <div class="w-24 xl:w-72 transition-all duration-250 h-full overflow-hidden">
+        <div class="w-24 xl:w-72 transition-all duration-250 h-full ">
             <div
             style="filter: blur(75px);"
             class="glow w-96 h-96 rounded-full bg-[#24CAFF] z-0 -ml-64 -mt-64 ">
     
             </div>
-
         </div>
     </div>
 
-    <div class="flex w-screen h-screen">
-        <div class="flex flex-col bg-[#1B1B1B] p-3 w-24 xl:w-72 items-center xl:items-start transition-all duration-250"> <!-- Sidebar here -->
+    <div class="flex w-screen h-screen overflow-hidden">
+        <div class="flex flex-col bg-[#1B1B1B] p-3 w-20 xl:w-72 items-center xl:items-start transition-all duration-250"> <!-- Sidebar here -->
             <!-- Logo  -->
             <div class=" w-full z-10"> 
                 <img :src="Logo" class="w-[4.5rem]"/>
             </div>
                 <!-- Navigation  -->
-            <div
-            
-            class="flex flex-col gap-4 w-full mt-20 flex-grow cursor-pointer">
+            <div class="flex flex-col gap-4 w-full mt-20 flex-grow cursor-pointer">
                 <div v-for="route in routes"
                 :style="{
                     cursor: route.path != null ? 'pointer' : 'default',
@@ -111,28 +109,35 @@
                 >
                     <img :src="route.image" class="w-6 h-6"/>
                     <div class="font-semibold text-white xl:block hidden">
-                        {{ route.name 
+                        {{ 
+                            route.name 
                         }}
                     </div>
                 </div>
             </div>
             <!-- Settings and help  -->
-            <div class="flex flex-col gap-4 w-full justify-end  flex-grow">
-                <router-link to="/app/settings" class="flex items-center gap-2 w-full">
-                    <img :src="Settings" class="w-6 h-6"/>
-                    <div class="font-semibold text-white xl:block hidden">
-                        Settings
+            <div class="flex flex-col gap-2 w-full justify-end  flex-grow">
+                <router-link to="/app/settings" class="flex items-center xl:justify-start justify-center gap-2 w-full">
+                    <div class="flex items-center xl:justify-start justify-center gap-2 w-full h-10 rounded-xl px-2"
+                    :style="{
+                        backgroundColor: props.currentRoute == '/app/settings' ? '#24CAFF' : '',
+                    }">
+                        <img :src="Settings" class="w-6 h-6"/>
+                        <div class="font-semibold text-white xl:block hidden">
+                            Settings
+                        </div>
                     </div>
+                    
                 </router-link>
-                <button :onclick="openHelpCenter" class="flex items-center gap-2 w-full">
+                <button :onclick="openHelpCenter" class="flex items-center px-2 xl:justify-start justify-center gap-2 w-full">
                     <img :src="Help" class="w-6 h-6"/>
-                    <div class="font-semibold text-white xl:block hidden ">
+                    <div class="font-semibold text-white xl:block hidden  ">
                         Help center
                     </div>
                 </button>
             </div>
         </div>
-        <div class="flex-grow"> <!-- App here -->
+        <div class=" flex-1"> <!-- App here -->
             <slot />
         </div>
     </div>

@@ -3,9 +3,12 @@ import { Version } from "../consts/versioning"
 export interface cache {
     reportNo:number,
     generationTime:string,
+    syncID:number,
+    path:string,
     
     seconds:number,
     totalSeconds:number,
+    bestSeconds:number,
 
     cardsStudied:number,
     totalCardsStudied:number,

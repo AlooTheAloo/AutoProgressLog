@@ -1,5 +1,5 @@
-import { KillAnkiIfOpen, LaunchAnki } from "../config/configAnkiIntegration";
-import { GetActivitiesBetween, GetLastEntry } from "../Helpers/DataBase/SearchDB";
+import { getAnkiProcesses, KillAnkiIfOpen, LaunchAnki } from "../config/configAnkiIntegration";
+import { GetActivitiesBetween, GetLastEntry, getreadinghours } from "../Helpers/DataBase/SearchDB";
 import { DeleteActivity, ModifyActivityByID, WriteEntries, WriteSyncData } from "../Helpers/DataBase/WriteDB";
 import { getConfig, syncDataPath } from "../Helpers/getConfig";
 import { getTimeEntries, toggl } from "../toggl/toggl-service";
@@ -10,6 +10,9 @@ import { sumTime } from "../Helpers/entryHelper";
 import { CreateDTO } from "../../electron/main/Electron-Backend/DashboardListeners";
 import { SyncData } from "../types/sync";
 import { CacheManager } from "../Helpers/cache";
+import { hasPerms } from "../Helpers/readWindows";
+import { ipcMain } from "electron";
+import { win } from "../../electron/main";
 
 export interface AnkiSyncData {
     cardReview: number;
@@ -21,15 +24,33 @@ export interface AnkiSyncData {
 export interface syncProps {
     syncAnki: boolean;
     syncToggl: boolean;
+
+    isReport: boolean;
 }
 
 const DEFAULT:syncProps = {
     syncAnki: true,
-    syncToggl: true
+    syncToggl: true,
+    isReport: false
 }
 
-export async function runSync(silent = false, props:syncProps = DEFAULT){
-    
+let syncing = false;
+
+export function setSyncing(value:boolean){
+    win.webContents.send("SetSync", value);
+    syncing = value;
+}
+
+export function isSyncing(){
+    return syncing;
+}
+
+
+export async function runSync(silent = false, props:syncProps = DEFAULT, sendSyncing = true){
+    if(!props.isReport && sendSyncing){
+        setSyncing(true);
+    } 
+
     let toggl:{
         entries : entry[]
         delta: number
@@ -38,28 +59,38 @@ export async function runSync(silent = false, props:syncProps = DEFAULT){
 
     const [t, a] = await Promise.all([
         props.syncToggl ? syncToggl() : null,
-        new Promise<AnkiSyncData>(async (res, rej) => {
+        new Promise<AnkiSyncData|null>(async (res, rej) => {
             if(props.syncAnki == false) return res(null);
             if(hasSyncEnabled(getConfig().anki.ankiIntegration.profile) && !silent){
-                console.log("launching anki");
                 await LaunchAnki(getConfig().anki.ankiIntegration);
+                syncAnki(props.isReport).then(res).catch(rej);
             }
-            if(silent)
-                await KillAnkiIfOpen();
+            if(silent){
+                syncAnkiIfClosed().then(res).catch(() => {
+                    res(null);
+                });
+            }
 
-            syncAnki().then(res).catch(rej);
         })
     ])
 
-    let lastEntry:SyncData|null = null;
+    let lastEntry:SyncData|null = await GetLastEntry();
     let time:number|null = null;
     
     toggl = t;
-    anki = a;
+    if(a == null)
+    {
+        anki = {
+            cardReview: 0,
+            matureCards: lastEntry.anki.mature,
+            retention: lastEntry.anki.retention,
+            lastUpdate: lastEntry.anki.lastAnkiUpdate
+        }
+    }
+    else anki = a;
 
     if(props.syncToggl)
     {
-        lastEntry = await GetLastEntry();
         time = sumTime(toggl.entries) + toggl.delta;
     }
    
@@ -78,22 +109,30 @@ export async function runSync(silent = false, props:syncProps = DEFAULT){
         type: "Full",
     }, toggl.entries);
 
+
+
+    if(!props.isReport && sendSyncing){
+        setSyncing(false);
+    } 
+
+    const h = await getreadinghours();
     return CreateDTO();
 }
 
+export async function syncAnkiIfClosed():Promise<AnkiSyncData>{
+    const targetProcesses = await getAnkiProcesses();
+    if(targetProcesses.length != 0) return;
+    return await syncAnki(false);
+}
 
-export async function syncAnki():Promise<AnkiSyncData> {
+export async function syncAnki(isReport = false):Promise<AnkiSyncData> {
+    console.log("Syncing Anki");
     const anki = getConfig().anki;
     const lastEntry = await GetLastEntry("Full");
-    console.log("since" + lastEntry.anki.lastAnkiUpdate);
-
     const cardReview = await getAnkiCardReviewCount(dayjs(lastEntry.anki?.lastAnkiUpdate ?? lastEntry.generationTime), anki.ankiIntegration);
     const matureCards = await getMatureCards(anki.ankiIntegration);
     const retention = await getRetention(anki.options.retentionMode, anki.ankiIntegration);
-    const lastUpdate = await getLastUpdate(anki.ankiIntegration);
-    console.log(anki.ankiIntegration);
-    console.log(lastUpdate);
-    
+    const lastUpdate = isReport ? dayjs().valueOf() : Math.max(lastEntry.anki.lastAnkiUpdate, await getLastUpdate(anki.ankiIntegration));
     return {
         cardReview: cardReview,
         matureCards: matureCards,

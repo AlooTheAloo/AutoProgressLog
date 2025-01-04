@@ -7,7 +7,7 @@
     import ImmersionStreak from "./Widgets/PublicWidgets/ImmersionStreak.vue";
     import pMature from "./Widgets/PublicWidgets/pMature.vue";
     import pImmersionLog from "./Widgets/PublicWidgets/pImmersionLog.vue";
-import { onMounted } from "vue";
+import MoreImmersionData from "./Widgets/PublicWidgets/MoreImmersionData.vue";
 
     const widgetMap = {
       mature: pMature,
@@ -15,21 +15,9 @@ import { onMounted } from "vue";
       ankistreak: AnkiStreak,
       immersiondata: ImmersionData,
       immersionlog: pImmersionLog,
-      immersionstreak: ImmersionStreak
+      immersionstreak: ImmersionStreak,
+      moreimmersiondata: MoreImmersionData
     };
-
-  //  // Uncomment for regular layout
-  //   // const reportLayout:(keyof typeof widgetMap)[][] = [
-  //   //     ["mature", "ankidata", "ankistreak"],
-  //   //     ["immersiondata", "immersionlog", "immersionstreak"]
-  //   // ]
-
-
-  //   // Uncomment for ankiless layout
-  //   const reportLayout:(keyof typeof widgetMap)[][] = [
-  //       ["immersionlog", "immersiondata"],
-  //       ["immersiondata", "immersionstreak"]
-  //   ]
 
     function getItemById(itemId: keyof typeof widgetMap) {
         return itemId ? widgetMap[itemId] || null : null;
@@ -41,11 +29,6 @@ import { onMounted } from "vue";
     }
 
     const props = defineProps<statsProps>();
-
-    onMounted(() => {
-      console.log("MEWOMEWOEMOWOME")
-        console.log(props.layout)
-    })
 
 </script>
 

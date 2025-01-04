@@ -1,39 +1,65 @@
 import { ipcMain } from "electron";
 import { runGeneration } from "../../../apl-backend/generate/generate";
-import sqlite3 from "sqlite3";
-import { CreateDB } from "../../../apl-backend/Helpers/DataBase/CreateDB";
 import { getConfig, getSyncProps, syncDataPath } from "../../../apl-backend/Helpers/getConfig";
-import { runSync } from "../../../apl-backend/generate/sync";
+import { isSyncing, runSync } from "../../../apl-backend/generate/sync";
 import { CacheManager } from "../../../apl-backend/Helpers/cache";
 import { DashboardDTO } from "./types/Dashboard";
 import { GetImmersionSourcesSince, GetImmersionTimeBetween, GetImmersionTimeSince, GetLastEntry, GetSyncCount } from "../../../apl-backend/Helpers/DataBase/SearchDB";
 import dayjs from "dayjs";
 import { roundTo } from "round-to";
+import { checkInternet, notifyNoInternet } from "../../../apl-backend/Helpers/Healthcheck/internetHelper";
+import { hasSyncEnabled } from "../../../apl-backend/anki/db";
+import { hasPerms, macOSRequirePerms } from "../../../apl-backend/Helpers/readWindows";
+import { notifyNoPermissions } from "../../../apl-backend/Helpers/Healthcheck/permHelper";
 
 export function DashboardListeners() {
+    ipcMain.handle("isSyncing", async (event: any) => {
+        return isSyncing();
+    })
+    
     ipcMain.handle("GenerateReport", async (event: any) => {
-        return await runGeneration();
+        if(await runChecks()){
+            return await runGeneration();
+        }
     });
 
     ipcMain.handle("Sync", async (event: any, alternative: boolean) => {
-        return await runSync(alternative, getSyncProps());
+        if(await runChecks()){
+            return await runSync(alternative, getSyncProps());
+        }
     });
 
     ipcMain.handle("Get-Dashboard-DTO", async (event: any) => {
         return await CreateDTO();
     })
+}
 
+export async function runChecks():Promise<boolean>{
+    if(await checkInternet()){
+        // MacOS and sync => we need perms
+        if(hasSyncEnabled(getConfig().anki.ankiIntegration.profile) && process.platform == "darwin"){
+            if(!(await hasPerms())){
+                notifyNoPermissions();
+                macOSRequirePerms();
+                return false;
+            }
+        }
+        return true;
+    }
+    else {
+        notifyNoInternet()
+        return false;
+    }
 }
 
 export async function CreateDTO(){
     const lastEntry = await GetLastEntry();
     const lastReport = await CacheManager.peek();
-
+    console.log(getConfig().account.userName);
     const thisMonth = await GetImmersionTimeSince(dayjs().startOf("month"));
     const lastMonth = await GetImmersionTimeBetween(dayjs().subtract(1, "month").startOf("month"), dayjs().subtract(1, "month"));
-
     const DTO:DashboardDTO = {    
-        userName: getConfig().toggl.userName,
+        userName: getConfig().account.userName,
         lastSyncTime: dayjs(lastEntry.generationTime).toISOString(),
         lastReportTime: lastReport.generationTime,
         ankiDTO: getConfig().anki.enabled ? {

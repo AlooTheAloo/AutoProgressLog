@@ -7,8 +7,8 @@
     import BackButton from '../../../components/Common/BackButton.vue';
     import AnkiLogo from '../../../assets/AnkiLogo.png';
     import { onMounted, ref } from 'vue';
-import Listbox from 'primevue/listbox';
-import ProgressSpinner from 'primevue/progressspinner';
+    import Listbox from 'primevue/listbox';
+    import ProgressSpinner from 'primevue/progressspinner';
     const message = ref<string>();
     const router = useRouter()
     const decks = ref<{name: string, cardCount: number; }[]>([]);
@@ -16,7 +16,6 @@ import ProgressSpinner from 'primevue/progressspinner';
     onMounted(() => {
         selectedDecks.value = [];
         window.ipcRenderer.invoke("anki-decks-list").then((d) => {
-            console.log(d);
             decks.value = d;
         })
     });

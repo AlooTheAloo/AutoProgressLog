@@ -4,12 +4,12 @@
     import dayjs from "dayjs";
     import { relativeActivity } from "../../types/report-data";
 
-    const limit = 6;
+    const limit = 7;
 
     interface ImmersionLogProps{
         log: relativeActivity[]
     }
-    const props =defineProps<ImmersionLogProps>();
+    const props = defineProps<ImmersionLogProps>();
 
 
     const hrTotal = computed(() => {
@@ -49,7 +49,7 @@
 </script>
 
 <template>
-   <div class="rounded-xl flex w-full bg-black  h-[20.7rem]">
+   <div class="rounded-xl flex w-full bg-black h-[23rem]">
         <div class="w-full flex items-center px-7 flex-col ">
             <div class="pl-1 flex flex-col w-full pt-5 ">
                 <div class="flex">

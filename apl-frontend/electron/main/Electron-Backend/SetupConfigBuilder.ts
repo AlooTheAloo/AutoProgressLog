@@ -1,11 +1,12 @@
-import { ipcMain } from "electron"
+import { app, dialog, ipcMain } from "electron"
 import { TogglAccount } from "../../../apl-backend/entry/FindAccounts"
 import { Tags, Toggl } from 'toggl-track';
-import { ankiIntegration, ankiOptions, options, RetentionMode, ServerOptions, TimeInterval } from "../../../apl-backend/types/options";
+import { ankiIntegration, ankiOptions, options, RetentionMode, ServerOptions } from "../../../apl-backend/types/options";
 import { writeFileSync } from "fs";
 import { configPath, syncDataPath } from "../../../apl-backend/Helpers/getConfig";
 import sqlite3 from "sqlite3";
 import { CreateDB } from "../../../apl-backend/Helpers/DataBase/CreateDB";
+import { win } from "..";
 
 let account:TogglAccount = undefined;
 const config:Partial<options> = {}
@@ -29,7 +30,6 @@ export function setAnkiIntegration(anki:ankiIntegration|false){
 }
 
 export function getSetupAnkiIntegration():ankiIntegration{
-    console.log(config.anki);
     return config.anki.ankiIntegration;
 }
 
@@ -51,6 +51,7 @@ export function setupListeners() {
             (err) => { 
                 CreateDB(db);
             });
+        
     })
 
     ipcMain.handle("SetOutputFile", (event: any, arg: any) => {
@@ -60,13 +61,24 @@ export function setupListeners() {
         }
     })
 
+    ipcMain.handle("GetPath", (evt, pathType) => {
+        return app.getPath(pathType);
+    })
+
+    ipcMain.handle("OpenPathDialog", (evt, openAt) => {
+        return dialog.showOpenDialogSync(win, {
+            properties: ["openDirectory", "createDirectory"],
+            defaultPath: openAt
+        })
+    })
+
     
 
-    ipcMain.handle("SetDeviceType", (event: any, arg: "Server" | "Client") => {
-        config.type = arg;
+    ipcMain.handle("SetDeviceType", (event: any, arg: boolean) => {
+        config.general.autogen.enabled = arg;
 
-        if(config.type == "Client"){
-            config.serverOptions = undefined;
+        if(!config.general.autogen.enabled){
+            config.general.autogen.options = undefined;
         }
     })
 
@@ -79,12 +91,14 @@ export function setupListeners() {
         
         config.toggl = {
             togglToken: arg,
+        }
+        config.account = {
             userName: me.fullname
         }
     })
 
     ipcMain.handle("set-server-options", (event: any, arg: ServerOptions) => {
-        config.serverOptions = arg;
+        config.general.autogen.options = arg;
     })
 
     ipcMain.handle("SetRetentionMode", (event: any, arg: RetentionMode) => {

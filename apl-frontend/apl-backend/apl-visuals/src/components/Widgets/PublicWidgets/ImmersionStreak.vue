@@ -10,7 +10,7 @@
 
 </script>
 <template>
-    <div class="flex-grow ">
+    <div class="">
         <TimeMap title="Immersion Streak" :streak="reportData.ImmersionStreak" :data="reportData.ImmersionData" ></TimeMap>
     </div>
 </template>

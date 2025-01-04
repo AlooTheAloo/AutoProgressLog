@@ -34,7 +34,7 @@
 </script>
 
 <template>
-   <div class="rounded-xl flex w-full bg-black max-h-fit">
+   <div class="rounded-xl flex w-full bg-black h-[23rem]">
         <div class="w-full flex justify-center ">
             <div class="pl-1 flex flex-col w-[90%] pt-5 ">
                 <div class="flex-col justify-around">

@@ -160,11 +160,9 @@
     ];
 
     onMounted(() => {   
-        console.log("mounted");
         selectedLanguage.value = undefined;
         selectedYears.value = undefined;
         panel.value = 0;
-        console.log(panel.value);
     })
 
 

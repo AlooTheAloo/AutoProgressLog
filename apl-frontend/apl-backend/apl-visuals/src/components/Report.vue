@@ -24,7 +24,7 @@
         'background-image': `linear-gradient(to bottom right, ${layoutdata.gradient})`
       }
       "
-      class="w-[1586px] h-[1718px] pt-[54px] pl-[52px] ">
+      class="w-[1586px] h-[1800px] pt-[54px] pl-[52px] ">
         <div :style="{
           boxShadow: '0px 24px 4rem rgba(0, 0, 0, 0.5)'
         }"

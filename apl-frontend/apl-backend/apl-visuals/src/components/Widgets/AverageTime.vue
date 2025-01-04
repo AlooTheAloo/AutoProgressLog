@@ -15,7 +15,6 @@
     })
 
     const hrDelta = computed(() => {
-        console.log(props.time.delta)
         if(props.time.delta == undefined || Math.abs(props.time.delta) < 1) {
             return 0;
         }

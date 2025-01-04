@@ -7,6 +7,7 @@ import dayjs from 'dayjs';
 
 dayjs.extend(duration);
 
+
 const app = createApp(App);
 app.use(VueApexCharts)
 app.mount('#app')

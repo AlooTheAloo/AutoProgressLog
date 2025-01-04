@@ -8,7 +8,7 @@
 
 </script>
 <template>
-    <div class=" ">
+    <div class="">
         <ImmersionLog :log="reportData.ImmersionLog"/>
     </div>
 </template>

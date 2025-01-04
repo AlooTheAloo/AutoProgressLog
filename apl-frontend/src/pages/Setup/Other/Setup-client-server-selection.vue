@@ -9,12 +9,12 @@
 import BackButton from '../../../components/Common/BackButton.vue';
     const router = useRouter()
     function SelectClient(){
-        window.ipcRenderer.invoke("SetDeviceType", "Client");
+        window.ipcRenderer.invoke("SetAutoGen", false);
         router.push('/setup/Toggl-home');
     }
 
     function SelectServer(){    
-        window.ipcRenderer.invoke("SetDeviceType", "Server");
+        window.ipcRenderer.invoke("SetAutoGen", true);
         router.push('/setup/server-setup');
     }
 

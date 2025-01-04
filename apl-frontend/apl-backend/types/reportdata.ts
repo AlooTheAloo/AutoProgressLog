@@ -15,12 +15,13 @@ export type ReportData = {
     ImmersionLog:relativeActivity[],
     ImmersionData:RelativeReportData[],
     ImmersionStreak:TPlusDelta<number>,
+    MonthlyImmersion:number,
+    BestImmersion:TPlusDelta<number>,
 
     ImmersionScore:number,
     AnkiScore:number,
     TotalScore:number
 
-    UserRanking:string,
     lastDaysPoints:number[]
 }
 

@@ -3,13 +3,14 @@ import { cache } from "../types/cache.js";
 import path from "path"
 import puppeteer from 'puppeteer';  
 import { fileURLToPath } from "url";
-import { ReportData } from "../types/reportdata.js";
+import { ReportData, TPlusDelta } from "../types/reportdata.js";
 import dayjs from "dayjs";
 import { roundTo } from "round-to";
 import { outputOptions } from "../types/options.js";
 import { arithmeticWeightedMean } from "./util.js";
 import { getConfig } from "./getConfig.js";
 import color from "color";
+import { GetImmersionTimeSince } from "./DataBase/SearchDB.js";
 
 interface ankiData {
     reviewCount:number,
@@ -17,10 +18,12 @@ interface ankiData {
     retention:number
 }
 
+const MATURE_HISTORY = 6; 
 export const __filename = fileURLToPath(import.meta.url);
 export const __dirname = path.dirname(__filename);
 
-export async function buildImage(options:outputOptions, height:number = 1718){
+export async function buildImage(options:outputOptions, height:number = 1775, reportNo:number) {
+    const outputPath = `${options.outputFile.path}${path.sep}${options.outputFile.name} ${reportNo}${options.outputFile.extension}`
     const browser = await puppeteer.launch({
     headless: true,
     devtools: true,
@@ -33,19 +36,14 @@ export async function buildImage(options:outputOptions, height:number = 1718){
     const page = await browser.newPage();
     page.setViewport({
     width: 2000 * options.outputQuality,
-    height: 1718,
+    height: 5000,
     deviceScaleFactor: options.outputQuality
     })    
-
-    page.on("console", (message) => { 
-        console.log(`Page said: ${message.text()}`); 
-    });
-
     await page.goto(`file:${path.join(__dirname, "..", "..", "apl-backend", "apl-visuals", "visuals", "index.html")}`);
     await page.waitForNetworkIdle();
 
     await page.screenshot({
-    path: `${options.outputFile.name}${options.outputFile.extension}`,
+    path: outputPath,
     type: "png",
     clip: {
         width: 1586,
@@ -54,28 +52,44 @@ export async function buildImage(options:outputOptions, height:number = 1718){
         y : 0
     }
     });    
-    await browser.close();    
+    await browser.close();
+    return outputPath;
 }
 
 const MOVING_AVERAGE_SIZE = 7;
 
-export function buildJSON(ankiData:ankiData, allEvents:relativeActivity[], lastCaches:cache[], timeToAdd:number):ReportData{
+interface builderDTO {
+    timeToAdd:number,
+    monthTime:number,
+    bestSeconds:TPlusDelta<number>
+}
+
+export function buildJSON(ankiData:ankiData, allEvents:relativeActivity[], lastCaches:cache[], builderDTO:builderDTO):ReportData{
     const date = dayjs();
-    const reportNo = lastCaches[0].reportNo + 1;
+    const lastCache = lastCaches[0];
+    const reportNo = lastCache.reportNo + 1;
 
-    const ankiStreak = lastCaches[0].ankiStreak + (ankiData.reviewCount == 0 ? (-lastCaches[0].ankiStreak) : 1);
-    const immersionStreak = lastCaches[0].immersionStreak + (timeToAdd == 0 ? (-lastCaches[0].immersionStreak) : 1);
+    let ankiDelta:number;
+    let ankiStreak:number;
+    let ankiScore:number;
+    
+    if(getConfig().anki.enabled){
+        ankiDelta = ankiData.reviewCount - lastCache.totalCardsStudied;
+        ankiStreak = lastCache.ankiStreak + (ankiDelta == 0 ? (-lastCache.ankiStreak) : 1);
+        ankiScore =  ankiDelta + (reportNo == 1 ? 0 : (Math.max(ankiData.matureCount - lastCache.mature, 0) * 100));
+    }
 
+    const immersionStreak = lastCache.immersionStreak + (builderDTO.timeToAdd == 0 ? (-lastCache.immersionStreak) : 1);
 
     let lastnElements = lastCaches.slice(0, MOVING_AVERAGE_SIZE).map(x => x.seconds);
     const oldAverage = arithmeticWeightedMean(lastnElements)
 
-    const newnElements = [timeToAdd, ...lastnElements.slice(0, lastnElements.length - 1), ];
+    const newnElements = [builderDTO.timeToAdd, ...lastnElements.slice(0, lastnElements.length - 1), ];
     const newAverage = arithmeticWeightedMean(newnElements);
 
-    const ImmersionScore = timeToAdd;
-    const AnkiScore = ankiData.reviewCount + (Math.max(ankiData.matureCount - lastCaches[0].mature, 0) * 100);
-    const TotalScore = (timeToAdd + ankiData.reviewCount);
+    
+    const ImmersionScore = builderDTO.timeToAdd;
+    const TotalScore = ImmersionScore + ankiScore;
 
 
     const reportData:ReportData = {
@@ -86,7 +100,7 @@ export function buildJSON(ankiData:ankiData, allEvents:relativeActivity[], lastC
                 reportNo: reportNo,
                 matureCardCount: ankiData.matureCount
             },
-            ...lastCaches.slice(0, 4).filter(x => x.reportNo != 0).map(x => {
+            ...lastCaches.slice(0, MATURE_HISTORY - 1).filter(x => x.reportNo != 0).map(x => {
                 return {
                     reportNo: x.reportNo,
                     matureCardCount: x.mature
@@ -95,20 +109,20 @@ export function buildJSON(ankiData:ankiData, allEvents:relativeActivity[], lastC
         ],
         retentionRate: {
             current: ankiData.retention,
-            delta: ankiData.retention - lastCaches[0].retention
+            delta: ankiData.retention - lastCache.retention
         },
         totalReviews: {
-            current: ankiData.reviewCount + lastCaches[0].totalCardsStudied,
-            delta: ankiData.reviewCount
+            current: ankiData.reviewCount,
+            delta: ankiDelta
         },
         AnkiStreak: {
             current: ankiStreak,
-            delta: ankiStreak - lastCaches[0].ankiStreak
+            delta: ankiStreak - lastCache.ankiStreak
         },
         AnkiData: [
             {
                 reportNo: reportNo,
-                value: ankiData.reviewCount
+                value: ankiDelta
             },
             ...lastCaches.slice(0, 24).filter(x => x.reportNo != 0).map(x => {
                 return {
@@ -118,18 +132,20 @@ export function buildJSON(ankiData:ankiData, allEvents:relativeActivity[], lastC
             }),
         ],
         ImmersionTime: {
-            current: Math.floor((timeToAdd + lastCaches[0].totalSeconds) / 3600),
-            delta: Math.floor((timeToAdd + lastCaches[0].totalSeconds) / 3600) - Math.floor(lastCaches[0].totalSeconds / 3600)
+            current: Math.floor((builderDTO.timeToAdd + lastCache.totalSeconds) / 3600),
+            delta: Math.floor((builderDTO.timeToAdd + lastCache.totalSeconds) / 3600) - Math.floor(lastCache.totalSeconds / 3600)
         },
         AverageImmersionTime: {
             current: newAverage,
             delta: newAverage - oldAverage
-        },
+        },        
+        MonthlyImmersion: builderDTO.monthTime,
+        BestImmersion: builderDTO.bestSeconds,
         ImmersionLog: allEvents,
         ImmersionData: [
             {
                 reportNo: reportNo,
-                value: timeToAdd
+                value: builderDTO.timeToAdd
             },
             ...lastCaches.slice(0, 24).filter(x => x.reportNo != 0).map(x => {
                 return {
@@ -140,12 +156,11 @@ export function buildJSON(ankiData:ankiData, allEvents:relativeActivity[], lastC
         ],
         ImmersionStreak: {
             current: immersionStreak,
-            delta: immersionStreak - lastCaches[0].immersionStreak
+            delta: immersionStreak - lastCache.immersionStreak
         },
         ImmersionScore: ImmersionScore,
-        AnkiScore: AnkiScore,
+        AnkiScore: ankiScore,
         TotalScore: TotalScore,
-        UserRanking: "",
         lastDaysPoints: cumulativeSum([
             TotalScore,
             ...lastCaches.slice(0, 9).filter(x => x.reportNo != 0).map(x => x.score)
@@ -220,7 +235,7 @@ function cumulativeSum<T extends number>(arr: T[]): T[] {
     }, []);
 }
 
-export function buildNewCache(reportData:ReportData, startCache:cache, timeToAdd:number){
+export function buildNewCache(reportData:ReportData, startCache:cache, timeToAdd:number, syncID:number, path:string, bestSeconds:number){
 
     const newCache:cache = {
         totalSeconds: startCache.totalSeconds + timeToAdd,
@@ -233,7 +248,10 @@ export function buildNewCache(reportData:ReportData, startCache:cache, timeToAdd
         retention : reportData.retentionRate.current,
         score: reportData.TotalScore,
         seconds: timeToAdd,
+        bestSeconds: bestSeconds,
         cardsStudied: reportData.totalReviews.delta,
+        syncID: syncID,
+        path: path
     }
     return newCache;
 }

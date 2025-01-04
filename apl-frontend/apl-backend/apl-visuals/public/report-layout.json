@@ -1,0 +1,11 @@
+{
+    "layout": [
+        ["immersionlog", "moreimmersiondata"],
+        ["immersiondata", "immersionstreak"]
+    ],
+    "gradient": [
+        "#148FE6",
+        "#A3695E",
+        "#E8706D"
+    ]
+}

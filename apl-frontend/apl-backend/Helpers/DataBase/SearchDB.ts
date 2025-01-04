@@ -24,7 +24,6 @@ export async function GetLastEntry(type?:SyncType):Promise<SyncData>{
         `, (err, rows:flatSyncData[]) => {
             if(err) reject(err);
             const flat = rows[0];
-            console.log(flat);
             resolve({
                 id: flat.id,
                 generationTime: flat.generationTime,
@@ -51,6 +50,21 @@ export async function GetActivitiesBetween(since:dayjs.Dayjs, until:dayjs.Dayjs)
         `, (err, rows:ImmersionActivity[]) => {
             if(err) reject(err);
             resolve(rows) 
+        });
+    })
+}
+
+
+export async function getreadinghours(){
+
+    return new Promise((resolve, reject) => {
+        new sqlite3.Database(syncDataPath).all(`
+            SELECT (SUM(seconds) / 3600) AS "time" FROM immersionActivity WHERE activityName LIKE '%read%';
+        `, (err, rows:any[]) => {
+            if(err) {
+                reject(err);
+            } 
+            resolve(rows[0].time ?? 0);
         });
     })
 }
@@ -83,18 +97,45 @@ export async function GetImmersionTimeBetween(since:dayjs.Dayjs, until:dayjs.Day
     })
 }
 
+type ImmersionSource = {
+    name: string;
+    relativeValue: number;
+}
 
-export async function GetImmersionSourcesSince(since:dayjs.Dayjs):Promise<{name: string;relativeValue: number; }[]>{
+export async function GetImmersionSourcesSince(since:dayjs.Dayjs):Promise<ImmersionSource[]>{
     return new Promise((resolve, reject) => {
         new sqlite3.Database(syncDataPath).all(`
             SELECT activityName AS "name", SUM(seconds) AS "relativeValue" FROM immersionActivity WHERE time > '${since.unix()}' GROUP BY activityName
         `, (err, rows:any[]) => {
             if(err) reject(err);
-            resolve(rows);
+            resolve(mergeItems(rows));
         });
     })
 }
 
+
+function mergeItems(items: ImmersionSource[]): ImmersionSource[] {
+// Create a map to store merged items
+    const mergedMap = new Map<string, ImmersionSource>();
+
+    items.forEach(item => {
+        const lowerCaseName = item.name.toLowerCase();
+
+        if (mergedMap.has(lowerCaseName)) {
+            const existingItem = mergedMap.get(lowerCaseName)!;
+
+            // Update the existing item
+            mergedMap.set(lowerCaseName, {
+                name: item.relativeValue > existingItem.relativeValue ? item.name : existingItem.name,
+                relativeValue: existingItem.relativeValue + item.relativeValue,
+            });
+        } else {
+        // Add the item to the map
+        mergedMap.set(lowerCaseName, { ...item });
+        }
+    });
+    return Array.from(mergedMap.values());
+}
 export async function GetSyncCount(){
     return new Promise<number>((resolve, reject) => {
         new sqlite3.Database(syncDataPath).all(`

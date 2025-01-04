@@ -1,9 +1,15 @@
 export interface options {
-    type : "Server" | "Client"
-    serverOptions?:ServerOptions
+    general:  {
+        autogen : {
+            enabled: boolean,
+            options?:ServerOptions
+        }
+    }
+    account:{
+        userName:string
+    }
     toggl:{
         togglToken:string,
-        userName:string
     }
     anki: ankiOptions
     outputOptions:outputOptions
@@ -21,6 +27,7 @@ export interface ankiOptions {
 
 export type outputOptions = {
     outputFile:{
+        path:string,
         name:string,
         extension:".png" | ".jpg" | ".jpeg" | ".webp" | ".pdf"
     },
@@ -36,14 +43,8 @@ export interface Time {
 
 export interface ServerOptions {
     generationTime: Time;
-    generationInterval: TimeInterval;
 }
 
-
-export interface TimeInterval {
-    intervalType: "Day" | "Week" | "Month",
-    intervalNumber: number
-}
 
 export interface ankiIntegration{
     ankiPath?:string,

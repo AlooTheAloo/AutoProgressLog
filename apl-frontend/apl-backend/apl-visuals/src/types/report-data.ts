@@ -18,7 +18,6 @@ export type ReportData = {
     AnkiScore:number,
     TotalScore:number
 
-    UserRanking:string,
     lastDaysPoints:number[]
 }
 

@@ -18,6 +18,10 @@ export const configPath = getFileInAPLData("config.json");
 export const syncDataPath = getFileInAPLData("syncData.db");
 export const cache_location= getFileInAPLData("cache.json");
 
+export function updateConfig(){
+    config = JSON.parse(fs.readFileSync(configPath).toString());
+}
+
 export function getConfig():options|null{
     if(config == null){
         if(!fs.existsSync(configPath)) {
@@ -34,9 +38,10 @@ export function getConfig():options|null{
     return config;
 }
 
-export function getSyncProps():syncProps{
+export function getSyncProps(isReport = false):syncProps{
     return {
         syncAnki: getConfig().anki.enabled,
-        syncToggl: true // TODO : Maybe add a toggle for toggl later (i thought this was funny)
+        syncToggl: true, // TODO : Maybe add a toggle for toggl later (i thought this was funny)
+        isReport: isReport
     }    
 }

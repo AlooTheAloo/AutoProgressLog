@@ -5,7 +5,11 @@ export default {
     "./src/**/*.{vue,js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      screens: {
+        '1820': '1820px', // Custom media query for exactly 1820px
+      },
+    },
   },
   plugins: [],
 }

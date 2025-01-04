@@ -21,8 +21,10 @@ export type ImmersionDTO = {
     immersionSinceLastReport: number,
     monthlyImmersion: number,
     monthlyImmersionLastMonth: number,
-    immersionSources:{
-        name: string,
-        relativeValue: number
-    }[],
+    immersionSources:ImmersionSource[],
+}
+
+export type ImmersionSource = {
+    name: string,
+    relativeValue: number
 }

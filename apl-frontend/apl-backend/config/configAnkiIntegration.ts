@@ -3,7 +3,7 @@ import fs, { existsSync } from "fs";
 import sqlite3 from 'sqlite3';
 import { exec } from 'child_process';
 import proc from 'find-process';
-import { app } from "electron";
+import { app, shell } from "electron";
 import path, { basename } from "path";
 import { kill } from "process";
 import { readWindows } from "../Helpers/readWindows.js";
@@ -197,6 +197,15 @@ export async function KillAnkiIfOpen(){
 // This function is pure hell. It's a mess.
 export async function LaunchAnki(paths:ankiPaths|ankiIntegration){
         
+    console.log("LAunching anki..");
+    // Uncomment for funny
+    // const Rand = Math.random();
+    // console.log(Rand);
+    // if( Rand > 0.5){
+    //     shell.openExternal("https://www.youtube.com/watch?v=gQD2IZItlVk");
+    // }
+    // return [false, null];
+
     if(!fs.existsSync(paths.ankiPath)){
         console.log(`The file ${paths.ankiPath} does not exist. Please provide a valid path`.red);
         return [false, null];
@@ -215,6 +224,7 @@ export async function LaunchAnki(paths:ankiPaths|ankiIntegration){
     const resp = await new Promise<string|null>(async (res, rej) => {
         var intervalOpen = setInterval(async () => {
             if(iterations > 500) res(null);
+        console.log("iterations: " + iterations);
             const targetProcesses = await getAnkiProcesses();
             if(targetProcesses.length == 0 && !isOpened) return;
             const pid = targetProcesses[0].pid;

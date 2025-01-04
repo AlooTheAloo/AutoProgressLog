@@ -41,12 +41,10 @@ export const ListProfiles = function (variant = variations.CHROME) {
     return locations[osType].
     filter(f => fsExistsSync(f))
     .map(variant => {
-        console.log("variant is " + variant);
         return fs.readdirSync(variant)
         .filter(f => f !== 'System Profile' && fsExistsSync(path.join(variant, f, 'Preferences')))
         .map(p => {
             let profileInfo = JSON.parse(fs.readFileSync((path.join(variant, p, 'Preferences'))).toString());
-            console.log("found profile " + p);
             return {
                 displayName: profileInfo.profile.name,
                 profileDirName: p,

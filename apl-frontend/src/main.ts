@@ -13,6 +13,9 @@ import Tooltip from 'primevue/tooltip';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import advancedFormat from 'dayjs/plugin/advancedFormat';
+
+import VueApexCharts from 'vue3-apexcharts'
 
 
 const router = createRouter({
@@ -22,54 +25,55 @@ const router = createRouter({
 
 const Noir = definePreset(Aura, {
   semantic: {
-      primary: {
-          50: '{zinc.50}',
-          100: '{zinc.100}',
-          200: '{zinc.200}',
-          300: '{zinc.300}',
-          400: '{zinc.400}',
-          500: '{zinc.500}',
-          600: '{zinc.600}',
-          700: '{zinc.700}',
-          800: '{zinc.800}',
-          900: '{zinc.900}',
-          950: '{zinc.950}'
-      },
-      colorScheme: {
-          light: {
-              primary: {
-                  color: '{zinc.950}',
-                  inverseColor: '#ffffff',
-                  hoverColor: '{zinc.900}',
-                  activeColor: '{zinc.800}'
-              },
-              highlight: {
-                  background: '{zinc.950}',
-                  focusBackground: '{zinc.700}',
-                  color: '#ffffff',
-                  focusColor: '#ffffff'
-              }
+    primary: {
+      50: '{zinc.50}',
+      100: '{zinc.100}',
+      200: '{zinc.200}',
+      300: '{zinc.300}',
+      400: '{zinc.400}',
+      500: '{zinc.500}',
+      600: '{zinc.600}',
+      700: '{zinc.700}',
+      800: '{zinc.800}',
+      900: '{zinc.900}',
+      950: '{zinc.950}'
+    },
+    colorScheme: {
+      light: {
+          primary: {
+              color: '{zinc.950}',
+              inverseColor: '#ffffff',
+              hoverColor: '{zinc.900}',
+              activeColor: '{zinc.800}'
           },
-          dark: {
-              primary: {
-                  color: '{zinc.50}',
-                  inverseColor: '{zinc.950}',
-                  hoverColor: '{zinc.100}',
-                  activeColor: '{zinc.200}'
-              },
-              highlight: {
-                  background: 'rgba(250, 250, 250, .16)',
-                  focusBackground: 'rgba(250, 250, 250, .24)',
-                  color: 'rgba(255,255,255,.87)',
-                  focusColor: 'rgba(255,255,255,.87)'
-              }
+          highlight: {
+              background: '{zinc.950}',
+              focusBackground: '{zinc.700}',
+              color: '#ffffff',
+              focusColor: '#ffffff'
           }
+      },
+      dark: {
+        primary: {
+          color: '{zinc.50}',
+          inverseColor: '{zinc.950}',
+          hoverColor: '{zinc.100}',
+          activeColor: '{zinc.200}'
+        },
+        highlight: {
+          background: 'rgba(250, 250, 250, .16)',
+          focusBackground: 'rgba(250, 250, 250, .24)',
+          color: 'rgba(255,255,255,.87)',
+          focusColor: 'rgba(255,255,255,.87)'
+        }
       }
+    }
   }
 });
 
 dayjs.extend(duration);
 dayjs.extend(relativeTime);
+dayjs.extend(advancedFormat)
 
 createApp(App)
   .use(router)
@@ -82,6 +86,7 @@ createApp(App)
     },
     ripple: true,
   })
+  .use(VueApexCharts)
   .directive('ripple', Ripple)
   .directive('tooltip', Tooltip)
   .mount('#app')
