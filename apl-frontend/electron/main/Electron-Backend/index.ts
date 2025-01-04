@@ -1,6 +1,5 @@
-
 import { ankiListeners } from "./AnkiListeners";
-import { DashboardListeners } from "./DashboardListeners";
+import { dashboardListeners } from "./dashboardListeners";
 import { globalListeners } from "./globalListeners";
 import { reportsListeners } from "./ReportsListeners";
 import { routeListeners } from "./routeListener";
@@ -9,15 +8,14 @@ import { setupListeners } from "./SetupConfigBuilder";
 import { surveyListeners } from "./SurveyListeners";
 import { togglListeners } from "./togglListener";
 
-export default function registerEvents(){
-    globalListeners();
-    routeListeners();
-    togglListeners();
-    setupListeners();
-    ankiListeners();
-    surveyListeners();
-    DashboardListeners();
-    reportsListeners();
-    settingsListeners();
-    
+export default function registerEvents() {
+  globalListeners();
+  routeListeners();
+  togglListeners();
+  setupListeners();
+  ankiListeners();
+  surveyListeners();
+  dashboardListeners();
+  reportsListeners();
+  settingsListeners();
 }
