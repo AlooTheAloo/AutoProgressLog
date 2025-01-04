@@ -12,7 +12,9 @@ export function ankiListeners() {
 
     ipcMain.handle("anki-read-data", async (event: any, arg: any) => {
         const int = getSetupAnkiIntegration() 
+        if(int == undefined) return undefined;
         const retention = await getRetention(arg, int);
+        if(retention == undefined) return undefined;
         const matureCards = await getMatureCards(int);
         return {
             retentionRate: roundTo(retention, 2),
@@ -37,7 +39,7 @@ export function ankiListeners() {
     });
 
     ipcMain.handle("anki-connect-start", async (event: any, arg: any) => {
-        win.webContents.send("anki-connect-message", "Locating Anki Paths");
+        win?.webContents.send("anki-connect-message", "Locating Anki Paths");
         await sleep(500)
         const profileCount = await getAnkiProfileCount();
 
@@ -48,7 +50,7 @@ export function ankiListeners() {
         else if(profileCount > 1)
         {
             const profiles = await getProfileDecks();
-            win.webContents.send("anki-multiple-profiles-detected", profiles);
+            win?.webContents.send("anki-multiple-profiles-detected", profiles);
             return null;
         }
         else 
@@ -70,7 +72,7 @@ export function ankiListeners() {
     });
 
     async function connectFromPaths(Paths:ankiPaths){
-        win.webContents.send("anki-connect-message", "Verifying validity of installation");
+        win?.webContents.send("anki-connect-message", "Verifying validity of installation");
         const verified = await verifyAnkiPaths(Paths);
         if(!verified) return false;
 
@@ -130,10 +132,10 @@ export function ankiListeners() {
 }
 
 async function macOSAnki(paths:any){
-    win.webContents.send("anki-connect-message", "Verifying permissions");        
+    win?.webContents.send("anki-connect-message", "Verifying permissions");        
     const perms = await hasPerms();
     if(perms){
-        win.webContents.send("anki-connect-message", "Launching anki");
+        win?.webContents.send("anki-connect-message", "Launching anki");
         return await createAnkiIntegration(paths);
     }
     else {

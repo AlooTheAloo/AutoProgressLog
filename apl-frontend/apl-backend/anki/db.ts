@@ -22,7 +22,9 @@ function getAnki(){
 
 
 function JoinTrackedDecks(table_primary_key:string = "revlog.cid"){
-    const trackedDecks = getAnki().options.trackedDecks.map(x => x.toString());
+    const options = getAnki()?.options;
+    if(options == undefined) return "";
+    const trackedDecks = options.trackedDecks.map(x => x.toString());
     return `JOIN cards c ON c.id = ${table_primary_key} WHERE c.did IN (${trackedDecks.join(",")})`;
 
 }
@@ -162,7 +164,7 @@ async function close(db:Database){
 
 export function hasSyncEnabled(profileName:string) {
     return new Promise<boolean>((res, rej) => {
-        const prefsDB = path.join(getConfig().anki.ankiIntegration.ankiDB, "..", "..", "prefs21.db");
+        const prefsDB = path.join(getConfig()?.anki.ankiIntegration?.ankiDB ?? "", "..", "..", "prefs21.db");
         let db = new sqlite3.Database(prefsDB, sqlite3.OPEN_READWRITE, (err) => {
             if(err) rej(err);
         });

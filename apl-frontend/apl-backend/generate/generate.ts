@@ -46,14 +46,13 @@ export async function runGeneration(){
     // Anki stuff
     const config = getConfig();
 
-    if(config.anki.enabled){
+    if(config == undefined) return;
+
+    if(config.anki.enabled && config.anki.ankiIntegration && sync.anki && config.anki.options){
         count = sync.anki.totalCardsStudied
         mature = await getMatureCards(config.anki.ankiIntegration);
         retention = await getRetention(config.anki.options.retentionMode, config.anki.ankiIntegration);
     }
-       
-
-
 
     const timeToAdd = sumTime(events)
     const monthTime = await GetImmersionTimeSince(dayjs().startOf("month"));
@@ -66,9 +65,9 @@ export async function runGeneration(){
 
     const json = buildJSON(
     {
-        reviewCount: count,
-        matureCount: mature,
-        retention: retention
+        reviewCount: count ?? 0,
+        matureCount: mature ?? 0,
+        retention: retention ?? 0
     }, events, CacheManager.getLastN(30), {
         timeToAdd: timeToAdd,
         monthTime: monthTime,

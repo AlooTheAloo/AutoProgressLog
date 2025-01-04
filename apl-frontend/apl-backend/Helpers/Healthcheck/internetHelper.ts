@@ -13,7 +13,7 @@ export async function checkInternet(){
 }
 
 export function notifyNoInternet(){
-    win.webContents.send("ShowDialog", {
+    win?.webContents.send("ShowDialog", {
         header: "No internet connection!",
         content: "APL is unable to connect to the internet. Make sure you are connected and try again.",
     })

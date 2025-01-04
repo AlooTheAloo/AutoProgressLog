@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { options } from '../../../../apl-backend/types/options';
+import { Options } from '../../../../apl-backend/types/options';
 import SettingsToggle from '../Common/SettingsToggle.vue';
 
 const props = defineProps<{
-    config:options|undefined
+    config:Options|undefined
 }>()
 
 // type-based
 const emit = defineEmits<{
-  (e: 'update:config', config: options): void
+  (e: 'update:config', config: Options): void
 }>()
 
 </script>

@@ -84,23 +84,27 @@ export function buildJSON(
   lastCaches: cache[],
   builderDTO: builderDTO
 ): ReportData {
+
+  const options = getConfig();
+  if(options == undefined) throw new Error("No config found");
+
   const date = dayjs();
   const lastCache = lastCaches[0];
   const reportNo = lastCache.reportNo + 1;
 
-  let ankiDelta: number;
-  let ankiStreak: number;
-  let ankiScore: number;
+  let ankiDelta = 0;
+  let ankiStreak = 0;
+  let ankiScore = 0;
 
-  if (getConfig().anki.enabled) {
+  if (options.anki.enabled) {
     ankiDelta = ankiData.reviewCount - lastCache.totalCardsStudied;
     ankiStreak =
       lastCache.ankiStreak + (ankiDelta == 0 ? -lastCache.ankiStreak : 1);
     ankiScore =
       ankiDelta +
-      (reportNo == 1
+      ((lastCache.mature == 0 || reportNo == 1)
         ? 0
-        : Math.max(ankiData.matureCount - lastCache.mature, 0) * 100);
+        : Math.max(ankiData.matureCount - (lastCache.mature ?? 0), 0) * 100);
   }
 
   const immersionStreak =
@@ -119,7 +123,7 @@ export function buildJSON(
   const newAverage = arithmeticWeightedMean(newnElements);
 
   const ImmersionScore = builderDTO.timeToAdd;
-  const TotalScore = ImmersionScore + ankiScore;
+  const TotalScore = ImmersionScore + (ankiScore ?? 0);
 
   const reportData: ReportData = {
     reportNo: reportNo,
@@ -137,13 +141,13 @@ export function buildJSON(
         .map((x) => {
           return {
             reportNo: x.reportNo,
-            matureCardCount: x.mature,
+            matureCardCount: x.mature ?? 0,
           };
         }),
     ],
     retentionRate: {
       current: ankiData.retention,
-      delta: ankiData.retention - lastCache.retention,
+      delta: ankiData.retention - (lastCache.retention ?? 0),
     },
     totalReviews: {
       current: ankiData.reviewCount,
@@ -229,6 +233,9 @@ const LAYOUT_ANKILESS = [
 ];
 
 export async function buildLayout() {
+  const config = getConfig();
+  if(config == undefined) return;
+
   let gradient: string[] = [];
   try {
     const seedList = [
@@ -258,7 +265,7 @@ export async function buildLayout() {
     gradient = ["#FF0000", "#D57AFF", "#74B4FF"];
   }
 
-  if (getConfig().anki.enabled) {
+  if (config.anki.enabled) {
     return {
       layout: LAYOUT_FULL,
       gradient: gradient,

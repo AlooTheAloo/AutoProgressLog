@@ -43,6 +43,7 @@
   "dependencies": {
     "@miniben90/x-win": "^1.10.2",
     "@primevue/themes": "^4.0.5",
+    "@types/color": "^4.2.0",
     "@types/node": "^22.2.0",
     "@vueuse/core": "^11.0.3",
     "apexcharts": "^4.1.0",
@@ -64,6 +65,7 @@
     "int": "^0.2.0",
     "js-abbreviation-number": "^1.4.0",
     "keytar": "^7.9.0",
+    "node-abi": "^3.71.0",
     "node-gyp": "^11.0.0",
     "node-schedule": "^2.1.1",
     "path": "^0.12.7",

@@ -2,6 +2,7 @@ import sqlite3 from "sqlite3";
 import { syncDataPath } from "../getConfig";
 import { ImmersionActivity, SyncData, SyncType } from "../../types/sync";
 import dayjs from "dayjs";
+import { ImmersionSource } from "../../../electron/main/Electron-Backend/types/Dashboard";
 
 interface flatSyncData {
     id: number;
@@ -97,10 +98,7 @@ export async function GetImmersionTimeBetween(since:dayjs.Dayjs, until:dayjs.Day
     })
 }
 
-type ImmersionSource = {
-    name: string;
-    relativeValue: number;
-}
+
 
 export async function GetImmersionSourcesSince(since:dayjs.Dayjs):Promise<ImmersionSource[]>{
     return new Promise((resolve, reject) => {

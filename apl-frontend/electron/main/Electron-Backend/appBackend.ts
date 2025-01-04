@@ -22,11 +22,11 @@ export async function buildContextMenu() {
         if (process.platform == "darwin") {
           app.dock.show();
         } else if (process.platform == "win32") {
-          win.setSkipTaskbar(false);
+          win?.setSkipTaskbar(false);
         }
-        if (win.isDestroyed()) await createWindow();
-        if (win.isMinimized()) win.restore();
-        win.focus();
+        if (win?.isDestroyed()) await createWindow();
+        if (win?.isMinimized()) win.restore();
+        win?.focus();
         buildContextMenu();
       },
     },
@@ -44,9 +44,9 @@ export async function buildContextMenu() {
     {
       label: "Hide Window",
       type: "normal",
-      enabled: !win.isDestroyed(),
+      enabled: !win?.isDestroyed(),
       click: () => {
-        win.destroy();
+        win?.destroy();
       },
     },
     {

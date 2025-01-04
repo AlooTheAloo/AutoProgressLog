@@ -6,7 +6,6 @@ import SideBarContainer from "../../components/Common/SideBarContainer.vue";
 import { appPath } from "../routes/appRoutes";
 import ProgressSpinner from "primevue/progressspinner";
 import dayjs from "dayjs";
-import { DashboardDTO } from "../../../types/DTO";
 import DashboardBody from "../../components/Dashboard/DashboardBody.vue";
 import { useMagicKeys } from '@vueuse/core'
 import { Maybe } from "../../../types/Maybe"
@@ -16,7 +15,8 @@ import GrainyColor from "../../assets/GrainyColor.png";
 import Report from "../../assets/Report.png";
 
 import Logo from "../../assets/Logo.png";
-import { options } from "../../../apl-backend/types/options";
+import { Options } from "../../../apl-backend/types/options";
+import { DashboardDTO } from "../../../electron/main/Electron-Backend/types/Dashboard";
 
 const TIME_SYNC_INTERVAL = 60 * 1000;
 const THIRTY_MINUTES = 30 * 60 * 1000;
@@ -26,7 +26,7 @@ const { shift } = useMagicKeys();
 const syncing = ref<boolean>(false);
 const dto = ref<DashboardDTO>();
 const lastSyncTime = ref<string>('');
-const config = ref<options>();
+const config = ref<Options>();
 
 
 onUnmounted(() => {
@@ -81,7 +81,7 @@ onUnmounted(() => {
 
 onMounted(async () => {
 
-  window.ipcRenderer.invoke("GetConfig").then((data:options) => {
+  window.ipcRenderer.invoke("GetConfig").then((data:Options) => {
     config.value = data;
   })
 

@@ -22,7 +22,7 @@ function updateValue(value:boolean){
     emit("update:value", value);
 }
 
-const checked = ref<boolean>(props.value ?? "");
+const checked = ref<boolean>(props.value ?? false);
 
 </script>
 

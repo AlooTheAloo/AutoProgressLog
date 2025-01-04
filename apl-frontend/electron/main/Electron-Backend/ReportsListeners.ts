@@ -50,6 +50,7 @@ ipcMain.handle('Get-Reports', async (event, args) => {
 
   ipcMain.handle('Reverse-Report', async (event) => {
     const report = CacheManager.pop();
+    if(report == undefined) return;
     if(existsSync(report.path)) rm(report.path, () => {});
     deleteSyncs(report.syncID);
   })
@@ -66,8 +67,8 @@ ipcMain.handle('Get-Reports', async (event, args) => {
                 const sharpFile = await sharp(file);
                 const metadata = await sharpFile.metadata();
 
-                const height = Math.round(metadata.height * scaleFactor);
-                const width = Math.round(metadata.width * scaleFactor);
+                const height = Math.round((metadata.height ?? 0) * scaleFactor);
+                const width = Math.round((metadata.width ?? 0) * scaleFactor);
 
                 // Resize the image using sharp and convert it to base64
                 resizedBase64 = await sharpFile

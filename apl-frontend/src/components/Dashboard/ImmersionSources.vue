@@ -1,5 +1,4 @@
 <script setup lang="ts">
-    import { ImmersionSource } from "../../../types/DTO";
     import play from "../../assets/Icons/play.png";
     import ApexCharts from 'vue3-apexcharts';
     import { ApexOptions } from "apexcharts";
@@ -8,6 +7,7 @@
     import dayjs from "dayjs";
     import { useWindowSize } from "@vueuse/core";
     import { NWayInterpol } from "../../util/n-way-interpol";
+import { ImmersionSource } from "../../../electron/main/Electron-Backend/types/Dashboard";
 
     const { width, height } = useWindowSize()
 

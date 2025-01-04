@@ -4,7 +4,7 @@ import { Tags, Toggl } from "toggl-track";
 import {
   ankiIntegration,
   ankiOptions,
-  options,
+  Options,
   RetentionMode,
   ServerOptions,
 } from "../../../apl-backend/types/options";
@@ -18,8 +18,8 @@ import { CreateDB } from "../../../apl-backend/Helpers/DataBase/CreateDB";
 import { win } from "..";
 import { buildContextMenu } from "./appBackend";
 
-let account: TogglAccount = undefined;
-const config: Partial<options> = {};
+let account: TogglAccount;
+const config: Partial<Options> = {};
 
 export function setAnkiIntegration(anki: ankiIntegration | false) {
   if (!anki) {
@@ -31,6 +31,7 @@ export function setAnkiIntegration(anki: ankiIntegration | false) {
 
   config.anki = {
     enabled: true,
+    
     ankiIntegration: anki,
     options: {
       trackedDecks: [],
@@ -39,16 +40,17 @@ export function setAnkiIntegration(anki: ankiIntegration | false) {
   };
 }
 
-export function getSetupAnkiIntegration(): ankiIntegration {
-  return config.anki.ankiIntegration;
+export function getSetupAnkiIntegration(): ankiIntegration|undefined {
+  return config?.anki?.ankiIntegration;
 }
 
-export function getSetupAnki(): ankiOptions {
+export function getSetupAnki(): ankiOptions|undefined {
   return config.anki;
 }
 
 export function setupListeners() {
   ipcMain.handle("anki-deck-select", async (event: any, arg: number[]) => {
+    if(config?.anki?.options == undefined) return;
     config.anki.options.trackedDecks = arg;
   });
 
@@ -76,6 +78,7 @@ export function setupListeners() {
   });
 
   ipcMain.handle("OpenPathDialog", (evt, openAt) => {
+    if(win == undefined) return;
     return dialog.showOpenDialogSync(win, {
       properties: ["openDirectory", "createDirectory"],
       defaultPath: openAt,
@@ -83,13 +86,26 @@ export function setupListeners() {
   });
 
   ipcMain.handle("SetAutoGen", (event: any, arg: boolean) => {
-    config.general = {
-      autogen: {
-        enabled: arg,
-      },
-    };
-
-    config.general.autogen.enabled = arg;
+    if(arg){
+      config.general = {
+        autogen: {
+          enabled: true,
+          options: {
+            generationTime: {
+              hours: 0,
+              minutes: 0,
+            },
+          },
+        },
+      };
+    }
+    else {
+      config.general = {
+        autogen: {
+          enabled: false,
+        },
+      };
+    }
 
     if (!config.general.autogen.enabled) {
       config.general.autogen.options = undefined;
@@ -112,10 +128,12 @@ export function setupListeners() {
   });
 
   ipcMain.handle("set-server-options", (event: any, arg: ServerOptions) => {
+    if(config.general == undefined) return;
     config.general.autogen.options = arg;
   });
 
   ipcMain.handle("SetRetentionMode", (event: any, arg: RetentionMode) => {
+    if(config.anki?.options == undefined) return;
     config.anki.options.retentionMode = arg;
   });
 
@@ -123,6 +141,8 @@ export function setupListeners() {
     if (account !== undefined) {
       return account;
     }
+
+    if(config.toggl == undefined) return undefined;
 
     const me = await new Toggl({
       auth: {

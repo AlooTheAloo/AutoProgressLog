@@ -19,7 +19,7 @@ export async function getTimeEntries(since:string|number){
     if(toggl == undefined) {
         toggl = new Toggl({
             auth: {
-                token: getConfig().toggl.togglToken ?? "",
+                token: getConfig()?.toggl.togglToken ?? "",
             },
         });
     }
@@ -29,8 +29,6 @@ export async function getTimeEntries(since:string|number){
             since: dayjs(since).unix().toString()
         }
     );
-
-    console.log("entries is " + entries);
 
     const entriesAfterLastGen = entries.filter(x => {
         const formattedTags = x.tags.map(x => (x as string).toLowerCase());

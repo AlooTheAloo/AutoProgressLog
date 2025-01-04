@@ -1,16 +1,16 @@
-import { options } from "../types/options.js";
+import { Options } from "../types/options.js";
 import fs from "fs";
 import path from "path"
 import {fileURLToPath} from "url"
 import electron from "electron";
 import { syncProps } from "../generate/sync.js";
 
-let config:options|null = null;
+let config:Options|null = null;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 
-const getFileInAPLData = (file:string) => path.join(environment == "electron" ? electron.app.getPath("userData") : process.env.APL_DATA_PATH, file);
+const getFileInAPLData = (file:string) => path.join(environment == "electron" ? electron.app.getPath("userData") : (process.env.APL_DATA_PATH ?? ""), file);
 
 
 const environment:"electron"|"node" = electron.app != null ? "electron" : "node";
@@ -22,7 +22,7 @@ export function updateConfig(){
     config = JSON.parse(fs.readFileSync(configPath).toString());
 }
 
-export function getConfig():options|null{
+export function getConfig():Options|null{
     if(config == null){
         if(!fs.existsSync(configPath)) {
             return null;
@@ -40,7 +40,7 @@ export function getConfig():options|null{
 
 export function getSyncProps(isReport = false):syncProps{
     return {
-        syncAnki: getConfig().anki.enabled,
+        syncAnki: getConfig()?.anki.enabled ?? false,
         syncToggl: true, // TODO : Maybe add a toggle for toggl later (i thought this was funny)
         isReport: isReport
     }    

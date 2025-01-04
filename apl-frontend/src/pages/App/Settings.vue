@@ -8,28 +8,28 @@ import Tab from 'primevue/tab';
 import TabPanels from 'primevue/tabpanels';
 import TabPanel from 'primevue/tabpanel';
 import AccountSettings from '../../components/Settings/Tabs/AccountSettings.vue';
-import { options } from '../../../apl-backend/types/options';
+import { Options } from '../../../apl-backend/types/options';
 import { onMounted, ref, watch } from 'vue';
 import Button from 'primevue/button';
 import GeneralSettings from '../../components/Settings/Tabs/GeneralSettings.vue';
 
 const router = useRouter();
 
-const config = ref<options>();
+const config = ref<Options>();
 
 onMounted(() => {
-    window.ipcRenderer.invoke("GetConfig").then((data:options) => {
+    window.ipcRenderer.invoke("GetConfig").then((data:Options) => {
         config.value = data;
     })
 })
 
 function save(){
-    window.ipcRenderer.invoke("SetConfig", JSON.stringify(config.value)).then((data:options) => {
+    window.ipcRenderer.invoke("SetConfig", JSON.stringify(config.value)).then((data:Options) => {
         config.value = data;
     })
 }
 
-function setConfig(newconfig:options){
+function setConfig(newconfig:Options){
     console.log(newconfig);
     config.value = newconfig;
 }

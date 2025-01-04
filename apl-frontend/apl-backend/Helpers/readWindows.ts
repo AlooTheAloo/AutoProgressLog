@@ -1,7 +1,7 @@
 import xwin, { openWindows, openWindowsAsync, subscribeActiveWindow, WindowInfo } from '@miniben90/x-win';
 import electron, { Notification, shell } from 'electron';
 import permissions from 'node-mac-permissions';
-let nodeMacPermissions = undefined;
+let nodeMacPermissions:any = undefined;
 
 export async function hasPerms(){
 

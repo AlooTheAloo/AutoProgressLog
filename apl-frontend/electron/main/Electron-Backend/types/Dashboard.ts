@@ -27,3 +27,8 @@ export type ImmersionDTO = {
         relativeValue: number
     }[],
 }
+
+export type ImmersionSource = {
+    name: string;
+    relativeValue: number;
+}

@@ -23,7 +23,12 @@ interface deck {
 
 export async function getDecksCards():Promise<deck[]>{
 
-    const prefsDB = new sqlite3.Database(getSetupAnkiIntegration().ankiDB, (err) => {});
+    const integration = getSetupAnkiIntegration();
+    if(integration == undefined) return [];
+    const ankiDB = integration.ankiDB;
+    if(ankiDB == undefined) return [];
+
+    const prefsDB = new sqlite3.Database(ankiDB, (err) => {});
     return await new Promise((res, rej) => {
             prefsDB.all(`SELECT COUNT(*) as "cardCount", did FROM cards group by did;`, async (err, rowsTop:{cardCount: number, did: number}[]) => {
             
@@ -45,7 +50,7 @@ export async function getDecksCards():Promise<deck[]>{
     });
 }
 
-export async function getDecks(chosenProfile?:string):Promise<string[]>{
+export async function getDecks(chosenProfile:string):Promise<string[]>{
     const prefsDBPath = path.join(getAnkiBase(), chosenProfile, "collection.anki2");
     const prefsDB = new sqlite3.Database(prefsDBPath, (err) => {});
     
@@ -99,7 +104,7 @@ export async function getAnkiProfiles():Promise<{name: string}[]>{
 
 export let getAnkiProfileCount = async () => (await getAnkiProfiles()).length;
 
-export async function getAnkiDBPaths(chosenProfile?:string):Promise<ankiPaths>{
+export async function getAnkiDBPaths(chosenProfile:string):Promise<ankiPaths>{
 
     const prefsDBPath = path.join(getAnkiBase(), chosenProfile, "collection.anki2");
     let AppPath = "";
@@ -178,7 +183,7 @@ export async function KillAnkiIfOpen(){
     const pid = targetProcesses[0].pid;
     kill(pid);
     let iterations = 0;
-    return new Promise<void>(async (res, rej) => {
+    return new Promise<void|null>(async (res, rej) => {
         var intervalClose = setInterval(async () => {
             if(iterations > 500) res(null);
             const remainingProcesses = await proc("name", "Anki")
@@ -206,6 +211,11 @@ export async function LaunchAnki(paths:ankiPaths|ankiIntegration){
     // }
     // return [false, null];
 
+    if(paths.ankiPath == undefined){
+        console.log(`The file ${paths.ankiPath} does not exist. Please provide a valid path`.red);
+        return [false, null];
+    }
+    
     if(!fs.existsSync(paths.ankiPath)){
         console.log(`The file ${paths.ankiPath} does not exist. Please provide a valid path`.red);
         return [false, null];

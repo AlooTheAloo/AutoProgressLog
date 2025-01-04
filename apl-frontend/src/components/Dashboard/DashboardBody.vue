@@ -8,12 +8,12 @@ import Calendar from "../../assets/Icons/calendar.png";
 
 import AppSmallWidget from './AppSmallWidget.vue';
 import { computed, onMounted, ref } from 'vue';
-import { DashboardDTO } from '../../../types/DTO';
 import pluralize, { plural } from 'pluralize';
 import ImmersionSources from './ImmersionSources.vue';
 import Skeleton from 'primevue/skeleton';
 import { useWindowSize } from '@vueuse/core';
 import Dialog from 'primevue/dialog';
+import { DashboardDTO } from '../../../electron/main/Electron-Backend/types/Dashboard';
 
 const props = defineProps<{
     dto: DashboardDTO;

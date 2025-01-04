@@ -3,15 +3,15 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { appPath } from '../../../pages/routes/appRoutes';
 import SettingsField from '../Common/SettingsField.vue';
-import { options } from '../../../../apl-backend/types/options';
+import { Options } from '../../../../apl-backend/types/options';
 
 const props = defineProps<{
-    config:options|undefined
+    config:Options|undefined
 }>()
 
 // type-based
 const emit = defineEmits<{
-  (e: 'update:config', config: options): void
+  (e: 'update:config', config: Options): void
 }>()
 
 </script>

@@ -35,9 +35,15 @@ export function DashboardListeners() {
 }
 
 export async function runChecks():Promise<boolean>{
+    const config = getConfig();
+    if(!config) return false;
+    
     if(await checkInternet()){
+
+        if(!config.anki.enabled) return true;
+        
         // MacOS and sync => we need perms
-        if(hasSyncEnabled(getConfig().anki.ankiIntegration.profile) && process.platform == "darwin"){
+        if(await hasSyncEnabled(config.anki.ankiIntegration?.profile ?? "") && process.platform == "darwin"){
             if(!(await hasPerms())){
                 notifyNoPermissions();
                 macOSRequirePerms();
@@ -53,8 +59,9 @@ export async function runChecks():Promise<boolean>{
 }
 
 function getNextReportTime(){
-    if(!getConfig().general.autogen.enabled) return "";
-    const time = getConfig().general.autogen.options.generationTime;
+    const config = getConfig();
+    if(!config?.general?.autogen?.enabled) return "";
+    const time = config.general.autogen.options.generationTime;
     const now = dayjs();
 
     // Create a dayjs instance for today with the given time
@@ -73,22 +80,23 @@ function getNextReportTime(){
 export async function CreateDTO(){
     const lastEntry = await GetLastEntry();
     const lastReport = await CacheManager.peek();
-    console.log(getConfig().account.userName);
+    const config = getConfig();
+    if(config == undefined) return undefined;
     const thisMonth = await GetImmersionTimeSince(dayjs().startOf("month"));
     const lastMonth = await GetImmersionTimeBetween(dayjs().subtract(1, "month").startOf("month"), dayjs().subtract(1, "month"));
     const DTO:DashboardDTO = {    
-        userName: getConfig().account.userName,
+        userName: config.account.userName,
         lastSyncTime: dayjs(lastEntry.generationTime).toISOString(),
         lastReportTime: lastReport.generationTime,
-        ankiDTO: getConfig().anki.enabled ? {
-            retentionRate: lastEntry.anki.retention,
-            retentionRateDelta: roundTo(roundTo(lastEntry.anki.retention, 2) - roundTo(lastReport.retention, 2), 2),
+        ankiDTO: config.anki.enabled ? {
+            retentionRate: lastEntry?.anki?.retention ?? 0,
+            retentionRateDelta: roundTo(roundTo(lastEntry?.anki?.retention ?? 0, 2) - roundTo(lastReport.retention ?? 0, 2), 2),
     
-            totalReviews: lastEntry.anki.totalCardsStudied,
-            reviewsDelta: lastEntry.anki.totalCardsStudied - lastReport.totalCardsStudied,
+            totalReviews: lastEntry.anki?.totalCardsStudied ?? 0,
+            reviewsDelta: (lastEntry.anki?.totalCardsStudied ?? 0) - lastReport.totalCardsStudied,
         } : undefined,
         immersionDTO: {
-            totalImmersion: lastEntry.toggl.totalSeconds,
+            totalImmersion: lastEntry?.toggl?.totalSeconds ?? 0,
             immersionSinceLastReport: await GetImmersionTimeSince(dayjs(lastReport.generationTime)),
             monthlyImmersion: thisMonth,
             monthlyImmersionLastMonth: lastMonth,
