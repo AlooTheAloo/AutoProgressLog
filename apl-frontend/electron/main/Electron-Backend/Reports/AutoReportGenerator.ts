@@ -1,17 +1,21 @@
-
 import { runGeneration } from "../../../../apl-backend/generate/generate";
 import { setSyncing } from "../../../../apl-backend/generate/sync";
 import { getConfig } from "../../../../apl-backend/Helpers/getConfig";
-import { runChecks } from "../DashboardListeners";
-import nodeScheduler, { Job } from "node-schedule"
+import { runChecks } from "../dashboardListeners";
+import nodeScheduler, { Job } from "node-schedule";
 
 let currentJob:Job|null = null; 
 
 export async function createAutoReport() {
+  console.log("Creating job");
+  if (currentJob != null) {
+    currentJob.cancel();
+  }
 
     if(currentJob != null){
         currentJob.cancel();
     }
+  );
 
     const config = getConfig();
     if(config == undefined) return;

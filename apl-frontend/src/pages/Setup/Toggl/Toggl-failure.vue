@@ -8,7 +8,7 @@
 
     const router = useRouter();
     function Return(){
-        router.push('/setup/toggl-home');
+        router.push('/setup/client-server-selection');
     }
 </script>
 
