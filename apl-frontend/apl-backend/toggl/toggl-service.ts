@@ -30,6 +30,7 @@ export async function getTimeEntries(since:string|number){
         }
     );
 
+    console.log("entries is " + entries);
 
     const entriesAfterLastGen = entries.filter(x => {
         const formattedTags = x.tags.map(x => (x as string).toLowerCase());
