@@ -2,10 +2,9 @@
 <script setup lang="ts">
 
     import Calendar from "/Icons/Calendar.png"
-    import { TPlusDelta } from "../../types/report-data"
     import SmallWidget from "../SmallWidget.vue"
     interface MonthTimeProps{
-        time: TPlusDelta<number>;
+        time: number;
     }
     defineProps<MonthTimeProps>();
     
@@ -14,7 +13,9 @@
 
 <template>
     <SmallWidget title="Immersion this month" units="hours" :image="Calendar" :value="{ 
-        current:time.current,
-        delta:time.delta
-      }"></SmallWidget>
+        current: (time / 3600).toFixed(2),
+        delta:0 
+      }"
+      :hide-delta="true"
+      ></SmallWidget>
 </template>

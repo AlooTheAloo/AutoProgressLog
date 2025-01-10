@@ -28,7 +28,7 @@ const checked = ref<boolean>(props.value ?? false);
 
 <template>
     <div class="flex items-center gap-10 w-full ">
-        <div class="flex h-12 items-center gap-2">
+        <div class="flex h-12 items-center gap-2 w-64">
             <p>
                 {{ 
                     label

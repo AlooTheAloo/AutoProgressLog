@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { appPath } from '../../../pages/routes/appRoutes';
 import SettingsField from '../Common/SettingsField.vue';
@@ -13,6 +13,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'update:config', config: Options): void
 }>()
+
 
 </script>
 

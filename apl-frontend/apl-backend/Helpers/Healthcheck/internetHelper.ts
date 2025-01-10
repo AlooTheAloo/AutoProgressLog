@@ -1,15 +1,17 @@
-import { ipcMain } from "electron";
 import { win } from "../../../electron/main";
+import nodeScheduler from "node-schedule"
+
+let hasInternet = false;
+
+
+export async function setInternet(value:boolean){
+    hasInternet = value;
+}
+
 
 export async function checkInternet(){
-    try{
-        await fetch("https://google.com")
-        return true;
-    }
-    catch(e){
-        return false
-    }
-    
+    console.log("Checking internet connection");
+    return hasInternet;
 }
 
 export function notifyNoInternet(){

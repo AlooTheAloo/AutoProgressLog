@@ -1,59 +1,44 @@
 import { ipcMain } from "electron";
 import { runGeneration } from "../../../apl-backend/generate/generate";
-import {
-  getConfig,
-  getSyncProps,
-  syncDataPath,
-} from "../../../apl-backend/Helpers/getConfig";
+import { getConfig, getSyncProps, syncDataPath } from "../../../apl-backend/Helpers/getConfig";
 import { isSyncing, runSync } from "../../../apl-backend/generate/sync";
 import { CacheManager } from "../../../apl-backend/Helpers/cache";
 import { DashboardDTO } from "./types/Dashboard";
-import {
-  GetImmersionSourcesSince,
-  GetImmersionTimeBetween,
-  GetImmersionTimeSince,
-  GetLastEntry,
-  GetSyncCount,
-} from "../../../apl-backend/Helpers/DataBase/SearchDB";
+import { GetImmersionSourcesSince, GetImmersionTimeBetween, GetImmersionTimeSince, GetLastEntry, GetSyncCount } from "../../../apl-backend/Helpers/DataBase/SearchDB";
 import dayjs from "dayjs";
 import { roundTo } from "round-to";
-import {
-  checkInternet,
-  notifyNoInternet,
-} from "../../../apl-backend/Helpers/Healthcheck/internetHelper";
+import { checkInternet, notifyNoInternet } from "../../../apl-backend/Helpers/Healthcheck/internetHelper";
 import { hasSyncEnabled } from "../../../apl-backend/anki/db";
-import {
-  hasPerms,
-  macOSRequirePerms,
-} from "../../../apl-backend/Helpers/readWindows";
+import { hasPerms, macOSRequirePerms } from "../../../apl-backend/Helpers/readWindows";
 import { notifyNoPermissions } from "../../../apl-backend/Helpers/Healthcheck/permHelper";
 
-export function dashboardListeners() {
-  ipcMain.handle("isSyncing", async (event: any) => {
-    return isSyncing();
-  });
+export function DashboardListeners() {
+    ipcMain.handle("isSyncing", async (event: any) => {
+        return isSyncing();
+    })
+    
+    ipcMain.handle("GenerateReport", async (event: any) => {
+        if(await runChecks()){
+            return await runGeneration();
+        }
+    });
 
-  ipcMain.handle("GenerateReport", async (event: any) => {
-    if (await runChecks()) {
-      return await runGeneration();
-    }
-  });
+    ipcMain.handle("Sync", async (event: any, alternative: boolean) => {
+        if(await runChecks()){
+            return await runSync(alternative, getSyncProps());
+        }
+    });
 
-  ipcMain.handle("Sync", async (event: any, alternative: boolean) => {
-    if (await runChecks()) {
-      return await runSync(alternative, getSyncProps());
-    }
-  });
-
-  ipcMain.handle("Get-Dashboard-DTO", async (event: any) => {
-    return await CreateDTO();
-  });
+    ipcMain.handle("Get-Dashboard-DTO", async (event: any) => {
+        return await CreateDTO();
+    })
 }
 
 export async function runChecks():Promise<boolean>{
+    const start = dayjs();
     const config = getConfig();
     if(!config) return false;
-    
+    console.log("running checks")
     if(await checkInternet()){
 
         if(!config.anki.enabled) return true;
@@ -71,13 +56,7 @@ export async function runChecks():Promise<boolean>{
     else {
         notifyNoInternet()
         return false;
-      }
     }
-    return true;
-  } else {
-    notifyNoInternet();
-    return false;
-  }
 }
 
 function getNextReportTime(){
@@ -86,17 +65,18 @@ function getNextReportTime(){
     const time = config.general.autogen.options.generationTime;
     const now = dayjs();
 
-  // Create a dayjs instance for today with the given time
-  let reportTime = now.hour(time.hours).minute(time.minutes).second(0);
+    // Create a dayjs instance for today with the given time
+    let reportTime = now.hour(time.hours).minute(time.minutes).second(0);
 
-  // If the time has already passed today, move to the next day
-  if (reportTime.isBefore(now)) {
-    reportTime = reportTime.add(1, "day");
-  }
+    // If the time has already passed today, move to the next day
+    if (reportTime.isBefore(now)) {
+        reportTime = reportTime.add(1, 'day');
+    }
 
-  // Format the time as "MMM D, YYYY at h:mm A"
-  return reportTime.format("MMM D, YYYY [at] h:mm A");
+    // Format the time as "MMM D, YYYY at h:mm A"
+    return reportTime.format("MMM D, YYYY [at] h:mm A");
 }
+
 
 export async function CreateDTO(){
     const lastEntry = await GetLastEntry();

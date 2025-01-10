@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ReportData } from '../../../types/report-data';
-import AverageTime from '../AverageTime.vue';
+import BestTime from '../BestTime.vue';
 import MonthImmersion from '../MonthImmersion.vue';
 
 interface AnkiDataProps{
@@ -12,7 +12,7 @@ defineProps<AnkiDataProps>();
 </script>
 <template>
 <div class=" flex gap-5">
-    <MonthImmersion :time="reportData.ImmersionTime"></MonthImmersion>
-    <AverageTime :time="reportData.AverageImmersionTime"></AverageTime>
+    <MonthImmersion :time="reportData.MonthlyImmersion"></MonthImmersion>
+    <BestTime :time="reportData.BestImmersion"></BestTime>
 </div>
 </template>

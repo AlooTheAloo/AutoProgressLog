@@ -1,7 +1,7 @@
 import { app, Menu, nativeImage, Notification, shell, Tray } from "electron";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { runChecks } from "./dashboardListeners";
+import { runChecks } from "./DashboardListeners";
 import { runGeneration } from "../../../apl-backend/generate/generate";
 import { hasPerms } from "../../../apl-backend/Helpers/readWindows";
 import { createWindow, win } from "..";

@@ -45,6 +45,7 @@ export function isSyncing(){
 
 
 export async function runSync(silent = false, props:syncProps = DEFAULT, sendSyncing = true){
+    const start = dayjs();
     if(!props.isReport && sendSyncing){
         setSyncing(true);
     } 
@@ -99,6 +100,7 @@ export async function runSync(silent = false, props:syncProps = DEFAULT, sendSyn
         time = sumTime(toggl.entries) + toggl.delta;
     }
    
+
     await WriteSyncData({
         generationTime: dayjs().valueOf(),
         toggl: props.syncToggl ? {
@@ -116,11 +118,12 @@ export async function runSync(silent = false, props:syncProps = DEFAULT, sendSyn
 
 
 
+
     if(!props.isReport && sendSyncing){
         setSyncing(false);
     } 
 
-    const h = await getreadinghours();
+    console.log("Sync took " + (dayjs().diff(start, "ms")) + "ms");
     return CreateDTO();
 }
 
@@ -189,7 +192,9 @@ export async function VerifyPreviousActivities(from:dayjs.Dayjs, to:dayjs.Dayjs,
 export async function syncToggl():Promise<{entries: entry[], delta:number}>{
     const lastReportTime = await CacheManager.peek().generationTime;
     const startSync = await GetLastEntry();
+    const start = dayjs()
     const entries = await getTimeEntries(lastReportTime);
+
     const delta = await VerifyPreviousActivities(dayjs(lastReportTime), dayjs(startSync.generationTime), entries.entriesAfterLastGen);
     return {
         entries: entries.entriesAfterLastGen.filter(x => dayjs(x.stop).isAfter(startSync.generationTime)),

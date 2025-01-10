@@ -1,315 +1,300 @@
 {
-    "reportNo": 178,
-    "time": "Generated on the 11th of november 2024 at 09:21",
+    "reportNo": 221,
+    "time": "Generated on the 4th of january 2025 at 17:07",
     "matureCards": [
         {
-            "reportNo": 178,
-            "matureCardCount": 3025
+            "reportNo": 221,
+            "matureCardCount": 3205
         },
         {
-            "reportNo": 177,
-            "matureCardCount": 3020
+            "reportNo": 220,
+            "matureCardCount": 3199
         },
         {
-            "reportNo": 176,
-            "matureCardCount": 3019
+            "reportNo": 219,
+            "matureCardCount": 3210
         },
         {
-            "reportNo": 175,
-            "matureCardCount": 3016
+            "reportNo": 218,
+            "matureCardCount": 3211
         },
         {
-            "reportNo": 174,
-            "matureCardCount": 3011
+            "reportNo": 217,
+            "matureCardCount": 3204
         },
         {
-            "reportNo": 173,
-            "matureCardCount": 3009
+            "reportNo": 216,
+            "matureCardCount": 3189
         }
     ],
     "retentionRate": {
-        "current": 74.86927099354045,
-        "delta": -0.06900061139781144
+        "current": 76.9041095890411,
+        "delta": 0.2336679129369088
     },
     "totalReviews": {
-        "current": 30901,
-        "delta": 154
+        "current": 39026,
+        "delta": 327
     },
     "AnkiStreak": {
-        "current": 60,
+        "current": 20,
         "delta": 1
     },
     "AnkiData": [
         {
-            "reportNo": 178,
-            "value": 154
+            "reportNo": 221,
+            "value": 327
         },
         {
-            "reportNo": 177,
-            "value": 169
+            "reportNo": 220,
+            "value": 427
         },
         {
-            "reportNo": 176,
-            "value": 203
+            "reportNo": 219,
+            "value": 783
         },
         {
-            "reportNo": 175,
-            "value": 216
-        },
-        {
-            "reportNo": 174,
-            "value": 82
-        },
-        {
-            "reportNo": 173,
-            "value": 147
-        },
-        {
-            "reportNo": 172,
-            "value": 149
-        },
-        {
-            "reportNo": 171,
-            "value": 191
-        },
-        {
-            "reportNo": 170,
-            "value": 442
-        },
-        {
-            "reportNo": 169,
-            "value": 160
-        },
-        {
-            "reportNo": 168,
-            "value": 191
-        },
-        {
-            "reportNo": 167,
-            "value": 277
-        },
-        {
-            "reportNo": 166,
-            "value": 1
-        },
-        {
-            "reportNo": 165,
-            "value": 111
-        },
-        {
-            "reportNo": 164,
-            "value": 179
-        },
-        {
-            "reportNo": 163,
-            "value": 160
-        },
-        {
-            "reportNo": 162,
-            "value": 164
-        },
-        {
-            "reportNo": 161,
-            "value": 165
-        },
-        {
-            "reportNo": 160,
-            "value": 167
-        },
-        {
-            "reportNo": 159,
-            "value": 348
-        },
-        {
-            "reportNo": 158,
-            "value": 182
-        },
-        {
-            "reportNo": 157,
-            "value": 185
-        },
-        {
-            "reportNo": 156,
-            "value": 164
-        },
-        {
-            "reportNo": 155,
+            "reportNo": 218,
             "value": 150
         },
         {
-            "reportNo": 154,
-            "value": 166
+            "reportNo": 217,
+            "value": 160
+        },
+        {
+            "reportNo": 216,
+            "value": 192
+        },
+        {
+            "reportNo": 215,
+            "value": 190
+        },
+        {
+            "reportNo": 214,
+            "value": 214
+        },
+        {
+            "reportNo": 213,
+            "value": 145
+        },
+        {
+            "reportNo": 212,
+            "value": 140
+        },
+        {
+            "reportNo": 211,
+            "value": 148
+        },
+        {
+            "reportNo": 210,
+            "value": 160
+        },
+        {
+            "reportNo": 209,
+            "value": 172
+        },
+        {
+            "reportNo": 208,
+            "value": 139
+        },
+        {
+            "reportNo": 207,
+            "value": 141
+        },
+        {
+            "reportNo": 206,
+            "value": 146
+        },
+        {
+            "reportNo": 205,
+            "value": 156
+        },
+        {
+            "reportNo": 204,
+            "value": 344
+        },
+        {
+            "reportNo": 203,
+            "value": 359
+        },
+        {
+            "reportNo": 202,
+            "value": 269
+        },
+        {
+            "reportNo": 201,
+            "value": 0
+        },
+        {
+            "reportNo": 200,
+            "value": 153
+        },
+        {
+            "reportNo": 199,
+            "value": 283
+        },
+        {
+            "reportNo": 198,
+            "value": 151
+        },
+        {
+            "reportNo": 197,
+            "value": 164
         }
     ],
     "ImmersionTime": {
-        "current": 381,
+        "current": 503,
         "delta": 3
     },
     "AverageImmersionTime": {
-        "current": 9952.714285714286,
-        "delta": 551.3214285714294
+        "current": 15913.5,
+        "delta": -971.0714285714275
+    },
+    "MonthlyImmersion": 31924,
+    "BestImmersion": {
+        "current": 21691,
+        "delta": 0
     },
     "ImmersionLog": [
         {
-            "name": "haikyuu s4",
-            "relativeValue": 8831
+            "name": "a sin(x) of affection",
+            "relativeValue": 881
         },
         {
-            "name": "jjk",
-            "relativeValue": 215
+            "name": "im watching all of one piece. wish me luck idiots.",
+            "relativeValue": 5229
         },
         {
-            "name": "rewatching old anime",
-            "relativeValue": 2729
-        },
-        {
-            "name": "rewatching old anime",
-            "relativeValue": 2729
+            "name": "one week friends :Death:",
+            "relativeValue": 951
         },
         {
             "name": "rewatching old anime",
-            "relativeValue": 2729
+            "relativeValue": 1679
         },
         {
-            "name": "rewatching old anime",
-            "relativeValue": 2729
-        },
-        {
-            "name": "rewatching old anime",
-            "relativeValue": 2729
-        },
-        {
-            "name": "rewatching old anime",
-            "relativeValue": 2729
-        },
-        {
-            "name": "rewatching old anime",
-            "relativeValue": 2729
-        },
-        {
-            "name": "rewatching old anime",
-            "relativeValue": 2729
+            "name": "youtube",
+            "relativeValue": 3157
         }
     ],
     "ImmersionData": [
         {
-            "reportNo": 178,
-            "value": 11775
+            "reportNo": 221,
+            "value": 11897
         },
         {
-            "reportNo": 177,
-            "value": 5407
+            "reportNo": 220,
+            "value": 17284
         },
         {
-            "reportNo": 176,
-            "value": 15997
+            "reportNo": 219,
+            "value": 21691
         },
         {
-            "reportNo": 175,
-            "value": 10324
+            "reportNo": 218,
+            "value": 10871
         },
         {
-            "reportNo": 174,
-            "value": 7672
+            "reportNo": 217,
+            "value": 23435
         },
         {
-            "reportNo": 173,
-            "value": 4669
+            "reportNo": 216,
+            "value": 12378
         },
         {
-            "reportNo": 172,
-            "value": 10174
+            "reportNo": 215,
+            "value": 11595
         },
         {
-            "reportNo": 171,
-            "value": 12745
+            "reportNo": 214,
+            "value": 13215
         },
         {
-            "reportNo": 170,
-            "value": 6420
+            "reportNo": 213,
+            "value": 12841
         },
         {
-            "reportNo": 169,
-            "value": 15612
+            "reportNo": 212,
+            "value": 10178
         },
         {
-            "reportNo": 168,
-            "value": 1221
+            "reportNo": 211,
+            "value": 11327
         },
         {
-            "reportNo": 167,
-            "value": 19293
+            "reportNo": 210,
+            "value": 19234
         },
         {
-            "reportNo": 166,
-            "value": 6350
+            "reportNo": 209,
+            "value": 11984
         },
         {
-            "reportNo": 165,
-            "value": 8209
+            "reportNo": 208,
+            "value": 13328
         },
         {
-            "reportNo": 164,
-            "value": 15096
+            "reportNo": 207,
+            "value": 8297
         },
         {
-            "reportNo": 163,
-            "value": 12800
+            "reportNo": 206,
+            "value": 12795
         },
         {
-            "reportNo": 162,
-            "value": 7951
+            "reportNo": 205,
+            "value": 6315
         },
         {
-            "reportNo": 161,
-            "value": 12928
+            "reportNo": 204,
+            "value": 19082
         },
         {
-            "reportNo": 160,
-            "value": 11661
+            "reportNo": 203,
+            "value": 5667
         },
         {
-            "reportNo": 159,
-            "value": 11576
+            "reportNo": 202,
+            "value": 8715
         },
         {
-            "reportNo": 158,
-            "value": 11553
+            "reportNo": 201,
+            "value": 4694
         },
         {
-            "reportNo": 157,
-            "value": 9283
+            "reportNo": 200,
+            "value": 3903
         },
         {
-            "reportNo": 156,
-            "value": 12000
+            "reportNo": 199,
+            "value": 19089
         },
         {
-            "reportNo": 155,
-            "value": 5939
+            "reportNo": 198,
+            "value": 9311
         },
         {
-            "reportNo": 154,
-            "value": 7424
+            "reportNo": 197,
+            "value": 3963
         }
     ],
     "ImmersionStreak": {
-        "current": 45,
+        "current": 88,
         "delta": 1
     },
-    "ImmersionScore": 11775,
-    "AnkiScore": 654,
-    "TotalScore": 11929,
+    "ImmersionScore": 11897,
+    "AnkiScore": 927,
+    "TotalScore": 12824,
     "lastDaysPoints": [
-        15772,
-        22634,
-        35570,
-        45893,
-        50709,
-        58463,
-        69003,
-        85203,
-        90779,
-        102708
+        11018,
+        25004,
+        38733,
+        51218,
+        64688,
+        89783,
+        101504,
+        123978,
+        141689,
+        154513
     ]
 }

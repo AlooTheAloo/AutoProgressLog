@@ -13,6 +13,7 @@
         image:string,
         deltaOverride?:number,
         hideDelta?:boolean
+        newBest?:boolean
     }
 
     const hrValue = computed(() => {
@@ -35,13 +36,18 @@
             <div class="font-normal tracking-wider">
                 {{ title }}
             </div>
-            <div class="font-extrabold text-3xl" v-if="!hideDelta">
+            <div class="font-extrabold text-3xl" >
                 <div class=" flex flex-row">
                     <div>
                         {{ hrValue }} {{ units ?? "" }}
                     </div>
-                    <div class="flex-grow">
+                    <div class="flex-grow" v-if="!hideDelta">
                         <Delta v-bind:override="deltaOverride" :delta="value.delta"></Delta>
+                    </div>
+                    <div class="flex-grow" v-if="props.newBest">
+                        <div class="ml-[5px] pb-[2px] h-full flex items-end text-sm text-[#5FFFB2]">
+                            New Best!
+                        </div>
                     </div>
                 </div>
             </div>

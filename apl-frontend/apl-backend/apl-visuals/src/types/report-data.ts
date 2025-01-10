@@ -1,3 +1,4 @@
+
 export type ReportData = {
     reportNo:number,
     time:string,
@@ -11,8 +12,10 @@ export type ReportData = {
     ImmersionTime:TPlusDelta<number>,
     AverageImmersionTime:TPlusDelta<number>,
     ImmersionLog:relativeActivity[],
+    ImmersionData:RelativeReportData[],
     ImmersionStreak:TPlusDelta<number>,
-    ImmersionData:RelativeReportData[],    
+    MonthlyImmersion:number,
+    BestImmersion:TPlusDelta<number>,
 
     ImmersionScore:number,
     AnkiScore:number,

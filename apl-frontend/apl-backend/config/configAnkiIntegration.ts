@@ -199,7 +199,7 @@ export async function KillAnkiIfOpen(){
 }
 
 
-// This function is pure hell. It's a mess.
+// This function is pure hell. It's a mess. No actually its based :based:
 export async function LaunchAnki(paths:ankiPaths|ankiIntegration){
         
     console.log("LAunching anki..");

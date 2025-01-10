@@ -24,11 +24,13 @@ export async function getTimeEntries(since:string|number){
         });
     }
 
+    const start = dayjs();
     const entries:entry[] = await toggl.timeEntry.list(
         {
             since: dayjs(since).unix().toString()
         }
     );
+    console.log("Fetch took " + (dayjs().diff(start, "ms")) + " ms")
 
     const entriesAfterLastGen = entries.filter(x => {
         const formattedTags = x.tags.map(x => (x as string).toLowerCase());

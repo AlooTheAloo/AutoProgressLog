@@ -1,5 +1,5 @@
 import { ankiListeners } from "./AnkiListeners";
-import { dashboardListeners } from "./dashboardListeners";
+import { DashboardListeners } from "./DashboardListeners";
 import { globalListeners } from "./globalListeners";
 import { reportsListeners } from "./ReportsListeners";
 import { routeListeners } from "./routeListener";
@@ -15,7 +15,7 @@ export default function registerEvents() {
   setupListeners();
   ankiListeners();
   surveyListeners();
-  dashboardListeners();
+  DashboardListeners();
   reportsListeners();
   settingsListeners();
 }

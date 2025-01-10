@@ -28,7 +28,7 @@ const value = ref<string>(props.value ?? "");
 
 <template>
     <div class="flex items-center gap-10 w-full h-12 ">
-        <div class="flex h-full items-center gap-2">
+        <div class="flex h-full items-center gap-2 w-64">
             <p>
                 {{ 
                     label
