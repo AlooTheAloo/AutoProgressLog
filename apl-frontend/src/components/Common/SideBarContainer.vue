@@ -70,7 +70,9 @@
     :modal="true"
     :dismissableMask="true"
     >
-     {{dialog?.content}}
+    <div v-html="dialog?.content">
+
+    </div>
     </Dialog>
     <div class="h-screen w-screen absolute overflow-hidden pointer-events-none">
         <div class="flex absolute w-full h-full items-end justify-end">

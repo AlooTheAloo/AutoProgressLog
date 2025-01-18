@@ -9,8 +9,9 @@
     import Dropdown from 'primevue/dropdown';
     import AccountDisplay from '../../../components/Common/AccountDisplay.vue';
     import Panel from 'primevue/panel';
+import { reportExtensions } from '../../../../apl-backend/types/options';
     
-    const extensions = [".png", ".jpg", ".jpeg", ".webp", ".pdf"];
+    const extensions = reportExtensions;
 
     const selectedExtension = defineModel<string>('selectedExtension');
     const filename = defineModel<string>('filename');
@@ -28,8 +29,7 @@
 
     function chooseFilePath(){
         window.ipcRenderer.invoke("OpenPathDialog", filePath.value).then(path => {
-            console.log(path);
-            if(path.length == 0) return;
+            if(!path || path.length == 0) return;
             filePath.value = path[0];
         })
     }

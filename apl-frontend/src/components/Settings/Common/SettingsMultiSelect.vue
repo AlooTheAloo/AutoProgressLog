@@ -5,16 +5,19 @@ import { appPath } from '../../../pages/routes/appRoutes';
 import InputText from 'primevue/inputtext';
 import Password from 'primevue/password';
 import help from "../../../assets/Icons/help.png"
+import RadioButton from 'primevue/radiobutton';
+import MultiSelect from 'primevue/multiselect';
+
 
 const props = defineProps<{
     label:string,
-    value?:string,
+    value?:any[],
     password?:boolean,
-    options?:any,
+    options?:any[],
     disabled?:boolean,
     placeholder?:string,
     helpText?:string,
-    link?:string
+    link?:string,
 }>()
 
 const emit = defineEmits(['update:value']);
@@ -28,10 +31,11 @@ function openLink(){
 }
 
 watch(props, () => {
-    value.value = props.value ?? "";
+    console.log(props.value);
+    value.value = props.value ?? [];
 })
 
-const value = ref<string>(props.value ?? "");
+const value = ref<any[]>([]);
 
 </script>
 
@@ -50,25 +54,19 @@ const value = ref<string>(props.value ?? "");
                 />
             </div>
         </div>
-        <div class="w-96">
-            <InputText v-if="!password" 
-            :disabled="disabled" 
-            @update:model-value="updateValue" 
-            v-model="value" type="text" 
-            size="large" 
-            :placeholder="placeholder" 
-            fluid 
-             />
-    
-            <Password v-else toggle-mask
-            :feedback="false"
-            v-model="value" 
-            :disabled="disabled"
-            @update:model-value="updateValue" 
-            size="large" 
-            :placeholder="placeholder" 
-            fluid 
-             />
+        <div class="flex-grow lg:gap-10">
+            <MultiSelect
+            :options="options" 
+            :model-value="value"
+            @update:model-value="updateValue"
+            option-label="name"
+            :show-toggle-all="false"
+            option-value="id"
+            class="w-96"
+            placeholder="Select decks to track"
+            display="chip"
+            :disabled="props.disabled"
+            />
         </div>
         
     </div>

@@ -5,21 +5,27 @@ import { appPath } from '../../../pages/routes/appRoutes';
 import InputText from 'primevue/inputtext';
 import Password from 'primevue/password';
 import help from "../../../assets/Icons/help.png"
+import RadioButton from 'primevue/radiobutton';
+interface Option {
+    key: string;
+    name: string;
+}
 
 const props = defineProps<{
     label:string,
     value?:string,
     password?:boolean,
-    options?:any,
+    options?:Option[],
     disabled?:boolean,
     placeholder?:string,
     helpText?:string,
-    link?:string
+    link?:string,
 }>()
 
 const emit = defineEmits(['update:value']);
 
 function updateValue(value:any){
+    console.log("Updating " + value);
     emit("update:value", value);
 }
 
@@ -50,25 +56,14 @@ const value = ref<string>(props.value ?? "");
                 />
             </div>
         </div>
-        <div class="w-96">
-            <InputText v-if="!password" 
-            :disabled="disabled" 
-            @update:model-value="updateValue" 
-            v-model="value" type="text" 
-            size="large" 
-            :placeholder="placeholder" 
-            fluid 
-             />
-    
-            <Password v-else toggle-mask
-            :feedback="false"
-            v-model="value" 
-            :disabled="disabled"
-            @update:model-value="updateValue" 
-            size="large" 
-            :placeholder="placeholder" 
-            fluid 
-             />
+        <div class="flex-grow  lg:gap-10">
+
+            <div v-for="category in (props.options)" :key="category.key" class="flex items-center text-xl">
+                <RadioButton v-model:model-value="value" :disabled="props.disabled" :inputId="category.key" name="dynamic" :value="category.key" @update:model-value="updateValue" />
+                <label :for="category.key" class="ml-2 font-semibold px-1 text-lg ">{{ category.name }}</label>
+            </div>
+
+
         </div>
         
     </div>

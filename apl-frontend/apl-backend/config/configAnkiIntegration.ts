@@ -15,17 +15,16 @@ export interface ankiPaths{
     profile: string
 }
 
-interface deck {
+export interface deck {
     name: string,
     cardCount: number,
     id: number
 }
 
-export async function getDecksCards():Promise<deck[]>{
+export async function getDecksCards(ankiDBPath?:string):Promise<deck[]>{
 
     const integration = getSetupAnkiIntegration();
-    if(integration == undefined) return [];
-    const ankiDB = integration.ankiDB;
+    const ankiDB = ankiDBPath ?? integration?.ankiDB;
     if(ankiDB == undefined) return [];
 
     const prefsDB = new sqlite3.Database(ankiDB, (err) => {});
@@ -44,6 +43,7 @@ export async function getDecksCards():Promise<deck[]>{
                     });
                 })
             }))
+            prefsDB.close();
             res(ret);
             
         });
@@ -172,7 +172,6 @@ export async function createAnkiIntegration(paths:ankiPaths):Promise<ankiIntegra
     return {
         ankiDB: paths.ankiDB,
         ankiPath: paths.ankiPath,
-        ankiProgramBinaryName: worked[1] as string,
         profile: paths.profile
     }
 }
@@ -202,7 +201,6 @@ export async function KillAnkiIfOpen(){
 // This function is pure hell. It's a mess. No actually its based :based:
 export async function LaunchAnki(paths:ankiPaths|ankiIntegration){
         
-    console.log("LAunching anki..");
     // Uncomment for funny
     // const Rand = Math.random();
     // console.log(Rand);
@@ -222,8 +220,7 @@ export async function LaunchAnki(paths:ankiPaths|ankiIntegration){
     }
 
     const isOpened = (await getAnkiProcesses()).length > 0;
-    const openCommand = (process.platform == "darwin" ? "open " : "") + paths.ankiPath;
-
+    const openCommand = (process.platform == "darwin" ? "open '" : "'") + paths.ankiPath + "'";
 
     if(!isOpened){
         exec(openCommand);    
@@ -233,11 +230,22 @@ export async function LaunchAnki(paths:ankiPaths|ankiIntegration){
 
     const resp = await new Promise<string|null>(async (res, rej) => {
         var intervalOpen = setInterval(async () => {
-            if(iterations > 500) res(null);
-            const targetProcesses = await getAnkiProcesses();
-            if(targetProcesses.length == 0 && !isOpened) return;
-            const pid = targetProcesses[0].pid;
-            if((await readWindows([pid])).length > 0 || isOpened){
+            if(iterations > 30) {
+                {
+                    clearInterval(intervalOpen);
+                    res(null);
+                }
+            } 
+            const allAnkis = await proc("name", "Anki");
+            iterations++;
+            if(allAnkis.length == 0 && !isOpened){
+                return;
+            }
+
+            const windows = (await readWindows(allAnkis.map(x => x.pid)))
+            const pid = (await getAnkiProcesses()).at(0)?.pid;
+            if((windows.length > 0 || isOpened) && pid != undefined){
+
                 if(!isOpened) await sleep(1000);
                 try{
                     kill(pid);                    
@@ -247,30 +255,86 @@ export async function LaunchAnki(paths:ankiPaths|ankiIntegration){
                 }
                 clearInterval(intervalOpen);
                 var intervalClose = setInterval(async () => {
-                    if(iterations > 500) res(null);
+                    if(iterations > 30) 
+                    {
+                        clearInterval(intervalClose);
+                        res(null);
+                    }
                     const remainingProcesses = await proc("name", "Anki")
                     if(remainingProcesses.filter(x => x.pid == pid).length == 0){
-                        res(targetProcesses.filter(x => x.pid == pid)[0].cmd);
+                        const cmd = allAnkis.filter(x => x.pid == pid)[0].cmd;
+                        res(cmd);
                         clearInterval(intervalClose);
 
                         if(isOpened){
                             exec(openCommand);    
+                            minimizeAnki(cmd);
                         }
                     }
                     iterations++;
                 }, 500)
             }
-
-            iterations++;
         }, 500);
 
     })
-    if(typeof(resp) == null)
+    if(resp == null)
     {
         return [false, null];
     }
     
     return [true, resp];
+}
+
+export async function minimizeAnki(cmd:string){
+    
+    let iterations = 0;
+    const resp = await new Promise<void|null>(async (res, rej) => {
+        var intervalOpen = setInterval(async () => {
+            if(iterations > 10) {
+                {
+                    clearInterval(intervalOpen);
+                    res(null);
+                }
+            } 
+            const targetProcesses = (await getAnkiProcesses()).filter(x => x.cmd == cmd);
+            iterations++;
+            if(targetProcesses.length == 0){
+                return;
+            }
+            const pid = targetProcesses[0].pid;
+            const allAnkis = await proc("name", "Anki");
+            const windows = (await readWindows(allAnkis.map(x => x.pid)))
+            if(windows.length == 1){
+                
+                clearInterval(intervalOpen);
+
+                // Check if platform is Windows or macOS
+                if (process.platform === 'win32') {
+                    exec(`powershell -Command "& { (Get-Process -Id ${pid}).MainWindowHandle | ForEach-Object { [void][System.Runtime.InteropServices.Marshal]::WriteInt32($_, 0, 2) } }"`, (err, stdout, stderr) => {
+                        if (err) {
+                            console.error("Error minimizing window:", stderr);
+                        }
+                        res();
+                    });
+                } else if (process.platform === 'darwin') {
+                    exec(`osascript -e 'tell application "System Events" to set visible of first application process whose unix id is ${pid} to false'`, (err, stdout, stderr) => {
+                        if (err) {
+                            console.error("Error hiding window:", stderr);
+                        }
+                        res();
+                    });
+                }
+
+
+
+
+
+            }
+        }, 500);
+
+    })
+    
+    return resp;
 }
 
 

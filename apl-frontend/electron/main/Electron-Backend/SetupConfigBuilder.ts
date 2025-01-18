@@ -17,6 +17,7 @@ import sqlite3 from "sqlite3";
 import { CreateDB } from "../../../apl-backend/Helpers/DataBase/CreateDB";
 import { win } from "..";
 import { buildContextMenu } from "./appBackend";
+import path from "path";
 
 let account: TogglAccount;
 const config: Partial<Options> = {};
@@ -84,6 +85,16 @@ export function setupListeners() {
       defaultPath: openAt,
     });
   });
+
+  ipcMain.handle("OpenFileDialog", (evt, openAt) => {
+    if(win == undefined) return;
+    console.log("Opening file dialog");
+    return dialog.showOpenDialogSync(win, {
+      properties: ["openFile", "showHiddenFiles", "dontAddToRecent", "createDirectory"],
+      defaultPath: path.dirname(openAt),
+    });
+  });
+
 
   ipcMain.handle("SetAutoGen", (event: any, arg: boolean) => {
     if(arg){

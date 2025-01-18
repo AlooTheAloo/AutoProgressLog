@@ -16,14 +16,14 @@ interface flatSyncData {
     lastAnkiUpdate: number;
 }
 
-export async function GetLastEntry(type?:SyncType):Promise<SyncData>{
+export async function GetLastEntry(type?:SyncType):Promise<SyncData|null>{
     return new Promise((resolve, reject) => {
         new sqlite3.Database(syncDataPath).all(`
             SELECT * FROM syncData 
             ${type ? `WHERE type = '${type}'` : ""}
             ORDER BY id DESC LIMIT 1
         `, (err, rows:flatSyncData[]) => {
-            if(err) reject(err);
+            if(err) resolve(null);
             const flat = rows[0];
             resolve({
                 id: flat.id,

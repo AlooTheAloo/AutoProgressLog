@@ -3,12 +3,14 @@ import { RouterView, useRouter } from 'vue-router'
 
 const router = useRouter();
 
-window.ipcRenderer.on("router-push", (e, args: string) => {
-  router.push(args);
-})
+
+if(window.ipcRenderer)
+  window.ipcRenderer.on("router-push", (e, args: string) => {
+    router.push(args);
+  })
 
 const updateOnlineStatus = () => {
-  console.log("Updating online status to " + navigator.onLine);
+  if(!window.ipcRenderer) return;
   window.ipcRenderer.invoke("SetInternetConnection", navigator.onLine);
 }
 

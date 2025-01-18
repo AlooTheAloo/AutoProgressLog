@@ -13,7 +13,7 @@ export default defineConfig(({ command }) => {
 
   return {
     optimizeDeps: {
-      exclude: ['keytar', 'win-dpapi', 'node-mac-permissions']
+      exclude: ['keytar', 'win-dpapi', 'node-mac-permissions', '@miniben90/x-win'],
     },
     plugins: [
       vue(),

@@ -1,14 +1,41 @@
 import { dialog, ipcMain } from "electron"
 import { win } from "..";
-import { ankiIntegration } from "../../../apl-backend/types/options";
+import { ankiIntegration, Options } from "../../../apl-backend/types/options";
 import { getSetupAnkiIntegration, setAnkiIntegration } from "./SetupConfigBuilder";
-import { getAnkiCardReviewCount, getMatureCards, getRetention } from "../../../apl-backend/anki/db";
+import { getAnkiCardReviewCount, getMatureCards, getRetention, hasSyncEnabled } from "../../../apl-backend/anki/db";
 import { roundTo } from "round-to";
 import { hasPerms } from "../../../apl-backend/Helpers/readWindows";
-import { ankiPaths, createAnkiIntegration, getAnkiDBPaths, getAnkiProfileCount, getAnkiProfiles, getDecks, getDecksCards, getProfileDecks, sleep, verifyAnkiPaths } from "../../../apl-backend/config/configAnkiIntegration";
+import { ankiPaths, createAnkiIntegration, getAnkiDBPaths, getAnkiProfileCount, getAnkiProfiles, getDecks, getDecksCards, getProfileDecks, LaunchAnki, sleep, verifyAnkiPaths } from "../../../apl-backend/config/configAnkiIntegration";
 import path, { basename, join } from "path";
 
 export function ankiListeners() {
+
+    ipcMain.handle("test-anki-connection", async (event: any, arg: Options) => {
+        const no = {worked: false, decks: []};
+
+        try{
+            const int = arg.anki.ankiIntegration
+            if(int == undefined) return no;
+            if(arg.anki.ankiIntegration?.profile == undefined) return no;
+            const hse = await hasSyncEnabled(arg.anki.ankiIntegration?.profile) 
+            if(hse == null) return no;
+            const worked = await LaunchAnki(int);
+            if(!worked[0]) return no;
+            const retention = await getRetention("true_retention", int);
+            if(retention == undefined) return no;
+            const matureCards = await getMatureCards(int);
+            if(matureCards == undefined) return no;
+            const obj = {
+                worked: true, 
+                decks: await getDecksCards(arg.anki.ankiIntegration?.ankiDB)
+            }            
+            return obj;
+        }
+        catch(e){
+            return no;
+        }
+        
+    });
 
     ipcMain.handle("anki-read-data", async (event: any, arg: any) => {
         const int = getSetupAnkiIntegration() 

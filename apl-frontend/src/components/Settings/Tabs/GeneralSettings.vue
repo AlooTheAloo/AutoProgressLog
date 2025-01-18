@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import DatePicker from 'primevue/datepicker';
 import { Options } from '../../../../apl-backend/types/options';
-import SettingsField from '../Common/SettingsField.vue';
 import SettingsToggle from '../Common/SettingsToggle.vue';
 import help from "../../../assets/Icons/help.png"
-import { onMounted, ref } from 'vue';
-import dayjs from 'dayjs';
+import { ref } from 'vue';
 import { watch } from 'vue';
+import SettingsDatePicker from '../Common/SettingsDatePicker.vue';
 
 const props = defineProps<{
     config:Options|undefined
@@ -66,7 +65,7 @@ function updateTime(value:Date){
 </script>
 
 <template>  
-    <div class="flex flex-col w-full" v-if="config != undefined">
+    <div class="flex flex-col w-full gap-2" v-if="config != undefined">
         <SettingsToggle :value="config.general.autogen.enabled" 
         label="Automatic Report Generation" 
         help-text="Automatically generate reports at a predetermined time interval. If your computer is turned off or disconnected from the internet, the reports will not be generated."
@@ -74,12 +73,17 @@ function updateTime(value:Date){
         />
 
         <div class="flex items-center gap-10 w-full ">
-            <div class="flex h-12 items-center gap-2 w-64">
+            <SettingsDatePicker :value="selectedTime" label="Time to Generate Reports" @update:value="updateTime"
+            :disabled="!props.config?.general.autogen.enabled"
+
+            help-text="The time at which reports will be generated every day"
+            />
+            <!-- <div class="flex h-12 items-center gap-2 w-64">
                 <p>
-                    Meow :3
+                    Time to Generate Reports
                 </p>
                 <div class=" h-full w-4">
-                    <img v-tooltip.top="'helpText'" place :src="help" class="h-4 w-4 mt-2"/>
+                    <img v-tooltip.top="'The time at which reports will be generated every day'" place :src="help" class="h-4 w-4 mt-2"/>
                 </div>
             </div>
             <div class="flex ">
@@ -90,7 +94,7 @@ function updateTime(value:Date){
             @update:model-value="updateTime"
             hour-format="12"
             class=" h-12" id="datepicker-timeonly" v-model="selectedTime" timeOnly />
-    
+     -->
     
         </div>
        

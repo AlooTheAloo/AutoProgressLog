@@ -54,10 +54,9 @@ if (process.platform === "win32") app.setAppUserModelId(app.getName());
 
 export let win: BrowserWindow | null = null;
 const preload = path.join(__dirname, "../preload/index.mjs");
-const indexHtml = path.join(RENDERER_DIST, "index.html");
+export const indexHtml = path.join(RENDERER_DIST, "index.html");
 
 export async function createWindow() {
-  console.log("Creating window");
   win = new BrowserWindow({
     minHeight: 600,
     minWidth: 900,
@@ -138,9 +137,12 @@ import {
   createAppBackend,
 } from "./Electron-Backend/appBackend";
 import { createAutoReport } from "./Electron-Backend/Reports/AutoReportGenerator";
+import { createAutoRPC } from "./Electron-Backend/RPC/RPCHandler";
 
 app.on("ready", async () => {
   buildMenu(app);
   createAutoReport();
+  createAutoRPC();
   await electronUpdater.autoUpdater.checkForUpdatesAndNotify();
 });
+

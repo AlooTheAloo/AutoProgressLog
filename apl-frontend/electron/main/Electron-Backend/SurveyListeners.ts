@@ -42,4 +42,5 @@ export async function surveyListeners() {
 }
 
 function sendSurveyAnswer() {
+    // TODO : send survey answer to backend
 }

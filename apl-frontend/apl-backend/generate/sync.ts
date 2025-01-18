@@ -46,6 +46,7 @@ export function isSyncing(){
 
 export async function runSync(silent = false, props:syncProps = DEFAULT, sendSyncing = true){
     const start = dayjs();
+    
     if(!props.isReport && sendSyncing){
         setSyncing(true);
     } 
@@ -62,11 +63,36 @@ export async function runSync(silent = false, props:syncProps = DEFAULT, sendSyn
             if(props.syncAnki == false) return res(null);
             const config = getConfig();
             if(config == undefined) return res(null);
-            if(await hasSyncEnabled(config.anki?.ankiIntegration?.profile ?? "") && !silent){
+
+
+            const hasSync = await hasSyncEnabled(config.anki?.ankiIntegration?.profile ?? "")
+           
+            if(hasSync == null){
+                win?.webContents.send("ShowDialog", {
+                    header: "Cannot connect to Anki!",
+                    content: "APL is unable to connect to your Anki installation. <br> <b>Potential cause of error : Invalid profile name.</b> "
+                })
+                return res(null);
+            } 
+            if(hasSync && !silent){
                 if(config.anki?.ankiIntegration == undefined) return res(null);
-                await LaunchAnki(config.anki?.ankiIntegration);
+                const worked = await LaunchAnki(config.anki?.ankiIntegration);
+                if(!worked[0]){
+                    win?.webContents.send("ShowDialog", {
+                        header: "Cannot connect to Anki!",
+                        content: "APL is unable to connect to your Anki installation. <br> <b>Potential cause of error : Invalid anki program path.</b> "
+                    })
+                    return res(null);    
+                }
+                
                 syncAnki(props.isReport).then(res).catch(rej);
             }
+
+            if(!hasSync && !silent) {
+                syncAnki(props.isReport).then(res).catch(rej);
+            }
+
+
             if(silent){
                 syncAnkiIfClosed().then((data) => {res(data ?? null)}).catch(() => {
                     res(null);
@@ -76,10 +102,16 @@ export async function runSync(silent = false, props:syncProps = DEFAULT, sendSyn
         })
     ])
 
-    if(t == null) return null;
+    if(t == null) {
+        win?.webContents.send("ShowDialog", {
+            header: "Cannot complete sync!",
+            content: "APL is unable to perform a synchronisation with the toggl servers. <br> <b>Potential cause of error : Invalid toggl token.</b> "
+        })
+        return null;
+    }
 
-    let lastEntry:SyncData = await GetLastEntry();
-    if(lastEntry.toggl == undefined) return null;
+    let lastEntry:SyncData|null = await GetLastEntry();
+    if(lastEntry?.toggl == undefined) return null;
 
     let time:number = 0;
     
@@ -116,14 +148,10 @@ export async function runSync(silent = false, props:syncProps = DEFAULT, sendSyn
         type: "Full",
     }, toggl.entries);
 
-
-
-
     if(!props.isReport && sendSyncing){
         setSyncing(false);
     } 
 
-    console.log("Sync took " + (dayjs().diff(start, "ms")) + "ms");
     return CreateDTO();
 }
 
@@ -139,12 +167,21 @@ export async function syncAnki(isReport = false):Promise<AnkiSyncData | null> {
     const integration = anki?.ankiIntegration;
     if(integration == undefined || !anki?.enabled) return null;
     const lastEntry = await GetLastEntry("Full");
+
+    if(lastEntry == null) return null;
+
     const cardReview = await getAnkiCardReviewCount(dayjs(lastEntry.anki?.lastAnkiUpdate ?? lastEntry.generationTime), integration);
     const matureCards = await getMatureCards(integration);
     const retention = await getRetention(anki.options.retentionMode, integration);
     const lastUpdate = isReport ? dayjs().valueOf() : Math.max(lastEntry?.anki?.lastAnkiUpdate ?? 0, await getLastUpdate(integration));
     
-    if(cardReview == null || matureCards == null || retention == null || lastUpdate == null) return null;
+    if(cardReview == null || matureCards == null || retention == null || lastUpdate == null){
+        win?.webContents.send("ShowDialog", {
+            header: "Cannot read anki data!",
+            content: "APL is unable to connect with your anki installation. <br> <b>Potential cause of error : Invalid anki database path.</b> "
+        })
+        return null;
+    };
     return {
         cardReview: cardReview,
         matureCards: matureCards,
@@ -152,6 +189,8 @@ export async function syncAnki(isReport = false):Promise<AnkiSyncData | null> {
         lastUpdate: lastUpdate
     }
 }
+
+
 
 export async function VerifyPreviousActivities(from:dayjs.Dayjs, to:dayjs.Dayjs, togglEntries:entry[] = []):Promise<number>{
     let delta = 0;
@@ -189,11 +228,14 @@ export async function VerifyPreviousActivities(from:dayjs.Dayjs, to:dayjs.Dayjs,
 } 
 
 
-export async function syncToggl():Promise<{entries: entry[], delta:number}>{
+export async function syncToggl():Promise<{entries: entry[], delta:number}|null>{
     const lastReportTime = await CacheManager.peek().generationTime;
     const startSync = await GetLastEntry();
-    const start = dayjs()
+
+    if(startSync == null) return null;
     const entries = await getTimeEntries(lastReportTime);
+
+    if(entries == null) return null;
 
     const delta = await VerifyPreviousActivities(dayjs(lastReportTime), dayjs(startSync.generationTime), entries.entriesAfterLastGen);
     return {

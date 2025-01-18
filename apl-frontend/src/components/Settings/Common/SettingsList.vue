@@ -1,39 +1,30 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import ToggleSwitch from 'primevue/toggleswitch';
-
+import Select from 'primevue/select';
 import help from "../../../assets/Icons/help.png"
+import Slider from 'primevue/slider';
+import InputText from 'primevue/inputtext';
+import InputNumber from 'primevue/inputnumber';
 
 const props = defineProps<{
     label:string,
-    value:boolean,
-    password?:boolean,
+    value:string,
     options?:any,
     disabled?:boolean,
     helpText?:string,
+    placeholder: string,
 }>()
 
 const emit = defineEmits(['update:value']);
 
-function updateValue(value:boolean){
-    console.log("Value updated to " + value);
+function updateValue(value:string){
     emit("update:value", value);
 }
 
-const forceTrue = (evt:any) => {
-    console.log("Forced to true");
-    toggleValue.value = true; // Revert any change back to true
-};
-
-
-const toggleValue = ref(props.value); // Initial value set to true
-
-watch(props, () => {
-    console.log("Props changed");
-    toggleValue.value = props.value;
+onMounted(() => {
+    console.log("props " + props.value);
 })
-
-
 
 </script>
 
@@ -49,12 +40,16 @@ watch(props, () => {
                 <img v-if="props.helpText != undefined" v-tooltip.top="props.helpText" place :src="help" class="h-4 w-4 mt-2"/>
             </div>
         </div>
-        
-        <ToggleSwitch 
-            v-model=toggleValue
-            :disabled="props.disabled"
-            v-on:value-change="updateValue"
-        />
+        <div class="w-96 flex items-center gap-5 ">
+            <Select
+            @value-change="updateValue"
+            v-model:modelValue="props.value" :options="props.options" :placeholder="placeholder" fluid/>
 
+        </div>
     </div>
 </template>
+<style>
+.p-listbox-list-container{
+    background-color: red;
+}
+</style>

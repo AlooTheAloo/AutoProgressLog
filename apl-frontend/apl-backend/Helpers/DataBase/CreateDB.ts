@@ -45,14 +45,15 @@ export async function CreateDB(db: sqlite3.Database) {
   const entries = await getTimeEntries(
     dayjs().startOf("month").subtract(1, "month").valueOf()
   );
+  if(entries == undefined) return;
   if (entries.entriesAfterLastGen.length != 0) {
     await db.run(`INSERT INTO immersionActivity (id, syncDataId, time, seconds, activityName) VALUES 
-            ${entries.entriesAfterLastGen
-              .map((x) => {
-                return `(${x.id}, ${dayjs().startOf("day").valueOf()}, '${dayjs(
-                  x.stop
-                ).unix()}', ${x.duration}, '${x.description}')`;
-              })
-              .join(", \n")}`);
+    ${entries.entriesAfterLastGen
+      .map((x) => {
+        return `(${x.id}, ${dayjs().startOf("day").valueOf()}, '${dayjs(
+          x.stop
+        ).unix()}', ${x.duration}, '${x.description}')`;
+      })
+      .join(", \n")}`);
   }
 }

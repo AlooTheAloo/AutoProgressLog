@@ -21,7 +21,6 @@ export type ConditionalOption<T> =
 export interface AnkiIntegration{
     ankiPath?:string,
     ankiDB?:string,
-    ankiProgramBinaryName?:string,
     profile?:string
 }
 
@@ -30,11 +29,14 @@ export type AnkiOptions = {
     trackedDecks: number[];
 };
   
+export type ReportExtension = ".png" | ".jpg" | ".jpeg" | ".webp"
+export const reportExtensions = [".png", ".jpg", ".jpeg", ".webp"]
+
 export type OutputOptions = {
     outputFile: {
       path: string;
       name: string;
-      extension: ".png" | ".jpg" | ".jpeg" | ".webp" | ".pdf";
+      extension: ReportExtension;
     };
     outputQuality: number;
 };
@@ -53,7 +55,7 @@ export type outputOptions = {
     outputFile:{
         path:string,
         name:string,
-        extension:".png" | ".jpg" | ".jpeg" | ".webp" | ".pdf"
+        extension:ReportExtension
     },
     outputQuality:number
 }
@@ -72,6 +74,5 @@ export interface Time {
 export interface ankiIntegration{
     ankiPath?:string,
     ankiDB?:string,
-    ankiProgramBinaryName?:string,
     profile?:string
 }

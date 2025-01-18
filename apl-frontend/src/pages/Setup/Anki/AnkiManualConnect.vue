@@ -28,7 +28,7 @@
 
 
     function OpenAnkiDocs(){
-        window.ipcRenderer.invoke("OpenExternal", "https://docs.ankiweb.net/files.html")
+        window.ipcRenderer.invoke("OpenExternal", "https://docs.ankiweb.net/files.html#file-locations")
     }
 
     

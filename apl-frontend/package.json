@@ -1,5 +1,5 @@
 {
-  "name": "aplwindowsversion",
+  "name": "autoprogresslog",
   "version": "1.0.0",
   "main": "dist-electron/main/index.js",
   "description": "The frontend and configuration interface for the APL desktop app. Based upon the work of Leo Wang's electron-vue-vite template.",
@@ -23,6 +23,7 @@
   "devDependencies": {
     "@types/bun": "latest",
     "@types/d3-interpolate": "^3.0.4",
+    "@types/discord-rpc": "^4.0.8",
     "@types/node-schedule": "^2.1.7",
     "@types/pluralize": "^0.0.33",
     "@types/semver": "^7.5.8",
@@ -58,6 +59,7 @@
     "country-flag-icons": "^1.5.13",
     "d3-interpolate": "^3.0.1",
     "dayjs": "^1.11.12",
+    "discord-rpc": "^4.0.1",
     "electron-updater": "^6.3.4",
     "find-process": "^1.4.7",
     "fs": "^0.0.1-security",
@@ -72,7 +74,7 @@
     "pickleparser": "^0.2.1",
     "pluralize": "^8.0.0",
     "primeicons": "^7.0.0",
-    "primevue": "^4.0.5",
+    "primevue": "^4.2.5",
     "puppeteer": "^23.2.1",
     "request": "^2.88.2",
     "round-to": "^6.0.0",

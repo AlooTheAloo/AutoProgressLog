@@ -21,6 +21,7 @@ export function DashboardListeners() {
         if(await runChecks()){
             return await runGeneration();
         }
+        
     });
 
     ipcMain.handle("Sync", async (event: any, alternative: boolean) => {
@@ -38,7 +39,6 @@ export async function runChecks():Promise<boolean>{
     const start = dayjs();
     const config = getConfig();
     if(!config) return false;
-    console.log("running checks")
     if(await checkInternet()){
 
         if(!config.anki.enabled) return true;
@@ -87,14 +87,14 @@ export async function CreateDTO(){
     const lastMonth = await GetImmersionTimeBetween(dayjs().subtract(1, "month").startOf("month"), dayjs().subtract(1, "month"));
     const DTO:DashboardDTO = {    
         userName: config.account.userName,
-        lastSyncTime: dayjs(lastEntry.generationTime).toISOString(),
+        lastSyncTime: dayjs(lastEntry?.generationTime).toISOString(),
         lastReportTime: lastReport.generationTime,
         ankiDTO: config.anki.enabled ? {
             retentionRate: lastEntry?.anki?.retention ?? 0,
             retentionRateDelta: roundTo(roundTo(lastEntry?.anki?.retention ?? 0, 2) - roundTo(lastReport.retention ?? 0, 2), 2),
     
-            totalReviews: lastEntry.anki?.totalCardsStudied ?? 0,
-            reviewsDelta: (lastEntry.anki?.totalCardsStudied ?? 0) - lastReport.totalCardsStudied,
+            totalReviews: lastEntry?.anki?.totalCardsStudied ?? 0,
+            reviewsDelta: (lastEntry?.anki?.totalCardsStudied ?? 0) - lastReport.totalCardsStudied,
         } : undefined,
         immersionDTO: {
             totalImmersion: lastEntry?.toggl?.totalSeconds ?? 0,

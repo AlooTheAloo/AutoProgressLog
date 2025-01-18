@@ -12,42 +12,55 @@ const ignore = (tags:string[]) => ["aplignore", "ignore", "autoprogresslogignore
 
 export let toggl:Toggl|undefined = undefined;
 
+export async function getLiveActivity(){
+    const entries:entry[] = await toggl?.timeEntry.list(
+        {
+            since: dayjs().unix().toString()
+        }
+    );
+    return entries;
+}
 
 export async function getTimeEntries(since:string|number){
 
-
-    if(toggl == undefined) {
-        toggl = new Toggl({
-            auth: {
-                token: getConfig()?.toggl.togglToken ?? "",
-            },
-        });
+    try {
+        if(toggl == undefined) {
+            toggl = new Toggl({
+                auth: {
+                    token: getConfig()?.toggl.togglToken ?? "",
+                },
+            });
+        }
+    
+        const start = dayjs();
+        const entries:entry[] = await toggl.timeEntry.list(
+            {
+                since: dayjs(since).unix().toString()
+            }
+        );
+        console.log("Fetch took " + (dayjs().diff(start, "ms")) + " ms")
+    
+        const entriesAfterLastGen = entries.filter(x => {
+            const formattedTags = x.tags.map(x => (x as string).toLowerCase());
+            return !ignore(formattedTags) && dayjs(x.stop).isAfter(dayjs(since)) && x.server_deleted_at == null && x.stop != null;
+        })
+    
+        const uniqueEvents:string[] = [...new Set(entriesAfterLastGen.map(x => x.description))]
+        const allEvents = uniqueEvents.map(function(evt) {
+            const correspondingEntries = entriesAfterLastGen.filter(x => x.description == evt)
+            const activityTime = sumTime(correspondingEntries)
+            const ret:activity = {
+                activityTitle: evt,
+                activityDurationHR: dayjs.duration(activityTime, 'second').format(HHMMSS) + "",
+                activitySeconds: activityTime
+            }
+            return ret;
+        }).sort(compareActivities).reverse()
+    
+        return {entriesAfterLastGen, allEvents};
     }
-
-    const start = dayjs();
-    const entries:entry[] = await toggl.timeEntry.list(
-        {
-            since: dayjs(since).unix().toString()
-        }
-    );
-    console.log("Fetch took " + (dayjs().diff(start, "ms")) + " ms")
-
-    const entriesAfterLastGen = entries.filter(x => {
-        const formattedTags = x.tags.map(x => (x as string).toLowerCase());
-        return !ignore(formattedTags) && dayjs(x.stop).isAfter(dayjs(since)) && x.server_deleted_at == null && x.stop != null;
-    })
-
-    const uniqueEvents:string[] = [...new Set(entriesAfterLastGen.map(x => x.description))]
-    const allEvents = uniqueEvents.map(function(evt) {
-        const correspondingEntries = entriesAfterLastGen.filter(x => x.description == evt)
-        const activityTime = sumTime(correspondingEntries)
-        const ret:activity = {
-            activityTitle: evt,
-            activityDurationHR: dayjs.duration(activityTime, 'second').format(HHMMSS) + "",
-            activitySeconds: activityTime
-        }
-        return ret;
-    }).sort(compareActivities).reverse()
-
-    return {entriesAfterLastGen, allEvents};
+    catch(e){
+        return null;
+    }
+    
 }

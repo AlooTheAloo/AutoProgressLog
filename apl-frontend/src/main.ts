@@ -14,7 +14,7 @@ import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import advancedFormat from 'dayjs/plugin/advancedFormat';
-
+import ToastService from 'primevue/toastservice';
 import VueApexCharts from 'vue3-apexcharts'
 
 
@@ -76,6 +76,7 @@ dayjs.extend(relativeTime);
 dayjs.extend(advancedFormat)
 
 createApp(App)
+  .use(ToastService)
   .use(router)
   .use(PrimeVue, { 
     theme: {

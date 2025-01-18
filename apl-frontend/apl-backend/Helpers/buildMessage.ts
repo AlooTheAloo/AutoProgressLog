@@ -6,7 +6,7 @@ import { fileURLToPath } from "url";
 import { ReportData, TPlusDelta } from "../types/reportdata.js";
 import dayjs from "dayjs";
 import { roundTo } from "round-to";
-import { outputOptions } from "../types/options.js";
+import { outputOptions, ReportExtension } from "../types/options.js";
 import { arithmeticWeightedMean } from "./util.js";
 import { getConfig } from "./getConfig.js";
 import color from "color";
@@ -39,9 +39,9 @@ export async function buildImage(
   });
   const page = await browser.newPage();
   page.setViewport({
-    width: 2000 * options.outputQuality,
+    width: 2000 * options.outputQuality / 2,
     height: 5000,
-    deviceScaleFactor: options.outputQuality,
+    deviceScaleFactor: options.outputQuality / 2,
   });
   await page.goto(
     `file:${path.join(
@@ -58,7 +58,7 @@ export async function buildImage(
 
   await page.screenshot({
     path: outputPath,
-    type: "png",
+    type: extensionToType(options.outputFile.extension),
     clip: {
       width: 1586,
       height: height,
@@ -69,6 +69,14 @@ export async function buildImage(
   await browser.close();
   return outputPath;
 }
+
+const extensionToType = (ext:ReportExtension) => {
+  if(ext == ".png") return "png";
+  if(ext == ".jpg") return "jpeg";
+  if(ext == ".jpeg") return "jpeg";
+  if(ext == ".webp") return "webp";
+}
+
 
 const MOVING_AVERAGE_SIZE = 7;
 

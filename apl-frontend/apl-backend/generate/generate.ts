@@ -28,13 +28,12 @@ export async function runGeneration(){
     await runSync(false, getSyncProps(), false);
     setSyncing(true);
     const sync = await GetLastEntry("Full");
+    if(sync == undefined) return;
     const syncID = sync.id;
-
+    
 
     const startCache = CacheManager.peek()
     const generationTime = dayjs(startCache.generationTime);
-
-    
 
     // Toggl stuff
     const events = await GetImmersionSourcesSince(generationTime);

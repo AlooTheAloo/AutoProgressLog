@@ -19,11 +19,14 @@ const emit = defineEmits<{
 
 <template>
     <div class="flex flex-col w-full gap-2" v-if="config != undefined">
-        <SettingsField 
-        :value="config?.account?.userName"
-        label="Username" 
-        placeholder="Enter your username"
-        @update:value="$emit('update:config', {...config, account:{...config.account, userName: $event}})"
+        <SettingsField
+        :password="true"
+        :value="config?.toggl.togglToken"
+        label="Toggl Token"
+        placeholder="Enter your toggl track api key"
+        @update:value="$emit('update:config', { ...config, toggl:{ ...config.toggl, togglToken: $event }})"
+        link="https://toggl.com/app/profile"
+        help-text="You can find your toggl token by going to the bottom of your profile page. Click to open it in a browser."
         />
     </div>
-</template>
+</template> 
