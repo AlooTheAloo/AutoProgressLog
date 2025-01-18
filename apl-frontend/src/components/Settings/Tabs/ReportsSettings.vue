@@ -61,8 +61,6 @@ function updateFilepath(value:string){
 }
 
 function updateQuality(value:number){
-    console.log("New value caca " + value);
-
     if(props.config?.anki?.options == undefined) return;
     emit('update:config', { ...props.config, outputOptions: { ...props.config.outputOptions, outputQuality: value } });
 }
