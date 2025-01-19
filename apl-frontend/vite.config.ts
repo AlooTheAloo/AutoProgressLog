@@ -13,7 +13,7 @@ export default defineConfig(({ command }) => {
 
   return {
     optimizeDeps: {
-      exclude: ['keytar', 'win-dpapi', 'node-mac-permissions', '@miniben90/x-win'],
+      exclude: ['node-mac-permissions', '@miniben90/x-win'],
     },
     plugins: [
       vue(),
@@ -33,7 +33,7 @@ export default defineConfig(({ command }) => {
               minify: isBuild,
               outDir: 'dist-electron/main',
               rollupOptions: {
-                external: [...Object.keys('dependencies' in pkg ? pkg.dependencies : {}), 'keytar', 'win-dpapi', 'node-mac-permissions'],
+                external: [...Object.keys('dependencies' in pkg ? pkg.dependencies : {}), 'node-mac-permissions'],
               },
             },
           },
@@ -46,7 +46,7 @@ export default defineConfig(({ command }) => {
               minify: isBuild,
               outDir: 'dist-electron/preload',
               rollupOptions: {
-                external: [...Object.keys('dependencies' in pkg ? pkg.dependencies : {}), 'keytar', 'win-dpapi', 'node-mac-permissions'],
+                external: [...Object.keys('dependencies' in pkg ? pkg.dependencies : {}), 'node-mac-permissions'],
               },
             },
           },
