@@ -27,7 +27,7 @@
                 minutes: dayjsTime.minute()
             },
         }).then(() => {
-            router.push('/setup/toggl-connect');
+            router.push('/setup/toggl-manual-connect');
         })
     }
 </script>

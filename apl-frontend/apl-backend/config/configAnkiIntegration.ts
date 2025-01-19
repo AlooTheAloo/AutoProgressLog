@@ -114,6 +114,7 @@ export async function getAnkiDBPaths(chosenProfile:string):Promise<ankiPaths>{
     }
     else if (process.platform == "win32"){
         // TODO : Windows
+        AppPath = path.join(app.getPath("appData"), "..", "Local", "Programs", "Anki", "anki.exe")
     }
     else {
         AppPath = path.join("/", "usr", "bin", "anki");
@@ -200,10 +201,8 @@ export async function KillAnkiIfOpen(){
 
 // This function is pure hell. It's a mess. No actually its based :based:
 export async function LaunchAnki(paths:ankiPaths|ankiIntegration){
-        
     // Uncomment for funny
     // const Rand = Math.random();
-    // console.log(Rand);
     // if( Rand > 0.5){
     //     shell.openExternal("https://www.youtube.com/watch?v=gQD2IZItlVk");
     // }
@@ -220,19 +219,23 @@ export async function LaunchAnki(paths:ankiPaths|ankiIntegration){
     }
 
     const isOpened = (await getAnkiProcesses()).length > 0;
-    const openCommand = (process.platform == "darwin" ? "open '" : "'") + paths.ankiPath + "'";
+    const openCommand = (process.platform == "darwin" ? `open '${paths.ankiPath}'` : `${paths.ankiPath}`);
 
+    console.log(openCommand);
     if(!isOpened){
-        exec(openCommand);    
+        exec(openCommand, (err, out, err2) => {
+            console.log(out);
+            console.log(err);
+        });    
     }
     
     let iterations = 0;
-
+    let hasExecOpen = false;
     const resp = await new Promise<string|null>(async (res, rej) => {
-        var intervalOpen = setInterval(async () => {
+        var intervalOpen = setAsyncInterval(async () => {
             if(iterations > 30) {
                 {
-                    clearInterval(intervalOpen);
+                    intervalOpen();
                     res(null);
                 }
             } 
@@ -245,26 +248,26 @@ export async function LaunchAnki(paths:ankiPaths|ankiIntegration){
             const windows = (await readWindows(allAnkis.map(x => x.pid)))
             const pid = (await getAnkiProcesses()).at(0)?.pid;
             if((windows.length > 0 || isOpened) && pid != undefined){
-
+                intervalOpen();
                 if(!isOpened) await sleep(1000);
+                
                 try{
                     kill(pid);                    
                 }
                 catch(e){
                     console.log(e);
                 }
-                clearInterval(intervalOpen);
-                var intervalClose = setInterval(async () => {
+                var intervalClose = setAsyncInterval(async () => {
                     if(iterations > 30) 
                     {
-                        clearInterval(intervalClose);
+                        intervalClose();
                         res(null);
                     }
                     const remainingProcesses = await proc("name", "Anki")
                     if(remainingProcesses.filter(x => x.pid == pid).length == 0){
                         const cmd = allAnkis.filter(x => x.pid == pid)[0].cmd;
                         res(cmd);
-                        clearInterval(intervalClose);
+                        intervalClose();
 
                         if(isOpened){
                             exec(openCommand);    
@@ -283,6 +286,32 @@ export async function LaunchAnki(paths:ankiPaths|ankiIntegration){
     }
     
     return [true, resp];
+}
+
+
+function setAsyncInterval(
+    callback: () => Promise<void>, 
+    delay: number
+): () => void {
+    let timerId: ReturnType<typeof setTimeout> | null = null;
+    let kill = false;
+    async function tick() {
+        if(kill) return;
+        await callback(); // Execute the callback
+        // Schedule the next execution after the delay
+        timerId = setTimeout(tick, delay);
+    }
+
+    // Start the first execution
+    tick();
+
+    return () => {
+        kill = true;
+        if (timerId !== null) {
+            clearTimeout(timerId); // Clear the interval if the function is called
+            timerId = null;
+        }
+    };
 }
 
 export async function minimizeAnki(cmd:string){
@@ -350,7 +379,7 @@ export async function getAnkiProcesses():Promise<{
     const linuxProcesses = await proc("name", "anki")
     const processes = winDarProcesses.concat(linuxProcesses);
     const targetProcesses = processes.filter(x => {
-        const base = basename(x.cmd).toLowerCase();
+        const base = basename((x as any).bin ?? x.cmd).toLowerCase();
         return base == "anki" || base == "anki.exe"
      });
      return targetProcesses

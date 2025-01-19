@@ -102,21 +102,29 @@ export function ankiListeners() {
         win?.webContents.send("anki-connect-message", "Verifying validity of installation");
         const verified = await verifyAnkiPaths(Paths);
         if(!verified) return false;
-
+        console.log(1);
         let ankiIntegration:ankiIntegration|false = false;
+        console.log(2);
+
         if(process.platform == "darwin"){
             ankiIntegration = await macOSAnki(Paths);
         }
         else {
+        console.log(3);
             ankiIntegration = await createAnkiIntegration(Paths);
             if(ankiIntegration != false){
                 setAnkiIntegration(ankiIntegration);
+                console.log(4);
+            
             }
         }
+        console.log(5);
 
         if(ankiIntegration){
             setAnkiIntegration(ankiIntegration);
         }
+        console.log(6);
+
 
         return !!ankiIntegration;
     }

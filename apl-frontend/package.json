@@ -61,6 +61,7 @@
     "dayjs": "^1.11.12",
     "discord-rpc": "^4.0.1",
     "electron-updater": "^6.3.4",
+    "esbuild": "0.21.5",
     "find-process": "^1.4.7",
     "fs": "^0.0.1-security",
     "get-windows": "^9.2.0",

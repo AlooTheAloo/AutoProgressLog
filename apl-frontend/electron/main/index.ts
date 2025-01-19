@@ -107,7 +107,8 @@ app.on("window-all-closed", () => {
   if (process.platform == "darwin") {
     app.dock.hide();
   } else if (process.platform == "win32") {
-    win?.setSkipTaskbar(true);
+    if(!win?.isDestroyed)
+      win?.setSkipTaskbar(true);
   } else {
     app.quit();
   }
