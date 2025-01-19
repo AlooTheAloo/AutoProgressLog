@@ -1,0 +1,19 @@
+version: "3.8"
+
+services:
+  elysia-app:
+    image: oven/bun:1
+    container_name: elysia-app
+    working_dir: /app
+    volumes:
+      - ./:/app
+      - elysia-db:/app/data  # Volume for SQLite3 file inside the container
+    ports:
+      - "11612:3000"
+    environment:
+      - DB_PATH=/data/prod.db  # Separate SQLite file for production
+    command: bun run start  # Adjust to your app's start command
+
+volumes:
+  elysia-db:
+    driver: local

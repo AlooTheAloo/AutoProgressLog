@@ -29,7 +29,7 @@
             <div class="flex flex-col flex-grow pt-5 justify-start gap-2 text-left ">
                 <BackButton route="/setup/client-server-selection"/> 
                 <div class="font-semibold text-3xl text-white">
-                    Connect to your Toggl Track account manually
+                    Connect to your Toggl Track account
                 </div>
                 <div class="text-sm">
                     Please enter your Toggl Track API Token. This key can be found at the bottom of your profile page.

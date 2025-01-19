@@ -1,6 +1,7 @@
 import { App, BrowserWindow, Menu, ipcMain } from "electron";
 import { indexHtml, VITE_DEV_SERVER_URL, win } from "..";
 import { getConfig } from "../../../apl-backend/Helpers/getConfig";
+import { shell } from "electron";
 
 export function buildMenu(app: App) {
   const template: Electron.MenuItemConstructorOptions[] = [
@@ -68,7 +69,6 @@ export function buildMenu(app: App) {
       submenu: [
         { role: "reload" },
         { role: "forceReload" },
-        { role: "toggleDevTools" },
         { type: "separator" },
         { role: "resetZoom" },
         { role: "zoomIn" },
@@ -93,8 +93,7 @@ export function buildMenu(app: App) {
         {
           label: "Learn More",
           click: async () => {
-            const { shell } = require("electron");
-            await shell.openExternal("https://electronjs.org");
+            await shell.openExternal("https://aplapp.dev");
           },
         },
       ],
