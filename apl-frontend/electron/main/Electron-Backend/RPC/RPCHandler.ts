@@ -15,6 +15,7 @@ export function createAutoRPC(){
     job = nodeScheduler.scheduleJob(`*/10 * * * * *`, async () => {
         if(!ready) return;
         const activity = await getLiveActivity();
+        if(activity == undefined) return;
         if(currentActivity != null && activity.length == 0){
             rpc.clearActivity();
             currentActivity = null;
