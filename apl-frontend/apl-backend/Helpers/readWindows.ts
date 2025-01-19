@@ -1,17 +1,15 @@
 import xwin, { openWindows, openWindowsAsync, subscribeActiveWindow, WindowInfo } from '@miniben90/x-win';
 import electron, { Notification, shell } from 'electron';
-import permissions from 'node-mac-permissions';
 let nodeMacPermissions:any = undefined;
 
 export async function hasPerms(){
-
-
   // @ts-ignore
   nodeMacPermissions = nodeMacPermissions ?? (await import("node-mac-permissions")).default;
   return nodeMacPermissions.getAuthStatus("screen") == "authorized";
 }
 
 export async function hasNotifPerms(){
+  // @ts-ignore
   nodeMacPermissions = nodeMacPermissions ?? (await import("node-mac-permissions")).default;
   return nodeMacPermissions.getAuthStatus("") == "authorized";
 }
