@@ -9,6 +9,7 @@ import { kill } from "process";
 import { readWindows } from "../Helpers/readWindows.js";
 import { getSetupAnkiIntegration } from "../../electron/main/Electron-Backend/SetupConfigBuilder.js";
 
+
 export interface ankiPaths{
     ankiDB: string,
     ankiPath: string,
@@ -314,8 +315,11 @@ function setAsyncInterval(
     };
 }
 
+const normalizePath = (path:string) => path.replace(/^"|"$/g, '');
+
 export async function minimizeAnki(cmd:string){
-    
+    if (process.platform !== 'darwin') return;
+
     let iterations = 0;
     const resp = await new Promise<void|null>(async (res, rej) => {
         var intervalOpen = setInterval(async () => {
@@ -324,7 +328,7 @@ export async function minimizeAnki(cmd:string){
                     clearInterval(intervalOpen);
                     res(null);
                 }
-            } 
+            }
             const targetProcesses = (await getAnkiProcesses()).filter(x => x.cmd == cmd);
             iterations++;
             if(targetProcesses.length == 0){
@@ -337,27 +341,13 @@ export async function minimizeAnki(cmd:string){
                 
                 clearInterval(intervalOpen);
 
-                // Check if platform is Windows or macOS
-                if (process.platform === 'win32') {
-                    exec(`powershell -Command "& { (Get-Process -Id ${pid}).MainWindowHandle | ForEach-Object { [void][System.Runtime.InteropServices.Marshal]::WriteInt32($_, 0, 2) } }"`, (err, stdout, stderr) => {
-                        if (err) {
-                            console.error("Error minimizing window:", stderr);
-                        }
-                        res();
-                    });
-                } else if (process.platform === 'darwin') {
-                    exec(`osascript -e 'tell application "System Events" to set visible of first application process whose unix id is ${pid} to false'`, (err, stdout, stderr) => {
-                        if (err) {
-                            console.error("Error hiding window:", stderr);
-                        }
-                        res();
-                    });
-                }
-
-
-
-
-
+                exec(`osascript -e 'tell application "System Events" to set visible of first application process whose unix id is ${pid} to false'`, (err, stdout, stderr) => {
+                    if (err) {
+                        console.error("Error hiding window:", stderr);
+                    }
+                    res();
+                });
+                
             }
         }, 500);
 
