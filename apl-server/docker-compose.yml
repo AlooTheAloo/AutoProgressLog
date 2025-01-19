@@ -1,7 +1,7 @@
 version: "3.8"
 
 services:
-  elysia-app:
+  APL-Server:
     image: oven/bun:1
     container_name: elysia-app
     working_dir: /app
