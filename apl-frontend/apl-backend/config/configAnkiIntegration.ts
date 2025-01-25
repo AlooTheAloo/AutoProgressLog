@@ -65,17 +65,21 @@ export async function getDecks(chosenProfile:string):Promise<string[]>{
    return decks;
 }
 
-export async function getProfileDecks():Promise<{name: string, deckCount: number}[]>{
+export async function getProfileDecks():Promise<{name: string, deckCount: number}[]|false>{
     const profiles = await getAnkiProfiles();
+    if(profiles == undefined) return [];
+    let died = false;
     const ret:{name: string, deckCount: number}[] = [];
     await Promise.all(profiles.map(async (profile) => {
         const decks = await getDecks(profile.name);
+        if(decks == undefined) { died = true; return; };
         ret.push({
             name: profile.name,
             deckCount: decks.length,
         })
     }))
     
+    if(died) return false;
 
     return ret;
 }
@@ -91,10 +95,11 @@ const getAnkiBase = () => {
     }
 } 
 
-export async function getAnkiProfiles():Promise<{name: string}[]>{
+export async function getAnkiProfiles():Promise<{name: string}[]|null>{
     const prefsDBPath = path.join(getAnkiBase(), "prefs21.db");
+    console.log(prefsDBPath);
     const prefsDB = new sqlite3.Database(prefsDBPath, (err) => {});
-    const profiles:{name: string}[] = await new Promise((res, rej) => {
+    const profiles:{name: string}[]|null = await new Promise((res, rej) => {
         prefsDB.all("SELECT name FROM profiles WHERE name NOT IN ('_global')", (err, rows:any[]) => {
             res(rows);
         });
@@ -103,8 +108,11 @@ export async function getAnkiProfiles():Promise<{name: string}[]>{
    return profiles;
 }
 
-export let getAnkiProfileCount = async () => (await getAnkiProfiles()).length;
-
+export let getAnkiProfileCount = async () => {
+    const profiles = await getAnkiProfiles();
+    if(profiles == undefined) return 0;
+    return profiles.length;
+}
 export async function getAnkiDBPaths(chosenProfile:string):Promise<ankiPaths>{
 
     const prefsDBPath = path.join(getAnkiBase(), chosenProfile, "collection.anki2");
@@ -222,7 +230,6 @@ export async function LaunchAnki(paths:ankiPaths|ankiIntegration){
     const isOpened = (await getAnkiProcesses()).length > 0;
     const openCommand = (process.platform == "darwin" ? `open '${paths.ankiPath}'` : `${paths.ankiPath}`);
 
-    console.log(openCommand);
     if(!isOpened){
         exec(openCommand, (err, out, err2) => {
             console.log(out);

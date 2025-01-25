@@ -19,8 +19,6 @@ const emit = defineEmits<{
 const selectedTime = ref<Date|undefined>()
 
 watch(props,() => {
-    console.log("On mounted");
-    console.log(props.config);
     const time = props.config?.general.autogen.options?.generationTime;
     if(time == undefined) return;
     const date = new Date();
@@ -72,32 +70,16 @@ function updateTime(value:Date){
         @update:value="$emit('update:config', {...config, general:{...config.general, autogen:{...config.general.autogen, enabled: $event}}})"
         />
 
-        <div class="flex items-center gap-10 w-full ">
-            <SettingsDatePicker :value="selectedTime" label="Time to Generate Reports" @update:value="updateTime"
-            :disabled="!props.config?.general.autogen.enabled"
-
-            help-text="The time at which reports will be generated every day"
-            />
-            <!-- <div class="flex h-12 items-center gap-2 w-64">
-                <p>
-                    Time to Generate Reports
-                </p>
-                <div class=" h-full w-4">
-                    <img v-tooltip.top="'The time at which reports will be generated every day'" place :src="help" class="h-4 w-4 mt-2"/>
-                </div>
-            </div>
-            <div class="flex ">
-    
-            </div>
-            <DatePicker 
-            :disabled="!props.config?.general.autogen.enabled"
-            @update:model-value="updateTime"
-            hour-format="12"
-            class=" h-12" id="datepicker-timeonly" v-model="selectedTime" timeOnly />
-     -->
-    
-        </div>
-       
+        <SettingsDatePicker :value="selectedTime" label="Time to Generate Reports" @update:value="updateTime"
+        :disabled="!props.config?.general.autogen.enabled"
+        help-text="The time at which reports will be generated every day"
+        />
+        
+        <SettingsToggle :value="config.general.discordIntegration" 
+        label="Enable Discord RPC" 
+        help-text="This will enable the Discord Rich Presence. When immersing, the app will show your current immersion time and immersion activity in the discord status."
+        @update:value="$emit('update:config', {...config, general:{...config.general, discordIntegration: $event}})"
+        />
        
 
     </div>    

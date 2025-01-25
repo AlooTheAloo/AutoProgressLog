@@ -203,7 +203,7 @@ const closeFirstDialog = () => {
                     <div class="bg-[#70bbf3] p-2">
                       <img :src="Report" class="w-full h-full"/>
                     </div>
-                    <div :class="`flex items-center px-2 font-bold`" >
+                    <div :class="`flex items-center px-2 font-bold lg:text-lg text-xs`" >
                       <div>
                         Next report : {{ dto.nextReport }}
                       </div>

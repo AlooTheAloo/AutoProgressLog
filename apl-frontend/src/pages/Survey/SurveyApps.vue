@@ -39,7 +39,8 @@
 
     const router = useRouter();
     function NextPage(){
-        window.ipcRenderer.invoke("answer-survey-apps", selectedApps.value).then((res:any) => {
+        const sanitizedData = JSON.parse(JSON.stringify(selectedApps.value));
+        window.ipcRenderer.invoke("answer-survey-apps", sanitizedData).then((res:any) => {
             router.push('/setup/complete');
         });
     }

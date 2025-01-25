@@ -62,21 +62,26 @@ import { reportExtensions } from '../../../../apl-backend/types/options';
                 <p class="text-sm">
                     Your progress reports will be saved under this name with a number suffix. For example, if you choose "MyReport.png", your reports will be saved as "MyReport 1.png", "MyReport 2.png", etc.
                 </p>    
-                <div class="flex gap-2 mt-2 h-12">
-                    <Button class= w-full @click="chooseFilePath">
-                       <div class="flex flex-col w-full " style="direction: rtl;">
-                        <div class="text-sm text-ellipsis overflow-hidden whitespace-nowrap ">
-                            {{ 
-                                filePath
-                            }}
-                        </div>
-                        <div class="text-xs">
-                            (Click to edit)
-                        </div>
-                       </div> 
-                    </Button>
-                    <InputText v-model="filename" class="w-full text-white font-semibold  rounded-xl p-2 h-12 "/>
-                    <Dropdown v-model="selectedExtension" :options="extensions" class="w-1/4 text-white font-semibold text-lg rounded-xl h-12 "/>
+                <div class="flex flex-col gap-2 mt-2 h-12">
+                    <div>
+                        <Button class= w-full @click="chooseFilePath">
+                            <div class="flex flex-col w-full " style="direction: rtl;">
+                             <div class="text-sm text-ellipsis overflow-hidden whitespace-nowrap ">
+                                 {{ 
+                                     filePath
+                                 }}
+                             </div>
+                             <div class="text-xs">
+                                 (Click to edit)
+                             </div>
+                            </div> 
+                         </Button>
+                    </div>
+                    <div class="flex gap-2">
+                        <InputText v-model="filename" class="w-full text-white font-semibold  rounded-xl p-2 h-12 "/>
+                        <Dropdown v-model="selectedExtension" :options="extensions" class="w-1/4 text-white font-semibold text-lg rounded-xl h-12 "/>
+                    </div>
+                    
                 </div>
 
                 

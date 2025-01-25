@@ -15,7 +15,10 @@ import duration from 'dayjs/plugin/duration';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import advancedFormat from 'dayjs/plugin/advancedFormat';
 import ToastService from 'primevue/toastservice';
+import ConfirmationService from 'primevue/confirmationservice';
+
 import VueApexCharts from 'vue3-apexcharts'
+import ConfirmDialog from 'primevue/confirmdialog'
 
 
 const router = createRouter({
@@ -76,6 +79,7 @@ dayjs.extend(relativeTime);
 dayjs.extend(advancedFormat)
 
 createApp(App)
+  .use(ConfirmationService)
   .use(ToastService)
   .use(router)
   .use(PrimeVue, { 

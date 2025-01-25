@@ -108,6 +108,7 @@ export function setupListeners() {
             },
           },
         },
+        discordIntegration: false,
       };
     }
     else {
@@ -115,6 +116,7 @@ export function setupListeners() {
         autogen: {
           enabled: false,
         },
+        discordIntegration: false,
       };
     }
 

@@ -99,17 +99,18 @@ function ankiTest(worked:boolean){
     <SideBarContainer :currentRoute="router.currentRoute.value.path as appPath">
         <div class="flex flex-col w-full h-full">
             <div class="flex flex-col flex-grow w-full h-full">
-                <div class="flex w-full h-20 items-center px-10 mt-8  justify-between">
+                <div class="flex w-full h-20 items-center px-4 mt-8  justify-between">
                   <div class="flex flex-col text-white font-bold text-3xl">
                     Settings
                   </div>
                 </div>
-                <div class="flex w-full px-10 flex-grow">
+                <div class="flex w-full px-4 flex-grow">
                     <div class="flex w-full px-2 h-full rounded-lg">
                         <Tabs value="0" class="w-full"
                         :dt="{ activeBarBackground: '#2BFAFA', tabActiveBorderColor: '#2BFAFA' }"
                         >
-                            <TabList pt:activeBar="my-class" pt:tabList="my-class-2">
+                        <div class="w-0">
+                            <TabList pt:activeBar="my-class" pt:tabList="my-class-2" class=" w-0">
                                 <Tab value="0">General</Tab>
                                 <Tab value="1">Account</Tab>
                                 <Tab value="2" disabled>Appearance</Tab>
@@ -118,6 +119,8 @@ function ankiTest(worked:boolean){
                                 <Tab value="5" disabled>Notifications</Tab>
                                 <Tab value="6">Reports</Tab>
                             </TabList>
+                        </div>
+                           
                             <TabPanels unstyled class="py-2">
                                 <TabPanel value="0" class="">
                                     <GeneralSettings :config="config" @update:config="setConfig"/>
@@ -134,6 +137,7 @@ function ankiTest(worked:boolean){
                                 </TabPanel>
                                 <TabPanel value="6">
                                     <ReportsSettings :config="config" @update:config="setConfig"/>                         
+                                    
                                 </TabPanel>
                             </TabPanels>
                         </Tabs>

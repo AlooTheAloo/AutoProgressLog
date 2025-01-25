@@ -7,6 +7,10 @@
     import Dialog from "primevue/dialog";
     import { Overview, Reports, Competitions, Statistics, Settings, Help } from "../../assets/Icons/Sidebar/Icons"
     import UserDialog from "../../../types/UserDialog"
+import { UpdateInfo } from "electron-updater";
+import Button from "primevue/button";
+import { useToast } from "primevue/usetoast";
+import Toast from "primevue/toast";
     const HELP_PAGE_URL = "https://www.aplapp.dev/#/"
     const router = useRouter();
 
@@ -51,18 +55,68 @@
         currentRoute: AppPath;
     }>();
 
+
+
     window.ipcRenderer.on("ShowDialog", (evt, args:UserDialog) => {
         dialog.value = args;
         visible.value = true;     
     })
 
 
+    window.ipcRenderer.on("update-available", (e, args: UpdateInfo) => {
+        console.log("Updated")
+        toastValue.value = {
+            header: `An update is available!`,
+            content: `v${args.version}\n${args.releaseNotes}`,
+            footer: "",
+            yes: {
+                text: "Update now",
+                on: () => {
+                    window.ipcRenderer.invoke("Update-App");
+                }
+            },
+            no: {
+                text: "Skip this version",
+                on: () => {
+                    window.ipcRenderer.invoke("Skip-update", args.version);
+                    toastV.removeGroup('update');
+                }
+            }
+
+        }
+        toastV.add({ severity: 'secondary', life: 10000, group: 'update' });
+    })
+
+    const toastV = useToast();
+    
     const dialog = ref<UserDialog>();
     const visible = ref(false);
+    
+    const toastValue = ref<UserDialog>();
+    
 
 </script>
 
 <template>
+
+
+    <Toast position="top-right" group="update">
+        <template #message="slotProps">
+            <div class="flex flex-col items-start flex-auto">
+                <div class="flex items-center gap-2">
+                    <span class="font-bold">{{ toastValue?.header }}</span>
+                </div>
+                <div class="font-medium text-lg my-4">{{ toastValue?.content }}</div>
+                <div class="flex gap-2">
+                    <Button size="small" :label="toastValue?.yes?.text" @click="toastValue?.yes?.on"></Button>
+                    <Button size="small" :label="toastValue?.no?.text" severity="secondary" @click="toastValue?.no?.on"></Button>
+                </div>
+                
+            </div>
+        </template>
+    </Toast>
+
+
     <Dialog
     :header="dialog?.header"
     :footer="dialog?.footer"
@@ -73,14 +127,16 @@
     <div v-html="dialog?.content">
 
     </div>
+    <div class=" flex gap-2">
+        <Button v-if="dialog?.yes" severity="primary" :label="dialog?.yes?.text" @click="dialog?.yes?.on" class="mt-2"></Button>
+        <Button v-if="dialog?.no" severity="secondary" :label="dialog?.no?.text" @click="dialog?.no?.on" class="mt-2"></Button>
+    </div>
+    
     </Dialog>
     <div class="h-screen w-screen absolute overflow-hidden pointer-events-none">
         <div class="flex absolute w-full h-full items-end justify-end">
-            <div
-            style="filter: blur(75px);"
-            class="glow glow-delay w-96 h-96 absolute rounded-full bg-[#24CAFF] z-0 -mr-64 -mb-64 ">
-    
-            </div>
+            <div style="filter: blur(75px);"
+            class="glow glow-delay w-96 h-96 absolute rounded-full bg-[#24CAFF] z-0 -mr-64 -mb-64 "/>
         </div>
         <div class="w-24 xl:w-72 transition-all duration-250 h-full ">
             <div
@@ -98,7 +154,7 @@
                 <img :src="Logo" class="w-[4.5rem]"/>
             </div>
                 <!-- Navigation  -->
-            <div class="flex flex-col gap-4 w-full mt-20 flex-grow cursor-pointer">
+            <div class="flex flex-col gap-4 w-full mt-20 flex-grow ">
                 <div v-for="route in routes"
                 :style="{
                     cursor: route.path != null ? 'pointer' : 'default',

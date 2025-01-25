@@ -77,16 +77,16 @@ export function ankiListeners() {
         else if(profileCount > 1)
         {
             const profiles = await getProfileDecks();
+            if(profiles == false) return false;
             win?.webContents.send("anki-multiple-profiles-detected", profiles);
             return null;
         }
         else 
         {
-            const Paths = await getAnkiDBPaths((await getAnkiProfiles())[0].name);
+            const Paths = await getAnkiDBPaths((await getAnkiProfiles() ?? [])[0].name);
             return await connectFromPaths(Paths);
         }
     });
-
 
     ipcMain.handle("anki-manual-connect-start", async (event: any, appPath: string, dbPath: string) => {
         const Paths:ankiPaths = {
@@ -102,9 +102,7 @@ export function ankiListeners() {
         win?.webContents.send("anki-connect-message", "Verifying validity of installation");
         const verified = await verifyAnkiPaths(Paths);
         if(!verified) return false;
-        console.log(1);
         let ankiIntegration:ankiIntegration|false = false;
-        console.log(2);
 
         if(process.platform == "darwin"){
             ankiIntegration = await macOSAnki(Paths);

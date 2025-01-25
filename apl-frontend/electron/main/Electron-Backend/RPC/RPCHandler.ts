@@ -3,29 +3,78 @@ import RPC from "discord-rpc";
 import { getLiveActivity } from "../../../../apl-backend/toggl/toggl-service";
 import { app } from "electron";
 import { entry } from "../../../../apl-backend/types/entry";
+import { GetLastEntry } from "../../../../apl-backend/Helpers/DataBase/SearchDB";
+import { getLastUpdate } from "../../../../apl-backend/anki/db";
+import dayjs from "dayjs";
+import { runSync } from "../../../../apl-backend/generate/sync";
+import { checkInternet } from "../../../../apl-backend/Helpers/Healthcheck/internetHelper";
+import { getConfig } from "../../../../apl-backend/Helpers/getConfig";
+import { onConfigChange } from "../SettingsListeners";
+import { Options } from "../../../../apl-backend/types/options";
 
 const clientId = '1330290329261445221'; 
 let ready = false;
 let currentActivity:entry|null = null;
-let job;
+let job : Job | null = null;
+let rpc : RPC.Client | null = null;
+
 export function createAutoRPC(){
+
+
+    onConfigChange.on("config-change", async (oldConfig:Options, newConfig:Options) => {
+        if(oldConfig.general.discordIntegration != newConfig.general.discordIntegration){
+            if(newConfig.general.discordIntegration){
+                await createJob();
+            }
+            else {
+                job?.cancel();
+                job = null;
+            }
+        }
+    })
+
+        
+    app.on("before-quit", () => {
+        if(currentActivity != null){
+            rpc?.clearActivity();
+        }
+    });
+
+   
+}
+
+function createJob(){
+    const config = getConfig();
+    if(config == undefined) return;
+
+    if(!config.general.discordIntegration) // If autogen is disabled, don't do anything
+        return;
+
     const rpc = new RPC.Client({ transport: 'ipc' });
-    rpc.login({ clientId }).catch(console.error);
+    rpc.login({ clientId }).catch();
+
 
     job = nodeScheduler.scheduleJob(`*/10 * * * * *`, async () => {
-        if(!ready) return;
+        if(!ready || !(await checkInternet())) return;
         const activity = await getLiveActivity();
         if(activity == undefined) return;
         if(currentActivity != null && activity.length == 0){
+            runSync(true);
             rpc.clearActivity();
             currentActivity = null;
         }
         if(activity.length == 0) return;
         const single = activity[0];
-        if(currentActivity?.id == single.id) return;
+        if(single.id != currentActivity?.id){
+            await runSync(true);
+        }
+        const lastEntry = await GetLastEntry();
+        const seconds = (lastEntry?.toggl?.totalSeconds ?? 0) + Math.abs(dayjs(single.start).diff(dayjs(), "seconds"));
+        
+        // if(seconds == null) return;
 
         rpc.setActivity({
-            details: 'Immersing', // What the user is doing
+            details: `Immersing | ${(seconds / 3600).toFixed(2)} hours`, 
             state: single.description, // What the user is doing
             instance: false,
             startTimestamp: new Date(single.start),
@@ -42,11 +91,6 @@ export function createAutoRPC(){
 
     rpc.on("ready", () => {
         ready = true;
-     });
-    
-    app.on("before-quit", () => {
-        if(currentActivity != null){
-            rpc.clearActivity();
-        }
     });
+
 }

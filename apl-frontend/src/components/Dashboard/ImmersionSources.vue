@@ -16,6 +16,9 @@ import { ImmersionSource } from "../../../electron/main/Electron-Backend/types/D
         sources: ImmersionSource[];
     }>();
 
+    const totalHours = computed(() => {
+        return (props.sources.reduce((acc, x) => acc + x.relativeValue, 0) / 3600).toFixed(2);
+    });
 
     watch(width, () => {
         width.value > 1820 ? limit.value = 25 : limit.value = 12;
@@ -81,7 +84,13 @@ import { ImmersionSource } from "../../../electron/main/Electron-Backend/types/D
             plotOptions:{
                 pie: {
                     expandOnClick: false,
+                    donut: {
+                        size: '90%'
+                    }
                 }
+            },
+            stroke: {
+                width: 1
             },
             dataLabels: {
                 enabled: false
@@ -150,7 +159,16 @@ import { ImmersionSource } from "../../../electron/main/Electron-Backend/types/D
         </div>
     
         <!-- ApexCharts Section -->
-        <div class="flex items-center justify-center flex-none">
+        <div class="flex flex-col items-center justify-center flex-none">
+            <div class="absolute flex flex-col items-center">
+                <div class="font-bold text-xl 1820:text-3xl text-white">
+                    {{ totalHours }} hours
+                </div>
+                <div class="text-sm 1820:text-xl">
+                    From {{ props.sources.length }} sources
+                </div>
+                
+            </div>
             <ApexCharts type="donut"
                 
                 :options="options"

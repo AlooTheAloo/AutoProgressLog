@@ -1,6 +1,7 @@
 export interface Options {
     general: {
         autogen: ConditionalOption<ServerOptions>;
+        discordIntegration : boolean;
     };
     account: {
         userName: string;

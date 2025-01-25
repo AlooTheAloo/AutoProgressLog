@@ -10,7 +10,6 @@ export async function setInternet(value:boolean){
 
 
 export async function checkInternet(){
-    console.log("Checking internet connection");
     return hasInternet;
 }
 

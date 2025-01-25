@@ -38,6 +38,8 @@ export async function getTimeEntries(since:string|number){
                 since: dayjs(since).unix().toString()
             }
         );
+
+        // TODO : Telemetry maybe
         console.log("Fetch took " + (dayjs().diff(start, "ms")) + " ms")
     
         const entriesAfterLastGen = entries.filter(x => {

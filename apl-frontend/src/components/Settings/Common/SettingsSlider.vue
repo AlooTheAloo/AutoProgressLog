@@ -34,7 +34,7 @@ function updateValue(value:number|number[]){
 </script>
 
 <template>
-    <div class="flex items-center gap-10 w-full ">
+    <div class="flex items-center gap-10">
         <div class="flex h-12 items-center gap-2 w-64">
             <p>
                 {{ 
@@ -45,7 +45,7 @@ function updateValue(value:number|number[]){
                 <img v-if="props.helpText != undefined" v-tooltip.top="props.helpText" place :src="help" class="h-4 w-4 mt-2"/>
             </div>
         </div>
-        <div class="w-96 flex items-center gap-5">
+        <div class=" flex-grow  flex items-center gap-5">
 
             <div class="w-10">
                 <InputNumber v-model="props.value" :min="min" :max="max" fluid>

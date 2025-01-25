@@ -10,7 +10,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 
-const getFileInAPLData = (file:string) => path.join(environment == "electron" ? electron.app.getPath("userData") : (process.env.APL_DATA_PATH ?? ""), file);
+export const getFileInAPLData = (file:string) => path.join(environment == "electron" ? electron.app.getPath("userData") : (process.env.APL_DATA_PATH ?? ""), file);
 
 
 const environment:"electron"|"node" = electron.app != null ? "electron" : "node";

@@ -14,6 +14,9 @@ import registerEvents from "./Electron-Backend/";
 import path from "node:path";
 import os from "node:os";
 import { buildMenu } from "./Electron-App/MenuBuilder";
+import { version as v1 } from "../../package.json"
+import semver from "semver";
+
 
 const require = createRequire(import.meta.url);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -139,11 +142,24 @@ import {
 } from "./Electron-Backend/appBackend";
 import { createAutoReport } from "./Electron-Backend/Reports/AutoReportGenerator";
 import { createAutoRPC } from "./Electron-Backend/RPC/RPCHandler";
+import { existsSync, readFileSync } from "node:fs";
+import { get } from "node:http";
+import { getFileInAPLData } from "../../apl-backend/Helpers/getConfig";
 
 app.on("ready", async () => {
   buildMenu(app);
   createAutoReport();
   createAutoRPC();
-  await electronUpdater.autoUpdater.checkForUpdatesAndNotify();
+  electronUpdater.autoUpdater.forceDevUpdateConfig = true;
+  electronUpdater.autoUpdater.autoDownload = false;
+
+  const result = await electronUpdater.autoUpdater.checkForUpdates();
+  const f = getFileInAPLData("skip.txt")
+  const skipped = existsSync(f) ? readFileSync(f).toString() ?? "0.0.0" : "0.0.0";
+  console.log(skipped);
+  if(result?.updateInfo.version != (semver.gt(v1, skipped) ? v1 : skipped) && result?.updateInfo != null)
+  {
+    win?.webContents.send("update-available", result?.updateInfo);
+  }
 });
 

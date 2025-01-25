@@ -4,10 +4,12 @@ import { RouterView, useRouter } from 'vue-router'
 const router = useRouter();
 
 
-if(window.ipcRenderer)
+if(window.ipcRenderer){
+ 
   window.ipcRenderer.on("router-push", (e, args: string) => {
     router.push(args);
   })
+}
 
 const updateOnlineStatus = () => {
   if(!window.ipcRenderer) return;

@@ -102,31 +102,37 @@ const bottomText = computed(() => {
                     :hideDelta="dto.immersionDTO.immersionSinceLastReport === 0"
                     />
                 </div>
-                <div class="flex flex-row gap-3 w-[45rem]">
-                    <AppSmallWidget v-if="dto.ankiDTO != null"
-                    title="Retention rate"
-                    units="%"
-                    :value="{
-                        current: dto.ankiDTO.retentionRate.toFixed(2),
-                        delta: dto.ankiDTO.retentionRateDelta.toString(),
-                    }"
-                    :image="Brain"
-                    :direction="dto.ankiDTO.retentionRateDelta"
-                    :hideDelta="dto.ankiDTO.retentionRateDelta === 0"
-                    />
-            
-                    <AppSmallWidget v-if="dto.ankiDTO != null"
-                    title="Total Cards Reviewed"
-                    units="cards"
-                    :condense="true"
-                    :value="{
-                        current: dto.ankiDTO.totalReviews,
-                        delta: dto.ankiDTO.reviewsDelta,
-                    }"
-                    :image="Eye"
-                    :direction="dto.ankiDTO.reviewsDelta"
-                    :hideDelta="dto.ankiDTO.reviewsDelta === 0"
-                    /> 
+                <div class=" w-[45rem]">
+                    <div v-if="dto.ankiDTO != null" class="flex flex-row gap-3">
+                        <AppSmallWidget v-if="dto.ankiDTO != null"
+                        title="Retention rate"
+                        units="%"
+                        :value="{
+                            current: dto.ankiDTO.retentionRate.toFixed(2),
+                            delta: dto.ankiDTO.retentionRateDelta.toString(),
+                        }"
+                        :image="Brain"
+                        :direction="dto.ankiDTO.retentionRateDelta"
+                        :hideDelta="dto.ankiDTO.retentionRateDelta === 0"
+                        />
+                
+                        <AppSmallWidget v-if="dto.ankiDTO != null"
+                        title="Total Cards Reviewed"
+                        units="cards"
+                        :condense="true"
+                        :value="{
+                            current: dto.ankiDTO.totalReviews,
+                            delta: dto.ankiDTO.reviewsDelta,
+                        }"
+                        :image="Eye"
+                        :direction="dto.ankiDTO.reviewsDelta"
+                        :hideDelta="dto.ankiDTO.reviewsDelta === 0"
+                        /> 
+                    </div>
+                    <div v-else>
+                        
+                    </div>
+                    
                 </div>
             </div>
             <div class="flex-grow flex justify-start 1820:w-full w-[45rem]">
