@@ -1,23 +1,30 @@
 <script setup lang="ts">
   import { Layout, ReportData } from '../types/report-data';
-  import { Ref, ref } from 'vue';
-  import reportdataurl from "/report-data.json?url"
-  import layouturl from "/report-layout.json?url"
+  import { onMounted, ref } from 'vue';
+
   import Stats from './Stats.vue';
 
-  const reportdatareq = await fetch(reportdataurl)
-  const json = await reportdatareq.json();
-  let reportdata:Ref<ReportData> = ref(json);
+  declare global {
+    interface Window {
+      apl_ReportData: ReportData;
+      apl_ReportLayout: Layout;
+    }
+  }
 
-  const layoutreq = await fetch(layouturl)
-  const layout = await layoutreq.json();
-  const layoutdata:Ref<Layout> = ref(layout);  
+  const reportdata = ref<ReportData | null>(null);
+  const layoutdata = ref<Layout | null>(null);
+
+  onMounted(() => {
+    reportdata.value = window.apl_ReportData ?? null;
+    layoutdata.value = window.apl_ReportLayout ?? null;
+    console.log('Data loaded:', reportdata.value, layoutdata.value);
+  }); 
 </script>
 
 
 
 <template>
-    <div>
+    <div v-if="reportdata != null && layoutdata != null">
       <div 
       :style="
       {

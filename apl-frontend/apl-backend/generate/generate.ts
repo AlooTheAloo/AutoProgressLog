@@ -74,18 +74,10 @@ export async function runGeneration(){
     });
 
     const layout = await buildLayout();
-    const p = path.join(__dirname, "..", "..", "apl-backend", "apl-visuals", "visuals");
 
-    // Report Data
-    const reportPath = path.join(p, "report-data.json")
-    writeFileSync(reportPath, JSON.stringify(json));
-
-    const layoutPath = path.join(p, "report-layout.json")
-    writeFileSync(layoutPath, JSON.stringify(layout));
+    if(layout == undefined) return;
     
-    const imagePath = await buildImage(config.outputOptions, config.anki.enabled ? 1775 : 1375, json.reportNo);
-
-
+    const imagePath = await buildImage(config.outputOptions, config.anki.enabled ? 1775 : 1375, json, layout);
 
     const notification = new Notification({title: `Report #${json.reportNo} generated!`,
         body: `Click here to open it in ${process.platform == "darwin" ? "Finder" : "File Explorer"}`});

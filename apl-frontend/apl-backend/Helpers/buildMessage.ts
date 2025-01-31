@@ -11,6 +11,14 @@ import { arithmeticWeightedMean } from "./util.js";
 import { getConfig } from "./getConfig.js";
 import color from "color";
 import { GetImmersionTimeSince } from "./DataBase/SearchDB.js";
+import { Layout } from "../apl-visuals/src/types/report-data.js";
+
+declare global {
+  interface Window {
+    apl_ReportData: ReportData;
+    apl_ReportLayout: Layout;
+  }
+}
 
 interface ankiData {
   reviewCount: number;
@@ -25,9 +33,10 @@ export const __dirname = path.dirname(__filename);
 export async function buildImage(
   options: outputOptions,
   height: number = 1775,
-  reportNo: number
+  reportData: ReportData,
+  reportLayout:Layout
 ) {
-  const outputPath = `${options.outputFile.path}${path.sep}${options.outputFile.name} ${reportNo}${options.outputFile.extension}`;
+  const outputPath = `${options.outputFile.path}${path.sep}${options.outputFile.name} ${reportData.reportNo}${options.outputFile.extension}`;
   const browser = await puppeteer.launch({
     headless: true,
     devtools: true,
@@ -38,11 +47,19 @@ export async function buildImage(
     ],
   });
   const page = await browser.newPage();
+  await page.evaluateOnNewDocument((data, layout) => {
+    window.apl_ReportData = data;
+    window.apl_ReportLayout = layout;
+  }, reportData, reportLayout);
+  
+
   page.setViewport({
     width: 2000 * options.outputQuality / 2,
     height: 5000,
     deviceScaleFactor: options.outputQuality / 2,
   });
+
+  
   await page.goto(
     `file:${path.join(
       __dirname,
@@ -54,6 +71,9 @@ export async function buildImage(
       "index.html"
     )}`
   );
+
+
+
   await page.waitForNetworkIdle();
 
   await page.screenshot({
@@ -240,7 +260,12 @@ const LAYOUT_ANKILESS = [
   ["immersiondata", "immersionstreak"],
 ];
 
-export async function buildLayout() {
+export type layout = {
+  layout: string[][];
+  gradient: string[];
+}
+
+export async function buildLayout():Promise<layout | undefined> {
   const config = getConfig();
   if(config == undefined) return;
 
