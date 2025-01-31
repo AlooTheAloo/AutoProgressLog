@@ -48,7 +48,9 @@ function updateValue(value:number|number[]){
         <div class=" flex-grow  flex items-center gap-5">
 
             <div class="w-10">
-                <InputNumber v-model="props.value" :min="min" :max="max" fluid>
+                <InputNumber v-model="props.value" :min="min" :max="max" fluid
+                v-on:value-change="updateValue"
+                >
                     
                 </InputNumber>
             </div>

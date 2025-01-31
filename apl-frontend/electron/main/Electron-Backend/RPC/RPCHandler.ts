@@ -19,6 +19,7 @@ let job : Job | null = null;
 let rpc : RPC.Client | null = null;
 
 export function createAutoRPC(){
+    createJob();
 
 
     onConfigChange.on("config-change", async (oldConfig:Options, newConfig:Options) => {
@@ -49,24 +50,27 @@ function createJob(){
 
     if(!config.general.discordIntegration) // If autogen is disabled, don't do anything
         return;
-
     const rpc = new RPC.Client({ transport: 'ipc' });
     rpc.login({ clientId }).catch();
 
-
     job = nodeScheduler.scheduleJob(`*/10 * * * * *`, async () => {
         if(!ready || !(await checkInternet())) return;
+    
         const activity = await getLiveActivity();
         if(activity == undefined) return;
         if(currentActivity != null && activity.length == 0){
-            runSync(true);
+            setTimeout(() => {
+                runSync(true);                
+            }, 10000);
             rpc.clearActivity();
             currentActivity = null;
         }
         if(activity.length == 0) return;
         const single = activity[0];
         if(single.id != currentActivity?.id){
-            await runSync(true);
+            setTimeout(() => {
+                runSync(true);                
+            }, 10000);
         }
         const lastEntry = await GetLastEntry();
         const seconds = (lastEntry?.toggl?.totalSeconds ?? 0) + Math.abs(dayjs(single.start).diff(dayjs(), "seconds"));
@@ -85,9 +89,10 @@ function createJob(){
             //     },
             // ],
         });
-        console.log("Set activity to " + single.description);
         currentActivity = single;
     })
+
+    job.invoke();
 
     rpc.on("ready", () => {
         ready = true;

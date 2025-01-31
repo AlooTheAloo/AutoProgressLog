@@ -127,7 +127,7 @@ function updateAnki(value:boolean){
 </script>
 
 <template>  
-    <div class="flex flex-col w-full gap-5" v-if="config != undefined">
+    <div class="flex flex-col w-full gap-5 flex-grow  " v-if="config != undefined">
         <h1 class="text-2xl font-bold text-white mt-5">
             Connection settings
         </h1>

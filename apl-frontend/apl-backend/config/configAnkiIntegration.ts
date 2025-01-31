@@ -22,6 +22,9 @@ export interface deck {
     id: number
 }
 
+
+
+
 export async function getDecksCards(ankiDBPath?:string):Promise<deck[]>{
 
     const integration = getSetupAnkiIntegration();

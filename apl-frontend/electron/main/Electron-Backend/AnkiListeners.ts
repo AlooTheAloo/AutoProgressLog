@@ -2,11 +2,12 @@ import { dialog, ipcMain } from "electron"
 import { win } from "..";
 import { ankiIntegration, Options } from "../../../apl-backend/types/options";
 import { getSetupAnkiIntegration, setAnkiIntegration } from "./SetupConfigBuilder";
-import { getAnkiCardReviewCount, getMatureCards, getRetention, hasSyncEnabled } from "../../../apl-backend/anki/db";
+import { DeleteAnkiData, getAnkiCardReviewCount, getMatureCards, getRetention, hasSyncEnabled } from "../../../apl-backend/anki/db";
 import { roundTo } from "round-to";
 import { hasPerms } from "../../../apl-backend/Helpers/readWindows";
 import { ankiPaths, createAnkiIntegration, getAnkiDBPaths, getAnkiProfileCount, getAnkiProfiles, getDecks, getDecksCards, getProfileDecks, LaunchAnki, sleep, verifyAnkiPaths } from "../../../apl-backend/config/configAnkiIntegration";
 import path, { basename, join } from "path";
+import { onConfigChange } from "./SettingsListeners";
 
 export function ankiListeners() {
 
@@ -108,20 +109,15 @@ export function ankiListeners() {
             ankiIntegration = await macOSAnki(Paths);
         }
         else {
-        console.log(3);
             ankiIntegration = await createAnkiIntegration(Paths);
             if(ankiIntegration != false){
                 setAnkiIntegration(ankiIntegration);
-                console.log(4);
-            
             }
         }
-        console.log(5);
 
         if(ankiIntegration){
             setAnkiIntegration(ankiIntegration);
         }
-        console.log(6);
 
 
         return !!ankiIntegration;
@@ -162,6 +158,14 @@ export function ankiListeners() {
         return res.filePaths[0];
 
     });
+
+
+    onConfigChange.on("config-change", async (oldConfig:Options, newConfig:Options) => {
+        if(oldConfig.anki.enabled && !newConfig.anki.enabled){
+            await DeleteAnkiData();
+        }
+    });
+
 }
 
 async function macOSAnki(paths:any){

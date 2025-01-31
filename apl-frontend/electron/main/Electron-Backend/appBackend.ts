@@ -3,7 +3,6 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { runChecks } from "./DashboardListeners";
 import { runGeneration } from "../../../apl-backend/generate/generate";
-import { hasPerms } from "../../../apl-backend/Helpers/readWindows";
 import { createWindow, win } from "..";
 import { setSyncing } from "../../../apl-backend/generate/sync";
 import { getConfig } from "../../../apl-backend/Helpers/getConfig";

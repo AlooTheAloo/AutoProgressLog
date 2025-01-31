@@ -83,7 +83,10 @@ ipcMain.handle('Get-Reports', async (event, args) => {
         })
     );
 
-    return images; // Return the list of reports with resized image data
+    return {
+        start: start,
+        images: images
+    }; // Return the list of reports with resized image data
   });
 
 

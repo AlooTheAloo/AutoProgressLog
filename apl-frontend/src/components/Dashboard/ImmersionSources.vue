@@ -8,6 +8,7 @@
     import { useWindowSize } from "@vueuse/core";
     import { NWayInterpol } from "../../util/n-way-interpol";
 import { ImmersionSource } from "../../../electron/main/Electron-Backend/types/Dashboard";
+import pluralize from "pluralize";
 
     const { width, height } = useWindowSize()
 
@@ -159,13 +160,13 @@ import { ImmersionSource } from "../../../electron/main/Electron-Backend/types/D
         </div>
     
         <!-- ApexCharts Section -->
-        <div class="flex flex-col items-center justify-center flex-none">
+        <div class="flex flex-col items-center justify-center flex-none relative">
             <div class="absolute flex flex-col items-center">
                 <div class="font-bold text-xl 1820:text-3xl text-white">
                     {{ totalHours }} hours
                 </div>
                 <div class="text-sm 1820:text-xl">
-                    From {{ props.sources.length }} sources
+                    From {{ props.sources.length }} {{ pluralize("source", props.sources.length) }}
                 </div>
                 
             </div>

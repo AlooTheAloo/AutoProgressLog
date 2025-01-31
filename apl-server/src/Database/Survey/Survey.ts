@@ -7,7 +7,8 @@ const survetAnswerTable = "survey_answer";
 
 export function InsertSurvey(SurveyAnswer:SurveyAnswer) {
     db.query(`INSERT INTO ${survetAnswerTable} (track, refold_knows, refold_stage, years, language, appsUsing) VALUES (?, ?, ?, ?, ?, ?)`)
-    .run(...u(SurveyAnswer.track, SurveyAnswer.refoldData?.knows, SurveyAnswer.refoldData?.stage, SurveyAnswer.years, SurveyAnswer.language, SurveyAnswer.appsUsing));
+    .run(...u(SurveyAnswer.track, SurveyAnswer.refoldData?.knows, SurveyAnswer.refoldData?.stage, SurveyAnswer.years, SurveyAnswer.language, 
+        JSON.stringify(SurveyAnswer.appsUsing)));
 }
 
 export function CreateSurveyTable(db: Database) {
@@ -19,6 +20,6 @@ export function CreateSurveyTable(db: Database) {
         refold_stage TEXT NULL,
         years INTEGER NULL,
         language TEXT NULL,
-        appsUsing TEXT NULL)    
+        appsUsing TEXT NULL)
     `);
 }

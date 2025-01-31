@@ -1,6 +1,6 @@
 import dayjs, { Dayjs } from 'dayjs';
 import sqlite3, { Database } from 'sqlite3'
-import { getConfig } from '../Helpers/getConfig.js';
+import { getConfig, syncDataPath } from '../Helpers/getConfig.js';
 import { ankiIntegration, RetentionMode } from '../types/options.js';
 import { getSetupAnki } from '../../electron/main/Electron-Backend/SetupConfigBuilder.js';
 import { Parser } from 'pickleparser';
@@ -65,6 +65,19 @@ export async function getLastUpdate(ankiIntegration:ankiIntegration){
         close(db);
     });
 }
+
+
+export async function DeleteAnkiData(){
+    return new Promise<void>((res, rej) => {
+        new sqlite3.Database(syncDataPath).all(`UPDATE syncdata SET cardsStudied=0, totalCardsStudied=0, mature=0, retention=0, lastAnkiUpdate=0`, async (err, rows:{id:number}[]) => {
+            if(err){
+                console.log(err);
+            }
+            return res();
+        });
+    })
+}
+
 
 export async function getRetention(retentionMode:RetentionMode = "true_retention", ankiIntegration:ankiIntegration){
     return new Promise<number|null>((res, rej) => {

@@ -1,7 +1,7 @@
 import { ipcMain } from "electron";
 import { runGeneration } from "../../../apl-backend/generate/generate";
 import { getConfig, getSyncProps, syncDataPath } from "../../../apl-backend/Helpers/getConfig";
-import { isSyncing, runSync } from "../../../apl-backend/generate/sync";
+import { isSyncing, runSync, setSyncing } from "../../../apl-backend/generate/sync";
 import { CacheManager } from "../../../apl-backend/Helpers/cache";
 import { DashboardDTO } from "./types/Dashboard";
 import { GetImmersionSourcesSince, GetImmersionTimeBetween, GetImmersionTimeSince, GetLastEntry, GetSyncCount } from "../../../apl-backend/Helpers/DataBase/SearchDB";
@@ -26,7 +26,11 @@ export function DashboardListeners() {
 
     ipcMain.handle("Sync", async (event: any, alternative: boolean) => {
         if(await runChecks()){
-            return await runSync(alternative, getSyncProps());
+            const sync = await runSync(alternative, getSyncProps());
+            if(sync == null){
+                setSyncing(false);
+            }
+            return sync
         }
     });
 

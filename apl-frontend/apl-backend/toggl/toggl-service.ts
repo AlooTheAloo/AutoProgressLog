@@ -6,6 +6,8 @@ import { compareActivities } from "../Helpers/activityHelper";
 import { Toggl } from "toggl-track";
 import { getConfig } from "../Helpers/getConfig";
 import { activity } from "../types/activity";
+import { onConfigChange } from "../../electron/main/Electron-Backend/SettingsListeners";
+import { Options } from "../types/options";
 
 const ignore = (tags:string[]) => ["aplignore", "ignore", "autoprogresslogignore"].some(x => tags.map(x => x.toLowerCase()).includes(x))
 
@@ -18,6 +20,9 @@ export async function getLiveActivity(){
             since: dayjs().unix().toString()
         }
     );
+    if(typeof entries == "string"){
+        return undefined;
+    }
     return entries;
 }
 
@@ -66,3 +71,18 @@ export async function getTimeEntries(since:string|number){
     }
     
 }
+
+onConfigChange.on("config-change", async (oldConfig:Options, newConfig:Options) => {
+    if(oldConfig.toggl.togglToken != newConfig.toggl.togglToken){
+        if(newConfig.toggl.togglToken == ""){
+            toggl = undefined;
+        }
+        else {
+            toggl = new Toggl({
+                auth: {
+                    token: newConfig.toggl.togglToken,
+                },
+            });
+        }
+    }
+})

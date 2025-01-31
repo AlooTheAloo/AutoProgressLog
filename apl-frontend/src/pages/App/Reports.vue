@@ -41,11 +41,18 @@ async function getReports(){
     })
 }
 
+let lastFrom = 0;
 
 async function getImages(from:number, count:number){
+    lastFrom = from;
     return new Promise<void>((res, rej) => {
-        window.ipcRenderer.invoke("Get-Images", from, from + count).then((data:any) => {
-            images.value = data;
+        window.ipcRenderer.invoke("Get-Images", from, from + count).then((data:{
+            start: number,
+            images: string[]
+        }) => {
+            if(data.start == lastFrom){
+                images.value = data.images;
+            }
             res();
         });
     })
@@ -193,7 +200,7 @@ function nf(num:number){
                                                     </div>
                                                     <div class=" flex flex-col md:items-end gap-8">
                                                         <div class="flex flex-col md:flex-row gap-2">
-                                                            <Button v-popup v-if="item.revertable" severity="danger" :disabled="reverting" @click="revertReport($event)" class="h-8">
+                                                            <Button v-if="item.revertable" severity="danger" :disabled="reverting" @click="revertReport($event)" class="h-8">
                                                                 <i v-if="reverting"  :class="['pi', 'pi-spinner pi-spin text-white']" />
                                                                 <i v-else class="pi pi-undo text-white" />
                                                             </Button>

@@ -22,10 +22,6 @@ function updateValue(value:string){
     emit("update:value", value);
 }
 
-onMounted(() => {
-    console.log("props " + props.value);
-})
-
 </script>
 
 <template>
@@ -49,7 +45,4 @@ onMounted(() => {
     </div>
 </template>
 <style>
-.p-listbox-list-container{
-    background-color: red;
-}
 </style>
