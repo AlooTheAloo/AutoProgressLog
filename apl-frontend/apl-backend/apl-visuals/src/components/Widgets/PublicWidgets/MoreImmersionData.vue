@@ -7,12 +7,12 @@ interface AnkiDataProps{
     reportData:ReportData
 }
 
-defineProps<AnkiDataProps>();
+const props = defineProps<AnkiDataProps>();
 
 </script>
 <template>
 <div class=" flex gap-5">
-    <MonthImmersion :time="reportData.MonthlyImmersion"></MonthImmersion>
-    <BestTime :time="reportData.BestImmersion"></BestTime>
+    <MonthImmersion :time="props.reportData.MonthlyImmersion"></MonthImmersion>
+    <BestTime :time="props.reportData.BestImmersion"></BestTime>
 </div>
 </template>

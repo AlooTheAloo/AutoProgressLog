@@ -4,11 +4,11 @@ import Mature from '../Mature.vue';
     interface ImmersionDataProps{
         reportData:ReportData
     }
-    defineProps<ImmersionDataProps>();
+    const props = defineProps<ImmersionDataProps>();
 
 </script>
 <template>
     <div class="flex-grow ">
-        <Mature :data="reportData.matureCards" />
+        <Mature :data="props.reportData.matureCards" />
     </div>
 </template>

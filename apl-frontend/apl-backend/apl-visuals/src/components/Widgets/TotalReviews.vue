@@ -5,12 +5,12 @@
     interface TotalReviewProps{
         reviews: TPlusDelta<number>;
     }
-    defineProps<TotalReviewProps>();
+    const props = defineProps<TotalReviewProps>();
 </script>
 
 <template>
     <SmallWidget title="Total Reviews" v-bind:condense="true" :image="Reviews" :value="{ 
-        current:reviews.current,
-        delta:reviews.delta
+        current:props.reviews.current,
+        delta:props.reviews.delta
       }"></SmallWidget>
 </template>

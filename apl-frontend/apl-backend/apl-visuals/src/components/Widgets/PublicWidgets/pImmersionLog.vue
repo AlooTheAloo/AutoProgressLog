@@ -4,11 +4,11 @@
     interface ImmersionDataProps{
         reportData:ReportData
     }
-    defineProps<ImmersionDataProps>();
+    const props = defineProps<ImmersionDataProps>();
 
 </script>
 <template>
     <div class="">
-        <ImmersionLog :log="reportData.ImmersionLog"/>
+        <ImmersionLog :log="props.reportData.ImmersionLog"/>
     </div>
 </template>

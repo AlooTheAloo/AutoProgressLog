@@ -6,14 +6,14 @@
     interface MonthTimeProps{
         time: number;
     }
-    defineProps<MonthTimeProps>();
+    const props = defineProps<MonthTimeProps>();
     
 
 </script>
 
 <template>
     <SmallWidget title="Immersion this month" units="hours" :image="Calendar" :value="{ 
-        current: (time / 3600).toFixed(2),
+        current: (props.time / 3600).toFixed(2),
         delta:0 
       }"
       :hide-delta="true"

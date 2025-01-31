@@ -6,14 +6,14 @@
     interface TotalTimeProps{
         time: TPlusDelta<number>;
     }
-    defineProps<TotalTimeProps>();
+    const props = defineProps<TotalTimeProps>();
     
 
 </script>
 
 <template>
     <SmallWidget title="Total immersion time" units="hours" :image="Time" :value="{ 
-        current:time.current,
-        delta:time.delta
+        current:props.time.current,
+        delta:props.time.delta
       }"></SmallWidget>
 </template>

@@ -16,7 +16,7 @@
 
 <template>
     <SmallWidget title="Best Immersion Time" units="" :image="Calendar" :value="{ 
-        current: dayjs.duration(Math.abs(time.current), 'second').format('HH:mm:ss'),
+        current: dayjs.duration(Math.abs(props.time.current), 'second').format('HH:mm:ss'),
         delta: 0
       }"
       :hide-delta="true"

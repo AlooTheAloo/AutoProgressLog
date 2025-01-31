@@ -6,11 +6,11 @@
         reportData:ReportData
     }
 
-    defineProps<ImmersionDataProps>();
+    const props = defineProps<ImmersionDataProps>();
 
 </script>
 <template>
     <div class="">
-        <TimeMap title="Immersion Streak" :streak="reportData.ImmersionStreak" :data="reportData.ImmersionData" ></TimeMap>
+        <TimeMap title="Immersion Streak" :streak="props.reportData.ImmersionStreak" :data="props.reportData.ImmersionData" ></TimeMap>
     </div>
 </template>

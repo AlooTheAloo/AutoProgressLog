@@ -7,12 +7,12 @@ import TotalReviews from '../TotalReviews.vue';
         reportData:ReportData
     }
 
-    defineProps<AnkiDataProps>();
+    const props = defineProps<AnkiDataProps>();
 
 </script>
 <template>
     <div class=" flex gap-5">
-        <RetentionRate :retention="reportData.retentionRate"/>
-        <TotalReviews :reviews="reportData.totalReviews"/>
+        <RetentionRate :retention="props.reportData.retentionRate"/>
+        <TotalReviews :reviews="props.reportData.totalReviews"/>
     </div>
 </template>

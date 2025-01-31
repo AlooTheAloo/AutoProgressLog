@@ -35,12 +35,12 @@ import MoreImmersionData from "./Widgets/PublicWidgets/MoreImmersionData.vue";
 <template>
     <div class="flex flex-col h-full w-full flex-grow gap-12 ">
         <div class="w-full flex gap-8 ">
-          <div class="w-0 h-full flex flex-col flex-grow gap-5" v-for="(item, index) in layout" :key="index">
+          <div class="w-0 h-full flex flex-col flex-grow gap-5" v-for="(item, index) in props.layout" :key="index">
             <component v-for="comp in item" :is="getItemById(comp as any)" :reportData="props.reportData"/>
           </div>
         </div>
         <div class="w-full">
-          <TotalScore :data="reportData"></TotalScore>
+          <TotalScore :data="props.reportData"></TotalScore>
         </div>
     </div> 
 </template>
