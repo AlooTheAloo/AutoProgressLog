@@ -62,9 +62,17 @@ export async function buildContextMenu() {
 }
 
 export async function createAppBackend() {
-  const iconPath = path.resolve(__dirname, "../../src/assets/Logo.png");
+  
+    const isDev = process.env.NODE_ENV === "development";
+  
+  const iconPath = isDev
+    ? path.join(__dirname, "..", "..", "src", "assets", "Logo.png")
+    : path.join(process.resourcesPath, "app.asar.unpacked", "src", "assets", "Logo.png");
+
+  console.log('icon path is ' + iconPath)
   let trayIcon = nativeImage.createFromPath(iconPath);
 
+  console.log(iconPath);
   if (trayIcon.isEmpty()) {
     console.error(
       "Failed to load icon. Ensure the path is correct and the icon is compatible."
@@ -75,6 +83,6 @@ export async function createAppBackend() {
 
   tray = new Tray(trayIcon);
   tray.setToolTip("APL");
-
+  console.log(tray);
   buildContextMenu();
 }

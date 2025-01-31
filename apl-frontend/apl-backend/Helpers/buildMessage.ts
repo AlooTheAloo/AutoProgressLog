@@ -12,6 +12,7 @@ import { getConfig } from "./getConfig.js";
 import color from "color";
 import { GetImmersionTimeSince } from "./DataBase/SearchDB.js";
 import { Layout } from "../apl-visuals/src/types/report-data.js";
+import fs from 'fs';
 
 declare global {
   interface Window {
@@ -30,6 +31,9 @@ const MATURE_HISTORY = 6;
 export const __filename = fileURLToPath(import.meta.url);
 export const __dirname = path.dirname(__filename);
 
+
+
+
 export async function buildImage(
   options: outputOptions,
   height: number = 1775,
@@ -37,6 +41,16 @@ export async function buildImage(
   reportLayout:Layout
 ) {
   const outputPath = `${options.outputFile.path}${path.sep}${options.outputFile.name} ${reportData.reportNo}${options.outputFile.extension}`;
+
+  function getChromiumExecPath() {
+    return puppeteer.executablePath().replace('app.asar', 'app.asar.unpacked');
+  }
+
+  console.log(getChromiumExecPath());
+  console.log(process.resourcesPath);
+
+  fs.writeFileSync('C:\\Users\\Aloo\\caca.txt', getChromiumExecPath());
+  console.log(11.1)
   const browser = await puppeteer.launch({
     headless: true,
     devtools: true,
@@ -45,36 +59,42 @@ export async function buildImage(
       "--disable-features=IsolateOrigins",
       "--disable-site-isolation-trials",
     ],
+    executablePath: getChromiumExecPath()
   });
+  console.log(11.2)
+
   const page = await browser.newPage();
+  console.log(11.3)
+  
   await page.evaluateOnNewDocument((data, layout) => {
     window.apl_ReportData = data;
     window.apl_ReportLayout = layout;
   }, reportData, reportLayout);
   
+  console.log(11.4)
 
   page.setViewport({
     width: 2000 * options.outputQuality / 2,
     height: 5000,
     deviceScaleFactor: options.outputQuality / 2,
   });
+  console.log(11.5)
 
-  
-  await page.goto(
-    `file:${path.join(
-      __dirname,
-      "..",
-      "..",
-      "apl-backend",
-      "apl-visuals",
-      "visuals",
-      "index.html"
-    )}`
-  );
+  const isDev = process.env.NODE_ENV === "development";
+
+  const visualsPath = isDev
+    ? path.join(__dirname, "..", "..", "apl-backend", "apl-visuals", "visuals", "index.html")
+    : path.join(process.resourcesPath, "app.asar.unpacked", "apl-backend", "apl-visuals", "visuals", "index.html");
+
+  console.log(visualsPath);
+  await page.goto(visualsPath);
+
+  console.log(11.6)
 
 
 
   await page.waitForNetworkIdle();
+  console.log(11.7)
 
   await page.screenshot({
     path: outputPath,
@@ -86,7 +106,11 @@ export async function buildImage(
       y: 0,
     },
   });
+  console.log(11.8)
+
   await browser.close();
+  console.log(11.9)
+
   return outputPath;
 }
 
@@ -257,7 +281,7 @@ const LAYOUT_FULL = [
 
 const LAYOUT_ANKILESS = [
   ["immersionlog", "immersiondata"],
-  ["immersiondata", "immersionstreak"],
+  ["moreimmersiondata", "immersionstreak"],
 ];
 
 export type layout = {

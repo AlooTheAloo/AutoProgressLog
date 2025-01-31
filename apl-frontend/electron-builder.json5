@@ -2,12 +2,20 @@
 {
   $schema: "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
   appId: "727.AlooTheAloo.727",
-  asar: true,
+  "asar": true,
+  "asarUnpack": [
+    "apl-backend/apl-visuals/visuals/**",
+    "src/assets/**"
+  ],
+  "files": [
+    "dist*/**",
+    "apl-backend/apl-visuals/visuals/**",
+    "src/assets/**"
+  ],
   productName: "AutoProgressLog",
   directories: {
     output: "release/${version}",
   },
-  files: ["dist", "dist-electron"],
   dmg: {
     window: {
       width: 540,
