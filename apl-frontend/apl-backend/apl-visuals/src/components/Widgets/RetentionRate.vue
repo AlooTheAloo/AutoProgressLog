@@ -7,12 +7,12 @@
     interface RetentionRateProps{
         retention: TPlusDelta<number>;
     }
-    defineProps<RetentionRateProps>();
+    const props = defineProps<RetentionRateProps>();
 </script>
 
 <template>
     <SmallWidget title="Retention Rate" units="%" :image="Retention" :value="{ 
-        current:roundTo(retention.current, 2),
-        delta:roundTo(retention.delta, 2)
+        current:roundTo(props.retention.current, 2),
+        delta:roundTo(props.retention.delta, 2)
       }"></SmallWidget>
 </template>

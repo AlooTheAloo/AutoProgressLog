@@ -4,7 +4,7 @@
     import Graph from "./TotalScore/Graph.vue"
     import { ReportData } from "../../types/report-data";
 
-    defineProps<{data: ReportData}>();
+    const props = defineProps<{data: ReportData}>();
 
 </script>
 
@@ -16,9 +16,9 @@
                     Total Report Score               
                 </div>
                 <div class="flex flex-col divide-y divide-[#989898]">
-                    <ScoreRow v-bind:title="`Immersion`" v-bind:value="data.ImmersionScore"/>
-                    <ScoreRow v-bind:title="`Anki`" v-bind:value="data.AnkiScore"/>
-                    <ScoreRow v-bind:title="`Total`" v-bind:value="data.TotalScore" isTotal/>
+                    <ScoreRow v-bind:title="`Immersion`" v-bind:value="props.data.ImmersionScore"/>
+                    <ScoreRow v-bind:title="`Anki`" v-bind:value="props.data.AnkiScore"/>
+                    <ScoreRow v-bind:title="`Total`" v-bind:value="props.data.TotalScore" isTotal/>
                 </div>
                 
                 <div class="h-[4.5rem]" >
@@ -27,7 +27,7 @@
             </div>
             <div class="w-1/2 flex-col flex justify-center">
                 <div class="w-full px-5 font-semibold "/>
-                <Graph :data="data"></Graph>
+                <Graph :data="props.data"></Graph>
             </div>
         </div>
    </div>

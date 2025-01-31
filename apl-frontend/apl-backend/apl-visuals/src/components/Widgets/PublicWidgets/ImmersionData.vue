@@ -7,12 +7,12 @@ import TotalTime from '../TotalTime.vue';
         reportData:ReportData
     }
 
-    defineProps<AnkiDataProps>();
+    const props = defineProps<AnkiDataProps>();
 
 </script>
 <template>
     <div class=" flex gap-5">
-        <TotalTime :time="reportData.ImmersionTime"></TotalTime>
-        <AverageTime :time="reportData.AverageImmersionTime"></AverageTime>
+        <TotalTime :time="props.reportData.ImmersionTime"></TotalTime>
+        <AverageTime :time="props.reportData.AverageImmersionTime"></AverageTime>
     </div>
 </template>

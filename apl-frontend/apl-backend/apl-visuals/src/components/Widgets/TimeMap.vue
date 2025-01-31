@@ -42,17 +42,17 @@
                         <div class="flex items-center">
                             <div class="flex-grow">
                                 <div class="font-normal tracking-wider">
-                                    {{ title }}
+                                    {{ props.title }}
                                 </div>
                                 <div class="font-extrabold text-3xl">
                                     <div class="flex flex-row">
                                         <div>
                                             {{
-                                                pluralize("report", streak.current, true)
+                                                pluralize("report", props.streak.current, true)
                                             }} 
                                         </div>
                                         <div class="flex-grow">
-                                            <Delta v-bind:delta="streak.delta"></Delta>
+                                            <Delta v-bind:delta="props.streak.delta"></Delta>
                                         </div>
                                     </div>
                                 </div>

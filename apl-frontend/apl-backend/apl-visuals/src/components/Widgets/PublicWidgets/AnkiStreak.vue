@@ -6,11 +6,11 @@ import TimeMap from '../TimeMap.vue';
         reportData:ReportData
     }
 
-    defineProps<AnkiDataProps>();
+    const props = defineProps<AnkiDataProps>();
 
 </script>
 <template>
     <div class="flex-grow ">
-        <TimeMap title="Anki Streak" :streak="reportData.AnkiStreak" :data="reportData.AnkiData" ></TimeMap>
+        <TimeMap title="Anki Streak" :streak="props.reportData.AnkiStreak" :data="props.reportData.AnkiData" ></TimeMap>
     </div>
 </template>
