@@ -54,6 +54,7 @@
     "@types/node": "^22.2.0",
     "@vueuse/core": "^11.0.3",
     "apexcharts": "^4.1.0",
+    "axios": "^1.7.9",
     "clsx": "^2.1.1",
     "color": "^4.2.3",
     "color-convert": "^2.0.1",

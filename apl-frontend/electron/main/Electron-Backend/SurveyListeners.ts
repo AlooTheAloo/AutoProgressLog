@@ -1,3 +1,4 @@
+import axios from "axios";
 import { ipcMain, ipcRenderer } from "electron";
 
 interface surveyAnswer {
@@ -41,6 +42,9 @@ export async function surveyListeners() {
 
 }
 
+const backend_url = "https://apl.chromaserver.net/";
+
 function sendSurveyAnswer() {
     // TODO : send survey answer to backend
+    axios.post(`${backend_url}/survery-answer/v1`, surveyAnswer);
 }

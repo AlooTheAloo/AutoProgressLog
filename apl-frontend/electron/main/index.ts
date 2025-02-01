@@ -49,11 +49,10 @@ if (os.release().startsWith("6.1")) app.disableHardwareAcceleration();
 // Set application name for Windows 10+ notifications
 if (process.platform === "win32") app.setAppUserModelId(app.getName());
 
-// TODO : fix idk
-// if (!app.requestSingleInstanceLock()) {
-//   app.quit();
-//   process.exit(0);
-// }
+  if (!app.requestSingleInstanceLock()) {
+    app.quit();
+    process.exit(0);
+  }
 
 export let win: BrowserWindow | null = null;
 const preload = path.join(__dirname, "../preload/index.mjs");
@@ -163,8 +162,7 @@ app.on("ready", async () => {
   //   win?.webContents.send("update-available", result?.updateInfo);
   // }
 
-
-  const logFile = path.join('C:\\Users\\Aloo\\app.log');
+  const logFile = getFileInAPLData("app.log");
   const logStream = fs.createWriteStream(logFile, { flags: 'a' });
 
   console.log = (...args) => {

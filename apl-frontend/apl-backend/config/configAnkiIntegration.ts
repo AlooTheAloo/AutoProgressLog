@@ -220,6 +220,7 @@ export async function LaunchAnki(paths:ankiPaths|ankiIntegration){
     // }
     // return [false, null];
 
+    console.log("Launching Anki");
     if(paths.ankiPath == undefined){
         console.log(`The file ${paths.ankiPath} does not exist. Please provide a valid path`.red);
         return [false, null];
@@ -233,6 +234,8 @@ export async function LaunchAnki(paths:ankiPaths|ankiIntegration){
     const isOpened = (await getAnkiProcesses()).length > 0;
     const openCommand = (process.platform == "darwin" ? `open '${paths.ankiPath}'` : `${paths.ankiPath}`);
 
+    console.log("running command " + openCommand);
+
     if(!isOpened){
         exec(openCommand, (err, out, err2) => {
             console.log(out);
@@ -244,6 +247,7 @@ export async function LaunchAnki(paths:ankiPaths|ankiIntegration){
     let hasExecOpen = false;
     const resp = await new Promise<string|null>(async (res, rej) => {
         var intervalOpen = setAsyncInterval(async () => {
+            console.log("iterations " + iterations);
             if(iterations > 30) {
                 {
                     intervalOpen();
@@ -251,6 +255,7 @@ export async function LaunchAnki(paths:ankiPaths|ankiIntegration){
                 }
             } 
             const allAnkis = await proc("name", "Anki");
+            console.log("allAnkis " + allAnkis);
             iterations++;
             if(allAnkis.length == 0 && !isOpened){
                 return;
@@ -258,10 +263,16 @@ export async function LaunchAnki(paths:ankiPaths|ankiIntegration){
 
             const windows = (await readWindows(allAnkis.map(x => x.pid)))
             const pid = (await getAnkiProcesses()).at(0)?.pid;
+            console.log("pid " + pid);
+            console.log("windows " + windows);
+            
             if((windows.length > 0 || isOpened) && pid != undefined){
+                console.log("Anki has been found");
+                
                 intervalOpen();
                 if(!isOpened) await sleep(1000);
-                
+                console.log("killing anki");
+
                 try{
                     kill(pid);                    
                 }
@@ -275,6 +286,7 @@ export async function LaunchAnki(paths:ankiPaths|ankiIntegration){
                         res(null);
                     }
                     const remainingProcesses = await proc("name", "Anki")
+                    console.log("remainingProcesses " + remainingProcesses);
                     if(remainingProcesses.filter(x => x.pid == pid).length == 0){
                         const cmd = allAnkis.filter(x => x.pid == pid)[0].cmd;
                         res(cmd);
