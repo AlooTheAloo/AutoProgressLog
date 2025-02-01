@@ -232,7 +232,7 @@ export async function LaunchAnki(paths:ankiPaths|ankiIntegration){
     }
 
     const isOpened = (await getAnkiProcesses()).length > 0;
-    const openCommand = (process.platform == "darwin" ? `open '${paths.ankiPath}'` : `'${paths.ankiPath}'`);
+    const openCommand = (process.platform == "darwin" ? `open '${paths.ankiPath}'` : `"${paths.ankiPath}"`);
 
     console.log("running command " + openCommand);
 
