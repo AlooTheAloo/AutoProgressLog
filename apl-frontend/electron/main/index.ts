@@ -45,19 +45,21 @@ process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL
 
 // Disable GPU Acceleration for Windows 7
 if (os.release().startsWith("6.1")) app.disableHardwareAcceleration();
+console.log("wtf is happening 2");
 
 // Set application name for Windows 10+ notifications
 if (process.platform === "win32") app.setAppUserModelId(app.getName());
 
-  if (!app.requestSingleInstanceLock()) {
-    app.quit();
-    process.exit(0);
-  }
+if (!app.requestSingleInstanceLock()) {
+  console.log("dead");
+  app.quit();
+  process.exit(0);
+}
+
 
 export let win: BrowserWindow | null = null;
 const preload = path.join(__dirname, "../preload/index.mjs");
 export const indexHtml = path.join(RENDERER_DIST, "index.html");
-console.log("caca" + 5);
 export async function createWindow() {
   win = new BrowserWindow({
     minHeight: 600,
@@ -78,7 +80,7 @@ export async function createWindow() {
   });
 
   win.setMenuBarVisibility(false);
-
+  console.log("a");
   if (VITE_DEV_SERVER_URL) {
     // #298
     win.loadURL(VITE_DEV_SERVER_URL);
@@ -103,7 +105,11 @@ export async function createWindow() {
   win.webContents.once("did-finish-load", () => {});
 }
 
-app.whenReady().then(createWindow).then(createAppBackend);
+console.log(5);
+app.whenReady().then(() => {
+  if(app.getLoginItemSettings().wasOpenedAtLogin || process.argv.includes("was-opened-at-login")) return;
+  createWindow();
+}).then(createAppBackend);
 
 app.on("window-all-closed", () => {
   if (process.platform == "darwin") {
@@ -126,10 +132,12 @@ app.on("second-instance", () => {
 });
 
 app.on("activate", () => {
+  console.log("a");
   const allWindows = BrowserWindow.getAllWindows();
   if (allWindows.length) {
     allWindows[0].focus();
   } else {
+    if(app.getLoginItemSettings().wasOpenedAtLogin || process.argv.includes("was-opened-at-login")) return;
     createWindow();
   }
 });
@@ -146,6 +154,8 @@ import { get } from "node:http";
 import { getFileInAPLData } from "../../apl-backend/Helpers/getConfig";
 import fs from 'fs';
 
+console.log(6);
+
 app.on("ready", async () => {
   buildMenu(app);
   createAutoReport();
@@ -153,14 +163,14 @@ app.on("ready", async () => {
   electronUpdater.autoUpdater.forceDevUpdateConfig = true;
   electronUpdater.autoUpdater.autoDownload = false;
 
-  // const result = await electronUpdater.autoUpdater.checkForUpdates();
-  // const f = getFileInAPLData("skip.txt")
-  // const skipped = existsSync(f) ? readFileSync(f).toString() ?? "0.0.0" : "0.0.0";
-  // console.log(skipped);
-  // if(result?.updateInfo.version != (semver.gt(v1, skipped) ? v1 : skipped) && result?.updateInfo != null)
-  // {
-  //   win?.webContents.send("update-available", result?.updateInfo);
-  // }
+  const result = await electronUpdater.autoUpdater.checkForUpdates();
+  const f = getFileInAPLData("skip.txt")
+  const skipped = existsSync(f) ? readFileSync(f).toString() ?? "0.0.0" : "0.0.0";
+  console.log(skipped);
+  if(result?.updateInfo.version != (semver.gt(v1, skipped) ? v1 : skipped) && result?.updateInfo != null)
+  {
+    win?.webContents.send("update-available", result?.updateInfo);
+  }
 
   const logFile = getFileInAPLData("app.log");
   const logStream = fs.createWriteStream(logFile, { flags: 'a' });
@@ -169,7 +179,13 @@ app.on("ready", async () => {
     logStream.write(new Date().toISOString() + ' ' + args.join(' ') + '\n');
     process.stdout.write(args.join(' ') + '\n');
   };
-  console.log('caca')
+
+  app.setLoginItemSettings({
+    openAtLogin: true,
+    args: [
+      "was-opened-at-login"
+    ]
+  })
 
   
 });

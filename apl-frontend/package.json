@@ -16,9 +16,9 @@
   "scripts": {
     "dev": "vite",
     "build": "bun run build-v && vue-tsc && vite build && electron-builder --config -c.mac.identity=null",
-    "release:windows": "modclean -r && bun run build-v && vue-tsc && vite build && electron-builder build -w",
-    "release:mac": "modclean -r && bun run build-v && vue-tsc && vite build && electron-builder build -m",
-    "release:linux": "modclean -r && bun run build-v && vue-tsc && vite build && electron-builder build -l",
+    "release:windows": "bunx modclean -r && bun run build-v && vue-tsc && vite build && electron-builder build -w",
+    "release:mac": "bunx modclean -r && bun run build-v && vue-tsc && vite build && electron-builder build -m",
+    "release:linux": "bunx modclean -r && bun run build-v && vue-tsc && vite build && electron-builder build -l",
     "preview": "vite preview",
     "play": "bun --watch ./apl-backend/entry/tests.ts",
     "build-v": "cd ./apl-backend/apl-visuals && vue-tsc -b && vite build"

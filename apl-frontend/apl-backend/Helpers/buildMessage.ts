@@ -49,7 +49,6 @@ export async function buildImage(
   console.log(getChromiumExecPath());
   console.log(process.resourcesPath);
 
-  fs.writeFileSync('C:\\Users\\Aloo\\caca.txt', getChromiumExecPath());
   console.log(11.1)
   const browser = await puppeteer.launch({
     headless: true,
@@ -86,8 +85,7 @@ export async function buildImage(
     ? path.join(__dirname, "..", "..", "apl-backend", "apl-visuals", "visuals", "index.html")
     : path.join(process.resourcesPath, "app.asar.unpacked", "apl-backend", "apl-visuals", "visuals", "index.html");
 
-  console.log(visualsPath);
-  await page.goto(visualsPath);
+  await page.goto(`file:${visualsPath}`);
 
   console.log(11.6)
 
