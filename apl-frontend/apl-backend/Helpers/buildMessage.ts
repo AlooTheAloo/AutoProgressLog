@@ -69,55 +69,54 @@ export async function buildImage(
   });
 
   console.log(11.2)
-  return '';
-  // const page = await browser.newPage();
-  // console.log(11.3)
+  const page = await browser.newPage();
+  console.log(11.3)
   
-  // await page.evaluateOnNewDocument((data, layout) => {
-  //   window.apl_ReportData = data;
-  //   window.apl_ReportLayout = layout;
-  // }, reportData, reportLayout);
+  await page.evaluateOnNewDocument((data, layout) => {
+    window.apl_ReportData = data;
+    window.apl_ReportLayout = layout;
+  }, reportData, reportLayout);
   
-  // console.log(11.4)
+  console.log(11.4)
 
-  // page.setViewport({
-  //   width: 2000 * options.outputQuality / 2,
-  //   height: 5000,
-  //   deviceScaleFactor: options.outputQuality / 2,
-  // });
-  // console.log(11.5)
+  page.setViewport({
+    width: 2000 * options.outputQuality / 2,
+    height: 5000,
+    deviceScaleFactor: options.outputQuality / 2,
+  });
+  console.log(11.5)
 
-  // const isDev = process.env.NODE_ENV === "development";
+  const isDev = process.env.NODE_ENV === "development";
 
-  // const visualsPath = isDev
-  //   ? path.join(__dirname, "..", "..", "apl-backend", "apl-visuals", "visuals", "index.html")
-  //   : path.join(process.resourcesPath, "app.asar.unpacked", "apl-backend", "apl-visuals", "visuals", "index.html");
+  const visualsPath = isDev
+    ? path.join(__dirname, "..", "..", "apl-backend", "apl-visuals", "visuals", "index.html")
+    : path.join(process.resourcesPath, "app.asar.unpacked", "apl-backend", "apl-visuals", "visuals", "index.html");
 
-  // await page.goto(`file:${visualsPath}`);
+  await page.goto(`file:${visualsPath}`);
 
-  // console.log(11.6)
+  console.log(11.6)
 
 
 
-  // await page.waitForNetworkIdle();
-  // console.log(11.7)
+  await page.waitForNetworkIdle();
+  console.log(11.7)
 
-  // await page.screenshot({
-  //   path: outputPath,
-  //   type: extensionToType(options.outputFile.extension),
-  //   clip: {
-  //     width: 1586,
-  //     height: height,
-  //     x: 0,
-  //     y: 0,
-  //   },
-  // });
-  // console.log(11.8)
+  await page.screenshot({
+    path: outputPath,
+    type: extensionToType(options.outputFile.extension),
+    clip: {
+      width: 1586,
+      height: height,
+      x: 0,
+      y: 0,
+    },
+  });
+  console.log(11.8)
 
-  // await browser.close();
-  // console.log(11.9)
+  await browser.close();
+  console.log(11.9)
 
-  // return outputPath;
+  return outputPath;
 }
 
 const extensionToType = (ext:ReportExtension) => {
