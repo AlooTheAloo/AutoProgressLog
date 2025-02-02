@@ -16,7 +16,7 @@ import os from "node:os";
 import { buildMenu } from "./Electron-App/MenuBuilder";
 import { version as v1 } from "../../package.json"
 import semver from "semver";
-
+import { Browser, detectBrowserPlatform, getInstalledBrowsers, install, resolveBuildId} from '@puppeteer/browsers';
 
 const require = createRequire(import.meta.url);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -153,6 +153,8 @@ import { existsSync, readFileSync } from "node:fs";
 import { get } from "node:http";
 import { getFileInAPLData } from "../../apl-backend/Helpers/getConfig";
 import fs from 'fs';
+import puppeteer from "puppeteer";
+import { getChromiumExecPath } from "../../apl-backend/Helpers/buildMessage";
 
 console.log(6);
 
@@ -163,16 +165,17 @@ app.on("ready", async () => {
   electronUpdater.autoUpdater.forceDevUpdateConfig = true;
   electronUpdater.autoUpdater.autoDownload = false;
 
-  const result = await electronUpdater.autoUpdater.checkForUpdates();
-  const f = getFileInAPLData("skip.txt")
-  const skipped = existsSync(f) ? readFileSync(f).toString() ?? "0.0.0" : "0.0.0";
-  console.log(skipped);
-  if(result?.updateInfo.version != (semver.gt(v1, skipped) ? v1 : skipped) && result?.updateInfo != null)
-  {
-    win?.webContents.send("update-available", result?.updateInfo);
-  }
+  //const result = await electronUpdater.autoUpdater.checkForUpdates();
+  // const f = getFileInAPLData("skip.txt")
+  // const skipped = existsSync(f) ? readFileSync(f).toString() ?? "0.0.0" : "0.0.0";
+  // console.log(skipped);
+  // if(result?.updateInfo.version != (semver.gt(v1, skipped) ? v1 : skipped) && result?.updateInfo != null)
+  // {
+  //   win?.webContents.send("update-available", result?.updateInfo);
+  // }
 
   const logFile = getFileInAPLData("app.log");
+  console.log('writing to ' + logFile);
   const logStream = fs.createWriteStream(logFile, { flags: 'a' });
 
   console.log = (...args) => {
@@ -190,3 +193,28 @@ app.on("ready", async () => {
   
 });
 
+
+(async () => {
+  const cachedir = path.join(app.getPath('home'), '.cache', 'puppeteer')
+  const browsers = await getInstalledBrowsers({
+    cacheDir: cachedir
+  })
+
+  const plat = await detectBrowserPlatform();
+  if(plat == undefined) return;
+  console.log("plat is " + plat)
+  const buildId = await resolveBuildId(
+    Browser.CHROME, plat,  "latest"
+  );
+  console.log(buildId);
+
+
+  if((browsers.filter(x => x.browser == Browser.CHROME).length == 0)){
+    await install({ 
+      browser: Browser.CHROME,
+      cacheDir: cachedir,
+      buildId: buildId,
+      unpack: true,
+    })
+  }
+})();

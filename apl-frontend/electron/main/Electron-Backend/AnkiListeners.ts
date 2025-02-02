@@ -15,11 +15,15 @@ export function ankiListeners() {
         const no = {worked: false, decks: []};
 
         try{
+            console.log('1');
             const int = arg.anki.ankiIntegration
             if(int == undefined) return no;
+            console.log('2');
             if(arg.anki.ankiIntegration?.profile == undefined) return no;
+            console.log('3');
             const hse = await hasSyncEnabled(arg.anki.ankiIntegration?.profile) 
             if(hse == null) return no;
+            console.log('4');
             const worked = await LaunchAnki(int);
             if(!worked[0]) return no;
             const retention = await getRetention("true_retention", int);

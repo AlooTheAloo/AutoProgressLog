@@ -226,10 +226,13 @@ export async function LaunchAnki(paths:ankiPaths|ankiIntegration){
         return [false, null];
     }
     
+    console.log('1.1');
     if(!fs.existsSync(paths.ankiPath)){
         console.log(`The file ${paths.ankiPath} does not exist. Please provide a valid path`.red);
         return [false, null];
     }
+
+    console.log('1.2');
 
     const isOpened = (await getAnkiProcesses()).length > 0;
     const openCommand = (process.platform == "darwin" ? `open '${paths.ankiPath}'` : `"${paths.ankiPath}"`);

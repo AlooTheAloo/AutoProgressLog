@@ -5,7 +5,8 @@
   "asar": true,
   "asarUnpack": [
     "apl-backend/apl-visuals/visuals/**",
-    "src/assets/**"
+    "src/assets/**",
+    "node_modules/puppeteer/.local-chromium/**/*",
   ],
   "files": [
     "dist*/**",

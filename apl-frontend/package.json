@@ -16,9 +16,9 @@
   "scripts": {
     "dev": "vite",
     "build": "bun run build-v && vue-tsc && vite build && electron-builder --config -c.mac.identity=null",
-    "release:windows": "bunx modclean -r && bun run build-v && vue-tsc && vite build && electron-builder build -w",
-    "release:mac": "bunx modclean -r && bun run build-v && vue-tsc && vite build && electron-builder build -m",
-    "release:linux": "bunx modclean -r && bun run build-v && vue-tsc && vite build && electron-builder build -l",
+    "release:windows": "bun run build-v && vue-tsc && vite build && electron-builder build -w",
+    "release:mac": "bun run build-v && vue-tsc && vite build && electron-builder build -m",
+    "release:linux": "bun run build-v && vue-tsc && vite build && electron-builder build -l",
     "preview": "vite preview",
     "play": "bun --watch ./apl-backend/entry/tests.ts",
     "build-v": "cd ./apl-backend/apl-visuals && vue-tsc -b && vite build"
@@ -50,6 +50,7 @@
   "dependencies": {
     "@miniben90/x-win": "^1.10.2",
     "@primevue/themes": "^4.0.5",
+    "@puppeteer/browsers": "^2.7.0",
     "@types/color": "^4.2.0",
     "@types/node": "^22.2.0",
     "@vueuse/core": "^11.0.3",
@@ -70,6 +71,7 @@
     "fs": "^0.0.1-security",
     "int": "^0.2.0",
     "js-abbreviation-number": "^1.4.0",
+    "modclean": "^3.0.0-beta.1",
     "node-schedule": "^2.1.1",
     "path": "^0.12.7",
     "pickleparser": "^0.2.1",
