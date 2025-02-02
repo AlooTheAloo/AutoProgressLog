@@ -64,9 +64,7 @@ export async function buildImage(
       "--disable-site-isolation-trials",
     ],
     executablePath: execpath
-  }).catch((err) => { 
-    console.log('error ! ' + err);
-  });
+  })
 
   console.log(11.2)
   const page = await browser.newPage();
