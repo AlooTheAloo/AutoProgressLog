@@ -57,7 +57,7 @@ if (process.platform === "win32") app.setAppUserModelId(app.getName());
 export let win: BrowserWindow | null = null;
 const preload = path.join(__dirname, "../preload/index.mjs");
 export const indexHtml = path.join(RENDERER_DIST, "index.html");
-
+console.log("caca" + 5);
 export async function createWindow() {
   win = new BrowserWindow({
     minHeight: 600,
