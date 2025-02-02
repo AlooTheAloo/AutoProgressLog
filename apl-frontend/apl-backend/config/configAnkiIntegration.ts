@@ -100,7 +100,9 @@ const getAnkiBase = () => {
 
 export async function getAnkiProfiles():Promise<{name: string}[]|null>{
     const prefsDBPath = path.join(getAnkiBase(), "prefs21.db");
-    console.log(prefsDBPath);
+    if(!fs.existsSync(prefsDBPath)){
+        return null;
+    }
     const prefsDB = new sqlite3.Database(prefsDBPath, (err) => {});
     const profiles:{name: string}[]|null = await new Promise((res, rej) => {
         prefsDB.all("SELECT name FROM profiles WHERE name NOT IN ('_global')", (err, rows:any[]) => {
@@ -267,7 +269,7 @@ export async function LaunchAnki(paths:ankiPaths|ankiIntegration){
             const windows = (await readWindows(allAnkis.map(x => x.pid)))
             const pid = (await getAnkiProcesses()).at(0)?.pid;
             console.log("pid " + pid);
-            console.log("windows " + windows);
+            console.log("windows " + JSON.stringify(windows));
             
             if((windows.length > 0 || isOpened) && pid != undefined){
                 console.log("Anki has been found");
