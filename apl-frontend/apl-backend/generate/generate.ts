@@ -74,7 +74,7 @@ export async function runGeneration(){
         current: newBest,
         delta: newBest - oldBest
     }
-    console.log('10');
+    console.log('10' + bestObject);
 
 
     const json = buildJSON(

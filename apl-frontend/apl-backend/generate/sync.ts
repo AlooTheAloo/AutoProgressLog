@@ -215,10 +215,11 @@ export async function VerifyPreviousActivities(from:dayjs.Dayjs, to:dayjs.Dayjs,
 
     // Added
     const toAdd = togglEntries.filter(x => !dbIDs.includes(x.id) && dayjs(x.stop).unix() > from.unix() && dayjs(x.stop).unix() < to.unix());
+    console.log("toAdd is " + toAdd);
     await WriteEntries(toAdd);
 
     delta += toAdd.reduce((acc, x) => acc + x.duration, 0);
-
+    console.log("delta is " + delta);
 
     // Removed
     const toRemove = dbEntries.filter(x => !togglIDs.includes(x.id));
@@ -236,10 +237,10 @@ export async function syncToggl():Promise<{entries: entry[], delta:number}|null>
     const entries = await getTimeEntries(lastReportTime);
 
     if(entries == null) return null;
-
+    console.log(entries);
     const delta = await VerifyPreviousActivities(dayjs(lastReportTime), dayjs(startSync.generationTime), entries.entriesAfterLastGen);
     return {
-        entries: entries.entriesAfterLastGen.filter(x => dayjs(x.stop).isAfter(startSync.generationTime)),
+        entries: entries.entriesAfterLastGen.filter(x => dayjs(x.stop).isAfter(startSync.generationTime) && dayjs(x.stop).isBefore(dayjs())),
         delta: delta
     }
 }

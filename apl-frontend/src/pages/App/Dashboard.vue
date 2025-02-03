@@ -87,6 +87,7 @@ onMounted(async () => {
 
   try {
     const data: DashboardDTO = await window.ipcRenderer.invoke("Get-Dashboard-DTO");
+    console.log(data);
     dto.value = data;
 
     if(data.syncCount == 1){

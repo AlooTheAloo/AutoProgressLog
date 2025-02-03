@@ -1,9 +1,8 @@
 <script setup lang="ts">
     import MatureCards from "/Icons/MatureCards.png"
     import { computed } from "vue";
-    import dayjs from "dayjs";
     import { relativeActivity } from "../../types/report-data";
-
+    import formatTime from "../../util/timeFormat";
     const limit = 7;
 
     interface ImmersionLogProps{
@@ -13,7 +12,7 @@
 
 
     const hrTotal = computed(() => {
-        return dayjs.duration(props.log.reduce((a, b) => a + b.relativeValue, 0), "second").format("HH:mm:ss");
+        return formatTime(props.log.reduce((a, b) => a + b.relativeValue, 0));
     })
     const sortedActivities = computed(() => {
         const sorted = [...props.log].sort((a, b) => b.relativeValue - a.relativeValue);
@@ -22,7 +21,7 @@
             return {
                 name: x.name,
                 relativeValue: x.relativeValue,
-                hr : dayjs.duration(x.relativeValue, "second").format("HH:mm:ss")
+                hr : formatTime(x.relativeValue)
             }
         });
 
@@ -36,7 +35,7 @@
             return {
                 name: x.name,
                 relativeValue: x.relativeValue,
-                hr : dayjs.duration(x.relativeValue, "second").format("HH:mm:ss")
+                hr : formatTime(x.relativeValue)
             }
         });
 

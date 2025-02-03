@@ -4,7 +4,7 @@
     import Calendar from "/Icons/BestTime.png"
     import SmallWidget from "../SmallWidget.vue"
     import { TPlusDelta } from "../../types/report-data";
-    import dayjs from "dayjs";
+    import formatTime from "../../util/timeFormat";
     
     interface BestTimeProps{
         time: TPlusDelta<number>;
@@ -16,7 +16,7 @@
 
 <template>
     <SmallWidget title="Best Immersion Time" units="" :image="Calendar" :value="{ 
-        current: dayjs.duration(Math.abs(props.time.current), 'second').format('HH:mm:ss'),
+        current: formatTime(Math.abs(props.time.current)),
         delta: 0
       }"
       :hide-delta="true"

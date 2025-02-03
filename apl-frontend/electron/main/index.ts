@@ -50,11 +50,11 @@ console.log("wtf is happening 2");
 // Set application name for Windows 10+ notifications
 if (process.platform === "win32") app.setAppUserModelId(app.getName());
 
-if (!app.requestSingleInstanceLock()) {
-  console.log("dead");
-  app.quit();
-  process.exit(0);
-}
+// if (!app.requestSingleInstanceLock()) {
+//   console.log("dead");
+//   app.quit();
+//   process.exit(0);
+// }
 
 
 export let win: BrowserWindow | null = null;

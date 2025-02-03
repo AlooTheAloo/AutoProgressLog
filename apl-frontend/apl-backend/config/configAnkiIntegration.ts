@@ -8,6 +8,7 @@ import path, { basename } from "path";
 import { kill } from "process";
 import { readWindows } from "../Helpers/readWindows.js";
 import { getSetupAnkiIntegration } from "../../electron/main/Electron-Backend/SetupConfigBuilder.js";
+import { win } from "../../electron/main/index.js";
 
 
 export interface ankiPaths{
@@ -180,6 +181,8 @@ export async function verifyAnkiPaths(paths:ankiPaths):Promise<boolean>{
 
 
 export async function createAnkiIntegration(paths:ankiPaths):Promise<ankiIntegration|false>{
+    win?.webContents.send("anki-connect-message", "Launching anki");
+
     const worked = await LaunchAnki(paths);
     if(worked.at(0) == false) { 
         return false;
@@ -260,7 +263,7 @@ export async function LaunchAnki(paths:ankiPaths|ankiIntegration){
                 }
             } 
             const allAnkis = await proc("name", "Anki");
-            console.log("allAnkis " + allAnkis);
+            console.log("allAnkis " + JSON.stringify(allAnkis));
             iterations++;
             if(allAnkis.length == 0 && !isOpened){
                 return;

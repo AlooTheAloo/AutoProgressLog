@@ -6,7 +6,7 @@ import { SyncData } from "../../types/sync";
 
 export async function WriteEntries(entries:entry[], syncDataId:number = -1){
     if(entries.length == 0) return;
-    
+    console.log("Adding " + entries.length + " entries");
     return new Promise<void>((res, rej) => {
         const query = `INSERT OR IGNORE INTO immersionActivity (id, syncDataId, time, seconds, activityName) VALUES 
     ${

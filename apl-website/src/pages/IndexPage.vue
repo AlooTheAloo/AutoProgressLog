@@ -1,7 +1,5 @@
 <template>
-  <q-page>
-    <h1>Lorem ipsum</h1>
-  </q-page>
+  hello world
 </template>
 
 <script setup lang="ts"></script>

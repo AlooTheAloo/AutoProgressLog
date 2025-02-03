@@ -9,10 +9,11 @@
     import { NWayInterpol } from "../../util/n-way-interpol";
 import { ImmersionSource } from "../../../electron/main/Electron-Backend/types/Dashboard";
 import pluralize from "pluralize";
+import formatTime from "../../util/timeFormat";
 
     const { width, height } = useWindowSize()
 
-    const limit /* As x goes to infinity ??? */ = ref<number>(width.value > 1820 ? 50 : 12);
+    const limit /* As x goes to infinity ??? */ = ref<number>(width.value >= 1820 ? 50 : 12);
     const props = defineProps<{
         sources: ImmersionSource[];
     }>();
@@ -22,7 +23,7 @@ import pluralize from "pluralize";
     });
 
     watch(width, () => {
-        width.value > 1820 ? limit.value = 25 : limit.value = 12;
+        width.value >= 1820 ? limit.value = 25 : limit.value = 12;
     });
 
     const sortedSources = computed(() => {
@@ -43,7 +44,8 @@ import pluralize from "pluralize";
             return {
                 name: x.name,
                 relativeValue: x.relativeValue,
-                hr : dayjs.duration(x.relativeValue, "second").format("HH:mm:ss")
+                
+                hr : formatTime(x.relativeValue)
             }
         });
     });
@@ -70,7 +72,7 @@ import pluralize from "pluralize";
         const ret:ApexOptions = {
             
             chart:{
-                width: (width.value > 1820) ? 500 : 300,
+                width: (width.value >= 1820) ? 500 : 300,
                 animations: {
                     enabled: false
                 }

@@ -1,123 +1,26 @@
 <template>
-  <div class="q-pa-md">
-    <q-layout view="lHh LpR lFf">
-      <q-drawer
-        v-model="leftDrawerOpen"
-        :mini="miniState"
-        @mouseenter="miniState = false"
-        @mouseleave="miniState = true"
-        show-if-above
-      >
-        <div class="drawer-container">
-          <!-- Top Item -->
-          <div class="drawer-top">
-            <q-item clickable v-ripple>
-              <q-item-section avatar>
-                <q-icon :name="`img:${APLIcon}`" size="md" />
-              </q-item-section>
+  <div class="bot-container" style="padding-bottom: 1rem;">
+    If you're interested in getting beta access and help testing the app, shoot me a DM on discord (AlooTheAloo4250)
 
-              <q-item-section>AutoProgressLog</q-item-section>
-            </q-item>
-          </div>
-
-          <!-- Middle Items (Scrollable Area) -->
-          <div class="drawer-scroll">
-            <q-list padding class="menu-list">
-              <q-item clickable v-ripple :to="{ name: 'index' }">
-                <q-item-section avatar>
-                  <q-icon name="play_circle" />
-                </q-item-section>
-
-                <q-item-section>{{ t('layout.getStarted') }}</q-item-section>
-              </q-item>
-
-              <q-item clickable v-ripple :to="{ name: 'download' }">
-                <q-item-section avatar>
-                  <q-icon name="download" />
-                </q-item-section>
-
-                <q-item-section>{{ t('layout.download') }}</q-item-section>
-              </q-item>
-
-              <q-item clickable v-ripple>
-                <q-item-section avatar>
-                  <q-icon name="language" />
-                </q-item-section>
-
-                <q-item-section>{{ t('layout.wiki') }}</q-item-section>
-              </q-item>
-            </q-list>
-          </div>
-          <div class="drawer-bottom">
-            <q-list padding>
-              <q-item clickable v-ripple>
-                <q-item-section avatar>
-                  <q-icon name="discord" />
-                </q-item-section>
-
-                <q-item-section>Discord</q-item-section>
-              </q-item>
-
-              <q-item clickable v-ripple>
-                <q-item-section avatar>
-                  <q-icon name="settings" />
-                </q-item-section>
-
-                <q-item-section>Github</q-item-section>
-              </q-item>
-            </q-list>
-          </div>
-        </div>
-      </q-drawer>
-
-      <q-page-container>
-        <q-page padding>
-          <router-view />
-        </q-page>
-      </q-page-container>
-      <q-footer reveal class="bg-grey-10 text-white">
-        <q-toolbar class="flex justify-between items-center">
-          <!-- Logo and Title -->
-          <q-toolbar-title class="flex items-center gap-lg">
-            <q-icon :name="`img:${APLIcon}`" size="lg" />
-            <div>AutoProgressLog<span class="text-blue">.</span></div>
-          </q-toolbar-title>
-
-          <!-- Locale Selector -->
-          <q-select
-            v-model="locale"
-            :options="locale_options"
-            emit-value
-            map-options
-            dense
-            borderless
-            class="locale-selector"
-          />
-
-          <!-- Navigation Links -->
-          <q-list class="q-pa-md flex items-center gap-md">
-            <q-item clickable v-ripple :to="{ name: 'index' }">
-              <q-item-section>{{ t('layout.getStarted') }}</q-item-section>
-            </q-item>
-
-            <q-item clickable v-ripple :to="{ name: 'download' }">
-              <q-item-section>{{ t('layout.download') }}</q-item-section>
-            </q-item>
-
-            <q-item clickable v-ripple :to="{ name: 'wiki' }">
-              <q-item-section>{{ t('layout.wiki') }}</q-item-section>
-            </q-item>
-          </q-list>
-
-          <!-- Icon Buttons -->
-          <div class="icon-buttons flex gap-sm">
-            <q-btn icon="discord" flat aria-label="Discord" />
-            <q-btn icon="settings" flat aria-label="Settings" />
-          </div>
-        </q-toolbar>
-      </q-footer>
-    </q-layout>
   </div>
+  <div class="app-container">
+    <img :src="APLIcon" style="width: 5rem; height: 5rem; margin-bottom: 1rem;" />
+    <div style="display: flex; justify-content: center; align-items: center; flex-direction: column;">
+      <div style="font-size: 3rem; padding: 0.5rem;" class="text-gradient">
+        Hey there ! 
+      </div>
+      
+      <div style="font-size: 1.5rem; text-align: center; padding: 0.5rem;">
+        If you're here, you're probably looking for how to make those immersion reports.
+        <br>
+        The app used to create them is still in active development, but we're getting closer to launch! Stay tuned for updates! 🚀
+        <br>
+      </div>
+    </div>
+    
+  </div>
+
+
 </template>
 
 <script setup lang="ts">
@@ -131,6 +34,36 @@ const { t, locale } = useI18n();
 </script>
 
 <style lang="scss" scoped>
+
+.text-gradient {
+  background: linear-gradient(to right, #89BDFF, #40FFFF);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  align-items: center;
+  justify-content: center;
+  background-color: #242424;
+  color: white;
+}
+
+.bot-container {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  align-items: center;
+  justify-content: end;
+  color: white;
+}
+
+
 .drawer-container {
   display: flex;
   flex-direction: column;

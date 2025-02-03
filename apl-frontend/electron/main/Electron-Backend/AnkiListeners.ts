@@ -176,7 +176,6 @@ async function macOSAnki(paths:any){
     win?.webContents.send("anki-connect-message", "Verifying permissions");        
     const perms = await hasPerms();
     if(perms){
-        win?.webContents.send("anki-connect-message", "Launching anki");
         return await createAnkiIntegration(paths);
     }
     else {
