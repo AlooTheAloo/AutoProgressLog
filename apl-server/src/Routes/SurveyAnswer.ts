@@ -17,7 +17,7 @@ const t_surveyAnswer = t.Object({
 });
 
 export default new Elysia()
-	.post('/survery-answer/v1', ({ set, body }) => {
+	.post('/survey-answer/v1', ({ set, body }) => {
         InsertSurvey(body);
         set.status = 200;
         return "Survey answer saved successfully"

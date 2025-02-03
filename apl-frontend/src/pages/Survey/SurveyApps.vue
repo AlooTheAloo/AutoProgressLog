@@ -14,7 +14,7 @@
 
 
 
-    const selectedApps = defineModel<{label: string, value: string}[] | undefined>("language");
+    const selectedApps = defineModel<{label: string, value: any}[] | undefined>("language");
     const { width, height } = useWindowSize();
 
     const appList = [
@@ -39,7 +39,7 @@
 
     const router = useRouter();
     function NextPage(){
-        const sanitizedData = JSON.parse(JSON.stringify(selectedApps.value));
+        const sanitizedData = JSON.parse(JSON.stringify(selectedApps.value)).map((x:any) => x.value);
         window.ipcRenderer.invoke("answer-survey-apps", sanitizedData).then((res:any) => {
             router.push('/setup/complete');
         });

@@ -25,7 +25,7 @@ const fileSizes = [
     ,
     {
         quality: 3,
-        size: "~800MB",
+        size: "~800kB",
     }
     ,
     {

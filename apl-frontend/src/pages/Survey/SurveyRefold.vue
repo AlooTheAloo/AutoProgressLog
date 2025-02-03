@@ -8,7 +8,7 @@
     import SelectButton from 'primevue/selectbutton';
 
     const hasSeenRefold = defineModel<boolean|undefined>("refold");
-    const selectedStage = defineModel<string | undefined>("stage");
+    const selectedStage = defineModel<any | undefined>("stage");
 
     const options = [
         { 
@@ -74,7 +74,12 @@
     const router = useRouter();
     function NextPage(){
 
-        window.ipcRenderer.invoke("answer-survey-refold", hasSeenRefold.value, selectedStage.value).then((res:any) => {
+        window.ipcRenderer.invoke("answer-survey-refold", { 
+            knows : hasSeenRefold.value, 
+            stage: selectedStage.value?.value
+
+        }
+        ).then((res:any) => {
             router.push('/survey/learning');
         })
     }
@@ -135,8 +140,6 @@
                                             }
                                         }
                                     }"
-
-                                    
                                     >
                                         {{  
                                             slotProps.option.label

@@ -12,7 +12,7 @@
     import SelectButton from 'primevue/selectbutton';
     import { useWindowSize } from '@vueuse/core'
 
-    const active = ref<string|undefined>('0');
+    const active = ref<string|undefined>(0);
     const panel = defineModel<number>("a");
     const selectedYears = defineModel<{label:string, value: string} | undefined>("years");
     const selectedLanguage = defineModel<{label: string, value: string} | undefined>("language");
@@ -21,38 +21,38 @@
 
     watch(selectedLanguage, () => {
         if(selectedLanguage.value == undefined) return;
-        active.value = '1';
+        active.value = "1";
     })
 
     
     const timeList = [
         {
             label: "Less than 1 year",
-            value : '<1'
+            value : "0"
         },
         {
             label: "1 year",
-            value : '1'
+            value : "1"
         },
         {
             label: "2 years",
-            value : '2'
+            value : "2"
         },
         {
             label: "3 years",
-            value : '3'
+            value : "3"
         },
         {
             label: "4 years",
-            value : '4'
+            value : "4"
         },
         {
             label: "More than 4 years",
-            value : '>5'
+            value : "5"
         },
         {
             label: "I don't know",
-            value : '-1'
+            value : "-1"
         }
     ];
 
@@ -169,7 +169,7 @@
 
     const router = useRouter();
     function NextPage(){
-        window.ipcRenderer.invoke("answer-survey-language", selectedLanguage.value, selectedYears.value).then((res:any) => {
+        window.ipcRenderer.invoke("answer-survey-language", selectedLanguage.value?.value, parseInt(selectedYears.value?.value ?? "-2")).then((res:any) => {
             router.push('/survey/apps');
         });
     }

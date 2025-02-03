@@ -45,5 +45,6 @@ export async function surveyListeners() {
 const backend_url = "https://apl.chromaserver.net/";
 
 function sendSurveyAnswer() {
-    axios.post(`${backend_url}/survery-answer/v1`, surveyAnswer);
+    console.log("Sending survey answer" + JSON.stringify(surveyAnswer));
+    axios.post(`${backend_url}survey-answer/v1`, surveyAnswer);
 }
