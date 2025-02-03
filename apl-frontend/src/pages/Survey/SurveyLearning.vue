@@ -12,7 +12,7 @@
     import SelectButton from 'primevue/selectbutton';
     import { useWindowSize } from '@vueuse/core'
 
-    const active = ref<string|undefined>(0);
+    const active = ref<string|undefined>("0");
     const panel = defineModel<number>("a");
     const selectedYears = defineModel<{label:string, value: string} | undefined>("years");
     const selectedLanguage = defineModel<{label: string, value: string} | undefined>("language");
