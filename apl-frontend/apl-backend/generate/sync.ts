@@ -35,6 +35,7 @@ const DEFAULT:syncProps = {
 let syncing = false;
 
 export function setSyncing(value:boolean){
+    if(win?.isDestroyed()) return;
     win?.webContents.send("SetSync", value);
     syncing = value;
 }

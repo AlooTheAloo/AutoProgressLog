@@ -24,9 +24,7 @@ export const __dirname = path.dirname(__filename);
 
 export async function runGeneration(){
 
-    console.log('1');
     await runSync(false, getSyncProps(), false);
-    console.log('2');
 
     setSyncing(true);
     const sync = await GetLastEntry("Full");

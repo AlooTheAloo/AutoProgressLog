@@ -57,6 +57,9 @@ if (process.platform === "win32") app.setAppUserModelId(app.getName());
 // }
 
 
+
+
+
 export let win: BrowserWindow | null = null;
 const preload = path.join(__dirname, "../preload/index.mjs");
 export const indexHtml = path.join(RENDERER_DIST, "index.html");
@@ -123,16 +126,23 @@ app.on("window-all-closed", () => {
   buildContextMenu();
 });
 
-app.on("second-instance", () => {
+app.on("second-instance", async () => {
+  console.log("second instance");
   if (win) {
-    // Focus on the main window if the user tried to open another
-    if (win.isMinimized()) win.restore();
-    win.focus();
+    if (process.platform == "darwin") {
+      app.dock.show();
+    } else if (process.platform == "win32" && !win?.isDestroyed) {
+      win?.setSkipTaskbar(false);
+    }
+    if (win?.isDestroyed()) await createWindow();
+    if (win?.isMinimized()) win.restore();
+    win?.focus();
+    buildContextMenu();
   }
 });
 
 app.on("activate", () => {
-  console.log("a");
+  
   const allWindows = BrowserWindow.getAllWindows();
   if (allWindows.length) {
     allWindows[0].focus();
@@ -149,14 +159,9 @@ import {
 } from "./Electron-Backend/appBackend";
 import { createAutoReport } from "./Electron-Backend/Reports/AutoReportGenerator";
 import { createAutoRPC } from "./Electron-Backend/RPC/RPCHandler";
-import { existsSync, readFileSync } from "node:fs";
-import { get } from "node:http";
-import { getFileInAPLData } from "../../apl-backend/Helpers/getConfig";
+import { getConfig, getFileInAPLData } from "../../apl-backend/Helpers/getConfig";
 import fs from 'fs';
-import puppeteer from "puppeteer";
-import { getChromiumExecPath } from "../../apl-backend/Helpers/buildMessage";
 
-console.log(6);
 
 app.on("ready", async () => {
   buildMenu(app);

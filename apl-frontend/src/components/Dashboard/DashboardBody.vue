@@ -130,7 +130,16 @@ const bottomText = computed(() => {
                         /> 
                     </div>
                     <div v-else>
-                        
+                        <div class="hidden 1820:flex">
+                            <div class=" flex flex-col  flex-grow h-36 bg-black rounded-xl items-center justify-center text-white text-center">
+                                <div class="font-semibold text-2xl">
+                                    Want more data?
+                                </div>
+                                <div class="">
+                                    Enable anki integration in the settings page to see your statistics.
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     
                 </div>

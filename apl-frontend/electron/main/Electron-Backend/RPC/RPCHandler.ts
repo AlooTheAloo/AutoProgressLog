@@ -76,8 +76,8 @@ function createJob(){
         const seconds = (lastEntry?.toggl?.totalSeconds ?? 0) + Math.abs(dayjs(single.start).diff(dayjs(), "seconds"));
         
         // if(seconds == null) return;
-
-        rpc.setActivity({
+        console.log("set rpc to " + seconds);
+        const a = await rpc.setActivity({
             details: `Immersing | ${(seconds / 3600).toFixed(2)} hours`, 
             state: single.description, // What the user is doing
             instance: false,
@@ -89,6 +89,7 @@ function createJob(){
             //     },
             // ],
         });
+        console.log("set rpc to " + JSON.stringify(a));
         currentActivity = single;
     })
 

@@ -23,7 +23,6 @@
         if(selectedLanguage.value == undefined) return;
         active.value = "1";
     })
-
     
     const timeList = [
         {
