@@ -62,6 +62,8 @@ jobs:
         echo "VERSION=$VERSION" >> $GITHUB_ENV
 
     - name: Create Git tag for version
+      env:
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}  
       run: |
         git tag $VERSION
         git push origin $VERSION
@@ -74,6 +76,7 @@ jobs:
       with:
         title: AutoProgressLog v${{ env.VERSION }}
         tag: ${{ env.VERSION }}
+        
     - name: Upload release assets
       uses: softprops/action-gh-release@v1
       with:
