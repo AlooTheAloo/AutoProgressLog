@@ -31,19 +31,25 @@ jobs:
 
     - name: Build for Windows
       if: matrix.os == 'windows-latest'
-      run: npm run release:windows
+      run: |
+        cd apl-frontend
+        npm run release:windows
       env:
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
         
     - name: Build for macOS
       if: matrix.os == 'macos-latest'
-      run: npm run release:mac
+      run: |
+        cd apl-frontend
+        npm run release:mac
       env:
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
     - name: Build for Linux
       if: matrix.os == 'ubuntu-latest'
-      run: npm run release:linux
+      run: |
+        cd apl-frontend
+        npm run release:linux
       env:
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
