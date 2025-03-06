@@ -68,7 +68,7 @@ jobs:
       with:
         name: AutoProgressLog v${{ env.VERSION }}
         tag_name: ${{ env.VERSION }}
-        body_path: ${{ github.workspace }}-CHANGELOG.txt
+        body_path: ${{ github.workspace }}/CHANGELOG.md
         files: |
           apl-frontend/release/**/*.exe
           apl-frontend/release/**/*.dmg
