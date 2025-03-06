@@ -1,75 +1,55 @@
-name: Build and Release APL
+name: Release APL
 
 on:
   push:
     branches:
-      - main
-  pull_request:
-    branches:
-      - main
-  workflow_dispatch:
-  release:
-    types: [created]
+      - main  # Adjust this to match your branch, usually 'main' or 'master'
 
 jobs:
-  build:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
-      
-      - name: Install Dependencies
-        run: |
-          cd apl-frontend
-          npm install
-        
-      - name: Build for Windows
-        if: matrix.os == 'windows-latest'
-        run: |
-          cd apl-frontend
-          npm run release:windows
-      
-      - name: Build for macOS
-        if: matrix.os == 'macos-latest'
-        run: |
-          cd apl-frontend
-          npm run release:mac
-      
-      - name: Build for Linux
-        if: matrix.os == 'ubuntu-latest'
-        run: |
-          cd apl-frontend
-          npm run release:linux
-
-      - name: Upload Release Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: apl-build-${{ matrix.os }}
-          path: |
-            dist/  # Adjust to the actual output directory
-          retention-days: 7
-
   release:
-    needs: build
     runs-on: ubuntu-latest
-    steps:
-      - name: Download Artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: releases
 
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: releases/**/*
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v3
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'  # Adjust the Node.js version as needed
+
+    - name: Install dependencies
+      run: |
+        cd apl-frontend
+        npm install
+
+    - name: Get version from package.json
+      id: version
+      run: |
+        cd apl-frontend
+        VERSION=$(node -p "require('./package.json').version")
+        echo "Version: $VERSION"
+        echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+    - name: Create Git tag for version
+      run: |
+        git tag $VERSION
+        git push origin $VERSION
+
+    - name: Create a Release
+      uses: elgohr/Github-Release-Action@v5
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        title: AutoProgressLog v${{ env.VERSION }}
+        tag: ${{ env.VERSION }}
+    - name: Upload release assets
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          apl-frontend/release/**/*.exe    # Adjust to your actual build output files
+          apl-frontend/release/**/*.dmg
+          apl-frontend/release/**/*.AppImage
+          apl-frontend/release/**/*.yml
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
