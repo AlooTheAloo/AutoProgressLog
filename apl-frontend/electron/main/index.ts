@@ -170,15 +170,6 @@ app.on("ready", async () => {
   electronUpdater.autoUpdater.forceDevUpdateConfig = true;
   electronUpdater.autoUpdater.autoDownload = false;
 
-
-  const result = await electronUpdater.autoUpdater.checkForUpdates();
-  const f = getFileInAPLData("skip.txt")
-  const skipped = existsSync(f) ? readFileSync(f).toString() ?? "0.0.0" : "0.0.0";
-  if(result?.updateInfo.version != (semver.gt(v1, skipped) ? v1 : skipped) && result?.updateInfo != null)
-  {
-    win?.webContents.send("update-available", result?.updateInfo);
-  }
-
   const logFile = getFileInAPLData("app.log");
   const logStream = fs.createWriteStream(logFile, { flags: 'a' });
 
@@ -186,6 +177,17 @@ app.on("ready", async () => {
     logStream.write(new Date().toISOString() + ' ' + args.join(' ') + '\n');
     process.stdout.write(args.join(' ') + '\n');
   };
+
+  const result = await electronUpdater.autoUpdater.checkForUpdates();
+  console.log("result is " + result);
+  const f = getFileInAPLData("skip.txt")
+  const skipped = existsSync(f) ? readFileSync(f).toString() ?? "0.0.0" : "0.0.0";
+  if(result?.updateInfo.version != (semver.gt(v1, skipped) ? v1 : skipped) && result?.updateInfo != null)
+  {
+    win?.webContents.send("update-available", result?.updateInfo);
+  }
+
+
 
   app.setLoginItemSettings({
     openAtLogin: true,

@@ -23,6 +23,16 @@ jobs:
         cd apl-frontend
         npm install
 
+    - name: Build release files (Windows, macOS, Linux)
+      run: |
+        cd apl-frontend
+        npm run release:windows   # Adjust your build commands as needed
+        npm run release:mac
+        npm run release:linux
+      env:
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+
     - name: Get version from package.json
       id: version
       run: |
@@ -35,6 +45,7 @@ jobs:
       run: |
         git tag $VERSION
         git push origin $VERSION
+
 
     - name: Create a Release
       uses: elgohr/Github-Release-Action@v5
