@@ -71,10 +71,10 @@ jobs:
         tag_name: ${{ env.VERSION }}
         body_path: ${{ github.workspace }}/CHANGELOG.md
         files: |
-          apl-frontend/release/**/*.exe
-          apl-frontend/release/**/*.dmg
-          apl-frontend/release/**/*.AppImage
-          apl-frontend/release/**/*.yml
+          apl-frontend/release/**/AutoProgressLog-Windows*.exe
+          apl-frontend/release/**/AutoProgressLog_MacOS*.dmg
+          apl-frontend/release/**/AutoProgressLog-Linux*.AppImage
+          apl-frontend/release/**/latest*.yml
         
 permissions:
   contents: write
