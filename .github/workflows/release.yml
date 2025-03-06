@@ -55,6 +55,7 @@ jobs:
 
     - name: Get version from package.json
       id: version
+      shell: bash 
       run: |
         cd apl-frontend
         VERSION=$(node -p "require('./package.json').version")
