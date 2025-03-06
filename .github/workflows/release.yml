@@ -26,21 +26,29 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 18
-
+      
       - name: Install Dependencies
-        run: npm install
-
+        run: |
+          cd apl-frontend
+          npm install
+        
       - name: Build for Windows
         if: matrix.os == 'windows-latest'
-        run: npm run release:windows
-
+        run: |
+          cd apl-frontend
+          npm run release:windows
+      
       - name: Build for macOS
         if: matrix.os == 'macos-latest'
-        run: npm run release:mac
-
+        run: |
+          cd apl-frontend
+          npm run release:mac
+      
       - name: Build for Linux
         if: matrix.os == 'ubuntu-latest'
-        run: npm run release:linux
+        run: |
+          cd apl-frontend
+          npm run release:linux
 
       - name: Upload Release Artifact
         uses: actions/upload-artifact@v4
