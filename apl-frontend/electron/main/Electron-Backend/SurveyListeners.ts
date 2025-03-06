@@ -16,7 +16,6 @@ interface surveyAnswer {
 const surveyAnswer:surveyAnswer = {};
 
 export async function surveyListeners() {
-
     ipcMain.handle("answer-survey-track", async (event, args) => {
         surveyAnswer.track = args;
     })
@@ -38,8 +37,6 @@ export async function surveyListeners() {
         surveyAnswer.appsUsing = args;
         sendSurveyAnswer();
     })
-
-
 }
 
 const backend_url = "https://apl.chromaserver.net/";

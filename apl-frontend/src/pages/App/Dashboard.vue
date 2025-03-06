@@ -87,7 +87,6 @@ onMounted(async () => {
 
   try {
     const data: DashboardDTO = await window.ipcRenderer.invoke("Get-Dashboard-DTO");
-    console.log(data);
     dto.value = data;
 
     if(data.syncCount == 1){
@@ -111,6 +110,7 @@ onMounted(async () => {
     lastSyncTime.value = getLastSyncTime();
   }, TIME_SYNC_INTERVAL));
 });
+
 
 
 const intervals:Timer[] = [];

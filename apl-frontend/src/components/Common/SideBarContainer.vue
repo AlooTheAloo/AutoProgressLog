@@ -55,16 +55,15 @@ import Toast from "primevue/toast";
         currentRoute: AppPath;
     }>();
 
-
-
     window.ipcRenderer.on("ShowDialog", (evt, args:UserDialog) => {
         dialog.value = args;
         visible.value = true;     
-    })
+    });
 
+    const updateInfo = ref<UpdateInfo|null>(null);
 
     window.ipcRenderer.on("update-available", (e, args: UpdateInfo) => {
-        console.log("Updated")
+        updateInfo.value = args;
         toastValue.value = {
             header: `An update is available!`,
             content: `v${args.version}\n${args.releaseNotes}`,
@@ -72,7 +71,7 @@ import Toast from "primevue/toast";
             yes: {
                 text: "Update now",
                 on: () => {
-                    window.ipcRenderer.invoke("Update-App");
+                    window.ipcRenderer.invoke("Update-App", args);
                 }
             },
             no: {
@@ -106,17 +105,15 @@ import Toast from "primevue/toast";
                 <div class="flex items-center gap-2">
                     <span class="font-bold">{{ toastValue?.header }}</span>
                 </div>
-                <div class="font-medium text-lg my-4">{{ toastValue?.content }}</div>
+                <div class="font-medium text-lg my-4" v-html="toastValue?.content"></div>
                 <div class="flex gap-2">
                     <Button size="small" :label="toastValue?.yes?.text" @click="toastValue?.yes?.on"></Button>
                     <Button size="small" :label="toastValue?.no?.text" severity="secondary" @click="toastValue?.no?.on"></Button>
                 </div>
-                
             </div>
         </template>
     </Toast>
-
-
+    
     <Dialog
     :header="dialog?.header"
     :footer="dialog?.footer"

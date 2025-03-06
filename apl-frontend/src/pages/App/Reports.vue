@@ -173,17 +173,27 @@ function nf(num:number){
                                                     <div class="flex flex-row md:flex-col justify-between items-start">
                                                         <div class="flex items-center gap-2">
                                                             <div class="text-lg font-medium">Report #{{ item.id }}</div>
+                                                            
                                                             <span class="font-medium text-surface-500 dark:text-surface-400 text-sm text-[#24CAFF] italic">
-                                                                {{
-                                                                    item.date.format('Do')
-                                                                }}
-                                                                of
-                                                                {{
-                                                                    item.date.format('MMMM').toLowerCase()
-                                                                }} 
-                                                                {{
-                                                                    item.date.format('YYYY')
-                                                                }}
+                                                                <span v-if="item.date.isSame(dayjs(), 'd') "> 
+                                                                    Today
+                                                                </span>
+                                                                <span v-else-if="item.date.diff(dayjs(), 'd') == -1">
+                                                                    Yesterday
+                                                                </span>
+                                                                <span v-else>
+                                                                    {{
+                                                                        item.date.format('Do')
+                                                                    }}
+                                                                    of
+                                                                    {{
+                                                                        item.date.format('MMMM').toLowerCase()
+                                                                    }} 
+                                                                    {{
+                                                                        item.date.format('YYYY')
+                                                                    }}
+                                                                </span>
+                                                               
                                                                 at
                                                                 {{ 
                                                                     item.date.format('h:mm a')

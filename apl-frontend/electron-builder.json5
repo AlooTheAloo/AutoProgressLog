@@ -24,7 +24,7 @@
     },
   },
   mac: {
-    target: ["default"],
+    target: ["dmg"],
     artifactName: "${productName}_MacOS_${version}_Installer.${ext}",
     entitlements: "build/entitlements.mac.plist",
     entitlementsInherit: "build/entitlements.mac.plist",
@@ -52,8 +52,8 @@
   publish: [
     {
       provider: "github",
-      owner: "727apps",
-      repo: "AutoUpdateTest",
+      owner: "AlooTheAloo",
+      repo: "AutoProgressLog",
     },
   ],
 }

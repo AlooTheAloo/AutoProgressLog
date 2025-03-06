@@ -100,7 +100,7 @@ const bottomText = computed(() => {
                     :image="Time"
                     :direction="dto.immersionDTO.immersionSinceLastReport"
                     :hideDelta="dto.immersionDTO.immersionSinceLastReport === 0"
-                    />
+                    />                    
                 </div>
                 <div class=" w-[45rem]">
                     <div v-if="dto.ankiDTO != null" class="flex flex-row gap-3">

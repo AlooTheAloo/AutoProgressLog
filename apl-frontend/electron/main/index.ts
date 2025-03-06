@@ -108,12 +108,10 @@ export async function createWindow() {
   win.webContents.once("did-finish-load", () => {});
 }
 
-console.log(5);
 app.whenReady().then(() => {
   if(app.getLoginItemSettings().wasOpenedAtLogin || process.argv.includes("was-opened-at-login")) return;
   createWindow();
 }).then(createAppBackend);
-
 app.on("window-all-closed", () => {
   if (process.platform == "darwin") {
     app.dock.hide();
@@ -123,6 +121,7 @@ app.on("window-all-closed", () => {
   } else {
     app.quit();
   }
+  
   buildContextMenu();
 });
 
@@ -161,6 +160,7 @@ import { createAutoReport } from "./Electron-Backend/Reports/AutoReportGenerator
 import { createAutoRPC } from "./Electron-Backend/RPC/RPCHandler";
 import { getConfig, getFileInAPLData } from "../../apl-backend/Helpers/getConfig";
 import fs from 'fs';
+import { existsSync, readFileSync } from "node:fs";
 
 
 app.on("ready", async () => {
@@ -170,17 +170,16 @@ app.on("ready", async () => {
   electronUpdater.autoUpdater.forceDevUpdateConfig = true;
   electronUpdater.autoUpdater.autoDownload = false;
 
-  //const result = await electronUpdater.autoUpdater.checkForUpdates();
-  // const f = getFileInAPLData("skip.txt")
-  // const skipped = existsSync(f) ? readFileSync(f).toString() ?? "0.0.0" : "0.0.0";
-  // console.log(skipped);
-  // if(result?.updateInfo.version != (semver.gt(v1, skipped) ? v1 : skipped) && result?.updateInfo != null)
-  // {
-  //   win?.webContents.send("update-available", result?.updateInfo);
-  // }
+
+  const result = await electronUpdater.autoUpdater.checkForUpdates();
+  const f = getFileInAPLData("skip.txt")
+  const skipped = existsSync(f) ? readFileSync(f).toString() ?? "0.0.0" : "0.0.0";
+  if(result?.updateInfo.version != (semver.gt(v1, skipped) ? v1 : skipped) && result?.updateInfo != null)
+  {
+    win?.webContents.send("update-available", result?.updateInfo);
+  }
 
   const logFile = getFileInAPLData("app.log");
-  console.log('writing to ' + logFile);
   const logStream = fs.createWriteStream(logFile, { flags: 'a' });
 
   console.log = (...args) => {
@@ -194,8 +193,6 @@ app.on("ready", async () => {
       "was-opened-at-login"
     ]
   })
-
-  
 });
 
 
@@ -207,11 +204,9 @@ app.on("ready", async () => {
 
   const plat = await detectBrowserPlatform();
   if(plat == undefined) return;
-  console.log("plat is " + plat)
   const buildId = await resolveBuildId(
     Browser.CHROME, plat,  "latest"
   );
-  console.log(buildId);
 
 
   if((browsers.filter(x => x.browser == Browser.CHROME).length == 0)){

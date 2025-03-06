@@ -4,7 +4,7 @@
     import Delta from "../Common/Delta.vue"
     import { abbreviateNumber } from "js-abbreviation-number";
     import { TPlusDelta } from "../../../types/Util";
-    import {roundTo} from "round-to";
+    import {roundTo, roundToDown} from "round-to";
 
     interface SmallWidgetProps{
         value: TPlusDelta<any>;
@@ -18,7 +18,7 @@
     }
 
     const hrValue = computed(() => {
-        return props.condense ? abbreviateNumber(roundTo(props.value.current, 2), 2) : props.value.current
+        return props.condense ? abbreviateNumber(roundToDown(props.value.current, 2), 2) : props.value.current
     })
 
     const props = defineProps<SmallWidgetProps>();

@@ -7,20 +7,16 @@ import { SyncData } from "../../types/sync";
 export async function WriteEntries(entries:entry[], syncDataId:number = -1){
     if(entries.length == 0) return;
     console.log("Adding " + entries.length + " entries");
-    return new Promise<void>((res, rej) => {
-        const query = `INSERT OR IGNORE INTO immersionActivity (id, syncDataId, time, seconds, activityName) VALUES 
-    ${
-        entries.map((x) => {
-            return `(${x.id}, ${syncDataId}, '${dayjs(x.stop).unix()}', ${x.duration}, '${x.description}')`
-        }).join(", \n")
-    }`;
-        new sqlite3.Database(syncDataPath).all(query, (err, rows:any[]) => {
-            if(err){
-                console.log(err);
-            }
-            res();
-        });
-    })
+    const db = new sqlite3.Database(syncDataPath);
+    const stmt = db.prepare(
+        "INSERT OR IGNORE INTO immersionActivity (id, syncDataId, time, seconds, activityName) VALUES (?, ?, ?, ?, ?)"
+    );
+
+    entries.forEach((x) => {
+        stmt.run(x.id, syncDataId, dayjs(x.stop).unix(), x.duration, x.description);
+    });
+
+    stmt.finalize();
 }
 
 export async function WriteSyncData(syncData:Omit<SyncData, "id">, entries:entry[]){
@@ -48,14 +44,23 @@ export async function WriteSyncData(syncData:Omit<SyncData, "id">, entries:entry
 
 export async function ModifyActivityByID(id:number, entry:entry){
     return new Promise<void>((res, rej) => {
-        new sqlite3.Database(syncDataPath).all(`
-            UPDATE immersionActivity SET time = '${dayjs(entry.stop).unix()}', seconds = ${entry.duration}, activityName = '${entry.description}' WHERE id = ${id}
-            `, async (err, rows:{id:number}[]) => {
-            if(err){
-                console.log(err);
+        const db = new sqlite3.Database(syncDataPath);
+
+        const stmt = db.prepare(`
+            UPDATE immersionActivity 
+            SET time = ?, seconds = ?, activityName = ? 
+            WHERE id = ?
+        `);
+
+        stmt.run(dayjs(entry.stop).unix(), entry.duration, entry.description, id, function (err:any) {
+            if (err) {
+                rej(err);
+            } else {
+                res();
             }
-            res();
         });
+
+        stmt.finalize();
     })
 }
 

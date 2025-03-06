@@ -4,6 +4,8 @@ import electronUpdater from "electron-updater";
 import { writeFileSync } from "fs";
 import { getFileInAPLData } from "../../../apl-backend/Helpers/getConfig";
 
+const APP_URL = "https://github.com/AlooTheAloo/AutoProgressLog/";
+
 export function globalListeners() {
     ipcMain.handle("OpenExternal", (event, args) => {
         shell.openExternal(args);
@@ -18,7 +20,8 @@ export function globalListeners() {
     })
 
     ipcMain.handle("Update-App", async (event, args) => {
-        return await electronUpdater.autoUpdater.downloadUpdate();
+        console.log(args);
+        shell.openExternal(`${APP_URL}/releases/download/${args.version}/${args.path}`);
     })
 
     ipcMain.handle("Skip-update", async (event, args) => {
