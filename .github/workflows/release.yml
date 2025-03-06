@@ -63,11 +63,12 @@ jobs:
 
     - name: Create Git tag for version
       env:
-        GH_TOKEN: ${{ secrets.GH_TOKEN }}  
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
         git tag $VERSION
         git push origin $VERSION
-
 
     - name: Create a Release
       uses: elgohr/Github-Release-Action@v5
@@ -76,7 +77,7 @@ jobs:
       with:
         title: AutoProgressLog v${{ env.VERSION }}
         tag: ${{ env.VERSION }}
-        
+
     - name: Upload release assets
       uses: softprops/action-gh-release@v1
       with:
@@ -87,3 +88,5 @@ jobs:
           apl-frontend/release/**/*.yml
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+permissions:
+  contents: write
