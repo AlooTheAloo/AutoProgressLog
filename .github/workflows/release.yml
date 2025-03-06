@@ -82,10 +82,11 @@ jobs:
       uses: softprops/action-gh-release@v1
       with:
         files: |
-          apl-frontend/release/**/*.exe    # Adjust to your actual build output files
+          apl-frontend/release/**/*.exe
           apl-frontend/release/**/*.dmg
           apl-frontend/release/**/*.AppImage
           apl-frontend/release/**/*.yml
+        tag_name: ${{ env.VERSION }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 permissions:
