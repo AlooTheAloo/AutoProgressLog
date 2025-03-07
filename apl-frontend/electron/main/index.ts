@@ -14,8 +14,6 @@ import registerEvents from "./Electron-Backend/";
 import path from "node:path";
 import os from "node:os";
 import { buildMenu } from "./Electron-App/MenuBuilder";
-import { version as v1 } from "../../package.json"
-import semver from "semver";
 import { Browser, detectBrowserPlatform, getInstalledBrowsers, install, resolveBuildId} from '@puppeteer/browsers';
 
 const require = createRequire(import.meta.url);
@@ -178,16 +176,8 @@ app.on("ready", async () => {
     process.stdout.write(args.join(' ') + '\n');
   };
 
-  const result = await electronUpdater.autoUpdater.checkForUpdates();
-  console.log("result is " + result);
-  const f = getFileInAPLData("skip.txt")
-  const skipped = existsSync(f) ? readFileSync(f).toString() ?? "0.0.0" : "0.0.0";
-  if(result?.updateInfo.version != (semver.gt(v1, skipped) ? v1 : skipped) && result?.updateInfo != null)
-  {
-    win?.webContents.send("update-available", result?.updateInfo);
-  }
 
-
+  
 
   app.setLoginItemSettings({
     openAtLogin: true,

@@ -52,8 +52,8 @@
   publish: [
     {
       provider: "github",
-      owner: "AlooTheAloo",
-      repo: "AutoProgressLog",
+      owner: "727apps",
+      repo: "AutoUpdateTest",
     },
   ],
 }

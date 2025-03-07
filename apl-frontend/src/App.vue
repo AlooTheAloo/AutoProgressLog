@@ -1,28 +1,29 @@
 <script setup lang="ts">
-import { RouterView, useRouter } from 'vue-router'
-
+import { RouterView, useRouter } from "vue-router";
+import SideBarContainer from "./components/Common/SideBarContainer.vue";
+import { appPath } from "./pages/routes/appRoutes";
 const router = useRouter();
+window.ipcRenderer.invoke("check-for-update");
 
-
-if(window.ipcRenderer){
- 
+if (window.ipcRenderer) {
   window.ipcRenderer.on("router-push", (e, args: string) => {
     router.push(args);
-  })
+  });
 }
 
 const updateOnlineStatus = () => {
-  if(!window.ipcRenderer) return;
+  if (!window.ipcRenderer) return;
   window.ipcRenderer.invoke("SetInternetConnection", navigator.onLine);
-}
+};
 
-window.addEventListener('online', updateOnlineStatus)
-window.addEventListener('offline', updateOnlineStatus)
+window.addEventListener("online", updateOnlineStatus);
+window.addEventListener("offline", updateOnlineStatus);
 
 updateOnlineStatus();
-
 </script>
 
 <template>
-  <RouterView />
+  <SideBarContainer :currentRoute="router.currentRoute.value.path as appPath">
+    <RouterView />
+  </SideBarContainer>
 </template>

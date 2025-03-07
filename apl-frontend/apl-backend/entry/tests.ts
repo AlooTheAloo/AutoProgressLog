@@ -38,8 +38,8 @@ async function getInstallerUrl(owner:string, repo:string, platform:string) {
 }
 
 (async () => {
-  const owner = "AlooTheAloo";
-  const repo = "AutoProgressLog";
+  const owner = "727apps";
+  const repo = "AutoUpdateTest";
 
   const windowsUrl = await getInstallerUrl(owner, repo, "windows");
   const macUrl = await getInstallerUrl(owner, repo, "mac");

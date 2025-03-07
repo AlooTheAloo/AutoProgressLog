@@ -18,4 +18,11 @@
   -webkit-text-size-adjust: 100%;
 }
 
-
+@layer base {
+  ul {
+    list-style: disc;
+  }
+  ol {
+    list-style: decimal;
+  }
+}
