@@ -1,47 +1,50 @@
-import { Octokit } from "@octokit/rest";
-import yaml from "js-yaml";
+// import { Octokit } from "@octokit/rest";
+// import yaml from "js-yaml";
 
-interface Release {
-  version: string;
-  files: {
-    url: string;
-    sha512: string;
-    size: number;
-  }[];
-  path: string;
-  sha512: string;
-  releaseDate: string;
-}
+import dayjs from "dayjs";
+import { getTimeEntries } from "../toggl/toggl-service";
 
-const octokit = new Octokit();
+// interface Release {
+//   version: string;
+//   files: {
+//     url: string;
+//     sha512: string;
+//     size: number;
+//   }[];
+//   path: string;
+//   sha512: string;
+//   releaseDate: string;
+// }
 
-async function getInstallerUrl(owner: string, repo: string, platform: string) {
-  const assetName = `latest-${platform}.yml`;
+// const octokit = new Octokit();
 
-  // Fetch the latest release
-  const release = await octokit.repos.getLatestRelease({ owner, repo });
+// async function getInstallerUrl(owner: string, repo: string, platform: string) {
+//   const assetName = `latest-${platform}.yml`;
 
-  // Find the correct .yml file
-  const ymlAsset = release.data.assets.find((a) => a.name === assetName);
-  if (!ymlAsset) return null;
+//   // Fetch the latest release
+//   const release = await octokit.repos.getLatestRelease({ owner, repo });
 
-  // Fetch and parse the .yml file
-  const ymlResponse = await fetch(ymlAsset.browser_download_url);
-  const ymlText = await ymlResponse.text();
-  const ymlData = yaml.load(ymlText) as Release;
+//   // Find the correct .yml file
+//   const ymlAsset = release.data.assets.find((a) => a.name === assetName);
+//   if (!ymlAsset) return null;
 
-  // Construct the direct download URL
-  const baseUrl = `https://github.com/${owner}/${repo}/releases/download/${release.data.tag_name}/${ymlData.path}`;
-  return baseUrl;
-}
+//   // Fetch and parse the .yml file
+//   const ymlResponse = await fetch(ymlAsset.browser_download_url);
+//   const ymlText = await ymlResponse.text();
+//   const ymlData = yaml.load(ymlText) as Release;
 
-(async () => {
-  const owner = "AlooTheAloo";
-  const repo = "AutoProgressLog";
+//   // Construct the direct download URL
+//   const baseUrl = `https://github.com/${owner}/${repo}/releases/download/${release.data.tag_name}/${ymlData.path}`;
+//   return baseUrl;
+// }
 
-  const windowsUrl = await getInstallerUrl(owner, repo, "windows");
-  const macUrl = await getInstallerUrl(owner, repo, "mac");
-  const linuxUrl = await getInstallerUrl(owner, repo, "linux");
+// (async () => {
+//   const owner = "AlooTheAloo";
+//   const repo = "AutoProgressLog";
 
-  console.log({ windowsUrl, macUrl, linuxUrl });
-})();
+//   const windowsUrl = await getInstallerUrl(owner, repo, "windows");
+//   const macUrl = await getInstallerUrl(owner, repo, "mac");
+//   const linuxUrl = await getInstallerUrl(owner, repo, "linux");
+
+//   console.log({ windowsUrl, macUrl, linuxUrl });
+// })();

@@ -3,9 +3,6 @@ import { ListOf, cache, cacheList, isList } from "../types/cache.js";
 import fs from "fs";
 import { SemVer, parse } from "semver";
 import { Version, appVersion } from "../consts/versioning.js";
-import path from "path";
-import { fileURLToPath } from "url";
-import { app } from "electron";
 import { cache_location } from "./getConfig.js";
 
 export class CacheManager {
@@ -18,12 +15,12 @@ export class CacheManager {
   };
 
   static exists = fs.existsSync(cache_location);
-  static init = () => {
+  static init = (time: number) => {
     this.set({
       list: [
         {
-          seconds: 0,
-          totalSeconds: 0,
+          seconds: time,
+          totalSeconds: time,
           generationTime: dayjs().startOf("day").toISOString(),
           totalCardsStudied: 0,
           cardsStudied: 0,
@@ -39,6 +36,7 @@ export class CacheManager {
         },
       ],
     });
+    console.log("Cache initialized");
   };
 
   static peek = () => {
@@ -81,9 +79,6 @@ export class CacheManager {
   };
 
   public static get = (createIfNull = true): cacheList => {
-    if (!CacheManager.exists && createIfNull) {
-      CacheManager.init();
-    }
     return JSON.parse(fs.readFileSync(cache_location).toString());
   };
 }

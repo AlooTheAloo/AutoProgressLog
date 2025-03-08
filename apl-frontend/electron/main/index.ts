@@ -14,7 +14,13 @@ import registerEvents from "./Electron-Backend/";
 import path from "node:path";
 import os from "node:os";
 import { buildMenu } from "./Electron-App/MenuBuilder";
-import { Browser, detectBrowserPlatform, getInstalledBrowsers, install, resolveBuildId} from '@puppeteer/browsers';
+import {
+  Browser,
+  detectBrowserPlatform,
+  getInstalledBrowsers,
+  install,
+  resolveBuildId,
+} from "@puppeteer/browsers";
 
 const require = createRequire(import.meta.url);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -53,10 +59,6 @@ if (process.platform === "win32") app.setAppUserModelId(app.getName());
 //   app.quit();
 //   process.exit(0);
 // }
-
-
-
-
 
 export let win: BrowserWindow | null = null;
 const preload = path.join(__dirname, "../preload/index.mjs");
@@ -106,20 +108,26 @@ export async function createWindow() {
   win.webContents.once("did-finish-load", () => {});
 }
 
-app.whenReady().then(() => {
-  if(app.getLoginItemSettings().wasOpenedAtLogin || process.argv.includes("was-opened-at-login")) return;
-  createWindow();
-}).then(createAppBackend);
+app
+  .whenReady()
+  .then(() => {
+    if (
+      app.getLoginItemSettings().wasOpenedAtLogin ||
+      process.argv.includes("was-opened-at-login")
+    )
+      return;
+    createWindow();
+  })
+  .then(createAppBackend);
 app.on("window-all-closed", () => {
   if (process.platform == "darwin") {
     app.dock.hide();
   } else if (process.platform == "win32") {
-    if(!win?.isDestroyed)
-      win?.setSkipTaskbar(true);
+    if (!win?.isDestroyed) win?.setSkipTaskbar(true);
   } else {
     app.quit();
   }
-  
+
   buildContextMenu();
 });
 
@@ -139,12 +147,15 @@ app.on("second-instance", async () => {
 });
 
 app.on("activate", () => {
-  
   const allWindows = BrowserWindow.getAllWindows();
   if (allWindows.length) {
     allWindows[0].focus();
   } else {
-    if(app.getLoginItemSettings().wasOpenedAtLogin || process.argv.includes("was-opened-at-login")) return;
+    if (
+      app.getLoginItemSettings().wasOpenedAtLogin ||
+      process.argv.includes("was-opened-at-login")
+    )
+      return;
     createWindow();
   }
 });
@@ -156,10 +167,14 @@ import {
 } from "./Electron-Backend/appBackend";
 import { createAutoReport } from "./Electron-Backend/Reports/AutoReportGenerator";
 import { createAutoRPC } from "./Electron-Backend/RPC/RPCHandler";
-import { getConfig, getFileInAPLData } from "../../apl-backend/Helpers/getConfig";
-import fs from 'fs';
+import {
+  getConfig,
+  getFileInAPLData,
+} from "../../apl-backend/Helpers/getConfig";
+import fs from "fs";
 import { existsSync, readFileSync } from "node:fs";
-
+import { getTimeEntries } from "../../apl-backend/toggl/toggl-service";
+import dayjs from "dayjs";
 
 app.on("ready", async () => {
   buildMenu(app);
@@ -169,44 +184,35 @@ app.on("ready", async () => {
   electronUpdater.autoUpdater.autoDownload = false;
 
   const logFile = getFileInAPLData("app.log");
-  const logStream = fs.createWriteStream(logFile, { flags: 'a' });
+  const logStream = fs.createWriteStream(logFile, { flags: "a" });
 
   console.log = (...args) => {
-    logStream.write(new Date().toISOString() + ' ' + args.join(' ') + '\n');
-    process.stdout.write(args.join(' ') + '\n');
+    logStream.write(new Date().toISOString() + " " + args.join(" ") + "\n");
+    process.stdout.write(args.join(" ") + "\n");
   };
-
-
-  
 
   app.setLoginItemSettings({
     openAtLogin: true,
-    args: [
-      "was-opened-at-login"
-    ]
-  })
+    args: ["was-opened-at-login"],
+  });
 });
 
-
 (async () => {
-  const cachedir = path.join(app.getPath('home'), '.cache', 'puppeteer')
+  const cachedir = path.join(app.getPath("home"), ".cache", "puppeteer");
   const browsers = await getInstalledBrowsers({
-    cacheDir: cachedir
-  })
+    cacheDir: cachedir,
+  });
 
   const plat = await detectBrowserPlatform();
-  if(plat == undefined) return;
-  const buildId = await resolveBuildId(
-    Browser.CHROME, plat,  "latest"
-  );
+  if (plat == undefined) return;
+  const buildId = await resolveBuildId(Browser.CHROME, plat, "latest");
 
-
-  if((browsers.filter(x => x.browser == Browser.CHROME).length == 0)){
-    await install({ 
+  if (browsers.filter((x) => x.browser == Browser.CHROME).length == 0) {
+    await install({
       browser: Browser.CHROME,
       cacheDir: cachedir,
       buildId: buildId,
       unpack: true,
-    })
+    });
   }
 })();

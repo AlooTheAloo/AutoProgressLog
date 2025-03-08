@@ -8,7 +8,7 @@ import {
   RetentionMode,
   ServerOptions,
 } from "../../../apl-backend/types/options";
-import { writeFileSync } from "fs";
+import { existsSync, writeFileSync } from "fs";
 import {
   configPath,
   syncDataPath,
@@ -18,6 +18,7 @@ import { CreateDB } from "../../../apl-backend/Helpers/DataBase/CreateDB";
 import { win } from "..";
 import { buildContextMenu } from "./appBackend";
 import path from "path";
+import { CacheManager } from "../../../apl-backend/Helpers/cache";
 
 let account: TogglAccount;
 const config: Partial<Options> = {};
@@ -32,7 +33,7 @@ export function setAnkiIntegration(anki: ankiIntegration | false) {
 
   config.anki = {
     enabled: true,
-    
+
     ankiIntegration: anki,
     options: {
       trackedDecks: [],
@@ -41,27 +42,37 @@ export function setAnkiIntegration(anki: ankiIntegration | false) {
   };
 }
 
-export function getSetupAnkiIntegration(): ankiIntegration|undefined {
+export function getSetupAnkiIntegration(): ankiIntegration | undefined {
   return config?.anki?.ankiIntegration;
 }
 
-export function getSetupAnki(): ankiOptions|undefined {
+export function getSetupAnki(): ankiOptions | undefined {
   return config.anki;
 }
 
 export function setupListeners() {
   ipcMain.handle("anki-deck-select", async (event: any, arg: number[]) => {
-    if(config?.anki?.options == undefined) return;
+    if (config?.anki?.options == undefined) return;
     config.anki.options.trackedDecks = arg;
   });
 
+  ipcMain.handle("SetupComplete", (event: any, arg: any) => {
+    console.log("setup complete :yippe:");
+    win?.webContents.send("is-setup-complete", true);
+  });
+
   ipcMain.handle("SaveConfig", (event: any, arg: any) => {
+    if (existsSync(configPath)) return;
     writeFileSync(configPath, JSON.stringify(config));
     let db = new sqlite3.Database(
       syncDataPath,
       sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE,
-      (err) => {
-        CreateDB(db);
+      async (err) => {
+        const time = await CreateDB(db);
+        console.log("time is " + time);
+        if (time == undefined) return;
+        console.log("literally init");
+        CacheManager.init(time);
       }
     );
     buildContextMenu();
@@ -79,7 +90,7 @@ export function setupListeners() {
   });
 
   ipcMain.handle("OpenPathDialog", (evt, openAt) => {
-    if(win == undefined) return;
+    if (win == undefined) return;
     return dialog.showOpenDialogSync(win, {
       properties: ["openDirectory", "createDirectory"],
       defaultPath: openAt,
@@ -87,17 +98,21 @@ export function setupListeners() {
   });
 
   ipcMain.handle("OpenFileDialog", (evt, openAt) => {
-    if(win == undefined) return;
+    if (win == undefined) return;
     console.log("Opening file dialog");
     return dialog.showOpenDialogSync(win, {
-      properties: ["openFile", "showHiddenFiles", "dontAddToRecent", "createDirectory"],
+      properties: [
+        "openFile",
+        "showHiddenFiles",
+        "dontAddToRecent",
+        "createDirectory",
+      ],
       defaultPath: path.dirname(openAt),
     });
   });
 
-
   ipcMain.handle("SetAutoGen", (event: any, arg: boolean) => {
-    if(arg){
+    if (arg) {
       config.general = {
         autogen: {
           enabled: true,
@@ -110,8 +125,7 @@ export function setupListeners() {
         },
         discordIntegration: false,
       };
-    }
-    else {
+    } else {
       config.general = {
         autogen: {
           enabled: false,
@@ -141,12 +155,12 @@ export function setupListeners() {
   });
 
   ipcMain.handle("set-server-options", (event: any, arg: ServerOptions) => {
-    if(config.general == undefined) return;
+    if (config.general == undefined) return;
     config.general.autogen.options = arg;
   });
 
   ipcMain.handle("SetRetentionMode", (event: any, arg: RetentionMode) => {
-    if(config.anki?.options == undefined) return;
+    if (config.anki?.options == undefined) return;
     config.anki.options.retentionMode = arg;
   });
 
@@ -155,7 +169,7 @@ export function setupListeners() {
       return account;
     }
 
-    if(config.toggl == undefined) return undefined;
+    if (config.toggl == undefined) return undefined;
 
     const me = await new Toggl({
       auth: {
