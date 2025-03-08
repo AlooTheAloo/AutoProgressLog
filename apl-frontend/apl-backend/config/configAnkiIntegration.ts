@@ -171,7 +171,7 @@ export async function getAnkiDBPaths(
 export async function verifyAnkiPaths(paths: ankiPaths): Promise<boolean> {
   if (!fs.existsSync(paths.ankiDB)) {
     console.log(
-      `The file ${paths.ankiDB} does not exist. Please provide a valid path`.red
+      `The file ${paths.ankiDB} does not exist. Please provide a valid path`
     );
     return false;
   }
@@ -182,7 +182,6 @@ export async function verifyAnkiPaths(paths: ankiPaths): Promise<boolean> {
       if (err) {
         console.log(
           `The database file could not be opened. Make sure you followed the instructions in the README properly and try again.`
-            .red
         );
         res(false);
       } else {
@@ -195,7 +194,6 @@ export async function verifyAnkiPaths(paths: ankiPaths): Promise<boolean> {
   if (!fs.existsSync(paths.ankiPath)) {
     console.log(
       `The file ${paths.ankiPath} does not exist. Please provide a valid path`
-        .red
     );
     return false;
   }
@@ -253,7 +251,6 @@ export async function LaunchAnki(paths: ankiPaths | ankiIntegration) {
   if (paths.ankiPath == undefined) {
     console.log(
       `The file ${paths.ankiPath} does not exist. Please provide a valid path`
-        .red
     );
     return [false, null];
   }
@@ -262,7 +259,6 @@ export async function LaunchAnki(paths: ankiPaths | ankiIntegration) {
   if (!fs.existsSync(paths.ankiPath)) {
     console.log(
       `The file ${paths.ankiPath} does not exist. Please provide a valid path`
-        .red
     );
     return [false, null];
   }

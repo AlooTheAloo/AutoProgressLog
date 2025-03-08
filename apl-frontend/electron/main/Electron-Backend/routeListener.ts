@@ -1,6 +1,5 @@
 import { ipcMain, Notification } from "electron";
 import { getConfig } from "../../../apl-backend/Helpers/getConfig";
-import { appUpgrade } from "../../../apl-backend/entry/upgrade";
 import { CacheManager } from "../../../apl-backend/Helpers/cache";
 import { shell } from "electron";
 import {
@@ -38,7 +37,7 @@ export function routeListeners() {
     } else {
       const ver = CacheManager.verifyVersion();
       if (!ver) {
-        appUpgrade(CacheManager.get(false));
+        console.log("Cache is out of date");
       }
       win?.webContents.send("is-setup-complete", true);
       return "/app/dashboard";
