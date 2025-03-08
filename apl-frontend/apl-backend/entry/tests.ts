@@ -2,22 +2,20 @@ import { Octokit } from "@octokit/rest";
 import yaml from "js-yaml";
 
 interface Release {
-    version: string;
-    files: {
-        url: string;
-        sha512: string;
-        size: number;
-    }[];
-    path: string;
+  version: string;
+  files: {
+    url: string;
     sha512: string;
-    releaseDate: string;
+    size: number;
+  }[];
+  path: string;
+  sha512: string;
+  releaseDate: string;
 }
 
 const octokit = new Octokit();
 
-
-
-async function getInstallerUrl(owner:string, repo:string, platform:string) {
+async function getInstallerUrl(owner: string, repo: string, platform: string) {
   const assetName = `latest-${platform}.yml`;
 
   // Fetch the latest release
@@ -38,8 +36,8 @@ async function getInstallerUrl(owner:string, repo:string, platform:string) {
 }
 
 (async () => {
-  const owner = "727apps";
-  const repo = "AutoUpdateTest";
+  const owner = "AlooTheAloo";
+  const repo = "AutoProgressLog";
 
   const windowsUrl = await getInstallerUrl(owner, repo, "windows");
   const macUrl = await getInstallerUrl(owner, repo, "mac");

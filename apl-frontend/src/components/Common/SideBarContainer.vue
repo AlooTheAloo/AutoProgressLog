@@ -18,7 +18,7 @@ import Button from "primevue/button";
 import { useToast } from "primevue/usetoast";
 import Toast from "primevue/toast";
 import { marked } from "marked";
-import "github-markdown-css/github-markdown.css";
+import "github-markdown-css/github-markdown-dark.css";
 
 const HELP_PAGE_URL = "https://www.aplapp.dev/#/";
 const router = useRouter();

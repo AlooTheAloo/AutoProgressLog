@@ -10,7 +10,7 @@ import { win } from "..";
 import semver from "semver";
 import { version as v1 } from "../../../package.json";
 
-const APP_URL = "https://github.com/727apps/AutoUpdateTest/";
+const APP_URL = "https://github.com/AlooTheAloo/AutoProgressLog/";
 
 export function globalListeners() {
   console.log("Global listeners loaded");
