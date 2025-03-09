@@ -31,12 +31,12 @@ Open a terminal and enter the following command to get rid of it.
 sudo xattr -cr /Applications/AutoProgressLog.app
 ```
 
-You will be required to authorize APL access to your screen. This is used to track the synchronisation process with anki.
+When launching the app, you will be required to authorize APL access to your screen. This is used to track the synchronisation process with anki.
 If you're on MacOS 15 Sequoia or later, you will need to revalidate this every month.
 
 ### Linux guidelines
 
-> [!Linux warning]
+> [!CAUTION]
 > Linux is malware. Please consider upgrading to MacOS for an optimal experience.
 
 Most of the automagic connections will not work on linux or will only work on very few distros, you will have to manually connect to anki and toggl.
