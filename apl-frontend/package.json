@@ -99,7 +99,6 @@
     "vue3-apexcharts": "^1.8.0"
   },
   "optionalDependencies": {
-    "node-mac-permissions": "^2.4.0",
-    "wmctrljs": "^1.2.9"
+    "node-mac-permissions": "^2.4.0"
   }
 }

@@ -18,7 +18,7 @@ export async function hasNotifPerms() {
 
 export async function readWindows(pids: number[]) {
   if (process.platform == "linux") {
-    let wmctrl = await import("wmctrljs");
+    let wmctrl = await import("./Linux/wmctrljs-master/src");
     return new Promise<any>((resolve, reject) => {
       try {
         const promises = pids.map((pid) => wmctrl.getWindowsByPid(pid));
