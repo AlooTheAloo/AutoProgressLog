@@ -300,15 +300,10 @@ export async function LaunchAnki(paths: ankiPaths | ankiIntegration) {
 
       const windows = await readWindows(allAnkis.map((x) => x.pid));
       const pid = (await getAnkiProcesses()).at(0)?.pid;
-      console.log("pid " + pid);
-      console.log("windows " + JSON.stringify(windows));
 
       if ((windows.length > 0 || isOpened) && pid != undefined) {
-        console.log("Anki has been found");
-
         intervalOpen();
         if (!isOpened) await sleep(1000);
-        console.log("killing anki");
 
         try {
           kill(pid);

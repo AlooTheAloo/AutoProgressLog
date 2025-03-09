@@ -7,12 +7,11 @@ services:
     working_dir: /app
     volumes:
       - ./:/app
-      - elysia-db:/app/data  # Volume for SQLite3 file inside the container
     ports:
       - "11612:3000"
     environment:
-      - DB_PATH=/data/prod.db  # Separate SQLite file for production
-    command: bun run start  # Adjust to your app's start command
+      - DB_PATH=/app/data/prod.db # Separate SQLite file for production
+    command: bun run start # Adjust to your app's start command
 
 volumes:
   elysia-db:
