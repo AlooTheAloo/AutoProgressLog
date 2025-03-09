@@ -1,7 +1,7 @@
 ![AutoProgressLog](apl-assets/Banner.png)
 
 ## Introduction
-This projects aims to be a ressource for the [Refold Discord Servers](https://refold.la/join/). Some people spend countless hours logging their immersion time, immersion streaks and anki streaks. This terminal-based utility aims to create an easy to use way to automate this process.
+This projects aims to be a ressource for immersion language learners. Some people spend countless hours logging their immersion time, immersion streaks and anki streaks. This utility aims to create an easy to use and simple way to automate this process.
 
 As well as simplifying the process of logging, this tool gamifies the process of language learning by tracking your statistics as well as giving you a score for all of your hard work and time put into language learning.
 
@@ -15,7 +15,7 @@ As well as simplifying the process of logging, this tool gamifies the process of
 ## Installation
 
 ### Windows guidelines
-As APL is unsigned on windows, you will need to bypass windows smartscreen to run the app.
+As APL is unsigned on windows, you will need to **bypass windows smartscreen** to run the app.
 
 ### MacOS guidelines
 MacOS will throw a warning at you when first trying to install the application. 
@@ -68,7 +68,7 @@ Once you provide this path, anki will launch. Once launched, the configuration s
 
 #### 
 ## Limitations
-This has only been tested on Windows and MacOS, if you have issues on other operating systems, skill issue lmao.
+This has only been tested thoroughly on Windows and MacOS, linux support is running on best-effort.
 
 This app will only work on computers with a graphical desktop environment, meaning you cannot run this on a CLI-only server.
 
