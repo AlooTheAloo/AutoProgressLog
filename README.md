@@ -15,14 +15,23 @@ As well as simplifying the process of logging, this tool gamifies the process of
 ## Installation
 
 ### Windows guidelines
-It is recommended to close your browser during the setup process. While fetching your toggl track token, there may be accessibility conflicts within the cookies database.
+As APL is unsigned on windows, you will need to bypass windows smartscreen to run the app.
 
 ### MacOS guidelines
+MacOS will throw a warning at you when first trying to install the application. 
+Open a terminal and enter the following command to get rid of it.
+`sudo xattr -cr /Applications/AutoProgressLog.app`
+
 You will be required to authorize APL access to your screen. This is used to track the synchronisation process with anki.
 If you're on MacOS 15 Sequoia or later, you will need to revalidate this every month.
 
 ### Linux guidelines
+
+> [!CAUTION]
+> Linux is malware. Please consider upgrading to MacOS for an optimal experience.
+
 Most of the automagic connections will not work on linux or will only work on very few distros, you will have to manually connect to anki and toggl.
+Anki connection may not work on some window managers like i3.
 
 ## Configuration
 
@@ -49,11 +58,11 @@ The database file will usually be named 'collection.anki2'
 #### Anki app path
 This is where your anki app is stored. 
 
-On Windows, you can find it by searching for the app in the windows search menu, right-clicking on the app and pressing "open file location" repeat this until you have the anki.exe app. This is the app path. 
+On Windows, you can find it by searching for the app in the windows search menu, right-clicking on the app and pressing "open file location" repeat this until you have the anki.exe file. This is the app path. 
 
 On MacOS, you can find it by searching for the app in spotlight search and pressing `⌘` + `Enter`. This will highlight the app.
 
-On Linux, figure it out lol idk 🤷
+On Linux, the path is different depending on your distribution and installation method.
 
 Once you provide this path, anki will launch. Once launched, the configuration script will ask you which one of many processes is anki. Find the process that most closely matches the anki process and enter the corresponding number.
 
