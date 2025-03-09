@@ -10,7 +10,7 @@ services:
     ports:
       - "11612:3000"
     environment:
-      - DB_PATH=/app/data/prod.db # Separate SQLite file for production
+      - DB_PATH=/data/prod.db # Separate SQLite file for production
     command: bun run start # Adjust to your app's start command
 
 volumes:
