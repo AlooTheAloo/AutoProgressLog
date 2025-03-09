@@ -23,7 +23,7 @@ As APL is unsigned on windows, you will need to **bypass windows smartscreen** t
 
 MacOS will throw a warning at you when first trying to install the application.
 
-<img src="apl-assets/APL_MacOS_Warning.png" alt="MacOS warning" width="500"/>
+<img src="apl-assets/APL_MacOS_Warning.png" alt="MacOS warning" width="200"/>
 
 Open a terminal and enter the following command to get rid of it.
 
