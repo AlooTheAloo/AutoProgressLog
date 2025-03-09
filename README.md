@@ -8,10 +8,12 @@ As well as simplifying the process of logging, this tool gamifies the process of
 
 ## Features
 
-- Automatic immersion tracking and formatting with Toggl Track
+- Automatic immersion tracking with Toggl Track
 - Integration with Anki to keep track of total reviews, retention rate, and mature cards !
+- Integration with Discord's RPC to show your gains to your friends
 - Visualisation of your language learning progress
 - Generation of awesome-looking reports
+
 
 ## Installation
 
