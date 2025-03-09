@@ -20,7 +20,9 @@ As APL is unsigned on windows, you will need to **bypass windows smartscreen** t
 ### MacOS guidelines
 MacOS will throw a warning at you when first trying to install the application. 
 Open a terminal and enter the following command to get rid of it.
-```sudo xattr -cr /Applications/AutoProgressLog.app```
+```
+sudo xattr -cr /Applications/AutoProgressLog.app
+```
 
 You will be required to authorize APL access to your screen. This is used to track the synchronisation process with anki.
 If you're on MacOS 15 Sequoia or later, you will need to revalidate this every month.
