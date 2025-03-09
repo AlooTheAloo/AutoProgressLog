@@ -83,7 +83,6 @@ export async function createWindow() {
   });
 
   win.setMenuBarVisibility(false);
-  console.log("a");
   if (VITE_DEV_SERVER_URL) {
     // #298
     win.loadURL(VITE_DEV_SERVER_URL);
@@ -110,13 +109,16 @@ export async function createWindow() {
 
 app
   .whenReady()
-  .then(() => {
+  .then(async () => {
+    await createWindow();
     if (
       app.getLoginItemSettings().wasOpenedAtLogin ||
       process.argv.includes("was-opened-at-login")
-    )
+    ) {
+      win?.destroy();
+      console.log("App opened at login but window not created");
       return;
-    createWindow();
+    }
   })
   .then(createAppBackend);
 app.on("window-all-closed", () => {
@@ -151,12 +153,15 @@ app.on("activate", () => {
   if (allWindows.length) {
     allWindows[0].focus();
   } else {
+    createWindow();
     if (
       app.getLoginItemSettings().wasOpenedAtLogin ||
       process.argv.includes("was-opened-at-login")
-    )
+    ) {
+      console.log("App opened at login but window not created");
+      win?.destroy();
       return;
-    createWindow();
+    }
   }
 });
 
@@ -191,8 +196,10 @@ app.on("ready", async () => {
     process.stdout.write(args.join(" ") + "\n");
   };
 
+  const isDev = process.env.NODE_ENV === "development";
+
   app.setLoginItemSettings({
-    openAtLogin: true,
+    openAtLogin: !isDev,
     args: ["was-opened-at-login"],
   });
 });

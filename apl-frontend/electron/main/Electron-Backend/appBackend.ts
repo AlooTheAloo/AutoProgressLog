@@ -62,14 +62,19 @@ export async function buildContextMenu() {
 }
 
 export async function createAppBackend() {
-  
-    const isDev = process.env.NODE_ENV === "development";
-  
+  const isDev = process.env.NODE_ENV === "development";
+
   const iconPath = isDev
     ? path.join(__dirname, "..", "..", "src", "assets", "Logo.png")
-    : path.join(process.resourcesPath, "app.asar.unpacked", "src", "assets", "Logo.png");
+    : path.join(
+        process.resourcesPath,
+        "app.asar.unpacked",
+        "src",
+        "assets",
+        "Logo.png"
+      );
 
-  console.log('icon path is ' + iconPath)
+  console.log("icon path is " + iconPath);
   let trayIcon = nativeImage.createFromPath(iconPath);
 
   console.log(iconPath);
