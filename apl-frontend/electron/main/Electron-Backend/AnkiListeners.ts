@@ -143,14 +143,15 @@ export function ankiListeners() {
     return !!ankiIntegration;
   }
 
+  const filters: { [key: string]: { name: string; extensions: string[] }[] } = {
+    win32: [{ name: "Anki", extensions: ["exe"] }],
+    darwin: [{ name: "Anki", extensions: ["app"] }],
+    linux: [{ name: "Anki", extensions: [] }], // Allow any file
+  };
+
   ipcMain.handle("SelectAppPath", async (event: any, arg: any) => {
     const res = await dialog.showOpenDialog({
-      filters: [
-        {
-          name: "Anki App",
-          extensions: ["app", "exe", ""],
-        },
-      ],
+      filters: filters[process.platform] || [],
     });
 
     if (res.canceled) return undefined;
