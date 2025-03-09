@@ -36,7 +36,7 @@ If you're on MacOS 15 Sequoia or later, you will need to revalidate this every m
 
 ### Linux guidelines
 
-> [!Linux warning]
+> [!CAUTION]
 > Linux is malware. Please consider upgrading to MacOS for an optimal experience.
 
 Most of the automagic connections will not work on linux or will only work on very few distros, you will have to manually connect to anki and toggl.
