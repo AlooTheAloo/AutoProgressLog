@@ -37,6 +37,8 @@ const bottomText = computed(() => {
   // Choose direction
   const direction = difference > 0;
 
+  if (Math.abs(difference) < 1 / 60) return "";
+
   // Build html
   return `
     <div style=\"color: ${

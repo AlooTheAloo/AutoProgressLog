@@ -40,7 +40,7 @@ async function NextPage() {
         </div>
         <div class="text-sm">
           Please enter your Toggl Track API Token. This key can be found at the
-          bottom of your profile page.
+          bottom of your profile settings page.
           <br />
           If you don't have an account, you can create one
           <Button
