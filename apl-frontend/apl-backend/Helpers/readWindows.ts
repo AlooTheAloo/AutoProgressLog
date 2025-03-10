@@ -18,17 +18,7 @@ export async function hasNotifPerms() {
 
 export async function readWindows(pids: number[]) {
   if (process.platform == "linux") {
-    let wmctrl = await import("./Linux/wmctrljs-master/src");
-    return new Promise<any>((resolve, reject) => {
-      try {
-        const promises = pids.map((pid) => wmctrl.getWindowsByPid(pid));
-        Promise.all(promises)
-          .then((results) => resolve(results.flat()))
-          .catch((error) => reject(error));
-      } catch (error) {
-        reject(error);
-      }
-    });
+    return [];
   } else {
     const windows = xwin.openWindows();
     return windows.filter((x) => pids.includes(x.info.processId));
