@@ -96,7 +96,9 @@
     "url": "^0.11.4",
     "vue-markdown": "^2.2.4",
     "vue-router": "4",
-    "vue3-apexcharts": "^1.8.0",
+    "vue3-apexcharts": "^1.8.0"
+  },
+  "optionalDependencies": {
     "node-mac-permissions": "^2.4.0"
   }
 }
