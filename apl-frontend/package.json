@@ -37,7 +37,7 @@
     "bun": "^1.1.42",
     "electron": "^33.2.1",
     "electron-builder": "^25.1.8",
-    "node-abi": "^3.73.0",
+    "node-abi": "^4.1.0",
     "postcss": "^8.4.41",
     "tailwindcss": "^3.4.9",
     "tsx": "^4.19.1",
@@ -49,6 +49,7 @@
     "vue-tsc": "^2.0.6"
   },
   "dependencies": {
+    "@electron/rebuild": "^3.7.1",
     "@miniben90/x-win": "^1.10.2",
     "@octokit/rest": "^21.1.1",
     "@primevue/themes": "^4.0.5",
