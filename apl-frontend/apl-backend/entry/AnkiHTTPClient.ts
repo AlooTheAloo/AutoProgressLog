@@ -32,12 +32,10 @@ export default class AnkiHTTPClient {
       ...options,
       redirect: "manual",
     });
-    console.log(response);
 
     if (response.headers.has("Location")) {
       const location = response.headers.get("Location");
       if (location) {
-        console.log(location);
         this.anki_URL = location.slice(0, -1);
         const newUrl = new URL(this.anki_URL); // Ensure the new URL is absolute
         newUrl.pathname = path; // Force the correct path
@@ -77,7 +75,6 @@ export default class AnkiHTTPClient {
       },
       body: compressedData,
     });
-    console.log(compressedData.toString("utf-8"));
 
     const blob = await response.blob();
     console.log(await blob.text());
