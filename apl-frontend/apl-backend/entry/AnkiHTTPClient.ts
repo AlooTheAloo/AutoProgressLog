@@ -1,4 +1,4 @@
-import { compressSync, decompressSync } from "zstd.ts";
+import { compressSync } from "zstd.ts";
 import * as fzstd from "fzstd";
 import { writeFileSync } from "fs";
 import { Chunk } from "./NormalSyncer";
@@ -10,7 +10,7 @@ export interface Graves {
 }
 
 export default class AnkiHTTPClient {
-  private anki_URL = "http://localhost:8080";
+  private anki_URL = "https://sync.ankiweb.net";
   public key: string = "";
   public simpleRandom = crypto.randomUUID();
 
@@ -27,9 +27,38 @@ export default class AnkiHTTPClient {
     });
   }
 
-  private async executeRequest<T>(endpoint: string, data: any): Promise<T> {
+  private async fetchWithRedirect(path: string, options: RequestInit = {}) {
+    const response = await fetch(this.anki_URL + path, {
+      ...options,
+      redirect: "manual",
+    });
+    console.log(response);
+
+    if (response.headers.has("Location")) {
+      const location = response.headers.get("Location");
+      if (location) {
+        console.log(location);
+        this.anki_URL = location.slice(0, -1);
+        const newUrl = new URL(this.anki_URL); // Ensure the new URL is absolute
+        newUrl.pathname = path; // Force the correct path
+
+        return fetch(newUrl.toString(), options); // Make the correct request
+      }
+    }
+
+    return response;
+  }
+
+  private async executeRequest<T>(
+    endpoint: string,
+    data: any,
+    raw = false
+  ): Promise<T | Response> {
+    console.log(endpoint);
+    console.log(this.createAnkiObject(this.key));
     const compressedData = compressSync({ input: JSON.stringify(data) });
-    const response = await fetch(`${this.anki_URL}${endpoint}`, {
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+    const response = await this.fetchWithRedirect(endpoint, {
       method: "POST",
       headers: {
         "anki-sync": this.createAnkiObject(this.key),
@@ -38,13 +67,20 @@ export default class AnkiHTTPClient {
       },
       body: compressedData,
     });
+    writeFileSync("caca.bin", compressedData);
+    console.log(compressedData.toString("utf-8"));
 
+    if (raw) {
+      return response;
+    }
     const blob = await response.blob();
     const arr = await this.blobToObject(blob);
     return JSON.parse(Buffer.from(arr).toString("utf-8"));
   }
 
   private async blobToObject(blob: Blob): Promise<Uint8Array> {
+    console.log(await blob.text());
+
     const stream = blob.stream();
     const reader = stream.getReader();
     const chunks: Uint8Array[] = [];
@@ -77,6 +113,8 @@ export default class AnkiHTTPClient {
       { u: username, p: password }
     );
     this.key = response.key;
+    console.log(this.key);
+
     return response.key;
   }
 
@@ -90,7 +128,7 @@ export default class AnkiHTTPClient {
   public async getMetaUSN(): Promise<number> {
     const response = await this.executeRequest<{ usn: number }>("/sync/meta", {
       v: 11,
-      cv: "anki,24.11 (87ccd24e),mac:15.1",
+      cv: "anki,24.11 (87ccd24e),mac:15.3.1",
     });
     return response.usn;
   }

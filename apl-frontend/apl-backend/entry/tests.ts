@@ -54,14 +54,14 @@ import Storage from "./Storage";
 // })();
 // import { writeFileSync } from "fs";
 
-const URL = "http://127.0.0.1:8080";
-
 async function testing() {
   const client = new AnkiHTTPClient();
-  const storage = new Storage("./test.anki2");
+  const storage = new Storage("./collection.anki2");
   const Syncer = new NormalSyncer(client, storage);
 
-  await client.getAnkiHostKey("user", "pass");
+  await client.getAnkiHostKey("masoux14@gmail.com", "");
+  await client.getMetaUSN();
+  await client.downloadInitialDatabase();
   const pending_usn = await Syncer.startAndProcessDeletions();
   await Syncer.processChunksFromServer(pending_usn);
   Syncer.stopConnection(pending_usn);
