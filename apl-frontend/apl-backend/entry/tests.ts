@@ -59,7 +59,7 @@ async function testing() {
   const storage = new Storage("./collection.anki2");
   const Syncer = new NormalSyncer(client, storage);
 
-  await client.getAnkiHostKey("masoux14@gmail.com", "");
+  await client.getAnkiHostKey("", "");
   await client.getMetaUSN();
   await client.downloadInitialDatabase();
   const pending_usn = await Syncer.startAndProcessDeletions();

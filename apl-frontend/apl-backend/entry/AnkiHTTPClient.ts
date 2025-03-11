@@ -52,8 +52,18 @@ export default class AnkiHTTPClient {
   private async executeRequest<T>(
     endpoint: string,
     data: any,
-    raw = false
-  ): Promise<T | Response> {
+    raw: true
+  ): Promise<Uint8Array<ArrayBufferLike>>;
+  private async executeRequest<T>(
+    endpoint: string,
+    data: any,
+    raw?: false
+  ): Promise<T>;
+  private async executeRequest<T>(
+    endpoint: string,
+    data: any,
+    raw: boolean = false
+  ): Promise<T | Uint8Array<ArrayBufferLike>> {
     console.log(endpoint);
     console.log(this.createAnkiObject(this.key));
     const compressedData = compressSync({ input: JSON.stringify(data) });
@@ -67,14 +77,15 @@ export default class AnkiHTTPClient {
       },
       body: compressedData,
     });
-    writeFileSync("caca.bin", compressedData);
     console.log(compressedData.toString("utf-8"));
 
-    if (raw) {
-      return response;
-    }
     const blob = await response.blob();
+    console.log(await blob.text());
+
     const arr = await this.blobToObject(blob);
+    if (raw) {
+      return arr;
+    }
     return JSON.parse(Buffer.from(arr).toString("utf-8"));
   }
 
@@ -119,9 +130,13 @@ export default class AnkiHTTPClient {
   }
 
   public async downloadInitialDatabase(): Promise<void> {
-    const obj = await this.executeRequest<Uint8Array>("/sync/download", {
-      _pad: null,
-    });
+    const obj = await this.executeRequest(
+      "/sync/download",
+      {
+        _pad: null,
+      },
+      true
+    );
     writeFileSync("caca.sql", obj);
   }
 
