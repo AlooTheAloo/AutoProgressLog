@@ -51,7 +51,7 @@ export default class AnkiHTTPClient {
     endpoint: string,
     data: any,
     raw: true
-  ): Promise<Uint8Array<ArrayBufferLike>>;
+  ): Promise<Uint8Array>;
   private async executeRequest<T>(
     endpoint: string,
     data: any,
@@ -61,7 +61,7 @@ export default class AnkiHTTPClient {
     endpoint: string,
     data: any,
     raw: boolean = false
-  ): Promise<T | Uint8Array<ArrayBufferLike>> {
+  ): Promise<T | Uint8Array> {
     console.log(endpoint);
     console.log(this.createAnkiObject(this.key));
     const compressedData = compressSync({ input: JSON.stringify(data) });
