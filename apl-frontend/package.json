@@ -68,7 +68,7 @@
     "bun": "^1.1.42",
     "electron": "^33.2.1",
     "electron-builder": "^25.1.8",
-    "node-abi": "^4.1.0",
+    "node-abi": "^4.2.0",
     "postcss": "^8.4.41",
     "tailwindcss": "^3.4.9",
     "tsx": "^4.19.1",
