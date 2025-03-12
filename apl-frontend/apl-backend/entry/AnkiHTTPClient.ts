@@ -9,14 +9,20 @@ export interface Graves {
   decks: string[];
 }
 
+const DEFAULT_ANKI_URL = "https://sync.ankiweb.net";
+let anki_url = DEFAULT_ANKI_URL;
+
 export default class AnkiHTTPClient {
-  private anki_URL = "https://sync.ankiweb.net";
   public key: string = "";
   public simpleRandom = crypto.randomUUID();
 
-  constructor(key: string = "") {
+  constructor(key: string = "", url: string = DEFAULT_ANKI_URL) {
+    console.log("Creating client with url ", url);
+    if (url != DEFAULT_ANKI_URL) anki_url = url;
     this.key = key;
   }
+
+  isLoggedIn = () => this.key != "";
 
   private createAnkiObject(key: string = "") {
     return JSON.stringify({
@@ -28,18 +34,16 @@ export default class AnkiHTTPClient {
   }
 
   private async fetchWithRedirect(path: string, options: RequestInit = {}) {
-    const response = await fetch(this.anki_URL + path, {
+    const response = await fetch(anki_url + path, {
       ...options,
       redirect: "manual",
     });
-
     if (response.headers.has("Location")) {
       const location = response.headers.get("Location");
       if (location) {
-        this.anki_URL = location.slice(0, -1);
-        const newUrl = new URL(this.anki_URL); // Ensure the new URL is absolute
+        anki_url = location.slice(0, -1);
+        const newUrl = new URL(anki_url); // Ensure the new URL is absolute
         newUrl.pathname = path; // Force the correct path
-
         return fetch(newUrl.toString(), options); // Make the correct request
       }
     }
@@ -51,21 +55,18 @@ export default class AnkiHTTPClient {
     endpoint: string,
     data: any,
     raw: true
-  ): Promise<Uint8Array>;
+  ): Promise<Uint8Array | undefined>;
   private async executeRequest<T>(
     endpoint: string,
     data: any,
     raw?: false
-  ): Promise<T>;
+  ): Promise<T | undefined>;
   private async executeRequest<T>(
     endpoint: string,
     data: any,
     raw: boolean = false
-  ): Promise<T | Uint8Array> {
-    console.log(endpoint);
-    console.log(this.createAnkiObject(this.key));
+  ): Promise<T | Uint8Array | undefined> {
     const compressedData = compressSync({ input: JSON.stringify(data) });
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
     const response = await this.fetchWithRedirect(endpoint, {
       method: "POST",
       headers: {
@@ -76,9 +77,11 @@ export default class AnkiHTTPClient {
       body: compressedData,
     });
 
+    if (response.status != 200) {
+      console.log("Response was not 200, it was " + response.status);
+      return undefined;
+    }
     const blob = await response.blob();
-    console.log(await blob.text());
-
     const arr = await this.blobToObject(blob);
     if (raw) {
       return arr;
@@ -87,8 +90,6 @@ export default class AnkiHTTPClient {
   }
 
   private async blobToObject(blob: Blob): Promise<Uint8Array> {
-    console.log(await blob.text());
-
     const stream = blob.stream();
     const reader = stream.getReader();
     const chunks: Uint8Array[] = [];
@@ -112,21 +113,26 @@ export default class AnkiHTTPClient {
     return fzstd.decompress(data);
   }
 
-  public async getAnkiHostKey(
+  public async login(
     username: string,
     password: string
   ): Promise<string | undefined> {
-    const response = await this.executeRequest<{ key: string }>(
-      "/sync/hostKey",
-      { u: username, p: password }
-    );
-    this.key = response.key;
-    console.log(this.key);
-
-    return response.key;
+    try {
+      const response = await this.executeRequest<{ key: string }>(
+        "/sync/hostKey",
+        { u: username, p: password }
+      );
+      if (response == undefined) return undefined;
+      this.key = response.key;
+      return response.key;
+    } catch (e) {
+      return undefined;
+    }
   }
 
-  public async downloadInitialDatabase(): Promise<void> {
+  public async downloadInitialDatabase(filePath: string): Promise<boolean> {
+    await this.getMetaUSN();
+
     const obj = await this.executeRequest(
       "/sync/download",
       {
@@ -134,18 +140,22 @@ export default class AnkiHTTPClient {
       },
       true
     );
-    writeFileSync("caca.sql", obj);
+
+    if (obj == undefined) return false;
+    writeFileSync(filePath, obj);
+    return true;
   }
 
-  public async getMetaUSN(): Promise<number> {
+  public async getMetaUSN(): Promise<number | false> {
     const response = await this.executeRequest<{ usn: number }>("/sync/meta", {
       v: 11,
       cv: "anki,24.11 (87ccd24e),mac:15.3.1",
     });
+    if (response == undefined) return false;
     return response.usn;
   }
 
-  public async startSync(usn: number): Promise<Graves> {
+  public async startSync(usn: number): Promise<Graves | undefined> {
     return this.executeRequest<Graves>("/sync/start", {
       minUsn: usn,
       lnewer: false,
@@ -153,17 +163,20 @@ export default class AnkiHTTPClient {
     });
   }
 
-  public async getChanges(): Promise<any> {
-    return this.executeRequest("/sync/applyChanges", {
-      changes: { models: [], decks: [[], []], tags: [] },
-    });
+  public async getChanges(): Promise<boolean> {
+    return (
+      (await this.executeRequest("/sync/applyChanges", {
+        changes: { models: [], decks: [[], []], tags: [] },
+      })) != undefined
+    );
   }
 
-  public async getChunk(): Promise<Chunk> {
+  public async getChunk(): Promise<Chunk | undefined> {
     return this.executeRequest<Chunk>("/sync/chunk", { _pad: null });
   }
 
   public async finish(): Promise<void> {
     await this.executeRequest("/sync/finish", { _pad: null });
+    return;
   }
 }

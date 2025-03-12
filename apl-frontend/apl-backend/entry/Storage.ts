@@ -47,6 +47,15 @@ export default class Storage {
     stmt.finalize();
   }
 
+  public async close() {
+    await new Promise((res, rej) => {
+      // Close the database connection when done
+      this.db.close((err) => {
+        res(err == null);
+      });
+    });
+  }
+
   addCardGrave(cid: string, usn: number): Promise<void> {
     return this.addGrave(cid, GraveKind.Card, usn);
   }
@@ -95,11 +104,12 @@ export default class Storage {
     });
   }
 
-  public applyChunk(chunk: Chunk, pending_usn: number) {
-    this.mergeRevlog(chunk.revlog ?? []);
-    this.mergeCards(chunk.cards ?? [], pending_usn);
-    this.mergeNotes(chunk.notes ?? [], pending_usn);
+  public async applyChunk(chunk: Chunk, pending_usn: number) {
+    await this.mergeRevlog(chunk.revlog ?? []);
+    await this.mergeCards(chunk.cards ?? [], pending_usn);
+    await this.mergeNotes(chunk.notes ?? [], pending_usn);
   }
+
   async mergeRevlog(entries: RevlogEntry[]): Promise<void> {
     for (const entry of entries) {
       await this.addRevlogEntry(entry);
@@ -133,6 +143,8 @@ export default class Storage {
   }
 
   async addOrUpdateCardIfNewer(entry: CardEntry, pendingUsn: number) {
+    console.log("adding/updating card " + entry);
+
     return new Promise<void>((s, j) => {
       this.db
         .prepare(

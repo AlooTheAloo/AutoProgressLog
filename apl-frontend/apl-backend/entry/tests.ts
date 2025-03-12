@@ -59,12 +59,10 @@ async function testing() {
   const storage = new Storage("./collection.anki2");
   const Syncer = new NormalSyncer(client, storage);
 
-  await client.getAnkiHostKey("", "");
+  await client.login("", "");
   await client.getMetaUSN();
-  await client.downloadInitialDatabase();
-  const pending_usn = await Syncer.startAndProcessDeletions();
-  await Syncer.processChunksFromServer(pending_usn);
-  Syncer.stopConnection(pending_usn);
+  await client.downloadInitialDatabase("caca.sql");
+  Syncer.start();
 }
 
 testing();

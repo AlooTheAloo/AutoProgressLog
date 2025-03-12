@@ -68,6 +68,7 @@ function createWarning(warningProps: WarningProps | undefined) {
 }
 
 function ankiTest(worked: boolean) {
+  console.log("ankitest worked " + worked);
   if (worked) {
     toast.add({
       severity: "success",

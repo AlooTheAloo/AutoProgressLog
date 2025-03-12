@@ -10,62 +10,57 @@ import {
   getAnkiCardReviewCount,
   getMatureCards,
   getRetention,
-  hasSyncEnabled,
 } from "../../../apl-backend/anki/db";
 import { roundTo } from "round-to";
-import { hasPerms } from "../../../apl-backend/Helpers/readWindows";
 import {
-  ankiPaths,
+  ankiLogin,
   createAnkiIntegration,
-  getAnkiDBPaths,
-  getAnkiProfileCount,
-  getAnkiProfiles,
-  getDecks,
   getDecksCards,
-  getProfileDecks,
-  LaunchAnki,
-  sleep,
-  verifyAnkiPaths,
 } from "../../../apl-backend/config/configAnkiIntegration";
 import path, { basename, join } from "path";
 import { onConfigChange } from "./SettingsListeners";
+import AnkiHTTPClient from "../../../apl-backend/entry/AnkiHTTPClient";
+import { ankiPath } from "../../../apl-backend/Helpers/getConfig";
 
 export function ankiListeners() {
-  ipcMain.handle("test-anki-connection", async (event: any, arg: Options) => {
-    const no = { worked: false, decks: [] };
+  ipcMain.handle("test-anki-connection", async (event: any, arg: ankiLogin) => {
+    win?.webContents.send("anki-connect-message", "Authenticating");
 
-    try {
-      console.log("1");
-      const int = arg.anki.ankiIntegration;
-      if (int == undefined) return no;
-      console.log("2");
-      if (arg.anki.ankiIntegration?.profile == undefined) return no;
-      console.log("3");
-      const hse = await hasSyncEnabled(arg.anki.ankiIntegration?.profile);
-      if (hse == null) return no;
-      console.log("4");
-      const worked = await LaunchAnki(int);
-      if (!worked[0]) return no;
-      const retention = await getRetention("true_retention", int);
-      if (retention == undefined) return no;
-      const matureCards = await getMatureCards(int);
-      if (matureCards == undefined) return no;
-      const obj = {
-        worked: true,
-        decks: await getDecksCards(arg.anki.ankiIntegration?.ankiDB),
-      };
-      return obj;
-    } catch (e) {
-      return no;
-    }
+    const httpClient = new AnkiHTTPClient("", arg.url);
+    await httpClient.login(arg.username, arg.password);
+    return loadDB(httpClient);
   });
+
+  ipcMain.handle(
+    "test-anki-connection-key",
+    async (event: any, key: string, url: string) => {
+      console.log("key is " + key);
+      console.log("url is " + url);
+      win?.webContents.send("anki-connect-message", "Authenticating");
+      const httpClient = new AnkiHTTPClient(key, url);
+      return loadDB(httpClient);
+    }
+  );
+
+  const loadDB = async (client: AnkiHTTPClient) => {
+    const worked = await client.downloadInitialDatabase(ankiPath);
+    console.log("worked is " + worked);
+    if (!worked) {
+      return { worked: false, decks: [], key: "" };
+    } else {
+      win?.webContents.send("anki-connect-message", "Reading decks");
+      const decks = await getDecksCards();
+      console.log("decks is " + decks);
+      return { worked: true, decks: decks, key: client.key };
+    }
+  };
 
   ipcMain.handle("anki-read-data", async (event: any, arg: any) => {
     const int = getSetupAnkiIntegration();
     if (int == undefined) return undefined;
-    const retention = await getRetention(arg, int);
+    const retention = await getRetention(arg);
     if (retention == undefined) return undefined;
-    const matureCards = await getMatureCards(int);
+    const matureCards = await getMatureCards();
     return {
       retentionRate: roundTo(retention, 2),
       matureCardCount: matureCards,
@@ -81,96 +76,40 @@ export function ankiListeners() {
     return decksCards;
   });
 
-  ipcMain.handle("anki-profile-select", async (event: any, profile: string) => {
-    const Paths = await getAnkiDBPaths(profile);
-    return await connectFromPaths(Paths);
+  let login: ankiLogin | undefined;
+  ipcMain.handle("anki-credentials", async (avt: any, data: ankiLogin) => {
+    login = data;
+    console.log("set login to " + JSON.stringify(login));
   });
 
-  ipcMain.handle("anki-connect-start", async (event: any, arg: any) => {
-    win?.webContents.send("anki-connect-message", "Locating Anki Paths");
-    await sleep(500);
-    const profileCount = await getAnkiProfileCount();
+  ipcMain.handle("anki-connect-start", async (event: any) => {
+    win?.webContents.send("anki-connect-message", "Authenticating");
+    if (login == undefined) return false;
 
-    if (profileCount == 0) {
-      return false;
-    } else if (profileCount > 1) {
-      const profiles = await getProfileDecks();
-      if (profiles == false) return false;
-      win?.webContents.send("anki-multiple-profiles-detected", profiles);
-      return null;
-    } else {
-      const Paths = await getAnkiDBPaths(
-        ((await getAnkiProfiles()) ?? [])[0].name
-      );
-      return await connectFromPaths(Paths);
-    }
+    const httpClient = new AnkiHTTPClient();
+    await httpClient.login(login?.username, login?.password);
+    return await connectFromClient(httpClient, login);
   });
 
-  ipcMain.handle(
-    "anki-manual-connect-start",
-    async (event: any, appPath: string, dbPath: string) => {
-      const Paths: ankiPaths = {
-        ankiDB: dbPath,
-        ankiPath: appPath,
-        profile: path.basename(path.join(dbPath, "..")),
-      };
-      return await connectFromPaths(Paths);
+  async function connectFromClient(client: AnkiHTTPClient, login: ankiLogin) {
+    console.log(1);
+    if (login == undefined) return false;
+    console.log(2);
+    if (!client.isLoggedIn()) return false;
+    console.log(3);
+    win?.webContents.send("anki-connect-message", "Downloading Anki Database");
+    console.log(4);
+    await client.downloadInitialDatabase(ankiPath);
+    console.log(5);
+    const integration = await createAnkiIntegration(login);
+    console.log("integration is " + JSON.stringify(integration));
+
+    if (integration) {
+      setAnkiIntegration(integration);
     }
-  );
-
-  async function connectFromPaths(Paths: ankiPaths) {
-    win?.webContents.send(
-      "anki-connect-message",
-      "Verifying validity of installation"
-    );
-    const verified = await verifyAnkiPaths(Paths);
-    if (!verified) return false;
-    let ankiIntegration: ankiIntegration | false = false;
-
-    if (process.platform == "darwin") {
-      ankiIntegration = await macOSAnki(Paths);
-    } else {
-      ankiIntegration = await createAnkiIntegration(Paths);
-      if (ankiIntegration != false) {
-        setAnkiIntegration(ankiIntegration);
-      }
-    }
-
-    if (ankiIntegration) {
-      setAnkiIntegration(ankiIntegration);
-    }
-
-    return !!ankiIntegration;
+    console.log("!!integration" + !!integration);
+    return !!integration;
   }
-
-  const filters: { [key: string]: { name: string; extensions: string[] }[] } = {
-    win32: [{ name: "Anki", extensions: ["exe"] }],
-    darwin: [{ name: "Anki", extensions: ["app"] }],
-    linux: [{ name: "Anki", extensions: [] }], // Allow any file
-  };
-
-  ipcMain.handle("SelectAppPath", async (event: any, arg: any) => {
-    const res = await dialog.showOpenDialog({
-      filters: filters[process.platform] || [],
-    });
-
-    if (res.canceled) return undefined;
-    return res.filePaths[0];
-  });
-
-  ipcMain.handle("SelectDBPath", async (event: any, arg: any) => {
-    const res = await dialog.showOpenDialog({
-      filters: [
-        {
-          name: "Anki Database",
-          extensions: ["anki2"],
-        },
-      ],
-    });
-
-    if (res.canceled) return undefined;
-    return res.filePaths[0];
-  });
 
   onConfigChange.on(
     "config-change",
@@ -180,14 +119,4 @@ export function ankiListeners() {
       }
     }
   );
-}
-
-async function macOSAnki(paths: any) {
-  win?.webContents.send("anki-connect-message", "Verifying permissions");
-  const perms = await hasPerms();
-  if (perms) {
-    return await createAnkiIntegration(paths);
-  } else {
-    return false;
-  }
 }

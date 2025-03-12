@@ -20,10 +20,6 @@ export const setupRoutes = [
     component: () => import("../Setup/Other/SetupIndex.vue"),
   },
   {
-    path: "/setup/macos-permissions",
-    component: () => import("../Setup/Other/Macos-permissions.vue"),
-  },
-  {
     path: "/setup/client-server-selection",
     component: () => import("../Setup/Other/Setup-client-server-selection.vue"),
   },
@@ -62,10 +58,6 @@ export const setupRoutes = [
   {
     path: "/setup/anki-failure",
     component: () => import("../Setup/Anki/AnkiFailure.vue"),
-  },
-  {
-    path: "/setup/anki-manual-connect",
-    component: () => import("../Setup/Anki/AnkiManualConnect.vue"),
   },
   {
     path: "/setup/anki-decks",

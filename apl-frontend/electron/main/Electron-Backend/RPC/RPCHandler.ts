@@ -57,12 +57,14 @@ function createJob() {
 
   job = nodeScheduler.scheduleJob(`*/10 * * * * *`, async () => {
     if (!ready || !(await checkInternet())) return;
-
     const activity = await getLiveActivity();
-    if (activity == undefined) return;
+    if (activity?.length == 0 || activity == undefined) {
+      rpc.clearActivity();
+      return;
+    }
     if (currentActivity != null && activity.length == 0) {
       setTimeout(() => {
-        runSync(true);
+        runSync();
       }, 10000);
       rpc.clearActivity();
       currentActivity = null;
@@ -71,7 +73,7 @@ function createJob() {
     const single = activity[0];
     if (single.id != currentActivity?.id) {
       setTimeout(() => {
-        runSync(true);
+        runSync();
       }, 10000);
     }
     const lastEntry = await GetLastEntry();

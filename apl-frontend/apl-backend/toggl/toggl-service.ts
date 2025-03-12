@@ -36,6 +36,8 @@ export async function getTimeEntries(since: string | number) {
       });
     }
 
+    fetch("https://google.com"); // dont worry about it
+
     const start = dayjs();
     const entries: entry[] = await toggl.timeEntry.list({
       since: dayjs(since).unix().toString(),

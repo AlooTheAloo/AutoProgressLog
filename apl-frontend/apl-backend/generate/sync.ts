@@ -1,249 +1,261 @@
-import { getAnkiProcesses, KillAnkiIfOpen, LaunchAnki } from "../config/configAnkiIntegration";
-import { GetActivitiesBetween, GetLastEntry, getreadinghours } from "../Helpers/DataBase/SearchDB";
-import { DeleteActivity, ModifyActivityByID, WriteEntries, WriteSyncData } from "../Helpers/DataBase/WriteDB";
-import { getConfig, syncDataPath } from "../Helpers/getConfig";
+import {
+  GetActivitiesBetween,
+  GetLastEntry,
+  getreadinghours,
+} from "../Helpers/DataBase/SearchDB";
+import {
+  DeleteActivity,
+  ModifyActivityByID,
+  WriteEntries,
+  WriteSyncData,
+} from "../Helpers/DataBase/WriteDB";
+import { ankiPath, getConfig, syncDataPath } from "../Helpers/getConfig";
 import { getTimeEntries, toggl } from "../toggl/toggl-service";
 import { entry } from "../types/entry";
-import { getAnkiCardReviewCount, getLastUpdate, getMatureCards, getRetention, hasSyncEnabled } from "../anki/db";
+import {
+  getAnkiCardReviewCount,
+  getLastUpdate,
+  getMatureCards,
+  getRetention,
+} from "../anki/db";
 import dayjs from "dayjs";
 import { sumTime } from "../Helpers/entryHelper";
 import { CreateDTO } from "../../electron/main/Electron-Backend/DashboardListeners";
 import { SyncData } from "../types/sync";
 import { CacheManager } from "../Helpers/cache";
 import { win } from "../../electron/main";
+import NormalSyncer from "../entry/NormalSyncer";
+import AnkiHTTPClient from "../entry/AnkiHTTPClient";
+import Storage from "../entry/Storage";
 
 export interface AnkiSyncData {
-    cardReview: number;
-    matureCards: number;
-    retention: number;
-    lastUpdate: number;
+  cardReview: number;
+  matureCards: number;
+  retention: number;
+  lastUpdate: number;
 }
 
 export interface syncProps {
-    syncAnki: boolean;
-    syncToggl: boolean;
+  syncAnki: boolean;
+  syncToggl: boolean;
 
-    isReport: boolean;
+  isReport: boolean;
 }
 
-const DEFAULT:syncProps = {
-    syncAnki: true,
-    syncToggl: true,
-    isReport: false
-}
+const DEFAULT: syncProps = {
+  syncAnki: true,
+  syncToggl: true,
+  isReport: false,
+};
 
 let syncing = false;
 
-export function setSyncing(value:boolean){
-    if(win?.isDestroyed()) return;
-    win?.webContents.send("SetSync", value);
-    syncing = value;
+export function setSyncing(value: boolean) {
+  if (win?.isDestroyed()) return;
+  win?.webContents.send("SetSync", value);
+  syncing = value;
 }
 
-export function isSyncing(){
-    return syncing;
+export function isSyncing() {
+  return syncing;
 }
 
+export async function runSync(props: syncProps = DEFAULT) {
+  let toggl: {
+    entries: entry[];
+    delta: number;
+  };
+  let anki: AnkiSyncData | null = null;
 
-export async function runSync(silent = false, props:syncProps = DEFAULT, sendSyncing = true){
-    const start = dayjs();
-    
-    if(!props.isReport && sendSyncing){
-        setSyncing(true);
-    } 
+  const [t, a] = await Promise.all([
+    props.syncToggl ? syncToggl() : null,
+    new Promise<AnkiSyncData | null>(async (res, rej) => {
+      const start = dayjs();
+      if (props.syncAnki == false) return res(null);
+      const config = getConfig();
+      if (config == undefined) return res(null);
+      await syncAnki(props.isReport).then(res).catch(rej);
+      console.log(
+        "Finished syncing anki in ",
+        dayjs().diff(start, "ms") + " ms"
+      );
+    }),
+  ]);
 
-    let toggl:{
-        entries : entry[]
-        delta: number
+  if (t == null) {
+    win?.webContents.send("ShowDialog", {
+      header: "Cannot complete sync!",
+      content:
+        "APL is unable to perform a synchronisation with the toggl servers. <br> <b>Potential cause of error : Invalid toggl token.</b> ",
+    });
+    return null;
+  }
+
+  let lastEntry: SyncData | null = await GetLastEntry();
+  if (lastEntry?.toggl == undefined) return null;
+
+  let time: number = 0;
+
+  toggl = t;
+  if (a == null) {
+    anki = {
+      cardReview: 0,
+      matureCards: lastEntry.anki?.mature ?? 0,
+      retention: lastEntry.anki?.retention ?? 0,
+      lastUpdate: lastEntry.anki?.lastAnkiUpdate ?? 0,
     };
-    let anki:AnkiSyncData|null = null;
+  } else anki = a;
 
-    const [t, a] = await Promise.all([
-        props.syncToggl ? syncToggl() : null,
-        new Promise<AnkiSyncData|null>(async (res, rej) => {
-            if(props.syncAnki == false) return res(null);
-            const config = getConfig();
-            if(config == undefined) return res(null);
+  if (props.syncToggl) {
+    time = sumTime(toggl.entries) + toggl.delta;
+  }
 
-
-            const hasSync = await hasSyncEnabled(config.anki?.ankiIntegration?.profile ?? "")
-           
-            if(hasSync == null){
-                win?.webContents.send("ShowDialog", {
-                    header: "Cannot connect to Anki!",
-                    content: "APL is unable to connect to your Anki installation. <br> <b>Potential cause of error : Invalid profile name.</b> "
-                })
-                return res(null);
-            } 
-            if(hasSync && !silent){
-                if(config.anki?.ankiIntegration == undefined) return res(null);
-                const worked = await LaunchAnki(config.anki?.ankiIntegration);
-                if(!worked[0]){
-                    win?.webContents.send("ShowDialog", {
-                        header: "Cannot connect to Anki!",
-                        content: "APL is unable to connect to your Anki installation. <br> <b>Potential cause of error : Invalid anki program path.</b> "
-                    })
-                    return res(null);    
-                }
-                
-                syncAnki(props.isReport).then(res).catch(rej);
-            }
-
-            if(!hasSync && !silent) {
-                syncAnki(props.isReport).then(res).catch(rej);
-            }
-
-
-            if(silent){
-                syncAnkiIfClosed().then((data) => {res(data ?? null)}).catch(() => {
-                    res(null);
-                });
-            }
-
-        })
-    ])
-
-    if(t == null) {
-        win?.webContents.send("ShowDialog", {
-            header: "Cannot complete sync!",
-            content: "APL is unable to perform a synchronisation with the toggl servers. <br> <b>Potential cause of error : Invalid toggl token.</b> "
-        })
-        return null;
-    }
-
-    let lastEntry:SyncData|null = await GetLastEntry();
-    if(lastEntry?.toggl == undefined) return null;
-
-    let time:number = 0;
-    
-    toggl = t;
-    if(a == null)
+  await WriteSyncData(
     {
-        anki = {
-            cardReview: 0,
-            matureCards: lastEntry.anki?.mature ?? 0,
-            retention: lastEntry.anki?.retention ?? 0,
-            lastUpdate: lastEntry.anki?.lastAnkiUpdate ?? 0
-        }
-    }
-    else anki = a;
-
-    if(props.syncToggl)
-    {
-        time = sumTime(toggl.entries) + toggl.delta;
-    }
-   
-
-    await WriteSyncData({
-        generationTime: dayjs().valueOf(),
-        toggl: props.syncToggl ? {
+      generationTime: dayjs().valueOf(),
+      toggl: props.syncToggl
+        ? {
             totalSeconds: lastEntry.toggl.totalSeconds + time,
-        } : undefined,
-        anki: props.syncAnki ? {
-            totalCardsStudied: (lastEntry.anki?.totalCardsStudied ?? 0)+ anki.cardReview,
+          }
+        : undefined,
+      anki: props.syncAnki
+        ? {
+            totalCardsStudied:
+              (lastEntry.anki?.totalCardsStudied ?? 0) + anki.cardReview,
             cardsStudied: anki.cardReview,
             mature: anki.matureCards,
             retention: anki.retention,
             lastAnkiUpdate: anki.lastUpdate,
-        } : undefined,
-        type: "Full",
-    }, toggl.entries);
+          }
+        : undefined,
+      type: "Full",
+    },
+    toggl.entries
+  );
 
-    if(!props.isReport && sendSyncing){
-        setSyncing(false);
-    } 
-
-    return CreateDTO();
+  return CreateDTO();
 }
 
-export async function syncAnkiIfClosed():Promise<AnkiSyncData|undefined>{
-    const targetProcesses = await getAnkiProcesses();
-    if(targetProcesses.length != 0) return;
-    return await syncAnki(false) ?? undefined;
+export async function syncAnki(isReport = false): Promise<AnkiSyncData | null> {
+  const anki = getConfig()?.anki;
+
+  if (!anki?.enabled) return null;
+  if (anki.ankiIntegration == undefined) return null;
+
+  let httpClient = new AnkiHTTPClient(
+    anki?.ankiIntegration?.key,
+    anki?.ankiIntegration?.url
+  );
+  let syncer: NormalSyncer = new NormalSyncer(
+    httpClient,
+    new Storage(ankiPath)
+  );
+
+  const lastEntry = await GetLastEntry("Full");
+  if (lastEntry == null) return null;
+  await syncer.start();
+  const cardReview = await getAnkiCardReviewCount(
+    dayjs(lastEntry.anki?.lastAnkiUpdate ?? lastEntry.generationTime)
+  );
+  const matureCards = await getMatureCards();
+  const retention = await getRetention(anki.options.retentionMode);
+  const lastUpdate = isReport
+    ? dayjs().valueOf()
+    : Math.max(lastEntry?.anki?.lastAnkiUpdate ?? 0, await getLastUpdate());
+
+  if (
+    cardReview == null ||
+    matureCards == null ||
+    retention == null ||
+    lastUpdate == null
+  ) {
+    win?.webContents.send("ShowDialog", {
+      header: "Cannot read anki data!",
+      content:
+        "APL is unable to connect with your anki installation. <br> <b>Potential cause of error : No internet connection.</b> ",
+    });
+    return null;
+  }
+  return {
+    cardReview: cardReview,
+    matureCards: matureCards,
+    retention: retention,
+    lastUpdate: lastUpdate,
+  };
 }
 
-export async function syncAnki(isReport = false):Promise<AnkiSyncData | null> {
+export async function VerifyPreviousActivities(
+  from: dayjs.Dayjs,
+  to: dayjs.Dayjs,
+  togglEntries: entry[] = []
+): Promise<number> {
+  let delta = 0;
+  const dbEntries = await GetActivitiesBetween(from, to);
 
-    const anki = getConfig()?.anki;
-    const integration = anki?.ankiIntegration;
-    if(integration == undefined || !anki?.enabled) return null;
-    const lastEntry = await GetLastEntry("Full");
+  const dbIDs = dbEntries.map((x) => x.id);
+  const togglIDs = togglEntries.map((x) => x.id);
 
-    if(lastEntry == null) return null;
+  // Modified
+  togglEntries
+    .filter((x) => dbIDs.includes(x.id))
+    .forEach((entry) => {
+      const dbEntry = dbEntries.find((x) => x.id == entry.id);
 
-    const cardReview = await getAnkiCardReviewCount(dayjs(lastEntry.anki?.lastAnkiUpdate ?? lastEntry.generationTime), integration);
-    const matureCards = await getMatureCards(integration);
-    const retention = await getRetention(anki.options.retentionMode, integration);
-    const lastUpdate = isReport ? dayjs().valueOf() : Math.max(lastEntry?.anki?.lastAnkiUpdate ?? 0, await getLastUpdate(integration));
-    
-    if(cardReview == null || matureCards == null || retention == null || lastUpdate == null){
-        win?.webContents.send("ShowDialog", {
-            header: "Cannot read anki data!",
-            content: "APL is unable to connect with your anki installation. <br> <b>Potential cause of error : Invalid anki database path.</b> "
-        })
-        return null;
-    };
-    return {
-        cardReview: cardReview,
-        matureCards: matureCards,
-        retention: retention,
-        lastUpdate: lastUpdate
-    }
+      if (dbEntry == undefined) return;
+
+      if (
+        [
+          () => dbEntry.time !== dayjs(entry.stop).unix(),
+          () => dbEntry.seconds !== entry.duration,
+          () => dbEntry.activityName !== entry.description,
+        ].some((check) => check())
+      ) {
+        delta += entry.duration - dbEntry.seconds;
+        ModifyActivityByID(entry.id, entry);
+      }
+    });
+
+  // Added
+  const toAdd = togglEntries.filter(
+    (x) =>
+      !dbIDs.includes(x.id) &&
+      dayjs(x.stop).unix() > from.unix() &&
+      dayjs(x.stop).unix() < to.unix()
+  );
+
+  await WriteEntries(toAdd);
+
+  delta += toAdd.reduce((acc, x) => acc + x.duration, 0);
+
+  // Removed
+  const toRemove = dbEntries.filter((x) => !togglIDs.includes(x.id));
+  await Promise.all(toRemove.map((x) => DeleteActivity(x.id)));
+  delta -= toRemove.reduce((acc, x) => acc + x.seconds, 0);
+  return delta;
 }
 
+export async function syncToggl(): Promise<{
+  entries: entry[];
+  delta: number;
+} | null> {
+  const lastReportTime = await CacheManager.peek().generationTime;
+  const startSync = await GetLastEntry();
 
+  if (startSync == null) return null;
+  const entries = await getTimeEntries(lastReportTime);
 
-export async function VerifyPreviousActivities(from:dayjs.Dayjs, to:dayjs.Dayjs, togglEntries:entry[] = []):Promise<number>{
-    let delta = 0;
-    const dbEntries = await GetActivitiesBetween(from, to);
-
-    const dbIDs = dbEntries.map(x => x.id);
-    const togglIDs = togglEntries.map(x => x.id);
-
-    // Modified
-    togglEntries.filter(x => dbIDs.includes(x.id)).forEach(entry => {
-        const dbEntry = dbEntries.find(x => x.id == entry.id);
-
-        if(dbEntry == undefined) return;
-
-        if([() => dbEntry.time !== dayjs(entry.stop).unix(),
-            () => dbEntry.seconds !== entry.duration,
-            () => dbEntry.activityName !== entry.description].some(check => check())){
-            delta += entry.duration - dbEntry.seconds;
-            ModifyActivityByID(entry.id, entry);
-        }
-    })
-
-    // Added
-    const toAdd = togglEntries.filter(x => !dbIDs.includes(x.id) && dayjs(x.stop).unix() > from.unix() && dayjs(x.stop).unix() < to.unix());
-    console.log("toAdd is " + toAdd);
-    await WriteEntries(toAdd);
-
-    delta += toAdd.reduce((acc, x) => acc + x.duration, 0);
-    console.log("delta is " + delta);
-
-    // Removed
-    const toRemove = dbEntries.filter(x => !togglIDs.includes(x.id));
-    await Promise.all(toRemove.map(x => DeleteActivity(x.id)));
-    delta -= toRemove.reduce((acc, x) => acc + x.seconds, 0);
-    return delta;
-} 
-
-
-export async function syncToggl():Promise<{entries: entry[], delta:number}|null>{
-    const lastReportTime = await CacheManager.peek().generationTime;
-    const startSync = await GetLastEntry();
-
-    if(startSync == null) return null;
-    const entries = await getTimeEntries(lastReportTime);
-
-    if(entries == null) return null;
-    console.log(entries);
-    const delta = await VerifyPreviousActivities(dayjs(lastReportTime), dayjs(startSync.generationTime), entries.entriesAfterLastGen);
-    return {
-        entries: entries.entriesAfterLastGen.filter(x => dayjs(x.stop).isAfter(startSync.generationTime) && dayjs(x.stop).isBefore(dayjs())),
-        delta: delta
-    }
+  if (entries == null) return null;
+  const delta = await VerifyPreviousActivities(
+    dayjs(lastReportTime),
+    dayjs(startSync.generationTime),
+    entries.entriesAfterLastGen
+  );
+  return {
+    entries: entries.entriesAfterLastGen.filter(
+      (x) =>
+        dayjs(x.stop).isAfter(startSync.generationTime) &&
+        dayjs(x.stop).isBefore(dayjs())
+    ),
+    delta: delta,
+  };
 }
-
-

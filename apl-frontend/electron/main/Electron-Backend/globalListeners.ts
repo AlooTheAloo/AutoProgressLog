@@ -13,7 +13,6 @@ import { version as v1 } from "../../../package.json";
 const APP_URL = "https://github.com/AlooTheAloo/AutoProgressLog/";
 
 export function globalListeners() {
-  console.log("Global listeners loaded");
   ipcMain.handle("OpenExternal", (event, args) => {
     shell.openExternal(args);
   });
@@ -38,19 +37,19 @@ export function globalListeners() {
   });
 
   ipcMain.handle("check-for-update", async (event, args) => {
-    const result = await electronUpdater.autoUpdater.checkForUpdates();
-    console.log("result is " + result);
-    const f = getFileInAPLData("skip.txt");
-    const skipped = existsSync(f)
-      ? readFileSync(f).toString() ?? "0.0.0"
-      : "0.0.0";
-    console.log(skipped);
-    if (
-      result?.updateInfo.version != (semver.gt(v1, skipped) ? v1 : skipped) &&
-      result?.updateInfo != null
-    ) {
-      console.log("Update availeable !");
-      win?.webContents.send("update-available", result?.updateInfo);
-    }
+    // const result = await electronUpdater.autoUpdater.checkForUpdates();
+    // console.log("result is " + result);
+    // const f = getFileInAPLData("skip.txt");
+    // const skipped = existsSync(f)
+    //   ? readFileSync(f).toString() ?? "0.0.0"
+    //   : "0.0.0";
+    // console.log(skipped);
+    // if (
+    //   result?.updateInfo.version != (semver.gt(v1, skipped) ? v1 : skipped) &&
+    //   result?.updateInfo != null
+    // ) {
+    //   console.log("Update availeable !");
+    //   win?.webContents.send("update-available", result?.updateInfo);
+    // }
   });
 }

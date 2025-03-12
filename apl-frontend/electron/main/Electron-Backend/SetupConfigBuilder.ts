@@ -30,10 +30,8 @@ export function setAnkiIntegration(anki: ankiIntegration | false) {
     };
     return;
   }
-
   config.anki = {
     enabled: true,
-
     ankiIntegration: anki,
     options: {
       trackedDecks: [],
@@ -69,9 +67,7 @@ export function setupListeners() {
       sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE,
       async (err) => {
         const time = await CreateDB(db);
-        console.log("time is " + time);
         if (time == undefined) return;
-        console.log("literally init");
         CacheManager.init(time);
       }
     );
