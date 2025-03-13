@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router";
-import SideBarContainer from "../../components/Common/SideBarContainer.vue";
-import { appPath } from "../routes/appRoutes";
 import Tabs from "primevue/tabs";
 import TabList from "primevue/tablist";
 import Tab from "primevue/tab";
@@ -20,6 +18,7 @@ import AnkiSettings from "../../components/Settings/Tabs/AnkiSettings.vue";
 import TimeSettings from "../../components/Settings/Tabs/TimeSettings.vue";
 import ReportsSettings from "../../components/Settings/Tabs/ReportsSettings.vue";
 import { useElementBounding, useWindowSize } from "@vueuse/core";
+import AppearanceSettings from "../../components/Settings/Tabs/AppearanceSettings.vue";
 
 const router = useRouter();
 
@@ -68,6 +67,7 @@ function createWarning(warningProps: WarningProps | undefined) {
 }
 
 function ankiTest(worked: boolean) {
+  console.log("ankitest worked " + worked);
   if (worked) {
     toast.add({
       severity: "success",
@@ -135,7 +135,7 @@ function ankiTest(worked: boolean) {
               >
                 <Tab value="0">General</Tab>
                 <Tab value="1">Account</Tab>
-                <Tab value="2" disabled>Appearance</Tab>
+                <Tab value="2">Appearance</Tab>
                 <Tab value="3">Anki</Tab>
                 <Tab value="4">Time Tracking</Tab>
                 <Tab value="5" disabled>Notifications</Tab>
@@ -159,6 +159,12 @@ function ankiTest(worked: boolean) {
                 </TabPanel>
                 <TabPanel value="1" class="">
                   <AccountSettings
+                    :config="config"
+                    @update:config="setConfig"
+                  />
+                </TabPanel>
+                <TabPanel value="2">
+                  <AppearanceSettings
                     :config="config"
                     @update:config="setConfig"
                   />

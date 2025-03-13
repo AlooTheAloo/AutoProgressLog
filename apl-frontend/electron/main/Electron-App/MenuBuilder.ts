@@ -8,16 +8,18 @@ export function buildMenu(app: App) {
     {
       label: app.name, // This will automatically use "Autoprogresslog" as the name
       submenu: [
-        { label: "About APL", click: () => {
-          const aboutWindow = new BrowserWindow({
-            width: 400,
-            height: 300,
-            resizable: false,
-            webPreferences: {
-              nodeIntegration: true,
-              contextIsolation: false,
-            },
-          });
+        {
+          label: "About APL",
+          click: () => {
+            const aboutWindow = new BrowserWindow({
+              width: 400,
+              height: 300,
+              resizable: false,
+              webPreferences: {
+                nodeIntegration: true,
+                contextIsolation: false,
+              },
+            });
             if (VITE_DEV_SERVER_URL) {
               // #298
               aboutWindow.loadURL(VITE_DEV_SERVER_URL);
@@ -26,12 +28,10 @@ export function buildMenu(app: App) {
               aboutWindow.loadFile(indexHtml);
             }
             aboutWindow.webContents.on("did-finish-load", () => {
-            aboutWindow?.webContents.send("router-push", "/about");
-          });
-
-
-
-        } }, // About menu item
+              aboutWindow?.webContents.send("router-push", "/about");
+            });
+          },
+        }, // About menu item
         { type: "separator" },
         {
           label: "Settings",

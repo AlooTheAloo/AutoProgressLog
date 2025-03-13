@@ -1,1 +1,0 @@
-A list of test scripts you don't really need to run, but can be useful for testing the upgrade process.

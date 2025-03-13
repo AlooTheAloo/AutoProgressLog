@@ -4,7 +4,6 @@ import { getLiveActivity } from "../../../../apl-backend/toggl/toggl-service";
 import { app } from "electron";
 import { entry } from "../../../../apl-backend/types/entry";
 import { GetLastEntry } from "../../../../apl-backend/Helpers/DataBase/SearchDB";
-import { getLastUpdate } from "../../../../apl-backend/anki/db";
 import dayjs from "dayjs";
 import { runSync } from "../../../../apl-backend/generate/sync";
 import { checkInternet } from "../../../../apl-backend/Helpers/Healthcheck/internetHelper";
@@ -35,7 +34,7 @@ export function createAutoRPC() {
           job = null;
         }
       }
-    }
+    },
   );
 
   app.on("before-quit", () => {
@@ -57,12 +56,14 @@ function createJob() {
 
   job = nodeScheduler.scheduleJob(`*/10 * * * * *`, async () => {
     if (!ready || !(await checkInternet())) return;
-
     const activity = await getLiveActivity();
-    if (activity == undefined) return;
+    if (activity?.length == 0 || activity == undefined) {
+      rpc.clearActivity();
+      return;
+    }
     if (currentActivity != null && activity.length == 0) {
       setTimeout(() => {
-        runSync(true);
+        runSync();
       }, 10000);
       rpc.clearActivity();
       currentActivity = null;
@@ -71,7 +72,7 @@ function createJob() {
     const single = activity[0];
     if (single.id != currentActivity?.id) {
       setTimeout(() => {
-        runSync(true);
+        runSync();
       }, 10000);
     }
     const lastEntry = await GetLastEntry();
@@ -92,7 +93,6 @@ function createJob() {
       //     },
       // ],
     });
-    console.log("Set activity to " + single.description);
     currentActivity = single;
   });
 

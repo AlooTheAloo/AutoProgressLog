@@ -1,18 +1,15 @@
-import { activity, relativeActivity } from "../types/activity.js";
+import { relativeActivity } from "../types/activity.js";
 import { cache } from "../types/cache.js";
 import path from "path";
 import puppeteer from "puppeteer";
 import { fileURLToPath } from "url";
 import { ReportData, TPlusDelta } from "../types/reportdata.js";
 import dayjs from "dayjs";
-import { roundTo } from "round-to";
 import { outputOptions, ReportExtension } from "../types/options.js";
 import { arithmeticWeightedMean } from "./util.js";
 import { getConfig } from "./getConfig.js";
 import color from "color";
-import { GetImmersionTimeSince } from "./DataBase/SearchDB.js";
 import { Layout } from "../apl-visuals/src/types/report-data.js";
-import fs from 'fs';
 import { Browser, getInstalledBrowsers } from "@puppeteer/browsers";
 import { app } from "electron";
 
@@ -33,28 +30,26 @@ const MATURE_HISTORY = 6;
 export const __filename = fileURLToPath(import.meta.url);
 export const __dirname = path.dirname(__filename);
 
-
 export async function getChromiumExecPath() {
-  const cachedir = path.join(app.getPath('home'), '.cache', 'puppeteer')
+  const cachedir = path.join(app.getPath("home"), ".cache", "puppeteer");
   const browsers = await getInstalledBrowsers({
-      cacheDir: cachedir
+    cacheDir: cachedir,
   });
-  return browsers.filter(x => x.browser == Browser.CHROME).at(0)?.executablePath;
+  return browsers.filter((x) => x.browser == Browser.CHROME).at(0)
+    ?.executablePath;
 }
-
 
 export async function buildImage(
   options: outputOptions,
   height: number = 1775,
   reportData: ReportData,
-  reportLayout:Layout
+  reportLayout: Layout
 ) {
   const outputPath = `${options.outputFile.path}${path.sep}${options.outputFile.name} ${reportData.reportNo}${options.outputFile.extension}`;
 
-
   const execpath = await getChromiumExecPath();
-  console.log('execpath is ' + execpath)
-  console.log(11.1)
+  console.log("execpath is " + execpath);
+  console.log(11.1);
   const browser = await puppeteer.launch({
     headless: true,
     devtools: true,
@@ -63,41 +58,58 @@ export async function buildImage(
       "--disable-features=IsolateOrigins",
       "--disable-site-isolation-trials",
     ],
-    executablePath: execpath
-  })
+    executablePath: execpath,
+  });
 
-  console.log(11.2)
+  console.log(11.2);
   const page = await browser.newPage();
-  console.log(11.3)
-  
-  await page.evaluateOnNewDocument((data, layout) => {
-    window.apl_ReportData = data;
-    window.apl_ReportLayout = layout;
-  }, reportData, reportLayout);
-  
-  console.log(11.4)
+  console.log(11.3);
+
+  await page.evaluateOnNewDocument(
+    (data, layout) => {
+      window.apl_ReportData = data;
+      window.apl_ReportLayout = layout;
+    },
+    reportData,
+    reportLayout
+  );
+
+  console.log(11.4);
 
   page.setViewport({
-    width: 2000 * options.outputQuality / 2,
+    width: (2000 * options.outputQuality) / 2,
     height: 5000,
     deviceScaleFactor: options.outputQuality / 2,
   });
-  console.log(11.5)
+  console.log(11.5);
 
   const isDev = process.env.NODE_ENV === "development";
 
   const visualsPath = isDev
-    ? path.join(__dirname, "..", "..", "apl-backend", "apl-visuals", "visuals", "index.html")
-    : path.join(process.resourcesPath, "app.asar.unpacked", "apl-backend", "apl-visuals", "visuals", "index.html");
+    ? path.join(
+        __dirname,
+        "..",
+        "..",
+        "apl-backend",
+        "apl-visuals",
+        "visuals",
+        "index.html"
+      )
+    : path.join(
+        process.resourcesPath,
+        "app.asar.unpacked",
+        "apl-backend",
+        "apl-visuals",
+        "visuals",
+        "index.html"
+      );
 
   await page.goto(`file:${visualsPath}`);
 
-  console.log(11.6)
-
-
+  console.log(11.6);
 
   await page.waitForNetworkIdle();
-  console.log(11.7)
+  console.log(11.7);
 
   await page.screenshot({
     path: outputPath,
@@ -109,21 +121,20 @@ export async function buildImage(
       y: 0,
     },
   });
-  console.log(11.8)
+  console.log(11.8);
 
   await browser.close();
-  console.log(11.9)
+  console.log(11.9);
 
   return outputPath;
 }
 
-const extensionToType = (ext:ReportExtension) => {
-  if(ext == ".png") return "png";
-  if(ext == ".jpg") return "jpeg";
-  if(ext == ".jpeg") return "jpeg";
-  if(ext == ".webp") return "webp";
-}
-
+const extensionToType = (ext: ReportExtension) => {
+  if (ext == ".png") return "png";
+  if (ext == ".jpg") return "jpeg";
+  if (ext == ".jpeg") return "jpeg";
+  if (ext == ".webp") return "webp";
+};
 
 const MOVING_AVERAGE_SIZE = 7;
 
@@ -139,9 +150,8 @@ export function buildJSON(
   lastCaches: cache[],
   builderDTO: builderDTO
 ): ReportData {
-
   const options = getConfig();
-  if(options == undefined) throw new Error("No config found");
+  if (options == undefined) throw new Error("No config found");
 
   const date = dayjs();
   const lastCache = lastCaches[0];
@@ -157,7 +167,7 @@ export function buildJSON(
       lastCache.ankiStreak + (ankiDelta == 0 ? -lastCache.ankiStreak : 1);
     ankiScore =
       ankiDelta +
-      ((lastCache.mature == 0 || reportNo == 1)
+      (lastCache.mature == 0 || reportNo == 1
         ? 0
         : Math.max(ankiData.matureCount - (lastCache.mature ?? 0), 0) * 100);
   }
@@ -290,11 +300,11 @@ const LAYOUT_ANKILESS = [
 export type layout = {
   layout: string[][];
   gradient: string[];
-}
+};
 
-export async function buildLayout():Promise<layout | undefined> {
+export async function buildLayout(): Promise<layout | undefined> {
   const config = getConfig();
-  if(config == undefined) return;
+  if (config == undefined) return;
 
   let gradient: string[] = [];
   try {

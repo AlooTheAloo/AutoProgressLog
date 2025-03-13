@@ -47,6 +47,15 @@ export default class Storage {
     stmt.finalize();
   }
 
+  public async close() {
+    await new Promise((res, rej) => {
+      // Close the database connection when done
+      this.db.close((err) => {
+        res(err == null);
+      });
+    });
+  }
+
   addCardGrave(cid: string, usn: number): Promise<void> {
     return this.addGrave(cid, GraveKind.Card, usn);
   }
@@ -74,7 +83,7 @@ export default class Storage {
   private addGrave(id: string, kind: GraveKind, usn: number): Promise<void> {
     return new Promise((r, rj) => {
       const stmt = this.db.prepare(
-        "INSERT OR IGNORE INTO graves (usn, oid, type) VALUES (?, ?, ?)"
+        "INSERT OR IGNORE INTO graves (usn, oid, type) VALUES (?, ?, ?)",
       );
       stmt.run(usn, id, kind);
       stmt.finalize(() => {
@@ -86,7 +95,7 @@ export default class Storage {
   private removeGrave(id: string, kind: GraveKind): Promise<void> {
     return new Promise((r, rj) => {
       const stmt = this.db.prepare(
-        "DELETE FROM graves WHERE oid = ? AND type = ?"
+        "DELETE FROM graves WHERE oid = ? AND type = ?",
       );
       stmt.run(id, kind);
       stmt.finalize(() => {
@@ -95,35 +104,43 @@ export default class Storage {
     });
   }
 
-  public applyChunk(chunk: Chunk, pending_usn: number) {
-    this.mergeRevlog(chunk.revlog ?? []);
-    this.mergeCards(chunk.cards ?? [], pending_usn);
-    this.mergeNotes(chunk.notes ?? [], pending_usn);
-  }
-  async mergeRevlog(entries: RevlogEntry[]): Promise<void> {
-    for (const entry of entries) {
-      await this.addRevlogEntry(entry);
-    }
+  public async applyChunk(chunk: Chunk, pending_usn: number) {
+    await this.mergeRevlog(chunk.revlog ?? []);
+    await this.mergeCards(chunk.cards ?? [], pending_usn);
+    await this.mergeNotes(chunk.notes ?? [], pending_usn);
   }
 
-  async mergeCards(entries: CardEntry[], pendingUsn: number): Promise<void> {
-    for (const entry of entries) {
-      await this.addOrUpdateCardIfNewer(entry, pendingUsn);
+  async mergeRevlog(entries: RevlogEntry[]): Promise<void[]> {
+    if (entries.length != 0) {
+      console.log(`Applying chunk with ${entries.length} reviews`);
     }
+    return Promise.all(entries.map((x) => this.addRevlogEntry(x)));
   }
 
-  async mergeNotes(entries: NoteEntry[], pendingUsn: number): Promise<void> {
-    for (const entry of entries) {
-      await this.addOrUpdateNoteIfNewer(entry, pendingUsn);
+  async mergeCards(entries: CardEntry[], pendingUsn: number): Promise<void[]> {
+    if (entries.length != 0) {
+      console.log(`Applying chunk with ${entries.length} cards`);
     }
+    return Promise.all(
+      entries.map((x) => this.addOrUpdateCardIfNewer(x, pendingUsn)),
+    );
+  }
+
+  async mergeNotes(entries: NoteEntry[], pendingUsn: number): Promise<void[]> {
+    if (entries.length != 0) {
+      console.log(`Applying chunk with ${entries.length} notes`);
+    }
+
+    return Promise.all(
+      entries.map((x) => this.addOrUpdateNoteIfNewer(x, pendingUsn)),
+    );
   }
 
   async addRevlogEntry(entry: RevlogEntry) {
-    console.log("adding revlog entry for " + entry);
     return new Promise<void>((s, j) => {
       this.db
         .prepare(
-          `INSERT OR IGNORE INTO revlog (id, cid, usn, ease, ivl, lastIvl, factor, time, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+          `INSERT OR IGNORE INTO revlog (id, cid, usn, ease, ivl, lastIvl, factor, time, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         )
         .run(entry)
         .finalize(() => {
@@ -133,10 +150,12 @@ export default class Storage {
   }
 
   async addOrUpdateCardIfNewer(entry: CardEntry, pendingUsn: number) {
+    console.log("adding/updating card " + entry);
+
     return new Promise<void>((s, j) => {
       this.db
         .prepare(
-          `INSERT OR REPLACE INTO cards (id, nid, did, ord, mod, usn, type, queue, due, ivl, factor, reps, lapses, left, odue, odid, flags, data) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`
+          `INSERT OR REPLACE INTO cards (id, nid, did, ord, mod, usn, type, queue, due, ivl, factor, reps, lapses, left, odue, odid, flags, data) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
         )
         .run(entry, (err: any, data: any) => {
           if (err) {
@@ -150,10 +169,11 @@ export default class Storage {
   }
 
   async addOrUpdateNoteIfNewer(entry: NoteEntry, pendingUsn: number) {
+    console.log("adding/updating " + entry);
     return new Promise<void>((s, j) => {
       this.db
         .prepare(
-          `INSERT OR REPLACE INTO notes (id,guid,mid,mod,usn,tags,flds,sfld,csum,flags,data) VALUES (?,?,?,?,?,?,?,?,?,0,"")`
+          `INSERT OR REPLACE INTO notes (id,guid,mid,mod,usn,tags,flds,sfld,csum,flags,data) VALUES (?,?,?,?,?,?,?,?,?,?,?)`,
         )
         .run(entry, (err: any, data: any) => {
           if (err) {

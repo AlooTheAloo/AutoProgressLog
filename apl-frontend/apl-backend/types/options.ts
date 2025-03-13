@@ -6,6 +6,9 @@ export interface Options {
   account: {
     userName: string;
   };
+  appreance: {
+    glow: boolean;
+  };
   toggl: {
     togglToken: string;
   };
@@ -18,12 +21,6 @@ export interface Options {
 export type ConditionalOption<T> =
   | { enabled: true; options: T }
   | { enabled: false; options?: undefined };
-
-export interface AnkiIntegration {
-  ankiPath?: string;
-  ankiDB?: string;
-  profile?: string;
-}
 
 export type AnkiOptions = {
   retentionMode: RetentionMode;

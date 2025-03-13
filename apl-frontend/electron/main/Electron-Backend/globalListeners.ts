@@ -9,11 +9,12 @@ import { getFileInAPLData } from "../../../apl-backend/Helpers/getConfig";
 import { win } from "..";
 import semver from "semver";
 import { version as v1 } from "../../../package.json";
+import { upgrade_schema } from "../../../apl-backend/apl-upgrade";
+import { CacheManager } from "../../../apl-backend/Helpers/cache";
 
 const APP_URL = "https://github.com/AlooTheAloo/AutoProgressLog/";
 
 export function globalListeners() {
-  console.log("Global listeners loaded");
   ipcMain.handle("OpenExternal", (event, args) => {
     shell.openExternal(args);
   });
@@ -26,10 +27,15 @@ export function globalListeners() {
     return setInternet(args);
   });
 
+  ipcMain.handle("Update-App-Schema", async (event, args) => {
+    await upgrade_schema(CacheManager.SemVer().version);
+    win?.webContents.send("router-push", "/app/dashboard");
+    win?.webContents.send("is-setup-complete", true);
+  });
+
   ipcMain.handle("Update-App", async (event, args) => {
-    console.log(args);
     shell.openExternal(
-      `${APP_URL}/releases/download/${args.version}/${args.path}`
+      `${APP_URL}/releases/download/${args.version}/${args.path}`,
     );
   });
 
@@ -42,7 +48,7 @@ export function globalListeners() {
     console.log("result is " + result);
     const f = getFileInAPLData("skip.txt");
     const skipped = existsSync(f)
-      ? readFileSync(f).toString() ?? "0.0.0"
+      ? (readFileSync(f).toString() ?? "0.0.0")
       : "0.0.0";
     console.log(skipped);
     if (

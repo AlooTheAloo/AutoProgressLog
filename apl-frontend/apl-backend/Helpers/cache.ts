@@ -6,11 +6,21 @@ import { Version, appVersion } from "../consts/versioning.js";
 import { cache_location } from "./getConfig.js";
 
 export class CacheManager {
+  static setVersion = (version: string) => {
+    this.set(
+      {
+        list: this.get().list,
+      },
+      version,
+    );
+  };
+
   static SemVer = () => {
     return new SemVer(this.get(false).version ?? "0.0.0");
   };
 
   static verifyVersion = () => {
+    console.log("compare is " + this.SemVer().compare(appVersion));
     return this.SemVer().compare(appVersion) == 0;
   };
 

@@ -16,7 +16,7 @@ function OpenTogglTrackPage() {
 function CreateAccount() {
   window.ipcRenderer.invoke(
     "OpenExternal",
-    "https://accounts.toggl.com/track/signup/"
+    "https://accounts.toggl.com/track/signup/",
   );
 }
 

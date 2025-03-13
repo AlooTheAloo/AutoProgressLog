@@ -21,26 +21,29 @@ import { DashboardDTO } from "../../../electron/main/Electron-Backend/types/Dash
 const TIME_SYNC_INTERVAL = 60 * 1000;
 const THIRTY_MINUTES = 30 * 60 * 1000;
 const router = useRouter();
-const { shift } = useMagicKeys();
 
+const generating_report = ref<boolean>(false);
 const syncing = ref<boolean>(false);
+
 const dto = ref<DashboardDTO>();
 const lastSyncTime = ref<string>("");
 const config = ref<Options>();
 
+const disableActionButtons = computed(
+  () => generating_report.value || syncing.value,
+);
+
 onUnmounted(() => {
   intervals.forEach((x) => clearInterval(x));
   intervals.length = 0;
-
   dto.value = undefined;
 });
 
 async function generateReport() {
   try {
-    syncing.value = true;
-    const maybe: Maybe<DashboardDTO> = await window.ipcRenderer.invoke(
-      "GenerateReport"
-    );
+    generating_report.value = true;
+    const maybe: Maybe<DashboardDTO> =
+      await window.ipcRenderer.invoke("GenerateReport");
     if (!("error" in maybe)) {
       dto.value = maybe;
     }
@@ -48,17 +51,14 @@ async function generateReport() {
     console.error("Error generating report:", error);
     // TODO : Handle error (e.g., show error message to user)
   } finally {
-    syncing.value = false;
+    generating_report.value = false;
   }
 }
 
-async function sync(alternate: boolean) {
+async function sync() {
+  syncing.value = true;
   try {
-    syncing.value = true;
-    const maybe: Maybe<DashboardDTO> = await window.ipcRenderer.invoke(
-      "Sync",
-      alternate
-    );
+    const maybe: Maybe<DashboardDTO> = await window.ipcRenderer.invoke("Sync");
     if (!("error" in maybe)) {
       dto.value = maybe;
       lastSyncTime.value = getLastSyncTime();
@@ -71,7 +71,7 @@ async function sync(alternate: boolean) {
 }
 
 window.ipcRenderer.on("SetSync", (evt, newSync: boolean) => {
-  syncing.value = newSync;
+  generating_report.value = newSync;
 });
 
 onUnmounted(() => {
@@ -85,33 +85,32 @@ onMounted(async () => {
   });
 
   try {
-    const data: DashboardDTO = await window.ipcRenderer.invoke(
-      "Get-Dashboard-DTO"
-    );
+    syncing.value = true;
+    const data: DashboardDTO =
+      await window.ipcRenderer.invoke("Get-Dashboard-DTO");
     dto.value = data;
 
     if (data.syncCount == 1) {
       firstDialog.value = true;
     }
 
-    // Full sync if no syncs have been done
-    await sync(data.syncCount !== 1);
+    await sync();
     const s = await window.ipcRenderer.invoke("isSyncing");
-    syncing.value = s;
+    generating_report.value = s;
   } catch (error) {
     console.error("Error fetching dashboard data:", error);
   }
 
   intervals.push(
     setInterval(() => {
-      sync(true);
-    }, THIRTY_MINUTES)
+      sync();
+    }, THIRTY_MINUTES),
   );
 
   intervals.push(
     setInterval(() => {
       lastSyncTime.value = getLastSyncTime();
-    }, TIME_SYNC_INTERVAL)
+    }, TIME_SYNC_INTERVAL),
   );
 });
 
@@ -191,8 +190,8 @@ const closeFirstDialog = () => {
           <div class="flex items-center">
             <div class="text-xl flex items-center gap-1.5">
               Last synced
-              <div v-if="lastSyncTime == undefined">
-                <Skeleton width="10rem" height="1.5rem" />
+              <div v-if="lastSyncTime == ''">
+                <Skeleton width="10.2rem" height="1.5rem" />
               </div>
               <div v-else>
                 {{ lastSyncTime }}
@@ -202,14 +201,14 @@ const closeFirstDialog = () => {
               class="h-6"
               plain
               text
-              @click="() => sync(shift)"
-              :loading="syncing"
+              @click="() => sync()"
+              :loading="disableActionButtons"
             >
               <span class="font-semibold text-[#00E0FF]">Sync Now</span>
               <i
                 :class="[
                   'pi',
-                  syncing ? 'pi-spinner pi-spin' : 'pi-sync',
+                  disableActionButtons ? 'pi-spinner pi-spin' : 'pi-sync',
                   'text-[#00E0FF]',
                 ]"
               />
@@ -217,7 +216,11 @@ const closeFirstDialog = () => {
           </div>
         </div>
         <div class="flex flex-col items-end gap-2">
-          <Button severity="info" @click="generateReport" :disabled="syncing">
+          <Button
+            severity="info"
+            @click="generateReport"
+            :disabled="disableActionButtons"
+          >
             <i class="pi pi-plus-circle text-white mr-2" />
             <span class="text-white font-bold">Generate Report</span>
           </Button>
@@ -237,7 +240,7 @@ const closeFirstDialog = () => {
         </div>
       </div>
       <div class="flex w-full px-10 flex-grow">
-        <DashboardBody :dto="dto" :syncing="syncing" />
+        <DashboardBody :dto="dto" :syncing="generating_report" />
       </div>
     </div>
   </div>
