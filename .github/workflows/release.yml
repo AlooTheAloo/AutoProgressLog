@@ -28,6 +28,7 @@ jobs:
 
       - name: Install dependencies
         run: |
+          python3 -m pip install setuptools
           cd apl-frontend
           npm install
 
