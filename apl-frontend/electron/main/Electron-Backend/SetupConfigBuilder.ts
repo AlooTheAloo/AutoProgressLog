@@ -69,7 +69,7 @@ export function setupListeners() {
         const time = await CreateDB(db);
         if (time == undefined) return;
         CacheManager.init(time);
-      }
+      },
     );
     buildContextMenu();
   });

@@ -34,7 +34,7 @@ export function createAutoRPC() {
           job = null;
         }
       }
-    }
+    },
   );
 
   app.on("before-quit", () => {

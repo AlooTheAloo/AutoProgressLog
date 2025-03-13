@@ -96,7 +96,7 @@ export async function runGeneration() {
       timeToAdd: timeToAdd,
       monthTime: monthTime,
       bestSeconds: bestObject,
-    }
+    },
   );
   console.log("11");
 
@@ -106,7 +106,7 @@ export async function runGeneration() {
     config.outputOptions,
     config.anki.enabled ? 1775 : 1375,
     json,
-    layout
+    layout,
   );
 
   console.log("15");
@@ -130,7 +130,7 @@ export async function runGeneration() {
 
   // Output
   CacheManager.push(
-    buildNewCache(json, startCache, timeToAdd, syncID, imagePath, newBest)
+    buildNewCache(json, startCache, timeToAdd, syncID, imagePath, newBest),
   );
   console.log("19");
 

@@ -1,49 +1,48 @@
-
 export type ReportData = {
-    reportNo:number,
-    time:string,
+  reportNo: number;
+  time: string;
 
-    matureCards:matureCardData[];
-    retentionRate:TPlusDelta<number>,
-    totalReviews:TPlusDelta<number>,
-    AnkiStreak:TPlusDelta<number>,
-    AnkiData:RelativeReportData[],
+  matureCards: matureCardData[];
+  retentionRate: TPlusDelta<number>;
+  totalReviews: TPlusDelta<number>;
+  AnkiStreak: TPlusDelta<number>;
+  AnkiData: RelativeReportData[];
 
-    ImmersionTime:TPlusDelta<number>,
-    AverageImmersionTime:TPlusDelta<number>,
-    ImmersionLog:relativeActivity[],
-    ImmersionData:RelativeReportData[],
-    ImmersionStreak:TPlusDelta<number>,
-    MonthlyImmersion:number,
-    BestImmersion:TPlusDelta<number>,
+  ImmersionTime: TPlusDelta<number>;
+  AverageImmersionTime: TPlusDelta<number>;
+  ImmersionLog: relativeActivity[];
+  ImmersionData: RelativeReportData[];
+  ImmersionStreak: TPlusDelta<number>;
+  MonthlyImmersion: number;
+  BestImmersion: TPlusDelta<number>;
 
-    ImmersionScore:number,
-    AnkiScore:number,
-    TotalScore:number
+  ImmersionScore: number;
+  AnkiScore: number;
+  TotalScore: number;
 
-    lastDaysPoints:number[]
-}
+  lastDaysPoints: number[];
+};
 
 export type Layout = {
-    layout:string[][],
-    gradient:string[]
-}
+  layout: string[][];
+  gradient: string[];
+};
 
 export type RelativeReportData = {
-    value:number,
-    reportNo:number
-}
+  value: number;
+  reportNo: number;
+};
 
 export interface relativeActivity {
-    name: string;
-    relativeValue: number;
+  name: string;
+  relativeValue: number;
 }
 export type TPlusDelta<T> = {
-    current:T,
-    delta:T
-}
+  current: T;
+  delta: T;
+};
 
 export type matureCardData = {
-    reportNo:number,
-    matureCardCount:number
-}
+  reportNo: number;
+  matureCardCount: number;
+};

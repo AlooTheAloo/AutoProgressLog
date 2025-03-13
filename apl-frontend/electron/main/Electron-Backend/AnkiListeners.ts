@@ -37,7 +37,7 @@ export function ankiListeners() {
       win?.webContents.send("anki-connect-message", "Authenticating");
       const httpClient = new AnkiHTTPClient(key, url);
       return loadDB(httpClient);
-    }
+    },
   );
 
   const loadDB = async (client: AnkiHTTPClient) => {
@@ -115,6 +115,6 @@ export function ankiListeners() {
       if (oldConfig.anki.enabled && !newConfig.anki.enabled) {
         await DeleteAnkiData();
       }
-    }
+    },
   );
 }

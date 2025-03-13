@@ -5,7 +5,7 @@ contextBridge.exposeInMainWorld("ipcRenderer", {
   on(...args: Parameters<typeof ipcRenderer.on>) {
     const [channel, listener] = args;
     return ipcRenderer.on(channel, (event, ...args) =>
-      listener(event, ...args)
+      listener(event, ...args),
     );
   },
   off(...args: Parameters<typeof ipcRenderer.off>) {
@@ -33,7 +33,7 @@ contextBridge.exposeInMainWorld("ipcRenderer", {
 
 // --------- Preload scripts loading ---------
 function domReady(
-  condition: DocumentReadyState[] = ["complete", "interactive"]
+  condition: DocumentReadyState[] = ["complete", "interactive"],
 ) {
   return new Promise((resolve) => {
     if (condition.includes(document.readyState)) {

@@ -1,34 +1,34 @@
-import { Version } from "../consts/versioning"
+import { Version } from "../consts/versioning";
 
 export interface cache {
-    reportNo:number,
-    generationTime:string,
-    syncID:number,
-    path:string,
-    
-    seconds:number,
-    totalSeconds:number,
-    bestSeconds:number,
+  reportNo: number;
+  generationTime: string;
+  syncID: number;
+  path: string;
 
-    cardsStudied:number,
-    totalCardsStudied:number,
-    mature:number|null,
-    retention:number|null,
-    
-    ankiStreak:number
-    immersionStreak:number,
+  seconds: number;
+  totalSeconds: number;
+  bestSeconds: number;
 
-    score:number
+  cardsStudied: number;
+  totalCardsStudied: number;
+  mature: number | null;
+  retention: number | null;
+
+  ankiStreak: number;
+  immersionStreak: number;
+
+  score: number;
 }
 
-export type versionInfo = { version: Version }
+export type versionInfo = { version: Version };
 
-export type cacheList = ListOf<cache> & versionInfo
+export type cacheList = ListOf<cache> & versionInfo;
 
 export type ListOf<T extends {}> = {
-    list:Array<T>
-}
+  list: Array<T>;
+};
 
-export function isList<T extends {}>(obj:T|ListOf<T>):obj is ListOf<T>{
-    return 'list' in obj
+export function isList<T extends {}>(obj: T | ListOf<T>): obj is ListOf<T> {
+  return "list" in obj;
 }

@@ -77,7 +77,7 @@ export async function runSync(props: syncProps = DEFAULT) {
       await syncAnki(props.isReport).then(res).catch(rej);
       console.log(
         "Finished syncing anki in ",
-        dayjs().diff(start, "ms") + " ms"
+        dayjs().diff(start, "ms") + " ms",
       );
     }),
   ]);
@@ -130,7 +130,7 @@ export async function runSync(props: syncProps = DEFAULT) {
         : undefined,
       type: "Full",
     },
-    toggl.entries
+    toggl.entries,
   );
 
   return CreateDTO();
@@ -144,11 +144,11 @@ export async function syncAnki(isReport = false): Promise<AnkiSyncData | null> {
 
   let httpClient = new AnkiHTTPClient(
     anki?.ankiIntegration?.key,
-    anki?.ankiIntegration?.url
+    anki?.ankiIntegration?.url,
   );
   let syncer: NormalSyncer = new NormalSyncer(
     httpClient,
-    new Storage(ankiPath)
+    new Storage(ankiPath),
   );
 
   const lastEntry = await GetLastEntry("Full");
@@ -170,7 +170,7 @@ export async function syncAnki(isReport = false): Promise<AnkiSyncData | null> {
     lastEntry.anki.lastAnkiUpdate = lastEntry.generationTime;
   }
   const cardReview = await getAnkiCardReviewCount(
-    dayjs(lastEntry.anki?.lastAnkiUpdate ?? lastEntry.generationTime)
+    dayjs(lastEntry.anki?.lastAnkiUpdate ?? lastEntry.generationTime),
   );
   const matureCards = await getMatureCards();
   const retention = await getRetention(anki.options.retentionMode);
@@ -202,7 +202,7 @@ export async function syncAnki(isReport = false): Promise<AnkiSyncData | null> {
 export async function VerifyPreviousActivities(
   from: dayjs.Dayjs,
   to: dayjs.Dayjs,
-  togglEntries: entry[] = []
+  togglEntries: entry[] = [],
 ): Promise<number> {
   let delta = 0;
   const dbEntries = await GetActivitiesBetween(from, to);
@@ -235,7 +235,7 @@ export async function VerifyPreviousActivities(
     (x) =>
       !dbIDs.includes(x.id) &&
       dayjs(x.stop).unix() > from.unix() &&
-      dayjs(x.stop).unix() < to.unix()
+      dayjs(x.stop).unix() < to.unix(),
   );
 
   await WriteEntries(toAdd);
@@ -263,13 +263,13 @@ export async function syncToggl(): Promise<{
   const delta = await VerifyPreviousActivities(
     dayjs(lastReportTime),
     dayjs(startSync.generationTime),
-    entries.entriesAfterLastGen
+    entries.entriesAfterLastGen,
   );
   return {
     entries: entries.entriesAfterLastGen.filter(
       (x) =>
         dayjs(x.stop).isAfter(startSync.generationTime) &&
-        dayjs(x.stop).isBefore(dayjs())
+        dayjs(x.stop).isBefore(dayjs()),
     ),
     delta: delta,
   };

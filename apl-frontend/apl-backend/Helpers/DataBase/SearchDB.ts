@@ -5,142 +5,169 @@ import dayjs from "dayjs";
 import { ImmersionSource } from "../../../electron/main/Electron-Backend/types/Dashboard";
 
 interface flatSyncData {
-    id: number;
-    generationTime: number;
-    type: SyncType;
-    totalCardsStudied: number;
-    cardsStudied: number;
-    mature: number;
-    retention: number;
-    totalSeconds: number;
-    lastAnkiUpdate: number;
+  id: number;
+  generationTime: number;
+  type: SyncType;
+  totalCardsStudied: number;
+  cardsStudied: number;
+  mature: number;
+  retention: number;
+  totalSeconds: number;
+  lastAnkiUpdate: number;
 }
 
-export async function GetLastEntry(type?:SyncType):Promise<SyncData|null>{
-    return new Promise((resolve, reject) => {
-        new sqlite3.Database(syncDataPath).all(`
+export async function GetLastEntry(type?: SyncType): Promise<SyncData | null> {
+  return new Promise((resolve, reject) => {
+    new sqlite3.Database(syncDataPath).all(
+      `
             SELECT * FROM syncData 
             ${type ? `WHERE type = '${type}'` : ""}
             ORDER BY id DESC LIMIT 1
-        `, (err, rows:flatSyncData[]) => {
-            if(err) resolve(null);
-            const flat = rows[0];
-            resolve({
-                id: flat.id,
-                generationTime: flat.generationTime,
-                type: flat.type,
-                anki: {
-                    totalCardsStudied: flat.totalCardsStudied,
-                    cardsStudied: flat.cardsStudied,
-                    mature: flat.mature,
-                    retention: flat.retention,
-                    lastAnkiUpdate: flat.lastAnkiUpdate
-                },
-                toggl: {
-                    totalSeconds: flat.totalSeconds,
-                } 
-            })
+        `,
+      (err, rows: flatSyncData[]) => {
+        if (err) resolve(null);
+        const flat = rows[0];
+        resolve({
+          id: flat.id,
+          generationTime: flat.generationTime,
+          type: flat.type,
+          anki: {
+            totalCardsStudied: flat.totalCardsStudied,
+            cardsStudied: flat.cardsStudied,
+            mature: flat.mature,
+            retention: flat.retention,
+            lastAnkiUpdate: flat.lastAnkiUpdate,
+          },
+          toggl: {
+            totalSeconds: flat.totalSeconds,
+          },
         });
-    })
+      },
+    );
+  });
 }
 
-export async function GetActivitiesBetween(since:dayjs.Dayjs, until:dayjs.Dayjs):Promise<ImmersionActivity[]>{
-    return new Promise((resolve, reject) => {
-        new sqlite3.Database(syncDataPath).all(`
+export async function GetActivitiesBetween(
+  since: dayjs.Dayjs,
+  until: dayjs.Dayjs,
+): Promise<ImmersionActivity[]> {
+  return new Promise((resolve, reject) => {
+    new sqlite3.Database(syncDataPath).all(
+      `
             SELECT * FROM immersionActivity WHERE time > '${since.unix()}' AND time < '${until.unix()}'
-        `, (err, rows:ImmersionActivity[]) => {
-            if(err) reject(err);
-            resolve(rows) 
-        });
-    })
+        `,
+      (err, rows: ImmersionActivity[]) => {
+        if (err) reject(err);
+        resolve(rows);
+      },
+    );
+  });
 }
 
-
-export async function getreadinghours(){
-
-    return new Promise((resolve, reject) => {
-        new sqlite3.Database(syncDataPath).all(`
+export async function getreadinghours() {
+  return new Promise((resolve, reject) => {
+    new sqlite3.Database(syncDataPath).all(
+      `
             SELECT (SUM(seconds) / 3600) AS "time" FROM immersionActivity WHERE activityName LIKE '%read%';
-        `, (err, rows:any[]) => {
-            if(err) {
-                reject(err);
-            } 
-            resolve(rows[0].time ?? 0);
-        });
-    })
+        `,
+      (err, rows: any[]) => {
+        if (err) {
+          reject(err);
+        }
+        resolve(rows[0].time ?? 0);
+      },
+    );
+  });
 }
 
-
-
-export async function GetImmersionTimeSince(since:dayjs.Dayjs):Promise<number>{
-    return new Promise((resolve, reject) => {
-        new sqlite3.Database(syncDataPath).all(`
+export async function GetImmersionTimeSince(
+  since: dayjs.Dayjs,
+): Promise<number> {
+  return new Promise((resolve, reject) => {
+    new sqlite3.Database(syncDataPath).all(
+      `
             SELECT SUM(seconds) as "sum" FROM immersionActivity WHERE time > '${since.unix()}'
-        `, (err, rows:any[]) => {
-            if(err) {
-                reject(err);
-            } 
-            resolve(rows[0].sum ?? 0);
-        });
-    })
+        `,
+      (err, rows: any[]) => {
+        if (err) {
+          reject(err);
+        }
+        resolve(rows[0].sum ?? 0);
+      },
+    );
+  });
 }
 
-export async function GetImmersionTimeBetween(since:dayjs.Dayjs, until:dayjs.Dayjs):Promise<number>{
-    return new Promise((resolve, reject) => {
-        new sqlite3.Database(syncDataPath).all(`
+export async function GetImmersionTimeBetween(
+  since: dayjs.Dayjs,
+  until: dayjs.Dayjs,
+): Promise<number> {
+  return new Promise((resolve, reject) => {
+    new sqlite3.Database(syncDataPath).all(
+      `
             SELECT SUM(seconds) as "sum" FROM immersionActivity WHERE time > '${since.unix()}' AND time < '${until.unix()}'
-        `, (err, rows:any[]) => {
-            if(err) {
-                reject(err);
-            } 
-            resolve(rows[0].sum ?? 0);
-        });
-    })
+        `,
+      (err, rows: any[]) => {
+        if (err) {
+          reject(err);
+        }
+        resolve(rows[0].sum ?? 0);
+      },
+    );
+  });
 }
 
-
-
-export async function GetImmersionSourcesSince(since:dayjs.Dayjs):Promise<ImmersionSource[]>{
-    return new Promise((resolve, reject) => {
-        new sqlite3.Database(syncDataPath).all(`
+export async function GetImmersionSourcesSince(
+  since: dayjs.Dayjs,
+): Promise<ImmersionSource[]> {
+  return new Promise((resolve, reject) => {
+    new sqlite3.Database(syncDataPath).all(
+      `
             SELECT activityName AS "name", SUM(seconds) AS "relativeValue" FROM immersionActivity WHERE time > '${since.unix()}' GROUP BY activityName
-        `, (err, rows:any[]) => {
-            if(err) reject(err);
-            resolve(mergeItems(rows));
-        });
-    })
+        `,
+      (err, rows: any[]) => {
+        if (err) reject(err);
+        resolve(mergeItems(rows));
+      },
+    );
+  });
 }
-
 
 function mergeItems(items: ImmersionSource[]): ImmersionSource[] {
-// Create a map to store merged items
-    const mergedMap = new Map<string, ImmersionSource>();
+  // Create a map to store merged items
+  const mergedMap = new Map<string, ImmersionSource>();
 
-    items.forEach(item => {
-        const lowerCaseName = item.name.toLowerCase();
+  items.forEach((item) => {
+    const lowerCaseName = item.name.toLowerCase();
 
-        if (mergedMap.has(lowerCaseName)) {
-            const existingItem = mergedMap.get(lowerCaseName)!;
+    if (mergedMap.has(lowerCaseName)) {
+      const existingItem = mergedMap.get(lowerCaseName)!;
 
-            // Update the existing item
-            mergedMap.set(lowerCaseName, {
-                name: item.relativeValue > existingItem.relativeValue ? item.name : existingItem.name,
-                relativeValue: existingItem.relativeValue + item.relativeValue,
-            });
-        } else {
-        // Add the item to the map
-        mergedMap.set(lowerCaseName, { ...item });
-        }
-    });
-    return Array.from(mergedMap.values());
+      // Update the existing item
+      mergedMap.set(lowerCaseName, {
+        name:
+          item.relativeValue > existingItem.relativeValue
+            ? item.name
+            : existingItem.name,
+        relativeValue: existingItem.relativeValue + item.relativeValue,
+      });
+    } else {
+      // Add the item to the map
+      mergedMap.set(lowerCaseName, { ...item });
+    }
+  });
+  return Array.from(mergedMap.values());
 }
-export async function GetSyncCount(){
-    return new Promise<number>((resolve, reject) => {
-        new sqlite3.Database(syncDataPath).all(`
+export async function GetSyncCount() {
+  return new Promise<number>((resolve, reject) => {
+    new sqlite3.Database(syncDataPath).all(
+      `
             SELECT COUNT(*) AS 'syncs' FROM syncData;  
-        `, (err, rows:any[]) => {
-            if(err) reject(err);
-            resolve(rows[0].syncs as number);
-        });
-    })
+        `,
+      (err, rows: any[]) => {
+        if (err) reject(err);
+        resolve(rows[0].syncs as number);
+      },
+    );
+  });
 }

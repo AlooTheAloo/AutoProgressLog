@@ -35,7 +35,7 @@ export function globalListeners() {
 
   ipcMain.handle("Update-App", async (event, args) => {
     shell.openExternal(
-      `${APP_URL}/releases/download/${args.version}/${args.path}`
+      `${APP_URL}/releases/download/${args.version}/${args.path}`,
     );
   });
 
@@ -48,7 +48,7 @@ export function globalListeners() {
     console.log("result is " + result);
     const f = getFileInAPLData("skip.txt");
     const skipped = existsSync(f)
-      ? readFileSync(f).toString() ?? "0.0.0"
+      ? (readFileSync(f).toString() ?? "0.0.0")
       : "0.0.0";
     console.log(skipped);
     if (

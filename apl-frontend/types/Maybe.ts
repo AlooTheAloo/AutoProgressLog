@@ -1,1 +1,1 @@
-export type Maybe<T> = {error:string} | T 
+export type Maybe<T> = { error: string } | T;

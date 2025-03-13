@@ -92,7 +92,7 @@ export async function CreateDTO() {
   const thisMonth = await GetImmersionTimeSince(dayjs().startOf("month"));
   const lastMonth = await GetImmersionTimeBetween(
     dayjs().subtract(1, "month").startOf("month"),
-    dayjs().subtract(1, "month")
+    dayjs().subtract(1, "month"),
   );
   const DTO: DashboardDTO = {
     userName: config.account.userName,
@@ -104,7 +104,7 @@ export async function CreateDTO() {
           retentionRateDelta: roundTo(
             roundTo(lastEntry?.anki?.retention ?? 0, 2) -
               roundTo(lastReport.retention ?? 0, 2),
-            2
+            2,
           ),
 
           totalReviews: lastEntry?.anki?.totalCardsStudied ?? 0,
@@ -116,12 +116,12 @@ export async function CreateDTO() {
     immersionDTO: {
       totalImmersion: lastEntry?.toggl?.totalSeconds ?? 0,
       immersionSinceLastReport: await GetImmersionTimeSince(
-        dayjs(lastReport.generationTime)
+        dayjs(lastReport.generationTime),
       ),
       monthlyImmersion: thisMonth,
       monthlyImmersionLastMonth: lastMonth,
       immersionSources: await GetImmersionSourcesSince(
-        dayjs().subtract(1, "month")
+        dayjs().subtract(1, "month"),
       ),
     },
     monthlyScore: 0,

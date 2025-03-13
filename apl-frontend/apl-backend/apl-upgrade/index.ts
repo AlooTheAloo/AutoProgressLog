@@ -10,11 +10,11 @@ export async function upgrade_schema(version_current: string): Promise<void> {
 
 export async function launchUpgrade(
   version_target: string,
-  upgradeFunc: (...params: any[]) => Promise<any>
+  upgradeFunc: (...params: any[]) => Promise<any>,
 ) {
   win?.webContents.send(
     "update-update-message",
-    `Upgrading to ${version_target}`
+    `Upgrading to ${version_target}`,
   );
   await upgradeFunc();
   console.log("upgraded to " + version_target);

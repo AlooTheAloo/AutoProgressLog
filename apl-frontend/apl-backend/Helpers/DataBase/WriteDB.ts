@@ -9,7 +9,7 @@ export async function WriteEntries(entries: entry[], syncDataId: number = -1) {
   console.log("Adding " + entries.length + " entries");
   const db = new sqlite3.Database(syncDataPath);
   const stmt = db.prepare(
-    "INSERT OR IGNORE INTO immersionActivity (id, syncDataId, time, seconds, activityName) VALUES (?, ?, ?, ?, ?)"
+    "INSERT OR IGNORE INTO immersionActivity (id, syncDataId, time, seconds, activityName) VALUES (?, ?, ?, ?, ?)",
   );
 
   entries.forEach((x) => {
@@ -21,7 +21,7 @@ export async function WriteEntries(entries: entry[], syncDataId: number = -1) {
 
 export async function WriteSyncData(
   syncData: Omit<SyncData, "id">,
-  entries: entry[]
+  entries: entry[],
 ) {
   return new Promise<void>((res, rej) => {
     new sqlite3.Database(syncDataPath).all(
@@ -43,7 +43,7 @@ export async function WriteSyncData(
         }
         await WriteEntries(entries, rows[0].id);
         res();
-      }
+      },
     );
   });
 }
@@ -69,7 +69,7 @@ export async function ModifyActivityByID(id: number, entry: entry) {
         } else {
           res();
         }
-      }
+      },
     );
 
     stmt.finalize();
@@ -87,7 +87,7 @@ export async function DeleteActivity(id: number) {
           console.log(err);
         }
         res();
-      }
+      },
     );
   });
 }

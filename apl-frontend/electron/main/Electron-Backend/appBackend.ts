@@ -71,14 +71,14 @@ export async function createAppBackend() {
         "app.asar.unpacked",
         "src",
         "assets",
-        "Logo.png"
+        "Logo.png",
       );
 
   let trayIcon = nativeImage.createFromPath(iconPath);
 
   if (trayIcon.isEmpty()) {
     console.error(
-      "Failed to load icon. Ensure the path is correct and the icon is compatible."
+      "Failed to load icon. Ensure the path is correct and the icon is compatible.",
     );
     return;
   }

@@ -83,7 +83,7 @@ export default class Storage {
   private addGrave(id: string, kind: GraveKind, usn: number): Promise<void> {
     return new Promise((r, rj) => {
       const stmt = this.db.prepare(
-        "INSERT OR IGNORE INTO graves (usn, oid, type) VALUES (?, ?, ?)"
+        "INSERT OR IGNORE INTO graves (usn, oid, type) VALUES (?, ?, ?)",
       );
       stmt.run(usn, id, kind);
       stmt.finalize(() => {
@@ -95,7 +95,7 @@ export default class Storage {
   private removeGrave(id: string, kind: GraveKind): Promise<void> {
     return new Promise((r, rj) => {
       const stmt = this.db.prepare(
-        "DELETE FROM graves WHERE oid = ? AND type = ?"
+        "DELETE FROM graves WHERE oid = ? AND type = ?",
       );
       stmt.run(id, kind);
       stmt.finalize(() => {
@@ -122,7 +122,7 @@ export default class Storage {
       console.log(`Applying chunk with ${entries.length} cards`);
     }
     return Promise.all(
-      entries.map((x) => this.addOrUpdateCardIfNewer(x, pendingUsn))
+      entries.map((x) => this.addOrUpdateCardIfNewer(x, pendingUsn)),
     );
   }
 
@@ -132,7 +132,7 @@ export default class Storage {
     }
 
     return Promise.all(
-      entries.map((x) => this.addOrUpdateNoteIfNewer(x, pendingUsn))
+      entries.map((x) => this.addOrUpdateNoteIfNewer(x, pendingUsn)),
     );
   }
 
@@ -140,7 +140,7 @@ export default class Storage {
     return new Promise<void>((s, j) => {
       this.db
         .prepare(
-          `INSERT OR IGNORE INTO revlog (id, cid, usn, ease, ivl, lastIvl, factor, time, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+          `INSERT OR IGNORE INTO revlog (id, cid, usn, ease, ivl, lastIvl, factor, time, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         )
         .run(entry)
         .finalize(() => {
@@ -155,7 +155,7 @@ export default class Storage {
     return new Promise<void>((s, j) => {
       this.db
         .prepare(
-          `INSERT OR REPLACE INTO cards (id, nid, did, ord, mod, usn, type, queue, due, ivl, factor, reps, lapses, left, odue, odid, flags, data) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`
+          `INSERT OR REPLACE INTO cards (id, nid, did, ord, mod, usn, type, queue, due, ivl, factor, reps, lapses, left, odue, odid, flags, data) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
         )
         .run(entry, (err: any, data: any) => {
           if (err) {
@@ -173,7 +173,7 @@ export default class Storage {
     return new Promise<void>((s, j) => {
       this.db
         .prepare(
-          `INSERT OR REPLACE INTO notes (id,guid,mid,mod,usn,tags,flds,sfld,csum,flags,data) VALUES (?,?,?,?,?,?,?,?,?,?,?)`
+          `INSERT OR REPLACE INTO notes (id,guid,mid,mod,usn,tags,flds,sfld,csum,flags,data) VALUES (?,?,?,?,?,?,?,?,?,?,?)`,
         )
         .run(entry, (err: any, data: any) => {
           if (err) {

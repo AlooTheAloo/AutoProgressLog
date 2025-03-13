@@ -11,7 +11,7 @@ export class CacheManager {
       {
         list: this.get().list,
       },
-      version
+      version,
     );
   };
 

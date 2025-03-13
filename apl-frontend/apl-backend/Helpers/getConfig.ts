@@ -13,8 +13,8 @@ export const getFileInAPLData = (file: string) =>
   path.join(
     environment == "electron"
       ? electron.app.getPath("userData")
-      : process.env.APL_DATA_PATH ?? "",
-    file
+      : (process.env.APL_DATA_PATH ?? ""),
+    file,
   );
 
 const environment: "electron" | "node" =

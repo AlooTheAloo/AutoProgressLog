@@ -1,19 +1,19 @@
 version: "3.9"
 name: autoprogresslog
 services:
-  anki-desktop: 
-      build: 
-        dockerfile: docker/anki-docker/Dockerfile
-      volumes:
-        - ankiConfig:/config/app/Anki2
-        - ~/backups:/config/app/backups
-      ports: 
-        - 3000:3000
-        # Anki Connect port
-        - 8765:8765
+  anki-desktop:
+    build:
+      dockerfile: docker/anki-docker/Dockerfile
+    volumes:
+      - ankiConfig:/config/app/Anki2
+      - ~/backups:/config/app/backups
+    ports:
+      - 3000:3000
+      # Anki Connect port
+      - 8765:8765
   apl:
-    build: 
+    build:
       dockerfile: docker/autoprogresslog/Dockerfile
-      
+
 volumes:
   ankiConfig:

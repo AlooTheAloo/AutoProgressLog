@@ -2,12 +2,12 @@ export default interface UserDialog {
   header: string;
   content: string;
   footer: string | undefined;
-  yes?:{
+  yes?: {
     text: string;
-    on:()=>void
-  },
-  no?:{
+    on: () => void;
+  };
+  no?: {
     text: string;
-    on:()=>void
-  },
+    on: () => void;
+  };
 }

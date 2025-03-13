@@ -87,7 +87,7 @@ function testKey() {
     .invoke(
       "test-anki-connection-key",
       props.config.anki.ankiIntegration.key,
-      props.config.anki.ankiIntegration.url
+      props.config.anki.ankiIntegration.url,
     )
     .then((retVal: { worked: boolean; decks: deck[]; key: string }) => {
       console.log("received " + JSON.stringify(retVal));

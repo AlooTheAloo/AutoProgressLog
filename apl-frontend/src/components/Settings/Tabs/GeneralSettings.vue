@@ -58,7 +58,7 @@ function updateTime(value: Date) {
               },
             },
           },
-        }
+        },
   );
 }
 
