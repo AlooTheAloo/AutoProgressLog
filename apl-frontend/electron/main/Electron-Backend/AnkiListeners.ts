@@ -17,7 +17,6 @@ import {
   createAnkiIntegration,
   getDecksCards,
 } from "../../../apl-backend/config/configAnkiIntegration";
-import path, { basename, join } from "path";
 import { onConfigChange } from "./SettingsListeners";
 import AnkiHTTPClient from "../../../apl-backend/entry/AnkiHTTPClient";
 import { ankiPath } from "../../../apl-backend/Helpers/getConfig";
@@ -28,14 +27,13 @@ export function ankiListeners() {
 
     const httpClient = new AnkiHTTPClient("", arg.url);
     await httpClient.login(arg.username, arg.password);
+    win?.webContents.send("anki-connect-message", "Downloading Anki Database");
     return loadDB(httpClient);
   });
 
   ipcMain.handle(
     "test-anki-connection-key",
     async (event: any, key: string, url: string) => {
-      console.log("key is " + key);
-      console.log("url is " + url);
       win?.webContents.send("anki-connect-message", "Authenticating");
       const httpClient = new AnkiHTTPClient(key, url);
       return loadDB(httpClient);

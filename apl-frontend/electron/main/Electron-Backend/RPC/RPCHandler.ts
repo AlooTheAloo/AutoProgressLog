@@ -4,7 +4,6 @@ import { getLiveActivity } from "../../../../apl-backend/toggl/toggl-service";
 import { app } from "electron";
 import { entry } from "../../../../apl-backend/types/entry";
 import { GetLastEntry } from "../../../../apl-backend/Helpers/DataBase/SearchDB";
-import { getLastUpdate } from "../../../../apl-backend/anki/db";
 import dayjs from "dayjs";
 import { runSync } from "../../../../apl-backend/generate/sync";
 import { checkInternet } from "../../../../apl-backend/Helpers/Healthcheck/internetHelper";
@@ -94,7 +93,6 @@ function createJob() {
       //     },
       // ],
     });
-    console.log("Set activity to " + single.description);
     currentActivity = single;
   });
 

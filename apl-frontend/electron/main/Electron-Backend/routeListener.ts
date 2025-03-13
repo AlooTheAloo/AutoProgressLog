@@ -11,8 +11,9 @@ export function routeListeners() {
     } else {
       const ver = CacheManager.verifyVersion();
       if (!ver) {
-        console.log("Cache is out of date");
+        return "/update-app";
       }
+      console.log("we're so happy here :3");
       win?.webContents.send("is-setup-complete", true);
       return "/app/dashboard";
     }

@@ -301,7 +301,7 @@ function updateAnki(value: boolean) {
     <SettingsField
       :value="props.config?.anki.ankiIntegration?.key"
       label="Anki Host Key"
-      help-text="Your Anki API key can be generated using the easy anki setup button above."
+      help-text="Your Anki Host key can be generated using the easy anki setup button above."
       @update:value="updateAnkiHostKey"
       password
       :disabled="testing_connection"
@@ -322,6 +322,7 @@ function updateAnki(value: boolean) {
         class="w-fit h-10"
         v-on:click="testKey"
         :loading="testing_connection"
+        :disabled="props.config?.anki.ankiIntegration == null"
       >
         Test key
       </Button>

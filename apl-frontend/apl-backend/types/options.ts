@@ -6,6 +6,9 @@ export interface Options {
   account: {
     userName: string;
   };
+  appreance: {
+    glow: boolean;
+  };
   toggl: {
     togglToken: string;
   };

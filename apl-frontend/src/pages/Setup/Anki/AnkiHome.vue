@@ -25,6 +25,7 @@ function NextPage() {
 }
 
 function SkipAnki() {
+  window.ipcRenderer.invoke("SkipAnki");
   router.push("/setup/pick-filename");
 }
 </script>
@@ -45,20 +46,26 @@ function SkipAnki() {
           the future.
         </p>
         <div class="flex justify-center flex-grow items-center">
-          <div class="flex flex-col gap-2 items-center w-[30rem] h-52">
-            <InputText
-              name="username"
-              type="text"
-              placeholder="Username"
-              v-model="email"
-            />
-            <Password
-              v-model="password"
-              name="pw"
-              type="text"
-              placeholder="Password"
-              :feedback="false"
-            />
+          <div class="flex flex-col gap-2 items-start w-full h-52">
+            <div class="flex w-full h-12 items-center">
+              <div class="text-lg text-white w-[25rem]">
+                AnkiWeb username (usually your email)
+              </div>
+              <div class="flex-grow">
+                <InputText v-model="email" placeholder="Username" fluid />
+              </div>
+            </div>
+            <div class="flex w-full h-12 items-center">
+              <div class="text-lg text-white w-[25rem]">AnkiWeb password</div>
+              <div class="flex-grow">
+                <Password
+                  v-model="password"
+                  placeholder="Password"
+                  fluid
+                  :feedback="false"
+                />
+              </div>
+            </div>
           </div>
         </div>
         <div class="flex justify-between">

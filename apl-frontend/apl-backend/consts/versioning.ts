@@ -1,2 +1,3 @@
-export const appVersion = "1.0.0"
-export type Version = string
+import { version } from "../../package.json";
+export const appVersion = version;
+export type Version = string;

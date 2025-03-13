@@ -9,7 +9,7 @@ export interface Graves {
   decks: string[];
 }
 
-const DEFAULT_ANKI_URL = "https://sync.ankiweb.net";
+export const DEFAULT_ANKI_URL = "https://sync.ankiweb.net";
 let anki_url = DEFAULT_ANKI_URL;
 
 export default class AnkiHTTPClient {

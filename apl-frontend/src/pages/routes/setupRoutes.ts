@@ -32,10 +32,6 @@ export const setupRoutes = [
     component: () => import("../Setup/Toggl/Toggl-manual-connect.vue"),
   },
   {
-    path: "/setup/toggl-connect",
-    component: () => import("../Setup/Toggl/Toggl-connect.vue"),
-  },
-  {
     path: "/setup/toggl-success",
     component: () => import("../Setup/Toggl/Toggl-success.vue"),
   },

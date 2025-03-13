@@ -72,12 +72,6 @@ export async function createWindow() {
     icon: path.join(process.env.VITE_PUBLIC, ""),
     webPreferences: {
       preload,
-      // Warning: Enable nodeIntegration and disable contextIsolation is not secure in production
-      // nodeIntegration: true,
-
-      // Consider using contextBridge.exposeInMainWorld
-      // Read more on https://www.electronjs.org/docs/latest/tutorial/context-isolation
-      // contextIsolation: false,
     },
   });
 
@@ -176,9 +170,6 @@ import {
   getFileInAPLData,
 } from "../../apl-backend/Helpers/getConfig";
 import fs from "fs";
-import { existsSync, readFileSync } from "node:fs";
-import { getTimeEntries } from "../../apl-backend/toggl/toggl-service";
-import dayjs from "dayjs";
 
 app.on("ready", async () => {
   buildMenu(app);

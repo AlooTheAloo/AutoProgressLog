@@ -153,7 +153,22 @@ export async function syncAnki(isReport = false): Promise<AnkiSyncData | null> {
 
   const lastEntry = await GetLastEntry("Full");
   if (lastEntry == null) return null;
-  await syncer.start();
+  const worked = await syncer.start();
+  if (!worked) {
+    win?.webContents.send("ShowDialog", {
+      header: "Invalid anki key!",
+      content:
+        "APL is unable to connect with your anki installation. <br> <b>Potential cause of error : Invalid anki key</b> ",
+    });
+    return null;
+  }
+  if (
+    (Number.isNaN(lastEntry.anki?.lastAnkiUpdate) ||
+      lastEntry.anki?.lastAnkiUpdate.toString() == "NaN") &&
+    lastEntry.anki?.lastAnkiUpdate != undefined
+  ) {
+    lastEntry.anki.lastAnkiUpdate = lastEntry.generationTime;
+  }
   const cardReview = await getAnkiCardReviewCount(
     dayjs(lastEntry.anki?.lastAnkiUpdate ?? lastEntry.generationTime)
   );
@@ -172,7 +187,7 @@ export async function syncAnki(isReport = false): Promise<AnkiSyncData | null> {
     win?.webContents.send("ShowDialog", {
       header: "Cannot read anki data!",
       content:
-        "APL is unable to connect with your anki installation. <br> <b>Potential cause of error : No internet connection.</b> ",
+        "APL is unable to connect with your anki installation. <br> <b>Potential cause of error : Never tested anki key.</b> ",
     });
     return null;
   }

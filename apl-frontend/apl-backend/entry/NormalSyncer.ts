@@ -10,8 +10,8 @@ export interface Chunk {
 }
 
 export type RevlogEntry = number[];
-export type CardEntry = number[];
-export type NoteEntry = number[];
+export type CardEntry = string[];
+export type NoteEntry = string[];
 
 export default class NormalSyncer {
   private client: AnkiHTTPClient;
@@ -57,7 +57,7 @@ export default class NormalSyncer {
           s(false);
           return;
         }
-        this.col.applyChunk(chunk, pending_usn);
+        await this.col.applyChunk(chunk, pending_usn);
         if (chunk.done) {
           s(true);
           break;

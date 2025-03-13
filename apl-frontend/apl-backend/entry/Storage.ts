@@ -110,26 +110,33 @@ export default class Storage {
     await this.mergeNotes(chunk.notes ?? [], pending_usn);
   }
 
-  async mergeRevlog(entries: RevlogEntry[]): Promise<void> {
-    for (const entry of entries) {
-      await this.addRevlogEntry(entry);
+  async mergeRevlog(entries: RevlogEntry[]): Promise<void[]> {
+    if (entries.length != 0) {
+      console.log(`Applying chunk with ${entries.length} reviews`);
     }
+    return Promise.all(entries.map((x) => this.addRevlogEntry(x)));
   }
 
-  async mergeCards(entries: CardEntry[], pendingUsn: number): Promise<void> {
-    for (const entry of entries) {
-      await this.addOrUpdateCardIfNewer(entry, pendingUsn);
+  async mergeCards(entries: CardEntry[], pendingUsn: number): Promise<void[]> {
+    if (entries.length != 0) {
+      console.log(`Applying chunk with ${entries.length} cards`);
     }
+    return Promise.all(
+      entries.map((x) => this.addOrUpdateCardIfNewer(x, pendingUsn))
+    );
   }
 
-  async mergeNotes(entries: NoteEntry[], pendingUsn: number): Promise<void> {
-    for (const entry of entries) {
-      await this.addOrUpdateNoteIfNewer(entry, pendingUsn);
+  async mergeNotes(entries: NoteEntry[], pendingUsn: number): Promise<void[]> {
+    if (entries.length != 0) {
+      console.log(`Applying chunk with ${entries.length} notes`);
     }
+
+    return Promise.all(
+      entries.map((x) => this.addOrUpdateNoteIfNewer(x, pendingUsn))
+    );
   }
 
   async addRevlogEntry(entry: RevlogEntry) {
-    console.log("adding revlog entry for " + entry);
     return new Promise<void>((s, j) => {
       this.db
         .prepare(
@@ -162,10 +169,11 @@ export default class Storage {
   }
 
   async addOrUpdateNoteIfNewer(entry: NoteEntry, pendingUsn: number) {
+    console.log("adding/updating " + entry);
     return new Promise<void>((s, j) => {
       this.db
         .prepare(
-          `INSERT OR REPLACE INTO notes (id,guid,mid,mod,usn,tags,flds,sfld,csum,flags,data) VALUES (?,?,?,?,?,?,?,?,?,0,"")`
+          `INSERT OR REPLACE INTO notes (id,guid,mid,mod,usn,tags,flds,sfld,csum,flags,data) VALUES (?,?,?,?,?,?,?,?,?,?,?)`
         )
         .run(entry, (err: any, data: any) => {
           if (err) {

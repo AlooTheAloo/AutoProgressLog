@@ -29,6 +29,9 @@ function JoinTrackedDecks(table_primary_key: string = "revlog.cid") {
 
 export async function getAnkiCardReviewCount(startTime: Dayjs) {
   return new Promise<number | null>((res, rej) => {
+    console.log(
+      `SELECT COUNT(*) as "reviews" FROM revlog ${JoinTrackedDecks()} AND revlog.id > ${startTime.valueOf()}`
+    );
     // Create a database connection
     const db = open();
     // Execute SQL query
