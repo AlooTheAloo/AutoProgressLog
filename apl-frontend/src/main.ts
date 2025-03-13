@@ -17,9 +17,7 @@ import advancedFormat from "dayjs/plugin/advancedFormat";
 import ToastService from "primevue/toastservice";
 import ConfirmationService from "primevue/confirmationservice";
 import VueWriter from "vue-writer";
-
 import VueApexCharts from "vue3-apexcharts";
-import ConfirmDialog from "primevue/confirmdialog";
 
 const router = createRouter({
   history: createMemoryHistory(),
@@ -82,7 +80,7 @@ createApp(App)
   .use(ConfirmationService)
   .use(ToastService)
   .use(router)
-  .use(VueWriter)
+  .use(VueWriter as any)
   .use(PrimeVue, {
     theme: {
       preset: Noir,

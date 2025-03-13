@@ -1,18 +1,15 @@
-import { activity, relativeActivity } from "../types/activity.js";
+import { relativeActivity } from "../types/activity.js";
 import { cache } from "../types/cache.js";
 import path from "path";
 import puppeteer from "puppeteer";
 import { fileURLToPath } from "url";
 import { ReportData, TPlusDelta } from "../types/reportdata.js";
 import dayjs from "dayjs";
-import { roundTo } from "round-to";
 import { outputOptions, ReportExtension } from "../types/options.js";
 import { arithmeticWeightedMean } from "./util.js";
 import { getConfig } from "./getConfig.js";
 import color from "color";
-import { GetImmersionTimeSince } from "./DataBase/SearchDB.js";
 import { Layout } from "../apl-visuals/src/types/report-data.js";
-import fs from "fs";
 import { Browser, getInstalledBrowsers } from "@puppeteer/browsers";
 import { app } from "electron";
 
@@ -46,7 +43,7 @@ export async function buildImage(
   options: outputOptions,
   height: number = 1775,
   reportData: ReportData,
-  reportLayout: Layout,
+  reportLayout: Layout
 ) {
   const outputPath = `${options.outputFile.path}${path.sep}${options.outputFile.name} ${reportData.reportNo}${options.outputFile.extension}`;
 
@@ -74,7 +71,7 @@ export async function buildImage(
       window.apl_ReportLayout = layout;
     },
     reportData,
-    reportLayout,
+    reportLayout
   );
 
   console.log(11.4);
@@ -96,7 +93,7 @@ export async function buildImage(
         "apl-backend",
         "apl-visuals",
         "visuals",
-        "index.html",
+        "index.html"
       )
     : path.join(
         process.resourcesPath,
@@ -104,7 +101,7 @@ export async function buildImage(
         "apl-backend",
         "apl-visuals",
         "visuals",
-        "index.html",
+        "index.html"
       );
 
   await page.goto(`file:${visualsPath}`);
@@ -151,7 +148,7 @@ export function buildJSON(
   ankiData: ankiData,
   allEvents: relativeActivity[],
   lastCaches: cache[],
-  builderDTO: builderDTO,
+  builderDTO: builderDTO
 ): ReportData {
   const options = getConfig();
   if (options == undefined) throw new Error("No config found");
@@ -242,7 +239,7 @@ export function buildJSON(
     ],
     ImmersionTime: {
       current: Math.floor(
-        (builderDTO.timeToAdd + lastCache.totalSeconds) / 3600,
+        (builderDTO.timeToAdd + lastCache.totalSeconds) / 3600
       ),
       delta:
         Math.floor((builderDTO.timeToAdd + lastCache.totalSeconds) / 3600) -
@@ -284,7 +281,7 @@ export function buildJSON(
           .slice(0, 9)
           .filter((x) => x.reportNo != 0)
           .map((x) => x.score),
-      ].reverse(),
+      ].reverse()
     ),
   };
   return reportData;
@@ -365,7 +362,7 @@ export function buildNewCache(
   timeToAdd: number,
   syncID: number,
   path: string,
-  bestSeconds: number,
+  bestSeconds: number
 ) {
   const newCache: cache = {
     totalSeconds: startCache.totalSeconds + timeToAdd,
