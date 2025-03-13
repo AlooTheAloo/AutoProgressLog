@@ -54,17 +54,17 @@ export default class AnkiHTTPClient {
   private async executeRequest<T>(
     endpoint: string,
     data: any,
-    raw: true,
+    raw: true
   ): Promise<Uint8Array | undefined>;
   private async executeRequest<T>(
     endpoint: string,
     data: any,
-    raw?: false,
+    raw?: false
   ): Promise<T | undefined>;
   private async executeRequest<T>(
     endpoint: string,
     data: any,
-    raw: boolean = false,
+    raw: boolean = false
   ): Promise<T | Uint8Array | undefined> {
     const compressedData = compressSync({ input: JSON.stringify(data) });
     const response = await this.fetchWithRedirect(endpoint, {
@@ -102,7 +102,7 @@ export default class AnkiHTTPClient {
     }
 
     const data = new Uint8Array(
-      chunks.reduce((acc, chunk) => acc + chunk.length, 0),
+      chunks.reduce((acc, chunk) => acc + chunk.length, 0)
     );
     let offset = 0;
     for (const chunk of chunks) {
@@ -115,12 +115,12 @@ export default class AnkiHTTPClient {
 
   public async login(
     username: string,
-    password: string,
+    password: string
   ): Promise<string | undefined> {
     try {
       const response = await this.executeRequest<{ key: string }>(
         "/sync/hostKey",
-        { u: username, p: password },
+        { u: username, p: password }
       );
       if (response == undefined) return undefined;
       this.key = response.key;
@@ -138,7 +138,7 @@ export default class AnkiHTTPClient {
       {
         _pad: null,
       },
-      true,
+      true
     );
 
     if (obj == undefined) return false;

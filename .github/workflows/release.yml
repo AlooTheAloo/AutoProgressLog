@@ -21,6 +21,11 @@ jobs:
         with:
           node-version: "21.4.0" # Adjust the Node.js version as needed
 
+      - name: Install Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.x"
+
       - name: Install dependencies
         run: |
           cd apl-frontend
