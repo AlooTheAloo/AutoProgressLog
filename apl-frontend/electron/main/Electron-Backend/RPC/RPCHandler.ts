@@ -34,7 +34,7 @@ export function createAutoRPC() {
           job = null;
         }
       }
-    },
+    }
   );
 
   app.on("before-quit", () => {
@@ -79,7 +79,6 @@ function createJob() {
     const seconds =
       (lastEntry?.toggl?.totalSeconds ?? 0) +
       Math.abs(dayjs(single.start).diff(dayjs(), "seconds"));
-
     // if(seconds == null) return;
     const a = await rpc.setActivity({
       details: `Immersing | ${(seconds / 3600).toFixed(2)} hours`,
