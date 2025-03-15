@@ -41,7 +41,7 @@ If you're on MacOS 15 Sequoia or later, you will need to revalidate this every m
 > [!CAUTION]
 > Linux is malware. Please consider upgrading to MacOS for an optimal experience.
 
-You need libvips to use APL.
+You need the libvips library to use APL.
 
 **Debian**
 ```
