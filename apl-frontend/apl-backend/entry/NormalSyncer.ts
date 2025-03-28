@@ -37,14 +37,11 @@ export default class NormalSyncer {
   }
 
   private async startAndProcessDeletions(): Promise<number | undefined> {
-    const start = dayjs();
     const local_usn = await this.col.getUsn();
-    console.log("1 is " + dayjs().diff(start, "ms") + " ms");
     const pending_usn = await this.client.getMetaUSN();
-    console.log("2 is " + dayjs().diff(start, "ms") + " ms");
+    if (!pending_usn) return undefined;
     const graves = await this.client.startSync(local_usn);
-    console.log("3 is " + dayjs().diff(start, "ms") + " ms");
-    if (graves == undefined || !pending_usn) return undefined;
+    if (graves == undefined) return undefined;
     this.col.apply_graves(graves, pending_usn);
     return pending_usn;
   }

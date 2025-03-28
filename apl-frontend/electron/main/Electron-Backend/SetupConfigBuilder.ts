@@ -21,7 +21,38 @@ import path from "path";
 import { CacheManager } from "../../../apl-backend/Helpers/cache";
 
 let account: TogglAccount;
-const config: Partial<Options> = {};
+const DEFAULT_CONFIG: Options = {
+  account: {
+    userName: "",
+  },
+  general: {
+    autogen: {
+      enabled: false,
+      options: undefined,
+    },
+    discordIntegration: false,
+  },
+  toggl: {
+    togglToken: "",
+  },
+  anki: {
+    enabled: false,
+    ankiIntegration: undefined,
+  },
+  appreance: {
+    glow: true,
+  },
+  outputOptions: {
+    outputFile: {
+      path: "",
+      name: "",
+      extension: ".png",
+    },
+    outputQuality: 5,
+  },
+};
+
+const config: Partial<Options> = DEFAULT_CONFIG;
 
 export function setAnkiIntegration(anki: ankiIntegration | false) {
   if (!anki) {
@@ -69,7 +100,7 @@ export function setupListeners() {
         const time = await CreateDB(db);
         if (time == undefined) return;
         CacheManager.init(time);
-      },
+      }
     );
     buildContextMenu();
   });

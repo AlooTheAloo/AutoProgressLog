@@ -2,17 +2,17 @@
 import Button from "primevue/button";
 import DataView from "primevue/dataview";
 import { ref, onMounted } from "vue";
-import { appPath } from "../routes/appRoutes";
 import { useRouter } from "vue-router";
-import SideBarContainer from "../../components/Common/SideBarContainer.vue";
 import dayjs, { Dayjs } from "dayjs";
 import ProgressSpinner from "primevue/progressspinner";
 import { PageState } from "primevue/paginator";
 import Skeleton from "primevue/skeleton";
-import Chip from "primevue/chip";
 import score from "../../../src/assets/rewarded.png";
 import ConfirmPopup from "primevue/confirmpopup";
 import { useConfirm } from "primevue/useconfirm";
+import { CopyReportToast } from "../../../electron/main/Electron-Backend/ReportsListeners";
+import Toast from "primevue/toast";
+import { useToast } from "primevue/usetoast";
 
 const rows = 6;
 const router = useRouter();
@@ -106,12 +106,35 @@ function openReport(id: string) {
   window.ipcRenderer.invoke("Open-Report", id);
 }
 
+const toast = useToast();
+function copyReport(id: string) {
+  window.ipcRenderer.invoke("Copy-Report", id).then((ret: CopyReportToast) => {
+    if (!ret.worked) {
+      toast.add({
+        severity: "error",
+        summary: "Failed to copy report!",
+        detail: "We were unable to copy the report to your clipboard.",
+        life: 5000,
+      });
+    } else {
+      toast.add({
+        severity: "success",
+        summary: "Report copied!",
+        detail: `Report #${ret.reportNo} was copied to your clipboard.`,
+        life: 5000,
+      });
+    }
+  });
+}
+
 function nf(num: number) {
   return new Intl.NumberFormat("en-US", { useGrouping: true }).format(num);
 }
 </script>
 
 <template>
+  <Toast />
+
   <ConfirmPopup />
   <div
     v-if="!reports"
@@ -254,6 +277,33 @@ function nf(num: number) {
                               />
                               <i v-else class="pi pi-undo text-white" />
                             </Button>
+
+                            <Button
+                              v-on:click="copyReport(item.id)"
+                              icon="pi pi-clipboard"
+                              label=""
+                              :disabled="!item.fileExists"
+                              v-tooltip.top="{
+                                value: item.fileExists
+                                  ? ''
+                                  : 'Report file could not be found',
+                                pt: {
+                                  arrow: {
+                                    style: {
+                                      backgroundColor: '',
+                                    },
+                                  },
+                                  text: {
+                                    style: {
+                                      fontSize: '0.6rem',
+                                      textAlign: 'center',
+                                      color: 'white',
+                                    },
+                                  },
+                                },
+                              }"
+                              class="flex-auto md:flex-initial whitespace-nowrap h-8"
+                            ></Button>
                             <Button
                               v-on:click="openReport(item.id)"
                               icon="pi pi-folder-open"

@@ -74,7 +74,8 @@ export async function runGeneration() {
   }
   console.log("9");
 
-  const timeToAdd = sumTime(events);
+  const timeToAdd = (sync.toggl?.totalSeconds ?? 0) - startCache.totalSeconds;
+  console.log("Adding " + timeToAdd + "seconds");
   const monthTime = await GetImmersionTimeSince(dayjs().startOf("month"));
   const oldBest = startCache.bestSeconds;
   const newBest = Math.max(timeToAdd, oldBest);
@@ -96,7 +97,7 @@ export async function runGeneration() {
       timeToAdd: timeToAdd,
       monthTime: monthTime,
       bestSeconds: bestObject,
-    },
+    }
   );
   console.log("11");
 
@@ -106,7 +107,7 @@ export async function runGeneration() {
     config.outputOptions,
     config.anki.enabled ? 1775 : 1375,
     json,
-    layout,
+    layout
   );
 
   console.log("15");
@@ -130,7 +131,7 @@ export async function runGeneration() {
 
   // Output
   CacheManager.push(
-    buildNewCache(json, startCache, timeToAdd, syncID, imagePath, newBest),
+    buildNewCache(json, startCache, timeToAdd, syncID, imagePath, newBest)
   );
   console.log("19");
 

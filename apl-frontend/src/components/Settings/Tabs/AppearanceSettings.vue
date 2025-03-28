@@ -21,7 +21,10 @@ const emit = defineEmits<{
       @update:value="
         $emit('update:config', {
           ...config,
-          account: { ...config.account, userName: $event },
+          appreance: {
+            ...config.appreance,
+            glow: $event,
+          },
         })
       "
     />

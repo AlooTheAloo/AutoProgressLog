@@ -22,7 +22,8 @@ import {
   resolveBuildId,
 } from "@puppeteer/browsers";
 
-const require = createRequire(import.meta.url);
+console.log("Listerlly here");
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 registerEvents();
@@ -63,7 +64,9 @@ export let win: BrowserWindow | null = null;
 const preload = path.join(__dirname, "../preload/index.mjs");
 export const indexHtml = path.join(RENDERER_DIST, "index.html");
 export async function createWindow() {
+  console.log("Creating window");
   win = new BrowserWindow({
+    show: true,
     minHeight: 600,
     minWidth: 900,
     width: 1920,
@@ -74,7 +77,15 @@ export async function createWindow() {
       preload,
     },
   });
-
+  // Only show when ready (for first load)
+  win.once("ready-to-show", () => {
+    if (process.env.NODE_ENV !== "development") {
+      win?.show();
+    } else {
+      win?.showInactive();
+      win?.blur();
+    }
+  });
   win.setMenuBarVisibility(false);
   if (VITE_DEV_SERVER_URL) {
     // #298
@@ -84,25 +95,23 @@ export async function createWindow() {
   } else {
     win.loadFile(indexHtml);
   }
-
   // Test actively push message to the Electron-Renderer
   win.webContents.on("did-finish-load", () => {
     win?.webContents.send("main-process-message", new Date().toLocaleString());
   });
-
   // Make all links open with the browser, not with the application
   win.webContents.setWindowOpenHandler(({ url }) => {
     if (url.startsWith("https:")) shell.openExternal(url);
     return { action: "deny" };
   });
   // win.webContents.on('will-navigate', (event, url) => { }) #344
-
   win.webContents.once("did-finish-load", () => {});
 }
 
 app
   .whenReady()
   .then(async () => {
+    console.log("Its time");
     await createWindow();
     if (
       app.getLoginItemSettings().wasOpenedAtLogin ||
@@ -188,10 +197,13 @@ app.on("ready", async () => {
 
   const isDev = process.env.NODE_ENV === "development";
 
-  app.setLoginItemSettings({
-    openAtLogin: !isDev,
-    args: ["was-opened-at-login"],
-  });
+  // TODO : Make this into a setting
+  if (!app.getLoginItemSettings().openAtLogin) {
+    app.setLoginItemSettings({
+      openAtLogin: !isDev,
+      args: ["was-opened-at-login"],
+    });
+  }
 });
 
 (async () => {

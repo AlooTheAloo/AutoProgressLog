@@ -27,7 +27,9 @@ export function buildMenu(app: App) {
             } else {
               aboutWindow.loadFile(indexHtml);
             }
+
             aboutWindow.webContents.on("did-finish-load", () => {
+              aboutWindow.webContents.openDevTools();
               aboutWindow?.webContents.send("router-push", "/about");
             });
           },

@@ -26,7 +26,8 @@ export function ankiListeners() {
     win?.webContents.send("anki-connect-message", "Authenticating");
 
     const httpClient = new AnkiHTTPClient("", arg.url);
-    await httpClient.login(arg.username, arg.password);
+    const loginInfo = await httpClient.login(arg.username, arg.password);
+    console.log("Info is " + loginInfo);
     win?.webContents.send("anki-connect-message", "Downloading Anki Database");
     return loadDB(httpClient);
   });
@@ -37,7 +38,7 @@ export function ankiListeners() {
       win?.webContents.send("anki-connect-message", "Authenticating");
       const httpClient = new AnkiHTTPClient(key, url);
       return loadDB(httpClient);
-    },
+    }
   );
 
   const loadDB = async (client: AnkiHTTPClient) => {
@@ -46,8 +47,10 @@ export function ankiListeners() {
     if (!worked) {
       return { worked: false, decks: [], key: "" };
     } else {
+      console.log("clearly because it worked we're here");
       win?.webContents.send("anki-connect-message", "Reading decks");
       const decks = await getDecksCards();
+      console.log("and my decks are " + decks);
       console.log("decks is " + decks);
       return { worked: true, decks: decks, key: client.key };
     }
@@ -115,6 +118,6 @@ export function ankiListeners() {
       if (oldConfig.anki.enabled && !newConfig.anki.enabled) {
         await DeleteAnkiData();
       }
-    },
+    }
   );
 }

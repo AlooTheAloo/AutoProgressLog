@@ -54,15 +54,19 @@ import Storage from "./Storage";
 // })();
 // import { writeFileSync } from "fs";
 
-async function testing() {
-  const client = new AnkiHTTPClient();
-  const storage = new Storage("./collection.anki2");
-  const Syncer = new NormalSyncer(client, storage);
+// async function testing() {
+//   const client = new AnkiHTTPClient();
+//   const storage = new Storage("./collection.anki2");
+//   const Syncer = new NormalSyncer(client, storage);
 
-  await client.login("", "");
-  await client.getMetaUSN();
-  await client.downloadInitialDatabase("caca.sql");
-  Syncer.start();
-}
+//   await client.login("", "");
+//   await client.getMetaUSN();
+//   await client.downloadInitialDatabase("caca.sql");
+//   Syncer.start();
+// }
 
-testing();
+// testing();
+
+// fixUnicaseCollation(
+//   "/Users/philipanthony-davis/Library/Application Support/autoprogresslog/anki.db"
+// );

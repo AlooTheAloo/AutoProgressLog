@@ -30,7 +30,7 @@ const lastSyncTime = ref<string>("");
 const config = ref<Options>();
 
 const disableActionButtons = computed(
-  () => generating_report.value || syncing.value,
+  () => generating_report.value || syncing.value
 );
 
 onUnmounted(() => {
@@ -42,8 +42,9 @@ onUnmounted(() => {
 async function generateReport() {
   try {
     generating_report.value = true;
-    const maybe: Maybe<DashboardDTO> =
-      await window.ipcRenderer.invoke("GenerateReport");
+    const maybe: Maybe<DashboardDTO> = await window.ipcRenderer.invoke(
+      "GenerateReport"
+    );
     if (!("error" in maybe)) {
       dto.value = maybe;
     }
@@ -86,8 +87,9 @@ onMounted(async () => {
 
   try {
     syncing.value = true;
-    const data: DashboardDTO =
-      await window.ipcRenderer.invoke("Get-Dashboard-DTO");
+    const data: DashboardDTO = await window.ipcRenderer.invoke(
+      "Get-Dashboard-DTO"
+    );
     dto.value = data;
 
     if (data.syncCount == 1) {
@@ -104,13 +106,13 @@ onMounted(async () => {
   intervals.push(
     setInterval(() => {
       sync();
-    }, THIRTY_MINUTES),
+    }, THIRTY_MINUTES)
   );
 
   intervals.push(
     setInterval(() => {
       lastSyncTime.value = getLastSyncTime();
-    }, TIME_SYNC_INTERVAL),
+    }, TIME_SYNC_INTERVAL)
   );
 });
 
@@ -177,7 +179,7 @@ const closeFirstDialog = () => {
   <div v-else class="flex flex-col w-full h-full">
     <div class="flex flex-col flex-grow w-full h-full">
       <div class="flex w-full h-20 items-center px-10 my-5 justify-between">
-        <div class="flex flex-col">
+        <div class="flex flex-col min-w-0 flex-grow">
           <h1
             class="flex items-center gap-2 bg-gradient-to-r bg-clip-text text-xl xl:text-4xl font-extrabold text-transparent from-[#89BDFF] to-[#40ffff]"
           >
@@ -185,7 +187,7 @@ const closeFirstDialog = () => {
             <div v-if="dto.userName == undefined">
               <Skeleton width="10rem" height="2rem" />
             </div>
-            <div v-else>{{ dto.userName }} !</div>
+            <div class="truncate w-full" v-else>{{ dto.userName }} !</div>
           </h1>
           <div class="flex items-center">
             <div class="text-xl flex items-center gap-1.5">
@@ -215,7 +217,7 @@ const closeFirstDialog = () => {
             </Button>
           </div>
         </div>
-        <div class="flex flex-col items-end gap-2">
+        <div class="flex flex-col items-end gap-2 w-fit flex-shrink-0">
           <Button
             severity="info"
             @click="generateReport"

@@ -5,6 +5,7 @@
     "module": "ESNext",
     "moduleResolution": "Node",
     "jsx": "preserve",
+    "jsxImportSource": "vue",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "esModuleInterop": true,

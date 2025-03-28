@@ -19,6 +19,7 @@ import { useToast } from "primevue/usetoast";
 import Toast from "primevue/toast";
 import { marked } from "marked";
 import "github-markdown-css/github-markdown-dark.css";
+import { Options } from "../../../apl-backend/types/options";
 
 const HELP_PAGE_URL = "https://www.aplapp.dev/#/";
 const router = useRouter();
@@ -65,8 +66,16 @@ const props = defineProps<{
 }>();
 
 const updateInfo = ref<UpdateInfo | null>(null);
+const glow = ref<boolean>(false);
 
 onMounted(() => {
+  window.ipcRenderer.invoke("GetConfig").then((data: Options) => {
+    glow.value = data.appreance.glow;
+  });
+  window.ipcRenderer.on("config-change", (e, args: Options) => {
+    glow.value = args.appreance.glow;
+  });
+
   window.ipcRenderer.on("ShowDialog", (evt, args: UserDialog) => {
     dialog.value = args;
     visible.value = true;
@@ -165,7 +174,10 @@ const toastValue = ref<UserDialog>();
       ></Button>
     </div>
   </Dialog>
-  <div class="h-screen w-screen absolute overflow-hidden pointer-events-none">
+  <div
+    class="h-screen w-screen absolute overflow-hidden pointer-events-none"
+    v-if="glow"
+  >
     <div class="flex absolute w-full h-full items-end justify-end">
       <div
         style="filter: blur(75px)"

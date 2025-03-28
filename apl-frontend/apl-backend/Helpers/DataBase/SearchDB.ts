@@ -42,14 +42,14 @@ export async function GetLastEntry(type?: SyncType): Promise<SyncData | null> {
             totalSeconds: flat.totalSeconds,
           },
         });
-      },
+      }
     );
   });
 }
 
 export async function GetActivitiesBetween(
   since: dayjs.Dayjs,
-  until: dayjs.Dayjs,
+  until: dayjs.Dayjs
 ): Promise<ImmersionActivity[]> {
   return new Promise((resolve, reject) => {
     new sqlite3.Database(syncDataPath).all(
@@ -59,7 +59,7 @@ export async function GetActivitiesBetween(
       (err, rows: ImmersionActivity[]) => {
         if (err) reject(err);
         resolve(rows);
-      },
+      }
     );
   });
 }
@@ -75,13 +75,13 @@ export async function getreadinghours() {
           reject(err);
         }
         resolve(rows[0].time ?? 0);
-      },
+      }
     );
   });
 }
 
 export async function GetImmersionTimeSince(
-  since: dayjs.Dayjs,
+  since: dayjs.Dayjs
 ): Promise<number> {
   return new Promise((resolve, reject) => {
     new sqlite3.Database(syncDataPath).all(
@@ -93,14 +93,14 @@ export async function GetImmersionTimeSince(
           reject(err);
         }
         resolve(rows[0].sum ?? 0);
-      },
+      }
     );
   });
 }
 
 export async function GetImmersionTimeBetween(
   since: dayjs.Dayjs,
-  until: dayjs.Dayjs,
+  until: dayjs.Dayjs
 ): Promise<number> {
   return new Promise((resolve, reject) => {
     new sqlite3.Database(syncDataPath).all(
@@ -112,13 +112,13 @@ export async function GetImmersionTimeBetween(
           reject(err);
         }
         resolve(rows[0].sum ?? 0);
-      },
+      }
     );
   });
 }
 
 export async function GetImmersionSourcesSince(
-  since: dayjs.Dayjs,
+  since: dayjs.Dayjs
 ): Promise<ImmersionSource[]> {
   return new Promise((resolve, reject) => {
     new sqlite3.Database(syncDataPath).all(
@@ -128,7 +128,7 @@ export async function GetImmersionSourcesSince(
       (err, rows: any[]) => {
         if (err) reject(err);
         resolve(mergeItems(rows));
-      },
+      }
     );
   });
 }
@@ -167,7 +167,7 @@ export async function GetSyncCount() {
       (err, rows: any[]) => {
         if (err) reject(err);
         resolve(rows[0].syncs as number);
-      },
+      }
     );
   });
 }

@@ -1,4 +1,4 @@
-import { ipcMain, ipcRenderer, shell } from "electron";
+import { clipboard, ipcMain, ipcRenderer, nativeImage, shell } from "electron";
 import { CacheManager } from "../../../apl-backend/Helpers/cache";
 import dayjs from "dayjs";
 import { existsSync, rm } from "fs";
@@ -12,6 +12,11 @@ type ListReport = {
   date: string;
   fileExists: boolean;
   revertable?: boolean;
+};
+
+export type CopyReportToast = {
+  worked: boolean;
+  reportNo?: string;
 };
 
 export function reportsListeners() {
@@ -37,7 +42,7 @@ export function reportsListeners() {
               revertable: i === 0,
             };
             return ret;
-          }),
+          })
       );
 
       return reports; // Return the list of reports with resized image data
@@ -49,10 +54,27 @@ export function reportsListeners() {
 
   ipcMain.handle("Open-Report", async (event, id: string) => {
     const report = CacheManager.get().list.find(
-      (x) => x.reportNo.toString() == id,
+      (x) => x.reportNo.toString() == id
     );
     if (report) {
       shell.showItemInFolder(report.path);
+    }
+  });
+
+  ipcMain.handle("Copy-Report", async (event, id: string) => {
+    const report = CacheManager.get().list.find(
+      (x) => x.reportNo.toString() == id
+    );
+    if (report) {
+      clipboard.writeImage(nativeImage.createFromPath(report.path));
+      return {
+        worked: true,
+        reportNo: report.reportNo.toString(),
+      };
+    } else {
+      return {
+        worked: false,
+      };
     }
   });
 
@@ -95,7 +117,7 @@ export function reportsListeners() {
               });
           }
           return resizedBase64;
-        }),
+        })
     );
 
     return {

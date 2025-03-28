@@ -32,6 +32,7 @@ export async function getDecksCards(): Promise<deck[]> {
     prefsDB.all(
       `SELECT COUNT(*) as "cardCount", did FROM cards group by did;`,
       async (err, rowsTop: { cardCount: number; did: number }[]) => {
+        console.log("error was " + err);
         const ret = await Promise.all(
           rowsTop.map(async (row) => {
             return await new Promise<deck>((res, rej) => {
@@ -43,14 +44,14 @@ export async function getDecksCards(): Promise<deck[]> {
                     name: rows[0].name,
                     id: row.did,
                   });
-                },
+                }
               );
             });
-          }),
+          })
         );
         prefsDB.close();
         res(ret);
-      },
+      }
     );
   });
 }
@@ -67,11 +68,11 @@ export async function getDecks(chosenProfile: string): Promise<string[]> {
 }
 
 export async function createAnkiIntegration(
-  ankiLogin: ankiLogin,
+  ankiLogin: ankiLogin
 ): Promise<ankiIntegration | false> {
   const key = await new AnkiHTTPClient().login(
     ankiLogin.username,
-    ankiLogin.password,
+    ankiLogin.password
   );
   if (key == undefined) return false;
   else

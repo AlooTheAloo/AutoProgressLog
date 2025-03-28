@@ -1,7 +1,9 @@
-import { compressSync } from "zstd.ts";
 import * as fzstd from "fzstd";
 import { writeFileSync } from "fs";
 import { Chunk } from "./NormalSyncer";
+import { init, compress } from "@bokuweb/zstd-wasm";
+
+init();
 
 export interface Graves {
   cards: string[];
@@ -17,7 +19,6 @@ export default class AnkiHTTPClient {
   public simpleRandom = crypto.randomUUID();
 
   constructor(key: string = "", url: string = DEFAULT_ANKI_URL) {
-    console.log("Creating client with url ", url);
     if (url != DEFAULT_ANKI_URL) anki_url = url;
     this.key = key;
   }
@@ -66,7 +67,10 @@ export default class AnkiHTTPClient {
     data: any,
     raw: boolean = false
   ): Promise<T | Uint8Array | undefined> {
-    const compressedData = compressSync({ input: JSON.stringify(data) });
+    const compressedData = compress(
+      Uint8Array.from(Buffer.from(JSON.stringify(data), "utf8"))
+    );
+
     const response = await this.fetchWithRedirect(endpoint, {
       method: "POST",
       headers: {
@@ -151,6 +155,7 @@ export default class AnkiHTTPClient {
       v: 11,
       cv: "anki,24.11 (87ccd24e),mac:15.3.1",
     });
+
     if (response == undefined) return false;
     return response.usn;
   }

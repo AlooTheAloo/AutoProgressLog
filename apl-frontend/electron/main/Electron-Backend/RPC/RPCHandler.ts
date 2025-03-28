@@ -44,60 +44,99 @@ export function createAutoRPC() {
   });
 }
 
-function createJob() {
+async function createJob() {
+  console.log("Creating job");
   const config = getConfig();
-  if (config == undefined) return;
+  if (config == undefined || !config.general.discordIntegration) return;
 
-  if (!config.general.discordIntegration)
-    // If autogen is disabled, don't do anything
-    return;
-  const rpc = new RPC.Client({ transport: "ipc" });
-  rpc.login({ clientId }).catch();
+  rpc = new RPC.Client({ transport: "ipc" });
+
+  await tryLoginWithRetries(rpc, clientId);
+
+  ready = true;
+  console.log("Discord RPC ready");
+
+  rpc.on("error", (err) => {
+    console.error("RPC Error:", err);
+  });
+
+  rpc.on("disconnected", () => {
+    console.warn("RPC disconnected. Will retry login...");
+    ready = false;
+    tryLoginWithRetries(rpc!, clientId);
+  });
 
   job = nodeScheduler.scheduleJob(`*/10 * * * * *`, async () => {
     if (!ready || !(await checkInternet())) return;
+
     const activity = await getLiveActivity();
-    if (activity?.length == 0 || activity == undefined) {
-      rpc.clearActivity();
+    if (!activity || activity.length === 0) {
+      rpc!.clearActivity();
       return;
     }
-    if (currentActivity != null && activity.length == 0) {
+
+    const single = activity[0];
+    if (currentActivity && activity.length === 0) {
       setTimeout(() => {
+        console.log("Runsync 2");
         runSync();
       }, 10000);
-      rpc.clearActivity();
+      rpc!.clearActivity();
       currentActivity = null;
     }
-    if (activity.length == 0) return;
-    const single = activity[0];
-    if (single.id != currentActivity?.id) {
-      setTimeout(() => {
-        runSync();
-      }, 10000);
-    }
+
+    if (activity.length === 0) return;
+
     const lastEntry = await GetLastEntry();
     const seconds =
       (lastEntry?.toggl?.totalSeconds ?? 0) +
       Math.abs(dayjs(single.start).diff(dayjs(), "seconds"));
-    // if(seconds == null) return;
-    const a = await rpc.setActivity({
+
+    await rpc!.setActivity({
       details: `Immersing | ${(seconds / 3600).toFixed(2)} hours`,
-      state: single.description, // What the user is doing
+      state: padToMinLength(single.description, 2),
       instance: false,
       startTimestamp: new Date(single.start),
-      // buttons: [
-      //     {
-      //         label: 'Get the app',
-      //         url: 'https://www.aplapp.dev/#/',
-      //     },
-      // ],
     });
+
+    console.log("Set current activity to ", single.description);
     currentActivity = single;
   });
 
   job.invoke();
+}
 
-  rpc.on("ready", () => {
-    ready = true;
-  });
+async function tryLoginWithRetries(
+  rpc: RPC.Client,
+  clientId: string,
+  maxRetries = 20
+) {
+  let attempt = 0;
+  while (attempt < maxRetries) {
+    try {
+      await rpc.login({ clientId });
+      console.log("Logged in to Discord RPC");
+      return;
+    } catch (err) {
+      attempt++;
+      const waitTime = Math.pow(2, attempt) * 1000;
+      console.warn(
+        `RPC login failed (attempt ${attempt}). Retrying in ${
+          waitTime / 1000
+        }s...`
+      );
+      if (attempt >= maxRetries) {
+        console.error(
+          "Failed to login to Discord RPC after multiple attempts.",
+          err
+        );
+        return;
+      }
+      await new Promise((resolve) => setTimeout(resolve, waitTime));
+    }
+  }
+}
+
+function padToMinLength(str: string, len: number) {
+  return str.length >= len ? str : str.padEnd(len, " ");
 }

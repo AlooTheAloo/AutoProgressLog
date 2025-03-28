@@ -7,6 +7,7 @@ import {
 import { writeFileSync } from "fs";
 import { Options } from "../../../apl-backend/types/options";
 import { EventEmitter } from "node:events";
+import { win } from "..";
 
 export const onConfigChange = new EventEmitter();
 
@@ -22,4 +23,11 @@ export function settingsListeners() {
     onConfigChange.emit("config-change", oldConfig, JSON.parse(arg));
     return getConfig();
   });
+
+  onConfigChange.on(
+    "config-change",
+    (oldConfig: Options, newConfig: Options) => {
+      win?.webContents.send("config-change", newConfig);
+    }
+  );
 }

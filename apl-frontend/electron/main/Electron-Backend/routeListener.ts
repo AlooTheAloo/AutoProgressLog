@@ -13,7 +13,6 @@ export function routeListeners() {
       if (!ver) {
         return "/update-app";
       }
-      console.log("we're so happy here :3");
       win?.webContents.send("is-setup-complete", true);
       return "/app/dashboard";
     }

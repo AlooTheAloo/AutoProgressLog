@@ -6,9 +6,9 @@ import { ref } from "vue";
 const router = useRouter();
 const showSideBar = ref<boolean>(false);
 
-window.ipcRenderer.invoke("check-for-update");
-
 if (window.ipcRenderer) {
+  window.ipcRenderer.invoke("check-for-update");
+
   window.ipcRenderer.on("router-push", (e, args: string) => {
     router.push(args);
   });

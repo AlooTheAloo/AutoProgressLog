@@ -11,7 +11,7 @@ export class CacheManager {
       {
         list: this.get().list,
       },
-      version,
+      version
     );
   };
 
@@ -20,7 +20,6 @@ export class CacheManager {
   };
 
   static verifyVersion = () => {
-    console.log("compare is " + this.SemVer().compare(appVersion));
     return this.SemVer().compare(appVersion) == 0;
   };
 

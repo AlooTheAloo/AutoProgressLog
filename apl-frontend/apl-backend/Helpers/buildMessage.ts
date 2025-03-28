@@ -1,7 +1,7 @@
 import { relativeActivity } from "../types/activity.js";
 import { cache } from "../types/cache.js";
 import path from "path";
-import puppeteer from "puppeteer";
+import puppeteer, { BoundingBox, Page, Puppeteer } from "puppeteer";
 import { fileURLToPath } from "url";
 import { ReportData, TPlusDelta } from "../types/reportdata.js";
 import dayjs from "dayjs";
@@ -111,22 +111,48 @@ export async function buildImage(
   await page.waitForNetworkIdle();
   console.log(11.7);
 
-  await page.screenshot({
-    path: outputPath,
-    type: extensionToType(options.outputFile.extension),
-    clip: {
+  await tryScreenshot(
+    page,
+    outputPath,
+    {
       width: 1586,
-      height: height,
+      height,
       x: 0,
       y: 0,
     },
-  });
+    extensionToType(options.outputFile.extension)
+  );
+
   console.log(11.8);
 
   await browser.close();
   console.log(11.9);
 
   return outputPath;
+}
+async function tryScreenshot(
+  page: Page,
+  path: string,
+  clip: BoundingBox,
+  type: "png" | "jpeg" | "webp" | undefined,
+  maxRetries = 3,
+  timeoutMs = 5000
+) {
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      await Promise.race([
+        page.screenshot({ path, type, clip }),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("Screenshot timed out")), timeoutMs)
+        ),
+      ]);
+      return; // success
+    } catch (err) {
+      console.warn(`Screenshot attempt ${i + 1} failed:`, err);
+      if (i === maxRetries - 1) throw err;
+      await new Promise((res) => setTimeout(res, 1000)); // wait 1 second before retry
+    }
+  }
 }
 
 const extensionToType = (ext: ReportExtension) => {
