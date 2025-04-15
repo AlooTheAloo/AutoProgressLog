@@ -228,7 +228,7 @@ const closeFirstDialog = () => {
           </Button>
           <div
             :class="`flex  h-8 rounded-full text-black bg-white overflow-hidden ${
-              syncing ? 'opacity-50' : ''
+              disableActionButtons ? 'opacity-50' : ''
             }`"
             v-if="config?.general.autogen.enabled"
           >

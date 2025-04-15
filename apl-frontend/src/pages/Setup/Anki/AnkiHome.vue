@@ -8,16 +8,23 @@ import InputText from "primevue/inputtext";
 import Password from "primevue/password";
 import { ankiLogin } from "../../../../apl-backend/config/configAnkiIntegration";
 import { ref, useModel } from "vue";
+import AccordionPanel from "primevue/accordionpanel";
+import Accordion from "primevue/accordion";
+import AccordionHeader from "primevue/accordionheader";
+import AccordionContent from "primevue/accordioncontent";
+
+const DEFAULT_URL = "https://sync.ankiweb.net";
 
 const email = ref<string>("");
 const password = ref<string>("");
+const url = ref<string>(DEFAULT_URL);
 
 const router = useRouter();
 function NextPage() {
   const login: ankiLogin = {
     username: email.value,
     password: password.value,
-    url: "https://sync.ankiweb.net",
+    url: url.value,
   };
   console.log(login);
   window.ipcRenderer.invoke("anki-credentials", login);
@@ -46,7 +53,7 @@ function SkipAnki() {
           the future.
         </p>
         <div class="flex justify-center flex-grow items-center">
-          <div class="flex flex-col gap-2 items-start w-full h-52">
+          <div class="flex flex-col gap-2 items-start w-full">
             <div class="flex w-full h-12 items-center">
               <div class="text-lg text-white w-[25rem]">
                 AnkiWeb username (usually your email)
@@ -66,6 +73,23 @@ function SkipAnki() {
                 />
               </div>
             </div>
+            <Accordion value="-1" class="w-full">
+              <AccordionPanel value="0" class="">
+                <AccordionHeader class="">Advanced Settings</AccordionHeader>
+                <AccordionContent class="">
+                  <div class="flex items-center gap-4 pt-5">
+                    <label for="email" class="font-semibold w-fit"
+                      >Anki Sync URL</label
+                    >
+                    <InputText
+                      class="flex-auto"
+                      autocomplete="off"
+                      v-model="url"
+                    />
+                  </div>
+                </AccordionContent>
+              </AccordionPanel>
+            </Accordion>
           </div>
         </div>
         <div class="flex justify-between">
@@ -82,3 +106,16 @@ function SkipAnki() {
     </div>
   </div>
 </template>
+
+<style>
+.p-accordionheader,
+.p-accordioncontent-content {
+  background-color: background !important;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+.p-accordionpanel {
+  border: 0 !important;
+}
+</style>

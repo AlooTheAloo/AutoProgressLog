@@ -14,6 +14,7 @@
           duration: 0.8,
           ease: 'easeInOut',
         }"
+        :inViewOptions="{ once: true }"
         class="absolute flex flex-col w-full p-10"
       >
         <div

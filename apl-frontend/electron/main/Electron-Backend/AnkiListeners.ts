@@ -80,14 +80,13 @@ export function ankiListeners() {
   let login: ankiLogin | undefined;
   ipcMain.handle("anki-credentials", async (avt: any, data: ankiLogin) => {
     login = data;
-    console.log("set login to " + JSON.stringify(login));
   });
 
   ipcMain.handle("anki-connect-start", async (event: any) => {
     win?.webContents.send("anki-connect-message", "Authenticating");
     if (login == undefined) return false;
 
-    const httpClient = new AnkiHTTPClient();
+    const httpClient = new AnkiHTTPClient(login.url);
     await httpClient.login(login?.username, login?.password);
     return await connectFromClient(httpClient, login);
   });

@@ -33,7 +33,7 @@
             </div>
 
             <div
-              class="lg:text-3xl text-base text-center font-extralight dark:text-neutral-200 md:text-left w-full"
+              class="lg:text-3xl text-2xl text-center font-extralight dark:text-neutral-200 md:text-left w-full"
             >
               The immersion tracking app that
               <TextHighlight
@@ -61,7 +61,7 @@
               class="py-4 w-full flex gap-2 justify-center md:justify-start"
             >
               <RainbowButton
-                @click="caca"
+                @click="openDownloads"
                 class="text-xs sm:text-base relative bg-black px-4 py-2 text-white flexw-12 flex-col items-center justify-center overflow-hidden rounded-full border shadow-xl"
               >
                 Download the app
@@ -111,10 +111,15 @@ import {
 import macos_apl from "../../assets/APL_Macbook.png";
 import { RainbowButton } from "../ui/rainbow-button";
 import TextHighlight from "../ui/text-highlight/TextHighlight.vue";
+import { useRouter } from "vue-router";
 
 const { scrollYProgress } = useScroll();
 
 const opacity = useTransform(() => 1 - scrollYProgress.get());
 
-function caca() {}
+const router = useRouter();
+
+function openDownloads() {
+  router.push("/downloads");
+}
 </script>

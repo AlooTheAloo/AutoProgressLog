@@ -1,8 +1,6 @@
-<script setup lang="ts">
-import Index from "./pages/index.vue";
-</script>
+<script setup lang="ts"></script>
 <template>
   <div class="w-screen h-screen">
-    <Index />
+    <RouterView />
   </div>
 </template>

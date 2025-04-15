@@ -29,8 +29,10 @@ dayjs.extend(advancedFormat);
 
 export const __filename = fileURLToPath(import.meta.url);
 export const __dirname = path.dirname(__filename);
+export let isGenerating = false;
 
 export async function runGeneration() {
+  isGenerating = true;
   await runSync(getSyncProps());
 
   setSyncing(true);
@@ -140,6 +142,6 @@ export async function runGeneration() {
 
   setSyncing(false);
   console.log("21");
-
+  isGenerating = false;
   return DTO;
 }

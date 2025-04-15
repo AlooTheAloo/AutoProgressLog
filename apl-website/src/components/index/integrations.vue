@@ -2,10 +2,13 @@
 import { Motion } from "motion-v";
 import FlickeringGrid from "../ui/flickering-grid/FlickeringGrid.vue";
 import { useWindowSize } from "@vueuse/core";
-import { Github, HardDrive } from "lucide-vue-next";
 import { onMounted, ref, watch } from "vue";
 import AnimatedBeam from "../ui/animated-beam/AnimatedBeam.vue";
 import GlowBorder from "../ui/glow-border/GlowBorder.vue";
+import AplLogo from "../../assets/Logo.png";
+import TogglLogo from "../../assets/Toggl_LOGO.png";
+import AnkiLogo from "../../assets/Anki_LOGO.png";
+import DiscordLogo from "../../assets/discord_logo.webp";
 
 const { width } = useWindowSize();
 
@@ -27,19 +30,19 @@ watch(containerRef, () => {
 </script>
 <template>
   <div
-    class="flex flex-col relative w-screen overflow-hidden h-[400px] rounded-lg border bg-black"
+    class="flex flex-col relative w-screen overflow-hidden h-[400px] rounded-lg bg-white"
   >
     <div class="w-screen flex justify-center items-center">
-      <div class="absolute w-[500px]]">
+      <div class="absolute w-[1000px]">
         <FlickeringGrid
-          class="h-[400px] inset-0 z-0 [mask-image:radial-gradient(750px_circle_at_center,white,transparent)]"
+          class="h-[1000px] inset-0 z-0 [mask-image:radial-gradient(500px_400px_at_center,white,transparent)]"
           :square-size="4"
           :grid-gap="6"
           color="#60A5FA"
           :max-opacity="0.5"
           :flicker-chance="0.05"
-          :height="800"
-          :width="500"
+          :height="1000"
+          :width="1000"
         />
       </div>
     </div>
@@ -54,17 +57,21 @@ watch(containerRef, () => {
       }"
       :transition="{
         delay: 0,
-        duration: 0.8,
+        duration: 1,
         ease: 'easeInOut',
       }"
-      class="flex flex-col w-full pt-5 text-white"
+      class="flex flex-col w-full pt-5"
     >
       <div
-        class="font-semibold text-2xl text-center md:text-4xl dark:text-white"
+        class="font-semibold text-2xl mt-5 text-center md:text-4xl text-black"
       >
-        Use the tools you already love
+        Use the tools you
+
+        <div class="text-blue-500 inline text-[1.5rem] text-2xl md:text-4xl">
+          already love
+        </div>
       </div>
-      <div class="font-md text-md text-center md:text-2xl dark:text-white">
+      <div class="font-md text-md text-center md:text-2xl">
         No extra configuration required
       </div>
     </Motion>
@@ -82,13 +89,17 @@ watch(containerRef, () => {
           duration: 0.8,
           ease: 'easeInOut',
         }"
-        class="relative flex items-center justify-center overflow-hidden rounded-lg w-50 sm:w-[30rem] max-w-screen"
+        class="relative flex items-center justify-center rounded-lg w-50 sm:w-[30rem] max-w-screen"
       >
         <GlowBorder
+          :duration="5"
           :border-width="10"
-          class="relative flex h-[200px] w-full flex-col items-center justify-center overflow-hidden border md:shadow-xl px-10"
+          class="relative rounded-xl flex h-[200px] w-full flex-col items-center justify-center overflow-hidden border md:shadow-xl px-10 shadow-lg shadow-slate-400X"
           :color="['#A07CFE', '#FE8FB5', '#FFBE7B']"
         >
+          <div class="w-full h-full absolute p-2">
+            <div class="bg-white w-full h-full rounded-md"></div>
+          </div>
           <div
             class="flex size-full items-center justify-between z-10"
             ref="containerRef"
@@ -98,28 +109,28 @@ watch(containerRef, () => {
                 ref="div1Ref"
                 class="z-10 flex size-12 items-center justify-center rounded-full border-2 bg-white p-2 shadow-[0_0_20px_-12px_rgba(0,0,0,0.8)]"
               >
-                <Github />
+                <img :src="TogglLogo" />
               </div>
               <div
                 ref="div2Ref"
-                class="z-10 flex size-12 items-center justify-center rounded-full border-2 bg-white p-2 shadow-[0_0_20px_-12px_rgba(0,0,0,0.8)]"
+                class="z-10 flex size-12 items-center justify-center rounded-full border-2 bg-white p-1.5 shadow-[0_0_20px_-12px_rgba(0,0,0,0.8)]"
               >
-                <HardDrive />
+                <img :src="AnkiLogo" />
               </div>
             </div>
             <div>
               <div
                 ref="div3Ref"
-                class="z-10 flex size-12 items-center justify-center rounded-full border-2 bg-white p-2 shadow-[0_0_20px_-12px_rgba(0,0,0,0.8)]"
+                class="z-10 flex size-12 items-center justify-center rounded-lg border-2 bg-white p-1 shadow-[0_0_20px_-12px_rgba(0,0,0,0.8)]"
               >
-                <HardDrive />
+                <img :src="AplLogo" class="w-full h-full" />
               </div>
             </div>
             <div
               ref="div4Ref"
-              class="z-10 flex size-12 items-center justify-center rounded-full border-2 bg-white p-2 shadow-[0_0_20px_-12px_rgba(0,0,0,0.8)]"
+              class="z-10 flex size-12 items-center justify-center rounded-full border-2 bg-white p-1.5 shadow-[0_0_20px_-12px_rgba(0,0,0,0.8)]"
             >
-              <Github />
+              <img :src="DiscordLogo" class="w-full h-full" />
             </div>
           </div>
           <div
