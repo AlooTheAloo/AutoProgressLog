@@ -132,7 +132,10 @@ const urls = ref<
 >([]);
 
 onMounted(() => {
-  const BACKEND_URL = "https://apl.chromaserver.net/api";
-  fetch("https://");
+  const BACKEND_URL = "https://apl.chromaserver.net/downloadLinks";
+  fetch(BACKEND_URL).then(async (x) => {
+    const data = await x.json();
+    console.log(data);
+  });
 });
 </script>

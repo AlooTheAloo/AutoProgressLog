@@ -39,10 +39,10 @@
               <TextHighlight
                 :delay="500"
                 :duration="1000"
-                class="pb bg-gradient-to-r from-[#a1a4f8] to-[#1BFFFF] rounded-sm"
+                class="px-2 bg-gradient-to-r from-[#a1a4f8] to-[#1BFFFF] rounded-sm"
               >
-                just works </TextHighlight
-              >.
+                just works.
+              </TextHighlight>
             </div>
 
             <Motion
