@@ -28,6 +28,7 @@ export default new Elysia().get("/downloadLinks", async ({ set, body }) => {
     windowsUrl: windowsUrl,
     macUrl: macUrl,
     linuxUrl: linuxUrl,
+    releasesUrl: await getLatestRelease(owner, repo),
   };
 });
 
@@ -51,4 +52,12 @@ async function getInstallerUrl(owner: string, repo: string, platform: string) {
   // Construct the direct download URL
   const baseUrl = `https://github.com/${owner}/${repo}/releases/download/${release.data.tag_name}/${ymlData.path}`;
   return baseUrl;
+}
+
+async function getLatestRelease(owner: string, repo: string) {
+  const octokit = new Octokit();
+
+  // Fetch the latest release
+  const release = await octokit.repos.getLatestRelease({ owner, repo });
+  return release.data.html_url;
 }
