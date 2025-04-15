@@ -3,7 +3,7 @@ import { RelativeReportData, TPlusDelta } from "../../types/report-data";
 import { computed, ref } from "vue";
 import { interpolateLab } from "d3-interpolate";
 import pluralize from "pluralize";
-import MatureCards from "/Icons/MatureCards.png";
+import Streak from "/Icons/Streak.png";
 import Delta from "../Delta.vue";
 
 interface TimeMapProps {
@@ -14,10 +14,10 @@ interface TimeMapProps {
 
 const props = defineProps<TimeMapProps>();
 const sortedDataByReport = ref(
-  props.data.slice(0, 24).sort((a, b) => b.reportNo - a.reportNo),
+  props.data.slice(0, 24).sort((a, b) => b.reportNo - a.reportNo)
 );
 const sortedDataByRelativeCount = ref(
-  props.data.slice(0, 24).sort((a, b) => b.value - a.value),
+  props.data.slice(0, 24).sort((a, b) => b.value - a.value)
 );
 
 const cardData = computed(() => {
@@ -33,8 +33,8 @@ const cardData = computed(() => {
         x.value == 0
           ? "#222222"
           : delta == 0
-            ? colorGradient(1)
-            : colorGradient((x.value - min.value) / delta),
+          ? colorGradient(1)
+          : colorGradient((x.value - min.value) / delta),
     };
   });
 });
@@ -65,7 +65,7 @@ const colorGradient = interpolateLab("#05006e", "#9c96ff");
                 </div>
               </div>
               <div class="w-10">
-                <img class="ml-2" v-bind:src="MatureCards" />
+                <img class="ml-2" v-bind:src="Streak" />
               </div>
             </div>
             <div class="mt-3"></div>

@@ -7,10 +7,13 @@
     "start": "bun run src/index.ts"
   },
   "dependencies": {
+    "@octokit/rest": "^21.1.1",
     "elysia": "latest",
+    "js-yaml": "^4.1.0",
     "zod": "^3.24.1"
   },
   "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
     "bun-types": "latest"
   },
   "module": "src/index.js"

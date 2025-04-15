@@ -5,6 +5,7 @@ import { existsSync, rm } from "fs";
 import { promises as fsPromises } from "fs";
 import sharp from "sharp";
 import { deleteSyncs } from "../../../apl-backend/Helpers/DataBase/DeleteDB";
+import { isGenerating } from "../../../apl-backend/generate/generate";
 
 type ListReport = {
   id: number;
@@ -76,6 +77,15 @@ export function reportsListeners() {
         worked: false,
       };
     }
+  });
+
+  ipcMain.handle("loadReportsPage", async (evt) => {
+    console.log("Isgenerating is " + isGenerating);
+    while (isGenerating) {
+      console.log("nope");
+      await new Promise((res) => setTimeout(res, 50));
+    }
+    return true;
   });
 
   ipcMain.handle("Reverse-Report", async (event) => {

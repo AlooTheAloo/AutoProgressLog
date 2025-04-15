@@ -11,7 +11,7 @@ import { Options } from "../types/options";
 
 const ignore = (tags: string[]) =>
   ["aplignore", "ignore", "autoprogresslogignore"].some((x) =>
-    tags.map((x) => x.toLowerCase()).includes(x),
+    tags.map((x) => x.toLowerCase()).includes(x)
   );
 
 export let toggl: Toggl | undefined = undefined;
@@ -34,6 +34,10 @@ export async function getTimeEntries(since: string | number) {
           token: getConfig()?.toggl.togglToken ?? "",
         },
       });
+    }
+
+    if (dayjs(since).isBefore(dayjs().subtract(3, "month").add(1, "minute"))) {
+      since = dayjs().subtract(3, "month").add(1, "minute").unix().toString();
     }
 
     const start = dayjs();
@@ -59,7 +63,7 @@ export async function getTimeEntries(since: string | number) {
     const allEvents = uniqueEvents
       .map(function (evt) {
         const correspondingEntries = entriesAfterLastGen.filter(
-          (x) => x.description == evt,
+          (x) => x.description == evt
         );
         const activityTime = sumTime(correspondingEntries);
         const ret: activity = {
@@ -93,5 +97,5 @@ onConfigChange.on(
         });
       }
     }
-  },
+  }
 );
