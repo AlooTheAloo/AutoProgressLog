@@ -68,7 +68,7 @@
     "@vitejs/plugin-vue": "^5.0.4",
     "autoprefixer": "^10.4.20",
     "bun": "^1.1.42",
-    "electron": "^33.2.1",
+    "electron": "^33.1.0",
     "electron-builder": "^25.1.8",
     "node-abi": "^4.2.0",
     "postcss": "^8.4.41",
