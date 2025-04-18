@@ -17,13 +17,19 @@
     "test:component:ci": "cross-env NODE_ENV=test cypress run --component"
   },
   "dependencies": {
-    "axios": "^1.2.1",
-    "vue-i18n": "^9.2.2",
-    "pinia": "^2.0.11",
-    "@quasar/extras": "^1.16.4",
-    "quasar": "^2.8.0",
-    "vue": "^3.2.29",
-    "vue-router": "^4.0.12"
+    "@octokit/rest": "^21.1.1",
+    "@tanstack/vue-table": "^8.21.3",
+    "@types/canvas-confetti": "^1.9.0",
+    "@vueuse/core": "^13.0.0",
+    "autoprefixer": "^10.4.21",
+    "canvas-confetti": "^1.9.3",
+    "js-yaml": "^4.1.0",
+    "lucide-vue-next": "^0.485.0",
+    "motion-v": "^0.13.1",
+    "ogl": "^1.0.11",
+    "reka-ui": "^2.2.0",
+    "vue": "^3.5.13",
+    "vue-router": "^4.5.0"
   },
   "devDependencies": {
     "@intlify/vite-plugin-vue-i18n": "^3.3.1",
