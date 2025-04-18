@@ -10,8 +10,14 @@ services:
     ports:
       - "11612:3000"
     environment:
-      - DB_PATH=/data/prod.db # Separate SQLite file for production
-    command: bun run start # Adjust to your app's start command
+      - DB_PATH=/data/prod.db
+    command: bun run start
+    networks:
+      - chromanet
+
+networks:
+  chromanet:
+    external: true
 
 volumes:
   elysia-db:

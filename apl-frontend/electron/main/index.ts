@@ -111,7 +111,6 @@ export async function createWindow() {
 app
   .whenReady()
   .then(async () => {
-    console.log("Its time");
     await createWindow();
     if (
       app.getLoginItemSettings().wasOpenedAtLogin ||

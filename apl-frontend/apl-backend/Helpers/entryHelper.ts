@@ -1,5 +1,6 @@
 import { relativeActivity } from "../types/activity.js";
 import { entry } from "../types/entry.js";
+import fs from "fs";
 
 export function sumTime(entries: relativeActivity[]): number;
 export function sumTime(entries: entry[]): number;
@@ -8,6 +9,6 @@ export function sumTime(entries: relativeActivity[] | entry[]): number {
     (sum, current) =>
       sum +
       ("relativeValue" in current ? current.relativeValue : current.duration),
-    0,
+    0
   );
 }

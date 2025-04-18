@@ -22,7 +22,7 @@ import formatTime from "../../util/timeFormat";
 const { width, height } = useWindowSize();
 
 const limit /* As x goes to infinity ??? */ = ref<number>(
-  width.value >= 1820 ? 50 : 12,
+  width.value >= 1820 ? 50 : 12
 );
 const props = defineProps<{
   sources: ImmersionSource[];
@@ -43,21 +43,19 @@ const sortedSources = computed(() => {
   const bottomActivitiesSeconds = sort
     .slice(limit.value)
     .reduce((a, b) => a + b.relativeValue, 0);
-
   let arr = [...sort.slice(0, limit.value)];
-
   if (sort.length > limit.value) {
     arr.push({
-      name: `${sort.length - limit.value} other${sort.length - limit.value > 1 ? "s" : ""}`,
+      name: `${sort.length - limit.value} other${
+        sort.length - limit.value > 1 ? "s" : ""
+      }`,
       relativeValue: bottomActivitiesSeconds,
     });
   }
-
   return arr.map((x) => {
     return {
       name: x.name,
       relativeValue: x.relativeValue,
-
       hr: formatTime(x.relativeValue),
     };
   });
@@ -118,16 +116,16 @@ let options: ComputedRef<ApexOptions> = computed(() => {
         {
           const value = sortedSources.value[seriesIndex];
           return `<div class="flex flex-col gap-2">
-                            <div class="flex flex-row gap-2 items-center p-2">
-                                <div class="w-3 h-3 rounded-full" style="background-color: ${colors.value[seriesIndex]}">
-                            </div>
-                            <p class="text-ellipsis overflow-hidden whitespace-nowrap text-sm font-normal">
-                                ${value.name}
-                            </p>
-                            <p class="text-ellipsis overflow-hidden whitespace-nowrap text-sm font-normal">
-                                ${value.hr}
-                            </p>
-                        </div>`;
+              <div class="flex flex-row gap-2 items-center p-2">
+                  <div class="w-3 h-3 rounded-full" style="background-color: ${colors.value[seriesIndex]}">
+              </div>
+              <p class="text-ellipsis overflow-hidden whitespace-nowrap text-sm font-normal">
+                  ${value.name}
+              </p>
+              <p class="text-ellipsis overflow-hidden whitespace-nowrap text-sm font-normal">
+                  ${value.hr}
+              </p>
+          </div>`;
         }
       },
     },

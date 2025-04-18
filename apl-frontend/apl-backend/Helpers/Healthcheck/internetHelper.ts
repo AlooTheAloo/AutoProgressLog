@@ -1,14 +1,22 @@
+import dayjs from "dayjs";
 import { win } from "../../../electron/main";
 import nodeScheduler from "node-schedule";
 
 let hasInternet = false;
 
 export async function setInternet(value: boolean) {
+  console.log("setting internet to " + value);
   hasInternet = value;
 }
 
 export async function checkInternet() {
-  return hasInternet;
+  try {
+    await fetch("https://google.com");
+    return true;
+  } catch (e) {
+    console.log("Error is " + e);
+    return false;
+  }
 }
 
 export function notifyNoInternet() {

@@ -56,8 +56,10 @@ async function getImages(from: number, count: number) {
 }
 
 onMounted(() => {
-  getReports();
-  getImages(0, rows);
+  window.ipcRenderer.invoke("loadReportsPage").then(() => {
+    getReports();
+    getImages(0, rows);
+  });
 });
 
 const reverting = ref<boolean>(false);
