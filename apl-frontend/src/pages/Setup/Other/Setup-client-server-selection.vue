@@ -6,6 +6,7 @@ import Client from "../../../assets/Client.png";
 import Logo from "../../../assets/Logo.png";
 import BackButton from "../../../components/Common/BackButton.vue";
 import { useWindowSize } from "@vueuse/core";
+import { motion } from 'motion-v';
 
 const router = useRouter();
 const { height } = useWindowSize();
@@ -25,26 +26,44 @@ function SelectServer() {
   <SetupBackground />
 
   <div class="flex w-screen">
-    <div class="p-12 flex flex-col w-2/4 bg-black h-screen">
-      <Transition name="fade-up" appear>
-      <div class="mx-auto w-[51rem] flex flex-col items-start space-y-8 mt-16">
-        <div v-if="height > 650">
-          <img :src="Logo" alt="APL Logo" class="w-20 h-20" />
-        </div>
+    <!-- Left panel: full-width up to 51rem, always flush left -->
+    <div class="p-4 sm:p-12 flex flex-col justify-center w-full max-w-[60rem] bg-black min-h-screen">
+      
+      <!-- Animate everything with motion-v -->
+      <motion.div
+        :initial="{ opacity: 0, y: 20, filter: 'blur(10px)' }"
+        :animate="{ opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 0.6 } }"
+        class="flex flex-col items-start space-y-6"
+      >
+        <!-- Responsive logo -->
+        <img
+          :src="Logo"
+          alt="APL Logo"
+          class="w-16 h-16 sm:w-20 sm:h-20 block"
+        />
+
+        <!-- Back link -->
         <BackButton route="/setup/index" />
-        <h1 class="text-5xl font-semibold text-white">
+
+        <!-- Responsive heading -->
+        <h1 class="text-xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-semibold text-white leading-tight">
           How do you want to generate reports?
         </h1>
-        <p class="text-xs lg:text-sm leading-relaxed text-[#C0C0C0]">
+
+        <!-- Responsive description -->
+        <p class="text-xs sm:text-sm lg:text-base text-[#C0C0C0] leading-relaxed">
           APL can generate reports automatically for you. Select automatic
           generation only if you know that your computer will always be turned
           on and connected to the internet.
         </p>
-        <div class="flex w-full justify-between gap-12 select-none">
+
+        <!-- Cards: collapse to one column on small screens -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full">
+          <!-- Manually card -->
           <div
             v-ripple
             @click="SelectClient"
-            class="relative bg-[#18181B] rounded-xl w-[24rem] h-72 cursor-pointer"
+            class="relative bg-[#18181B] rounded-xl w-full sm:w-[24rem] h-72 cursor-pointer mx-auto sm:mx-0"
           >
             <div
               class="absolute top-0 left-0 bg-[#0FB4EC] px-2 h-6 text-xs rounded-br-xl flex items-center"
@@ -63,10 +82,12 @@ function SelectServer() {
               </div>
             </div>
           </div>
+
+          <!-- Automatically card -->
           <div
             v-ripple
             @click="SelectServer"
-            class="bg-[#18181B] rounded-xl w-[24rem] h-72 cursor-pointer"
+            class="bg-[#18181B] rounded-xl w-full sm:w-[24rem] h-72 cursor-pointer mx-auto sm:mx-0"
           >
             <div class="w-full h-full flex flex-col justify-center items-center">
               <img :src="Server" class="w-1/4 aspect-square" />
@@ -81,23 +102,10 @@ function SelectServer() {
             </div>
           </div>
         </div>
-
-      </div>
-    </Transition>
+      </motion.div>
     </div>
+
+    <!-- Fills the remainder of the screen -->
+    <div class="flex-grow"></div>
   </div>
 </template>
-
-<style scoped>
-.fade-up-enter-active {
-  transition: opacity 0.6s ease, transform 0.6s ease;
-}
-.fade-up-enter-from {
-  opacity: 0;
-  transform: translateY(20px);
-}
-.fade-up-enter-to {
-  opacity: 1;
-  transform: translateY(0);
-}
-</style>
