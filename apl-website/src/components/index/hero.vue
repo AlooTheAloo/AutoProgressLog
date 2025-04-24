@@ -16,14 +16,32 @@
               filter: 'blur(0px)',
             }"
             :transition="{
-              delay: 0.3,
-              duration: 0.8,
+              delay: 0,
+              duration: 1,
+              ease: 'easeInOut',
+            }"
+          >
+            <img
+              :src="apl_logo"
+              class="relative flex flex-col mx-20 w-20 mb-5 shadow-xl rounded-2xl"
+            />
+          </Motion>
+
+          <Motion
+            as="div"
+            :initial="{ opacity: 0, y: 40, filter: 'blur(10px)' }"
+            :while-in-view="{
+              opacity: 1,
+              y: 0,
+              filter: 'blur(0px)',
+            }"
+            :transition="{
+              delay: 0.2,
+              duration: 1,
               ease: 'easeInOut',
             }"
             class="relative flex flex-col my-4 w-full md:px-20 px-10"
           >
-            <img :src="apl_logo" class="w-20 mb-10 shadow-xl rounded-2xl" />
-
             <div
               class="text-center md:text-left font-bold text-7xl dark:text-white"
             >
@@ -56,8 +74,8 @@
                 filter: 'blur(0px)',
               }"
               :transition="{
-                delay: 1.1,
-                duration: 0.8,
+                delay: 0.4,
+                duration: 1,
                 ease: 'easeInOut',
               }"
               class="py-4 w-full flex gap-2 justify-center md:justify-start"
