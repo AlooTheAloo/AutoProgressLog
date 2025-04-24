@@ -168,9 +168,8 @@ export async function syncAnki(isReport = false): Promise<AnkiSyncData | null> {
     return null;
   }
   if (
-    (Number.isNaN(lastEntry.anki?.lastAnkiUpdate) ||
-      lastEntry.anki?.lastAnkiUpdate.toString() == "NaN") &&
-    lastEntry.anki?.lastAnkiUpdate != undefined
+    Number.isNaN(lastEntry.anki?.lastAnkiUpdate) &&
+    lastEntry.anki != undefined
   ) {
     lastEntry.anki.lastAnkiUpdate = lastEntry.generationTime;
   }
