@@ -61,7 +61,8 @@
 
         <div class="lg:block hidden">
           <div class="flex">
-            <img :src="macos_apl" width="300" />
+            <img v-if="platform == 'mac'" :src="macos_apl" width="300" />
+            <img v-if="platform == 'windows'" :src="windows_apl" width="300" />
           </div>
         </div>
       </div>
@@ -105,6 +106,7 @@
 <script setup lang="ts">
 import Ripple from "@/components/ui/ripple/Ripple.vue";
 import { BoxIcon, DownloadIcon, RocketIcon } from "lucide-vue-next";
+import windows_apl from "../assets/APL_windows.png";
 import macos_apl from "../assets/APL_Macbook.png";
 import { computed, onMounted, ref } from "vue";
 import RainbowButton from "@/components/ui/rainbow-button/RainbowButton.vue";
@@ -135,6 +137,7 @@ type Platform = "windows" | "mac" | "linux" | "other" | "all";
 const platform = ref<Platform>(getPlatform());
 
 function getPlatform(): Platform {
+  return "windows";
   const agent = window.navigator.userAgent;
   if (agent.indexOf("Windows") != -1) return "windows";
   if (agent.indexOf("Mac") != -1) return "mac";
