@@ -21,45 +21,32 @@ function SelectServer() {
   router.push("/setup/toggl-auto");
 }
 </script>
-
 <template>
   <SetupBackground />
 
   <div class="flex w-screen">
-    <!-- Left panel: full-width up to 51rem, always flush left -->
-    <div class="p-4 sm:p-12 flex flex-col justify-center w-full max-w-[60rem] bg-black min-h-screen">
+    <div class="p-4 sm:p-12 flex flex-col justify-between w-full max-w-[60rem] bg-black min-h-screen">
       
-      <!-- Animate everything with motion-v -->
       <motion.div
         :initial="{ opacity: 0, y: 20, filter: 'blur(10px)' }"
         :animate="{ opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 0.6 } }"
         class="flex flex-col items-start space-y-6"
       >
-        <!-- Responsive logo -->
         <img
           :src="Logo"
           alt="APL Logo"
           class="w-16 h-16 sm:w-20 sm:h-20 block"
         />
-
-        <!-- Back link -->
         <BackButton route="/setup/index" />
-
-        <!-- Responsive heading -->
         <h1 class="text-xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-semibold text-white leading-tight">
           How do you want to generate reports?
         </h1>
-
-        <!-- Responsive description -->
         <p class="text-xs sm:text-sm lg:text-base text-[#C0C0C0] leading-relaxed">
           APL can generate reports automatically for you. Select automatic
           generation only if you know that your computer will always be turned
           on and connected to the internet.
         </p>
-
-        <!-- Cards: collapse to one column on small screens -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full">
-          <!-- Manually card -->
           <div
             v-ripple
             @click="SelectClient"
@@ -82,8 +69,6 @@ function SelectServer() {
               </div>
             </div>
           </div>
-
-          <!-- Automatically card -->
           <div
             v-ripple
             @click="SelectServer"
@@ -104,8 +89,6 @@ function SelectServer() {
         </div>
       </motion.div>
     </div>
-
-    <!-- Fills the remainder of the screen -->
     <div class="flex-grow"></div>
   </div>
 </template>
