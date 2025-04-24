@@ -22,6 +22,8 @@
             }"
             class="relative flex flex-col my-4 w-full md:px-20 px-10"
           >
+            <img :src="apl_logo" class="w-20 mb-10 shadow-xl rounded-2xl" />
+
             <div
               class="text-center md:text-left font-bold text-7xl dark:text-white"
             >
@@ -67,6 +69,7 @@
                 Download the app
               </RainbowButton>
               <button
+                @click="openVideo"
                 class="text-xs sm:text-base relative bg-white text-black px-4 py-2 flex-12 flex-col items-center justify-center overflow-hidden rounded-full border shadow-xl"
               >
                 Watch the trailer
@@ -108,7 +111,10 @@ import {
   PATTERN_BACKGROUND_DIRECTION,
   PATTERN_BACKGROUND_VARIANT,
 } from "../ui/pattern-background";
+import apl_logo from "../../assets/Logo.png";
+
 import macos_apl from "../../assets/APL_Macbook.png";
+
 import { RainbowButton } from "../ui/rainbow-button";
 import TextHighlight from "../ui/text-highlight/TextHighlight.vue";
 import { useRouter } from "vue-router";
@@ -121,5 +127,9 @@ const router = useRouter();
 
 function openDownloads() {
   router.push("/downloads");
+}
+
+function openVideo() {
+  window.open("https://youtu.be/qLt7HWdLydo?si=7uzEyXAjT2_yCyng&t=0", "_blank");
 }
 </script>
