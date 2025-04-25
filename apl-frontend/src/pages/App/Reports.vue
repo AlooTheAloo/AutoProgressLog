@@ -10,7 +10,7 @@ import Skeleton from "primevue/skeleton";
 import score from "../../../src/assets/rewarded.png";
 import ConfirmPopup from "primevue/confirmpopup";
 import { useConfirm } from "primevue/useconfirm";
-import { CopyReportToast } from "../../../electron/main/Electron-Backend/ReportsListeners";
+import { CopyReportToast } from "../../../electron/main/Electron-Backend/reportsListeners";
 import Toast from "primevue/toast";
 import { useToast } from "primevue/usetoast";
 

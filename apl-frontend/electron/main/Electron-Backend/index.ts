@@ -1,11 +1,11 @@
-import { ankiListeners } from "./AnkiListeners";
-import { DashboardListeners } from "./DashboardListeners";
+import { ankiListeners } from "./ankiListeners";
+import { dashboardListeners } from "./dashboardListeners";
 import { globalListeners } from "./globalListeners";
-import { reportsListeners } from "./ReportsListeners";
+import { reportsListeners } from "./reportsListeners";
 import { routeListeners } from "./routeListener";
-import { settingsListeners } from "./SettingsListeners";
-import { setupListeners } from "./SetupConfigBuilder";
-import { surveyListeners } from "./SurveyListeners";
+import { settingsListeners } from "./settingsListeners";
+import { setupListeners } from "./setupConfigBuilder";
+import { surveyListeners } from "./surveyListeners";
 import { togglListeners } from "./togglListener";
 
 export default function registerEvents() {
@@ -15,7 +15,7 @@ export default function registerEvents() {
   setupListeners();
   ankiListeners();
   surveyListeners();
-  DashboardListeners();
+  dashboardListeners();
   reportsListeners();
   settingsListeners();
 }

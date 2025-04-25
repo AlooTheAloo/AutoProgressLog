@@ -1,7 +1,7 @@
 import { app, Menu, nativeImage, Notification, shell, Tray } from "electron";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { runChecks } from "./DashboardListeners";
+import { runChecks } from "./dashboardListeners";
 import { runGeneration } from "../../../apl-backend/generate/generate";
 import { createWindow, win } from "..";
 import { setSyncing } from "../../../apl-backend/generate/sync";
@@ -71,14 +71,14 @@ export async function createAppBackend() {
         "app.asar.unpacked",
         "src",
         "assets",
-        "Logo.png",
+        "Logo.png"
       );
 
   let trayIcon = nativeImage.createFromPath(iconPath);
 
   if (trayIcon.isEmpty()) {
     console.error(
-      "Failed to load icon. Ensure the path is correct and the icon is compatible.",
+      "Failed to load icon. Ensure the path is correct and the icon is compatible."
     );
     return;
   }

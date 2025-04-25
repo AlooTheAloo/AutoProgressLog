@@ -6,7 +6,7 @@ import proc from "find-process";
 import { app, shell } from "electron";
 import path, { basename } from "path";
 import { kill } from "process";
-import { getSetupAnkiIntegration } from "../../electron/main/Electron-Backend/SetupConfigBuilder.js";
+import { getSetupAnkiIntegration } from "../../electron/main/Electron-Backend/setupConfigBuilder.js";
 import { win } from "../../electron/main/index.js";
 import { ankiPath } from "../Helpers/getConfig.js";
 import AnkiHTTPClient from "../entry/AnkiHTTPClient.js";
