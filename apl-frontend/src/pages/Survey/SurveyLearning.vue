@@ -37,6 +37,7 @@ import { useRouter } from "vue-router";
 import { onMounted, ref, watch } from "vue";
 import SelectButton from "primevue/selectbutton";
 import { useWindowSize } from "@vueuse/core";
+import { motion } from 'motion-v';
 
 const active = ref<string | undefined>("0");
 const panel = defineModel<number>("a");
@@ -209,121 +210,107 @@ function NextPage() {
 </script>
 
 <template>
+  <SetupBackground/>
+
   <div class="flex w-screen">
     <div
-      class="px-12 pb-12 flex flex-col w-full bg-black h-screen"
-      :style="{
-        paddingTop: height > 800 ? '3rem' : '0rem',
-      }"
+      class="p-4 sm:p-12
+             flex flex-col justify-between
+             h-screen w-full max-w-[60rem] bg-black"
     >
-      <div
-        class="pb-2"
-        :style="{
-          display: height > 800 ? 'block' : 'none',
-        }"
+      <div class="flex w-full items-center justify-between mb-6">
+        <img :src="Logo" alt="APL Logo" class="w-16 h-16 sm:w-20 sm:h-20"/>
+        <AccountDisplay/>
+      </div>
+      <motion.div
+        :initial="{ opacity: 0, y: 20, filter: 'blur(10px)' }"
+        :animate="{ opacity: 1, y: 0, filter: 'blur(0px)', transition:{ duration: 0.6 } }"
+        class="flex flex-col flex-1 space-y-6"
       >
-        <img :src="Logo" class="w-12 h-12" />
-      </div>
-      <div class="font-semibold text-white text-4xl py-4">
-        Tell us more about your learning journey.
-      </div>
-      <p class="text-sm"></p>
-      <div class="flex flex-col flex-grow">
-        <div class="p-2 bg-[#18181B] rounded-lg">
-          <Accordion v-model:value="active">
-            <AccordionPanel value="0">
-              <AccordionHeader>
-                <div class="font-semibold text-white text-2xl">
-                  What language are you learning?
-                </div>
-              </AccordionHeader>
-              <AccordionContent>
-                <p class="pb-4">
-                  If there are multiple languages you are learning, please
-                  select the one you're most comfortable with.
-                </p>
-                <Listbox
-                  :scrollHeight="height > 800 ? '300px' : height / 3 + 'px'"
-                  v-model="selectedLanguage"
-                  :options="languageList"
-                >
-                  <template
-                    #option="slotProps: {
-                      option: { label: string; value: string; flag: string };
-                      index: number;
-                    }"
-                  >
-                    <div class="w-full flex flex-col">
-                      <div class="flex flex-col jusitfy-center h-full">
-                        <div
-                          class="font-semibold text-md select-none flex items-center"
-                        >
-                          <div
-                            class="w-7 mr-2"
-                            v-html="slotProps.option.flag"
-                          />
-                          {{ slotProps.option.label }}
-                        </div>
-                      </div>
-                    </div>
-                  </template>
-                </Listbox>
-              </AccordionContent>
-            </AccordionPanel>
-            <AccordionPanel value="1">
-              <AccordionHeader>
-                <div class="font-semibold text-white text-2xl">
-                  How long have you been learning this language for?
-                </div>
-              </AccordionHeader>
-              <AccordionContent>
-                <p class="m-0 pb-2">
-                  A ballpark estimate of how long you've been learning this
-                  language for is fine. If the number fits between two options,
-                  select the closest one.
-                </p>
-                <SelectButton
-                  v-model="selectedYears"
-                  :options="timeList"
-                  optionLabel="value"
-                  dataKey="value"
-                  aria-labelledby="custom"
-                >
-                  <template #option="slotProps">
-                    <div
-                      v-tooltip.bottom="{
-                        value: slotProps.option.description,
-                        pt: {
-                          arrow: {
-                            style: {
-                              backgroundColor: '',
-                            },
-                          },
-                          text: {
-                            style: {
-                              fontSize: '0.8rem',
-                              textAlign: 'center',
-                              color: 'white',
-                            },
-                          },
-                        },
-                      }"
-                    >
-                      {{ slotProps.option.label }}
-                    </div>
-                  </template>
-                </SelectButton>
-              </AccordionContent>
-            </AccordionPanel>
-          </Accordion>
-        </div>
-      </div>
+        <h1
+          class="text-xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl
+                 font-semibold text-white leading-tight"
+        >
+          Tell us more about your learning journey.
+        </h1>
+        <p class="text-xs sm:text-sm lg:text-base text-[#C0C0C0] leading-relaxed">
+          We’d love to know which language you’re studying and for how long.
+        </p>
 
-      <Button
-        :disabled="selectedLanguage == null || selectedYears == null"
-        label="Continue"
-        @click="NextPage"
-      ></Button>
+        <Accordion v-model:value="active" class="bg-[#18181B] rounded-lg p-2 space-y-4">
+          <AccordionPanel value="0">
+            <AccordionHeader>
+              <div class="font-semibold text-white text-2xl">
+                What language are you learning?
+              </div>
+            </AccordionHeader>
+            <AccordionContent>
+              <p class="pb-4 text-[#C0C0C0]">
+                If you study multiple, choose the one you feel most comfortable with.
+              </p>
+              <Listbox
+                v-model="selectedLanguage"
+                :options="languageList"
+                optionLabel="label"
+                :scrollHeight="height > 800 ? '300px' : height/3 + 'px'"
+                class="w-full"
+              >
+                <template #option="{ option }">
+                  <div class="flex items-center gap-2 p-2 hover:bg-zinc-800 rounded cursor-pointer">
+                    <span class="w-6" v-html="option.flag"></span>
+                    <span class="text-white font-semibold">{{ option.label }}</span>
+                  </div>
+                </template>
+              </Listbox>
+            </AccordionContent>
+          </AccordionPanel>
+          <AccordionPanel value="1">
+            <AccordionHeader>
+              <div class="font-semibold text-white text-2xl">
+                How long have you been learning this language for?
+              </div>
+            </AccordionHeader>
+            <AccordionContent>
+              <p class="pb-2 text-[#C0C0C0]">
+                A rough estimate is fine—pick the closest range.
+              </p>
+              <SelectButton
+              v-model="selectedYears"
+              :options="timeList"
+              optionLabel="label"
+              dataKey="value"
+              class="w-full"
+              :optionStyle="{ width: '100%' }"
+            >
+              <template #option="{ option }">
+                <div
+                  v-tooltip.bottom="{
+                    value: option.description,
+                    pt: {
+                      arrow: { style: {} },
+                      text: { style: { fontSize: '0.8rem', textAlign: 'center', color: 'white' } }
+                    }
+                  }"
+                  class="w-full text-center px-4 py-2 hover:bg-zinc-800 rounded cursor-pointer text-white"
+                >
+                  {{ option.label }}
+                </div>
+              </template>
+            </SelectButton>
+            </AccordionContent>
+          </AccordionPanel>
+        </Accordion>
+      </motion.div>
+
+      <div class="flex justify-end mt-8">
+        <Button
+          label="Continue"
+          @click="NextPage"
+          class="w-[300px] p-3 !rounded-full"
+          :disabled="!selectedLanguage || !selectedYears"
+        />
+      </div>
     </div>
+    <div class="flex-grow"></div>
   </div>
 </template>

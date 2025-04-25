@@ -11,7 +11,6 @@ onMounted(async () => {
 </script>
 <template>
   <div class="flex gap-5 items-center justify-between">
-    <img :src="Logo" class="w-12 h-12" />
     <div
       class="flex gap-2 items-center justify-center"
       v-if="account !== undefined"
