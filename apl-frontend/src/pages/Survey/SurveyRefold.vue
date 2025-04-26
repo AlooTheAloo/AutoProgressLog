@@ -6,6 +6,7 @@ import { useRouter } from "vue-router";
 import RadioButton from "primevue/radiobutton";
 import { onMounted } from "vue";
 import SelectButton from "primevue/selectbutton";
+import { motion } from 'motion-v'
 
 const hasSeenRefold = defineModel<boolean | undefined>("refold");
 const selectedStage = defineModel<any | undefined>("stage");
@@ -89,98 +90,96 @@ function NextPage() {
     });
 }
 </script>
-
 <template>
+  <SetupBackground/>
   <div class="flex w-screen">
-    <div class="p-12 flex flex-col w-full bg-black h-screen">
-      <div class="pb-2">
-        <img :src="Logo" class="w-12 h-12" />
+    <div
+      class="p-4 sm:p-12 flex flex-col justify-between
+             h-screen w-full max-w-[60rem] bg-black"
+    >
+      <div class="flex w-full items-center justify-between mb-6">
+        <img :src="Logo" alt="APL Logo" class="w-16 h-16 sm:w-20 sm:h-20"/>
+        <AccountDisplay/>
       </div>
-      <div class="font-semibold text-white text-4xl">
-        Have you heard of the Refold language learning methodology?
-      </div>
-      <p class="text-sm"></p>
-      <div class="flex flex-col flex-grow">
-        <div class="py-10">
-          <div class="flex flex-col flex-wrap gap-4 text-xl">
-            <div class="flex items-center">
-              <RadioButton
-                v-model="hasSeenRefold"
-                inputId="Yes"
-                name="hasSeenRefold"
-                :value="true"
-              />
-              <label for="ingredient1" class="ml-2">Yes 🤘 </label>
-            </div>
-            <div class="flex items-center">
-              <RadioButton
-                v-model="hasSeenRefold"
-                inputId="No"
-                name="hasSeenRefold"
-                :value="false"
-              />
-              <label for="ingredient4" class="ml-2">
-                Never heard of it 🤔</label
-              >
-            </div>
-          </div>
-        </div>
-        <div>
-          <div
-            class="flex flex-col flex-wrap gap-4 text-xl"
-            v-if="hasSeenRefold"
-          >
-            <div class="flex flex-col flex-grow py-4">
-              <div class="font-semibold text-white text-2xl">
-                What stage of Refold do you estimate to be at?
-              </div>
-              <p class="text-sm pb-2">
-                You can hover over the stages to see what they mean.
-              </p>
-              <SelectButton
-                v-model="selectedStage"
-                :options="options"
-                optionLabel="value"
-                dataKey="value"
-                aria-labelledby="custom"
-              >
-                <template #option="slotProps">
-                  <div
-                    v-tooltip.bottom="{
-                      value: slotProps.option.description,
-                      pt: {
-                        arrow: {
-                          style: {
-                            backgroundColor: '',
-                          },
-                        },
-                        text: {
-                          style: {
-                            fontSize: '0.8rem',
-                            textAlign: 'center',
-                            color: 'white',
-                          },
-                        },
-                      },
-                    }"
-                  >
-                    {{ slotProps.option.label }}
-                  </div>
-                </template>
-              </SelectButton>
-            </div>
-          </div>
-        </div>
-      </div>
+      <motion.div
+        :initial="{ opacity: 0, y: 20, filter: 'blur(10px)' }"
+        :animate="{ opacity: 1, y: 0, filter: 'blur(0px)', transition:{ duration:0.6 } }"
+        class="flex flex-col flex-1 space-y-6"
+      >
+        <BackButton route="/survey/refold-intro"/>
 
-      <Button
-        :disabled="
-          selectedStage == null &&
-          (hasSeenRefold == true || hasSeenRefold == undefined)
-        "
-        label="Continue"
-        @click="NextPage"
-      ></Button>
+        <h1 class="text-xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl
+                   font-semibold text-white leading-tight">
+          Have you heard of the Refold language learning methodology?
+        </h1>
+        <p class="text-xs sm:text-sm lg:text-base text-[#C0C0C0] leading-relaxed">
+          An easy‐to‐follow process that takes you from zero to fluent.
+        </p>
+
+        <div class="space-y-4">
+          <div class="flex items-center gap-2">
+            <RadioButton
+              v-model="hasSeenRefold"
+              inputId="yes"
+              name="refold"
+              :value="true"
+            />
+            <label for="yes" class="text-lg text-white">Yes 🤘</label>
+          </div>
+          <div class="flex items-center gap-2">
+            <RadioButton
+              v-model="hasSeenRefold"
+              inputId="no"
+              name="refold"
+              :value="false"
+            />
+            <label for="no" class="text-lg text-white">Never heard of it 🤔</label>
+          </div>
+        </div>
+
+        <div v-if="hasSeenRefold" class="mt-6 w-full">
+          <h2 class="text-2xl font-semibold text-white mb-2">
+            What stage of Refold do you estimate to be at?
+          </h2>
+          <p class="text-xs sm:text-sm lg:text-base text-[#C0C0C0] mb-4">
+            Hover over each stage to learn more.
+          </p>
+
+          <SelectButton
+            v-model="selectedStage"
+            :options="options"
+            optionLabel="label"
+            dataKey="value"
+            class="w-full"
+            :optionStyle="{ width: '100%' }"
+          >
+            <template #option="slotProps">
+              <div
+                v-tooltip.bottom="{
+                  value: slotProps.option.description,
+                  pt: {
+                    arrow: { style: {} },
+                    text: { style: { fontSize:'0.8rem', textAlign:'center', color:'#fff' } }
+                  }
+                }"
+                class="w-full px-4 py-2 hover:bg-zinc-800 rounded cursor-pointer text-white text-center"
+              >
+                {{ slotProps.option.label }}
+              </div>
+            </template>
+          </SelectButton>
+        </div>
+      </motion.div>
+      <div class="flex justify-end mt-8">
+        <Button
+          label="Continue"
+          @click="NextPage"
+          class="w-[300px] p-3 !rounded-full"
+          :disabled="hasSeenRefold && !selectedStage"
+        />
+      </div>
     </div>
+
+    <div class="flex-grow"></div>
   </div>
 </template>

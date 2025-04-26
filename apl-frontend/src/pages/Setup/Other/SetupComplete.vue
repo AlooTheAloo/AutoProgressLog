@@ -4,6 +4,7 @@ import { useRoute, useRouter } from "vue-router";
 import SetupBackground from "../../../components/Setup/SetupBackground.vue";
 import Button from "primevue/button";
 import { onMounted } from "vue";
+import { motion } from 'motion-v';
 
 const router = useRouter();
 
@@ -19,25 +20,27 @@ onMounted(() => {
 </script>
 
 <template>
-  <SetupBackground></SetupBackground>
+  <SetupBackground />
+  <div class="flex">
 
-  <div class="flex w-screen">
-    <div class="p-12 flex flex-col w-2/3 bg-black h-screen">
-      <div>
-        <img :src="Logo" class="w-12 h-12" />
-      </div>
-      <div
-        class="text-white flex flex-col flex-grow justify-center gap-2 text-left font-semibold text-4xl"
+    <div class="p-12 w-full max-w-[60rem] bg-black min-h-screen flex flex-col justify-center">
+      <motion.div
+        :initial="{ opacity: 0, y: 20, filter: 'blur(10px)' }"
+        :animate="{ opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 1 } }"
+        class="flex flex-col items-start space-y-8"
       >
-        You're done !
-        <br />
-        Enjoy using AutoProgressLog!
-      </div>
-      <Button
-        label="Go to dashboard"
-        @click="NextPage"
-        class="w-full text-white font-semibold text-xl rounded-xl p-2 mt-10"
-      />
+        <img :src="Logo"alt="APL Logo"class="w-24 h-24 md:w-20 md:h-20 sm:w-16 sm:h-16 block"/>
+        <h1 class="text-6xl font-semibold text-white leading-tight">
+          You're all set!<br/>
+          Enjoy the app<span class="text-[#0FB4EC]">!</span>
+        </h1>
+        <Button
+          @click="NextPage"
+          class="w-[300px] p-3 !rounded-full self-start"
+        >
+          <span class="text-xl font-bold text-black">Go to dashboard</span>
+        </Button>
+      </motion.div>
     </div>
   </div>
 </template>

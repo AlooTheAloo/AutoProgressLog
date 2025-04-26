@@ -1,30 +1,34 @@
 <script setup lang="ts">
-import Logo from "../../../assets/Logo.png";
-import SetupBackground from "../../../components/Setup/SetupBackground.vue";
-import Button from "primevue/button";
-import BackButton from "../../../components/Common/BackButton.vue";
-import Password from "primevue/password";
-import { useRouter } from "vue-router";
-import { motion } from 'motion-v';
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+
+import Logo from "../../../assets/Logo.png"
+import SetupBackground from "../../../components/Setup/SetupBackground.vue"
+import Button from "primevue/button"
+import BackButton from "../../../components/Common/BackButton.vue"
+import Password from "primevue/password"
+import { motion } from 'motion-v'
 import ToggleIcon from '../../../assets/Toggl.svg'
+import { useWindowSize } from "@vueuse/core"
 
-const apiKey = defineModel<string>("");
+const apiKey = ref('')
+const router = useRouter()
+const { height } = useWindowSize()
 
-const router = useRouter();
 function OpenTogglTrackPage() {
-  window.ipcRenderer.invoke("OpenExternal", "https://track.toggl.com/profile");
+  window.ipcRenderer.invoke("OpenExternal", "https://track.toggl.com/profile")
 }
 
 function CreateAccount() {
-  window.ipcRenderer.invoke(
-    "OpenExternal",
-    "https://accounts.toggl.com/track/signup/",
-  );
+  window.ipcRenderer.invoke("OpenExternal", "https://accounts.toggl.com/track/signup/")
 }
 
 async function NextPage() {
-  await window.ipcRenderer.invoke("toggl-api-key-set", apiKey.value);
-  router.push("/setup/toggl-success");
+  if (!apiKey.value.trim()) {
+    return
+  }
+  await window.ipcRenderer.invoke("toggl-api-key-set", apiKey.value)
+  router.push("/setup/toggl-success")
 }
 </script>
 
@@ -95,7 +99,9 @@ async function NextPage() {
       <div class="flex justify-end">
         <Button
           @click="NextPage"
+          :disabled="!apiKey"
           class="w-[300px] p-3 !rounded-full"
+          :class="!apiKey ? 'opacity-50 cursor-not-allowed' : 'opacity-100'"
           >
           <span class="text-xl font-bold text-black">Continue</span>
         </Button>
