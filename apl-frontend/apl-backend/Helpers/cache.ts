@@ -25,6 +25,8 @@ export class CacheManager {
 
   static exists = fs.existsSync(cache_location);
   static init = (time: number) => {
+    console.log("Init time");
+
     this.set({
       list: [
         {

@@ -11,6 +11,7 @@ import {
 import { existsSync, writeFileSync } from "fs";
 import {
   configPath,
+  getConfig,
   syncDataPath,
 } from "../../../apl-backend/Helpers/getConfig";
 import sqlite3 from "sqlite3";
@@ -83,26 +84,36 @@ export function setupListeners() {
   ipcMain.handle("anki-deck-select", async (event: any, arg: number[]) => {
     if (config?.anki?.options == undefined) return;
     config.anki.options.trackedDecks = arg;
+    if (arg.length == 0) {
+      config.anki = {
+        enabled: false,
+        options: undefined,
+      };
+    }
   });
 
   ipcMain.handle("SetupComplete", (event: any, arg: any) => {
-    console.log("setup complete :yippe:");
     win?.webContents.send("is-setup-complete", true);
   });
 
-  ipcMain.handle("SaveConfig", (event: any, arg: any) => {
+  ipcMain.handle("SaveConfig", async (event: any, arg: any) => {
     if (existsSync(configPath)) return;
     writeFileSync(configPath, JSON.stringify(config));
-    let db = new sqlite3.Database(
-      syncDataPath,
-      sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE,
-      async (err) => {
-        const time = await CreateDB(db);
-        if (time == undefined) return;
-        CacheManager.init(time);
-      }
-    );
-    buildContextMenu();
+    await new Promise<void>((res, rej) => {
+      let db = new sqlite3.Database(
+        syncDataPath,
+        sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE,
+        async (err) => {
+          const time = await CreateDB(db);
+          if (time == undefined) return;
+          CacheManager.init(time);
+          res();
+        }
+      );
+    });
+    await buildContextMenu();
+    console.log("Done!!");
+    return;
   });
 
   ipcMain.handle("SetOutputFile", (event: any, arg: any) => {

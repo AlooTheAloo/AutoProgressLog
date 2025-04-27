@@ -26,20 +26,31 @@ export async function getLiveActivity() {
   return entries;
 }
 
-export async function getTimeEntries(since: string | number) {
+export async function getTimeEntries(sinceDayjs: dayjs.Dayjs) {
+  let since = sinceDayjs.valueOf();
   try {
-    if (toggl == undefined) {
-      toggl = new Toggl({
-        auth: {
-          token: getConfig()?.toggl.togglToken ?? "",
-        },
-      });
+    console.log("Config togglToken is " + getConfig()?.toggl.togglToken);
+    console.log("creating new toggl");
+    toggl = new Toggl({
+      auth: {
+        token: getConfig()?.toggl.togglToken ?? "",
+      },
+    });
+
+    console.log(await toggl.me.get());
+
+    console.log("Before changing, since is " + since);
+    const compare = dayjs().subtract(3, "month").add(1, "day");
+    if (dayjs(since).isBefore(compare)) {
+      console.log(
+        "Yes, " + since + " is before " + compare.valueOf().toString()
+      );
+      since = compare.valueOf();
     }
 
-    if (dayjs(since).isBefore(dayjs().subtract(3, "month").add(1, "minute"))) {
-      since = dayjs().subtract(3, "month").add(1, "minute").unix().toString();
-    }
-
+    const what = dayjs(since).toISOString();
+    console.log("Since is " + since);
+    console.log("In nice terms, since is " + what);
     const start = dayjs();
     const entries: entry[] = await toggl.timeEntry.list({
       since: dayjs(since).unix().toString(),
@@ -90,6 +101,7 @@ onConfigChange.on(
       if (newConfig.toggl.togglToken == "") {
         toggl = undefined;
       } else {
+        console.log("creating new toggl");
         toggl = new Toggl({
           auth: {
             token: newConfig.toggl.togglToken,

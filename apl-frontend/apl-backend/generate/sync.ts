@@ -168,14 +168,18 @@ export async function syncAnki(isReport = false): Promise<AnkiSyncData | null> {
     return null;
   }
   if (
-    Number.isNaN(lastEntry.anki?.lastAnkiUpdate) &&
+    Number.isNaN(Number(lastEntry.anki?.lastAnkiUpdate)) &&
     lastEntry.anki != undefined
   ) {
     lastEntry.anki.lastAnkiUpdate = lastEntry.generationTime;
   }
-  const cardReview = await getAnkiCardReviewCount(
-    dayjs(lastEntry.anki?.lastAnkiUpdate ?? lastEntry.generationTime)
-  );
+
+  let time = Number(lastEntry.anki?.lastAnkiUpdate);
+  if (time == undefined || Number.isNaN(time)) {
+    time = lastEntry.generationTime;
+  }
+
+  const cardReview = await getAnkiCardReviewCount(dayjs(time));
   const matureCards = await getMatureCards();
   const retention = await getRetention(anki.options.retentionMode);
   const lastUpdate = isReport
@@ -261,7 +265,7 @@ export async function syncToggl(): Promise<{
   const startSync = await GetLastEntry();
 
   if (startSync == null) return null;
-  const entries = await getTimeEntries(lastReportTime);
+  const entries = await getTimeEntries(dayjs(lastReportTime));
 
   if (entries == null) return null;
   const delta = await VerifyPreviousActivities(

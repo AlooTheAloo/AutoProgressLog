@@ -13,8 +13,8 @@ export const getFileInAPLData = (file: string) =>
   path.join(
     environment == "electron"
       ? electron.app.getPath("userData")
-      : (process.env.APL_DATA_PATH ?? ""),
-    file,
+      : process.env.APL_DATA_PATH ?? "",
+    file
   );
 
 const environment: "electron" | "node" =
@@ -31,6 +31,7 @@ export function updateConfig() {
 export function getConfig(): Options | null {
   if (config == null) {
     if (!fs.existsSync(configPath)) {
+      console.log("Unable to find config");
       return null;
     }
 

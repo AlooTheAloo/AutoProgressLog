@@ -70,3 +70,5 @@ import Storage from "./Storage";
 // fixUnicaseCollation(
 //   "/Users/philipanthony-davis/Library/Application Support/autoprogresslog/anki.db"
 // );
+
+// getTimeEntries(1738012699);

@@ -144,7 +144,7 @@ export default class AnkiHTTPClient {
       },
       true
     );
-
+    console.log("obj is " + obj);
     if (obj == undefined) return false;
     writeFileSync(filePath, obj);
     return true;
