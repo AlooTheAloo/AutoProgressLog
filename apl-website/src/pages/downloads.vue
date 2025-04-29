@@ -156,8 +156,6 @@ function getPlatform(): Platform {
   return "other";
 }
 
-// prout
-
 const nicerName = computed(() => {
   switch (platform.value) {
     case "windows":
