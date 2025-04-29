@@ -3,12 +3,13 @@ import sqlite3 from "sqlite3";
 import { getTimeEntries } from "../../toggl/toggl-service";
 
 export async function CreateDB(
-  db: sqlite3.Database,
+  db: sqlite3.Database
 ): Promise<number | undefined> {
   const entries = await getTimeEntries(
-    dayjs().subtract(3, "month").add(1, "minute").valueOf(),
+    dayjs().subtract(3, "month").add(1, "day")
   );
 
+  console.log("entries are " + JSON.stringify(entries));
   const fullTime = entries?.allEvents.reduce((acc, x) => {
     return acc + x.activitySeconds;
   }, 0);
@@ -42,9 +43,9 @@ export async function CreateDB(
         0,
         0,
         0,
-        "Full",
+        "Full"
       );
-    },
+    }
   );
 
   db.run(
@@ -72,9 +73,9 @@ export async function CreateDB(
 
       db.run(
         `INSERT INTO immersionActivity (id, syncDataId, time, seconds, activityName) VALUES ${placeholders}`,
-        values,
+        values
       );
-    },
+    }
   );
 
   return fullTime;

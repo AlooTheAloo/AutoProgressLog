@@ -203,14 +203,17 @@ export function buildJSON(
     (builderDTO.timeToAdd == 0 ? -lastCache.immersionStreak : 1);
 
   let lastnElements = lastCaches
+    .filter((x) => x.reportNo != 0)
     .slice(0, MOVING_AVERAGE_SIZE)
     .map((x) => x.seconds);
   const oldAverage = arithmeticWeightedMean(lastnElements);
-
+  console.log("LastnElements are " + JSON.stringify(lastnElements));
   const newnElements = [
     builderDTO.timeToAdd,
-    ...lastnElements.slice(0, lastnElements.length - 1),
+    ...lastnElements.slice(0, MOVING_AVERAGE_SIZE - 1),
   ];
+  console.log("NewnElements are " + JSON.stringify(newnElements));
+
   const newAverage = arithmeticWeightedMean(newnElements);
 
   const ImmersionScore = builderDTO.timeToAdd;

@@ -6,8 +6,8 @@ import { onMounted, ref, watch } from "vue";
 import AnimatedBeam from "../ui/animated-beam/AnimatedBeam.vue";
 import GlowBorder from "../ui/glow-border/GlowBorder.vue";
 import AplLogo from "../../assets/Logo.png";
-import TogglLogo from "../../assets/Toggl_LOGO.png";
-import AnkiLogo from "../../assets/Anki_LOGO.png";
+import TogglLogo from "../../assets/Toggl_logo.png";
+import AnkiLogo from "../../assets/Anki_logo.png";
 import DiscordLogo from "../../assets/discord_logo.webp";
 
 const { width } = useWindowSize();

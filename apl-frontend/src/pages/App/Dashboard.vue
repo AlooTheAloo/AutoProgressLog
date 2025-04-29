@@ -179,7 +179,7 @@ const closeFirstDialog = () => {
   <div v-else class="flex flex-col w-full h-full">
     <div class="flex flex-col flex-grow w-full h-full">
       <div class="flex w-full h-20 items-center px-10 my-5 justify-between">
-        <div class="flex flex-col min-w-0 flex-grow">
+        <div class="flex flex-col w-0 flex-grow">
           <h1
             class="flex items-center gap-2 bg-gradient-to-r bg-clip-text text-xl xl:text-4xl font-extrabold text-transparent from-[#89BDFF] to-[#40ffff]"
           >

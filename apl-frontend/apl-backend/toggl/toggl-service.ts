@@ -26,18 +26,18 @@ export async function getLiveActivity() {
   return entries;
 }
 
-export async function getTimeEntries(since: string | number) {
+export async function getTimeEntries(sinceDayjs: dayjs.Dayjs) {
+  let since = sinceDayjs.valueOf();
   try {
-    if (toggl == undefined) {
-      toggl = new Toggl({
-        auth: {
-          token: getConfig()?.toggl.togglToken ?? "",
-        },
-      });
-    }
+    toggl = new Toggl({
+      auth: {
+        token: getConfig()?.toggl.togglToken ?? "",
+      },
+    });
 
-    if (dayjs(since).isBefore(dayjs().subtract(3, "month").add(1, "minute"))) {
-      since = dayjs().subtract(3, "month").add(1, "minute").unix().toString();
+    const compare = dayjs().subtract(3, "month").add(1, "day");
+    if (dayjs(since).isBefore(compare)) {
+      since = compare.valueOf();
     }
 
     const start = dayjs();
@@ -90,6 +90,7 @@ onConfigChange.on(
       if (newConfig.toggl.togglToken == "") {
         toggl = undefined;
       } else {
+        console.log("creating new toggl");
         toggl = new Toggl({
           auth: {
             token: newConfig.toggl.togglToken,

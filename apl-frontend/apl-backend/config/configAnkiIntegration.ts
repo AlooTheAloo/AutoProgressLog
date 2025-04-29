@@ -29,30 +29,38 @@ export async function getDecksCards(): Promise<deck[]> {
 
   const prefsDB = new sqlite3.Database(ankiDB, (err) => {});
   return await new Promise((res, rej) => {
-    prefsDB.all(
-      `SELECT COUNT(*) as "cardCount", did FROM cards group by did;`,
-      async (err, rowsTop: { cardCount: number; did: number }[]) => {
-        console.log("error was " + err);
-        const ret = await Promise.all(
-          rowsTop.map(async (row) => {
-            return await new Promise<deck>((res, rej) => {
-              prefsDB.all(
-                `SELECT name FROM decks WHERE id = ${row.did};`,
-                (err, rows: any) => {
-                  res({
-                    cardCount: row.cardCount,
-                    name: rows[0].name,
-                    id: row.did,
-                  });
-                }
-              );
-            });
-          })
-        );
-        prefsDB.close();
-        res(ret);
-      }
-    );
+    if (
+      prefsDB.all(
+        "SELECT name FROM sqlite_master WHERE type='table' AND name='cards'"
+      )
+    )
+      prefsDB.all(
+        `SELECT COUNT(*) as "cardCount", did FROM cards group by did;`,
+        async (err, rowsTop: { cardCount: number; did: number }[]) => {
+          if (err) {
+            res([]);
+            return;
+          }
+          const ret = await Promise.all(
+            rowsTop.map(async (row) => {
+              return await new Promise<deck>((res, rej) => {
+                prefsDB.all(
+                  `SELECT name FROM decks WHERE id = ${row.did};`,
+                  (err, rows: any) => {
+                    res({
+                      cardCount: row.cardCount,
+                      name: rows[0].name,
+                      id: row.did,
+                    });
+                  }
+                );
+              });
+            })
+          );
+          prefsDB.close();
+          res(ret);
+        }
+      );
   });
 }
 

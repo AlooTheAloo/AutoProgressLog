@@ -57,10 +57,6 @@ const handleClick = (path: string | undefined) => {
   router.push(path);
 };
 
-const openHelpCenter = () => {
-  window.ipcRenderer.invoke("OpenExternal", HELP_PAGE_URL);
-};
-
 const props = defineProps<{
   currentRoute: AppPath;
 }>();
@@ -238,15 +234,23 @@ const toastValue = ref<UserDialog>();
             <div class="font-semibold text-white xl:block hidden">Settings</div>
           </div>
         </router-link>
-        <button
-          :onclick="openHelpCenter"
-          class="flex items-center px-2 xl:justify-start justify-center gap-2 w-full"
+        <router-link
+          to="/app/help"
+          class="flex items-center xl:justify-start justify-center gap-2 w-full"
         >
-          <img :src="Help" class="w-6 h-6" />
-          <div class="font-semibold text-white xl:block hidden">
-            Help center
+          <div
+            class="flex items-center xl:justify-start justify-center gap-2 w-full h-10 rounded-xl px-2"
+            :style="{
+              backgroundColor:
+                props.currentRoute == '/app/help' ? '#24CAFF' : '',
+            }"
+          >
+            <img :src="Help" class="w-6 h-6" />
+            <div class="font-semibold text-white xl:block hidden">
+              Help center
+            </div>
           </div>
-        </button>
+        </router-link>
       </div>
     </div>
     <div class="flex-1">
