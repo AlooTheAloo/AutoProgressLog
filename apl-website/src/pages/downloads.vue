@@ -67,7 +67,11 @@
               :src="windows_apl"
               width="700"
             />
-            <img v-else-if="platform == 'linux'" :src="linux_apl" width="1000" />
+            <img
+              v-else-if="platform == 'linux'"
+              :src="linux_apl"
+              width="1000"
+            />
           </div>
         </div>
       </div>
@@ -151,6 +155,8 @@ function getPlatform(): Platform {
   if (agent.indexOf("Linux") != -1) return "linux";
   return "other";
 }
+
+// prout
 
 const nicerName = computed(() => {
   switch (platform.value) {
