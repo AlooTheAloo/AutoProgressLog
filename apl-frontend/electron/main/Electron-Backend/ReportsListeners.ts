@@ -53,6 +53,32 @@ export function reportsListeners() {
     }
   });
 
+  ipcMain.handle("Get-Image", async (event, id: string) => {
+    const report = CacheManager.get().list.find(
+      (x) => x.reportNo.toString() == id
+    );
+    if (report) {
+      const fileExists = await fsPromises
+        .access(report.path)
+        .then(() => true)
+        .catch(() => false);
+      let resizedBase64: string = "";
+      if (fileExists) {
+        // Read the image file
+        const file = await fsPromises.readFile(report.path);
+        const sharpFile = await sharp(file);
+        // Resize the image using sharp and convert it to base64
+        resizedBase64 = await sharpFile
+          .toBuffer()
+          .then((buffer) => buffer.toString("base64")) // Convert buffer to base64
+          .catch((err) => {
+            throw new Error("Error resizing image");
+          });
+      }
+      return resizedBase64;
+    }
+  });
+
   ipcMain.handle("Open-Report", async (event, id: string) => {
     const report = CacheManager.get().list.find(
       (x) => x.reportNo.toString() == id
@@ -96,7 +122,8 @@ export function reportsListeners() {
   });
 
   ipcMain.handle("Get-Images", async (event, start, end) => {
-    const scaleFactor = 0.1;
+    const startTime = dayjs();
+    const scaleFactor = 0.05;
     const images = await Promise.all(
       CacheManager.get()
         .list.filter((x) => x.reportNo != 0)
@@ -129,7 +156,8 @@ export function reportsListeners() {
           return resizedBase64;
         })
     );
-
+    const endTime = dayjs();
+    console.log("Images took " + (endTime.diff(startTime, "ms") + " ms"));
     return {
       start: start,
       images: images,

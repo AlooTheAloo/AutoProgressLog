@@ -29,28 +29,17 @@ export async function getLiveActivity() {
 export async function getTimeEntries(sinceDayjs: dayjs.Dayjs) {
   let since = sinceDayjs.valueOf();
   try {
-    console.log("Config togglToken is " + getConfig()?.toggl.togglToken);
-    console.log("creating new toggl");
     toggl = new Toggl({
       auth: {
         token: getConfig()?.toggl.togglToken ?? "",
       },
     });
 
-    console.log(await toggl.me.get());
-
-    console.log("Before changing, since is " + since);
     const compare = dayjs().subtract(3, "month").add(1, "day");
     if (dayjs(since).isBefore(compare)) {
-      console.log(
-        "Yes, " + since + " is before " + compare.valueOf().toString()
-      );
       since = compare.valueOf();
     }
 
-    const what = dayjs(since).toISOString();
-    console.log("Since is " + since);
-    console.log("In nice terms, since is " + what);
     const start = dayjs();
     const entries: entry[] = await toggl.timeEntry.list({
       since: dayjs(since).unix().toString(),
