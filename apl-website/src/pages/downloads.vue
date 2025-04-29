@@ -61,13 +61,13 @@
 
         <div class="lg:block hidden">
           <div class="flex">
-            <img v-if="platform == 'mac'" :src="macos_apl" width="300" />
+            <img v-if="platform == 'mac'" :src="macos_apl" width="1000" />
             <img
               v-else-if="platform == 'windows'"
               :src="windows_apl"
-              width="300"
+              width="700"
             />
-            <img v-else :src="linux_apl" width="300" />
+            <img v-else-if="platform == 'linux'" :src="linux_apl" width="1000" />
           </div>
         </div>
       </div>
@@ -144,7 +144,7 @@ type Platform = "windows" | "mac" | "linux" | "other" | "all";
 const platform = ref<Platform>(getPlatform());
 
 function getPlatform(): Platform {
-  return "linux";
+  return "other";
   const agent = window.navigator.userAgent;
   if (agent.indexOf("Windows") != -1) return "windows";
   if (agent.indexOf("Mac") != -1) return "mac";
