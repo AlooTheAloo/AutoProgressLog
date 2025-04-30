@@ -179,18 +179,23 @@ const closeFirstDialog = () => {
     <ProgressSpinner />
   </div>
   <div v-else class="flex flex-col w-full h-full">
-    <div>
-      <img v-if="dto.profile_picture.isUrl" :src="dto.profile_picture.buffer" />
-      <div v-else>
-        <img
-          :src="'data:image/png;base64,' + dto.profile_picture.buffer"
-          class="w-14 h-14 sm:w-20 sm:h-20"
-        />
-      </div>
-    </div>
-
     <div class="flex flex-col flex-grow w-full h-full">
-      <div class="flex w-full h-20 items-center px-10 my-5 justify-between">
+      <div
+        class="flex w-full h-20 items-center px-10 my-5 justify-between gap-5"
+      >
+        <div class="ml-14">
+          <img
+            v-if="dto.profile_picture.isUrl"
+            :src="dto.profile_picture.buffer"
+            class="rounded-full"
+          />
+          <div v-else>
+            <img
+              :src="'data:image/png;base64,' + dto.profile_picture.buffer"
+              class="w-14 h-14 sm:w-20 sm:h-20 rounded-full"
+            />
+          </div>
+        </div>
         <div class="flex flex-col w-0 flex-grow">
           <h1
             class="flex items-center gap-2 bg-gradient-to-r text-xl xl:text-4xl font-bold"
