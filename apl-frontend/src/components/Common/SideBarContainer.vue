@@ -66,10 +66,11 @@ const glow = ref<boolean>(false);
 
 onMounted(() => {
   window.ipcRenderer.invoke("GetConfig").then((data: Options) => {
-    glow.value = data.appreance.glow;
+    console.log(data);
+    glow.value = data.appearance.glow;
   });
   window.ipcRenderer.on("config-change", (e, args: Options) => {
-    glow.value = args.appreance.glow;
+    glow.value = args.appearance.glow;
   });
 
   window.ipcRenderer.on("ShowDialog", (evt, args: UserDialog) => {

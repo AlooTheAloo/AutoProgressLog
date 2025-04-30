@@ -23,6 +23,27 @@ interface previous_config {
   outputOptions: OutputOptions;
 }
 
+interface new_config {
+  general: {
+    autogen: ConditionalOption<ServerOptions>;
+    discordIntegration: boolean;
+  };
+  account: {
+    userName: string;
+    profile_Picture: string;
+  };
+  appearance: {
+    glow: boolean;
+  };
+  toggl: {
+    togglToken: string;
+  };
+  anki: ConditionalOption<AnkiOptions> & {
+    ankiIntegration?: ankiIntegration;
+  };
+  outputOptions: OutputOptions;
+}
+
 type ConditionalOption<T> =
   | { enabled: true; options: T }
   | { enabled: false; options?: undefined };
@@ -84,6 +105,9 @@ interface ankiIntegration {
   key: string;
 }
 
+const defaultProfilePicture =
+  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR4aJxpLDs-i-t-xiNj4uNHz1mhNpCJpR21DQ&s";
+
 export default async function upgrade_1_0_1() {
   if (new SemVer(CacheManager.get().version).compare("1.0.1") > -1) {
     return;
@@ -95,16 +119,17 @@ export default async function upgrade_1_0_1() {
   const hadIntegration = config.anki.ankiIntegration != undefined;
   delete config.anki.ankiIntegration;
 
-  const new_config: Options = getConfig() as Options;
+  const new_config: new_config = getConfig() as new_config;
   if (hadIntegration) {
     new_config.anki.ankiIntegration = {
       url: DEFAULT_ANKI_URL,
       key: "",
     };
   }
-  new_config.appreance = {
+  new_config.appearance = {
     glow: true,
   };
+  new_config.account.profile_Picture = defaultProfilePicture;
 
   console.log("New config is " + JSON.stringify(new_config));
   setConfig(new_config);

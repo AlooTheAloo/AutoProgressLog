@@ -27,8 +27,11 @@ function JoinTrackedDecks(table_primary_key: string = "revlog.cid") {
   )})`;
 }
 
-export async function getAnkiCardReviewCount(startTime: Dayjs) {
-  console.log(startTime.valueOf());
+export async function getAnkiCardReviewCount(
+  startTime: Dayjs,
+  endTime: Dayjs = dayjs()
+) {
+  console.log("getting reviews since : " + startTime.valueOf());
   return new Promise<number | null>((res, rej) => {
     console.log(
       `SELECT COUNT(*) as "reviews" FROM revlog ${JoinTrackedDecks()} AND revlog.id > ${startTime.valueOf()}`
@@ -37,8 +40,8 @@ export async function getAnkiCardReviewCount(startTime: Dayjs) {
     const db = open();
     // Execute SQL query
     db.all(
-      `SELECT COUNT(*) as "reviews" FROM revlog ${JoinTrackedDecks()} AND revlog.id > ?`,
-      startTime.valueOf(),
+      `SELECT COUNT(*) as "reviews" FROM revlog ${JoinTrackedDecks()} AND revlog.id > ? AND revlog.id < ?`,
+      [startTime.valueOf(), endTime.valueOf()],
       (err, rows: reviewsrow[]) => {
         if (err) {
           console.log(err);
