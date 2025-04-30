@@ -27,6 +27,7 @@ let account: TogglAccount;
 const DEFAULT_CONFIG: Options = {
   account: {
     userName: "",
+    profilePicture: "",
   },
   general: {
     autogen: {
@@ -42,7 +43,7 @@ const DEFAULT_CONFIG: Options = {
     enabled: false,
     ankiIntegration: undefined,
   },
-  appreance: {
+  appearance: {
     glow: true,
   },
   outputOptions: {
@@ -202,6 +203,7 @@ export function setupListeners() {
     };
     config.account = {
       userName: me.fullname,
+      profilePicture: me.image_url,
     };
   });
 

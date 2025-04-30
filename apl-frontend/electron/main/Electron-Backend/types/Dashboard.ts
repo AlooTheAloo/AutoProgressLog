@@ -1,5 +1,6 @@
 export type DashboardDTO = {
   userName: string;
+  profile_picture: ProfilePicture;
   lastSyncTime: string;
   lastReportTime: string;
   immersionDTO: ImmersionDTO;
@@ -7,6 +8,11 @@ export type DashboardDTO = {
   monthlyScore: number;
   syncCount: number;
   nextReport: string;
+};
+
+export type ProfilePicture = {
+  buffer: string;
+  isUrl: boolean;
 };
 
 export type AnkiDTO = {

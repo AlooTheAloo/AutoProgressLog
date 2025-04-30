@@ -5,8 +5,9 @@ export interface Options {
   };
   account: {
     userName: string;
+    profilePicture: string;
   };
-  appreance: {
+  appearance: {
     glow: boolean;
   };
   toggl: {
