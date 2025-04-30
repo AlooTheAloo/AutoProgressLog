@@ -3,10 +3,12 @@ import sqlite3 from "sqlite3";
 import { getTimeEntries } from "../../toggl/toggl-service";
 
 export async function CreateDB(
-  db: sqlite3.Database
+  db: sqlite3.Database,
+  ankiData: { cards: number } | undefined = undefined
 ): Promise<number | undefined> {
   const entries = await getTimeEntries(
-    dayjs().subtract(3, "month").add(1, "day")
+    dayjs().subtract(3, "month").add(1, "day"),
+    dayjs().startOf("day")
   );
 
   console.log("entries are " + JSON.stringify(entries));
@@ -15,7 +17,7 @@ export async function CreateDB(
   }, 0);
 
   console.log("Full Time : " + fullTime);
-
+  console.log("Anki data is " + JSON.stringify(ankiData));
   db.run(
     `
       CREATE TABLE IF NOT EXISTS syncData 
@@ -34,16 +36,17 @@ export async function CreateDB(
     () => {
       console.log('Table "syncData" created');
       db.run(
-        `INSERT INTO syncData (id, generationTime, totalSeconds, totalCardsStudied, cardsStudied, mature, retention, type) VALUES (
-              $id, $generationTime, $totalSeconds, $totalCardsStudied, $cardsStudied, $mature, $retention, $type)`,
+        `INSERT INTO syncData (id, generationTime, totalSeconds, totalCardsStudied, cardsStudied, mature, retention, type, lastAnkiUpdate) VALUES (
+              $id, $generationTime, $totalSeconds, $totalCardsStudied, $cardsStudied, $mature, $retention, $type, $lastAnkiUpdate)`,
         0,
         dayjs().startOf("day").valueOf(),
         fullTime,
+        ankiData?.cards ?? 0,
+        ankiData?.cards ?? 0,
         0,
         0,
-        0,
-        0,
-        "Full"
+        "Full",
+        dayjs().startOf("day").valueOf()
       );
     }
   );

@@ -24,7 +24,7 @@ export class CacheManager {
   };
 
   static exists = fs.existsSync(cache_location);
-  static init = (time: number) => {
+  static init = (time: number, cards: number) => {
     console.log("Init time");
 
     this.set({
@@ -33,8 +33,8 @@ export class CacheManager {
           seconds: time,
           totalSeconds: time,
           generationTime: dayjs().startOf("day").toISOString(),
-          totalCardsStudied: 0,
-          cardsStudied: 0,
+          totalCardsStudied: cards,
+          cardsStudied: cards,
           ankiStreak: 0,
           immersionStreak: 0,
           reportNo: 0,

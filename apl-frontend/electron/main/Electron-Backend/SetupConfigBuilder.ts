@@ -20,6 +20,8 @@ import { win } from "..";
 import { buildContextMenu } from "./appBackend";
 import path from "path";
 import { CacheManager } from "../../../apl-backend/Helpers/cache";
+import { getAnkiCardReviewCount } from "../../../apl-backend/anki/db";
+import dayjs from "dayjs";
 
 let account: TogglAccount;
 const DEFAULT_CONFIG: Options = {
@@ -104,9 +106,20 @@ export function setupListeners() {
         syncDataPath,
         sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE,
         async (err) => {
-          const time = await CreateDB(db);
+          let cards = 0;
+          if (config.anki?.enabled) {
+            cards =
+              (await getAnkiCardReviewCount(
+                dayjs(0),
+                dayjs().startOf("day")
+              )) ?? 0;
+          }
+          const time = await CreateDB(db, {
+            cards: cards,
+          });
           if (time == undefined) return;
-          CacheManager.init(time);
+
+          CacheManager.init(time, cards);
           res();
         }
       );
