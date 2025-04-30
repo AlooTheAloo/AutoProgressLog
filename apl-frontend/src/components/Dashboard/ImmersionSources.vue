@@ -10,6 +10,7 @@ import {
   onUnmounted,
   Ref,
   ref,
+  toRef,
   watch,
 } from "vue";
 import dayjs from "dayjs";
@@ -19,9 +20,16 @@ import { ImmersionSource } from "../../../electron/main/Electron-Backend/types/D
 import pluralize from "pluralize";
 import formatTime from "../../util/timeFormat";
 
+type DashboardImmersionSource = {
+  name: string;
+  relativeValue: number;
+  enabled: boolean;
+  colorIndex: number;
+};
+
 const { width, height } = useWindowSize();
 
-const limit /* As x goes to infinity ??? */ = ref<number>(
+const limit /* As x goes to infinity ∫sqrt(tan x) dx ??? */ = ref<number>(
   width.value >= 1820 ? 50 : 12
 );
 const props = defineProps<{
@@ -38,8 +46,42 @@ watch(width, () => {
   width.value >= 1820 ? (limit.value = 25) : (limit.value = 12);
 });
 
+const computedSources = ref<DashboardImmersionSource[]>([]);
+
+watch(
+  props.sources,
+  () => {
+    computedSources.value = props.sources
+      .sort((a, b) => b.relativeValue - a.relativeValue)
+      .map((x: ImmersionSource, i) => {
+        return {
+          name: x.name,
+          relativeValue: x.relativeValue,
+          enabled: true,
+          colorIndex: i,
+        };
+      });
+  },
+  {
+    deep: true,
+    immediate: true,
+  }
+);
+
+const dateString = computed(() => {
+  const now = dayjs();
+  const start = now.subtract(30, "days");
+  const end = now;
+
+  return `Data from ${start.format("D MMM YYYY")} - ${end.format(
+    "D MMM YYYY"
+  )}`;
+});
+
 const sortedSources = computed(() => {
-  const sort = props.sources.sort((a, b) => b.relativeValue - a.relativeValue);
+  const sort = computedSources.value.sort(
+    (a, b) => b.relativeValue - a.relativeValue
+  );
   const bottomActivitiesSeconds = sort
     .slice(limit.value)
     .reduce((a, b) => a + b.relativeValue, 0);
@@ -50,15 +92,20 @@ const sortedSources = computed(() => {
         sort.length - limit.value > 1 ? "s" : ""
       }`,
       relativeValue: bottomActivitiesSeconds,
+      enabled: true,
+      colorIndex: 727,
     });
   }
-  return arr.map((x) => {
-    return {
-      name: x.name,
-      relativeValue: x.relativeValue,
-      hr: formatTime(x.relativeValue),
-    };
-  });
+  return arr
+    .filter((x) => x.enabled)
+    .map((x) => {
+      console.log(x);
+      return {
+        name: x.name,
+        relativeValue: x.relativeValue,
+        hr: formatTime(x.relativeValue),
+      };
+    });
 });
 
 const totalTime = computed(() => {
@@ -70,21 +117,18 @@ const colors = computed(() => {
   const a = sortedSources.value.map((x) => x.relativeValue);
 
   a.reduce((acc, x, i) => {
-    ret.push(gradient.interpolate(acc / totalTime.value));
+    ret.push(gradient.interpolate(i / a.length));
     return acc + x;
   }, 0);
   return ret;
 });
 
-let gradient = new NWayInterpol("#FF6961", "#33ffbf", "#cc8fff");
+let gradient = new NWayInterpol("#ff0000", "#00ff00", "#0000ff");
 
 let options: ComputedRef<ApexOptions> = computed(() => {
   const ret: ApexOptions = {
     chart: {
       width: width.value >= 1820 ? 500 : 300,
-      animations: {
-        enabled: false,
-      },
     },
     states: {
       active: {
@@ -102,7 +146,7 @@ let options: ComputedRef<ApexOptions> = computed(() => {
       },
     },
     stroke: {
-      width: 1,
+      width: 0,
     },
     dataLabels: {
       enabled: false,
@@ -136,6 +180,28 @@ let options: ComputedRef<ApexOptions> = computed(() => {
 let series /* Literally a calculus reference */ = computed(() => {
   return sortedSources.value.map((x) => x.relativeValue);
 });
+
+function immersionSourceTitleClick(x: DashboardImmersionSource) {
+  const element = computedSources.value.find((prout) => prout.name == x.name);
+  if (!element) return;
+
+  const index = computedSources.value.indexOf(element);
+  if (index == -1) return;
+
+  const killyourself = computedSources.value[index];
+  if (!killyourself) return;
+
+  killyourself.enabled = !killyourself.enabled;
+  computedSources.value[index] = killyourself;
+
+  let colorIndex = 0;
+  computedSources.value.forEach((element) => {
+    if (!element.enabled) return;
+
+    element.colorIndex = colorIndex;
+    colorIndex++;
+  });
+}
 </script>
 
 <template>
@@ -145,10 +211,12 @@ let series /* Literally a calculus reference */ = computed(() => {
       <!-- Title -->
       <div class="h-20 flex flex-col justify-center w-fit">
         <div
-          class="font-normal tracking-wider flex items-center gap-2 text-white"
+          class="mt-5 font-extrabold text-2xl flex items-center gap-2 text-white"
         >
-          <img class="w-5" v-bind:src="play" />
-          Immersion sources in the last 30 days
+          Immersion in the last 30 days
+        </div>
+        <div class="font-extrabold flex items-center text-gray-400">
+          {{ dateString }}
         </div>
       </div>
 
@@ -157,17 +225,22 @@ let series /* Literally a calculus reference */ = computed(() => {
         class="text-white flex flex-col justify-start w-full overflow-hidden"
       >
         <div
-          v-for="(x, i) in sortedSources"
+          v-for="(x, i) in computedSources"
           :key="x.name"
           class="flex flex-row items-center gap-2 w-full"
         >
           <div
             :style="{
-              backgroundColor: colors[i],
+              backgroundColor: x.enabled ? colors[x.colorIndex] : '',
             }"
             class="w-3 h-3 rounded-full"
           />
           <p
+            role="button"
+            tabindex="0"
+            @click="immersionSourceTitleClick(x)"
+            @keydown.space="immersionSourceTitleClick(x)"
+            @keydown.enter="immersionSourceTitleClick(x)"
             class="text-ellipsis overflow-hidden whitespace-nowrap text-sm font-normal"
           >
             {{ x.name }}

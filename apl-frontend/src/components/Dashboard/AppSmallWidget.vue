@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref, useTemplateRef, watchEffect } from "vue";
 import Delta from "../Common/Delta.vue";
+import SmallIcon from "./SmallIcon.vue";
 import { abbreviateNumber } from "js-abbreviation-number";
 import { TPlusDelta } from "../../../types/Util";
 import { roundTo, roundToDown } from "round-to";
+import { useElementSize } from "@vueuse/core";
 
 interface SmallWidgetProps {
   value: TPlusDelta<any>;
@@ -15,6 +17,17 @@ interface SmallWidgetProps {
   hideDelta?: boolean;
   bottomText?: string;
 }
+
+const parent = ref();
+const { width } = useElementSize(parent);
+
+watchEffect(() => {
+  if (width) {
+    console.log(width.value);
+  } else {
+    console.log("doesnt exist :()");
+  }
+});
 
 const hrValue = computed(() => {
   return props.condense
@@ -28,11 +41,19 @@ const props = defineProps<SmallWidgetProps>();
 <template>
   <div
     class="w-96 h-36 bg-black rounded-xl flex items-center justify-center text-white"
+    ref="parent"
   >
+    <div
+      class="h-36 pointer-events-none flex justify-end absolute"
+      :style="{
+        width: width + 'px',
+      }"
+    >
+      <SmallIcon :image="image"></SmallIcon>
+    </div>
     <div class="flex w-4/5 justify-center h-20">
-      <div class="flex-grow flex flex-col justify-center">
-        <div class="font-normal tracking-wider flex items-center gap-2">
-          <img class="w-5" v-bind:src="image" />
+      <div class="flex-grow flex flex-col justify-center gap-2">
+        <div class="font-extrabold flex items-center text-gray-400">
           {{ title }}
         </div>
         <div class="font-extrabold text-2xl">

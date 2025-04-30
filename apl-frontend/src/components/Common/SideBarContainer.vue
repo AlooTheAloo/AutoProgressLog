@@ -207,12 +207,12 @@ const toastValue = ref<UserDialog>();
             backgroundColor: route.path == props.currentRoute ? '#24CAFF' : '',
           }"
           :key="route.path"
-          class="xl:justify-start justify-center rounded-lg p-2 flex items-center gap-2 w-full h-12"
+          class="xl:justify-start justify-center rounded-[14px] p-2 flex items-center gap-2 w-full h-12"
           v-on:click="(e) => handleClick(route.path)"
           @click.stop
         >
           <img :src="route.image" class="w-6 h-6" />
-          <div class="font-semibold text-white xl:block hidden">
+          <div class="font-bold text-white xl:block hidden">
             {{ route.name }}
           </div>
         </div>
@@ -247,7 +247,7 @@ const toastValue = ref<UserDialog>();
           >
             <img :src="Help" class="w-6 h-6" />
             <div class="font-semibold text-white xl:block hidden">
-              Help center
+              Help Center
             </div>
           </div>
         </router-link>

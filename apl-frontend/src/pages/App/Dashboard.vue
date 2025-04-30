@@ -181,13 +181,14 @@ const closeFirstDialog = () => {
       <div class="flex w-full h-20 items-center px-10 my-5 justify-between">
         <div class="flex flex-col w-0 flex-grow">
           <h1
-            class="flex items-center gap-2 bg-gradient-to-r bg-clip-text text-xl xl:text-4xl font-extrabold text-transparent from-[#89BDFF] to-[#40ffff]"
+            class="flex items-center gap-2 bg-gradient-to-r text-xl xl:text-4xl font-bold"
           >
-            Hi,
+            <span class="w-f">Welcome back,</span>
+
             <div v-if="dto.userName == undefined">
               <Skeleton width="10rem" height="2rem" />
             </div>
-            <div class="truncate w-full" v-else>{{ dto.userName }} !</div>
+            <div class="flex-grow truncate" v-else>{{ dto.userName }} !</div>
           </h1>
           <div class="flex items-center">
             <div class="text-xl flex items-center gap-1.5">
@@ -206,7 +207,7 @@ const closeFirstDialog = () => {
               @click="() => sync()"
               :loading="disableActionButtons"
             >
-              <span class="font-semibold text-[#00E0FF]">Sync Now</span>
+              <span class="font-semibold text-[#22A7D1]">Sync Now</span>
               <i
                 :class="[
                   'pi',
@@ -232,7 +233,7 @@ const closeFirstDialog = () => {
             }`"
             v-if="config?.general.autogen.enabled"
           >
-            <div class="bg-[#70bbf3] p-2">
+            <div class="bg-[#22A7D1] p-2">
               <img :src="Report" class="w-full h-full" />
             </div>
             <div :class="`flex items-center px-2 font-bold lg:text-lg text-xs`">

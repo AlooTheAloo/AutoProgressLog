@@ -14,6 +14,7 @@ import Skeleton from "primevue/skeleton";
 import { useWindowSize } from "@vueuse/core";
 import Dialog from "primevue/dialog";
 import { DashboardDTO } from "../../../electron/main/Electron-Backend/types/Dashboard";
+import AccountDisplay from "../Common/AccountDisplay.vue";
 
 const props = defineProps<{
   dto: DashboardDTO;
@@ -76,8 +77,10 @@ const bottomText = computed(() => {
       </div>
     </div>
   </div>
+
   <div v-else class="flex flex-col flex-grow items-center">
-    <div class="flex-col justify-center gap-3 flex h-fit w-fit items-center">
+    <AccountDisplay></AccountDisplay>
+    <div class="flex-col justify-center gap-14 flex h-fit w-fit items-center">
       <div class="flex flex-wrap gap-3 justify-center">
         <div class="flex flex-row gap-3 w-[45rem]">
           <AppSmallWidget
