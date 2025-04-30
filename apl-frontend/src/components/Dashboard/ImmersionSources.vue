@@ -206,23 +206,43 @@ function immersionSourceTitleClick(x: DashboardImmersionSource) {
 
 <template>
   <div class="flex bg-black 1820:h-[40rem] h-96 rounded-lg w-full">
-    <!-- Left Section -->
-    <div class="flex flex-col px-10 flex-1 overflow-hidden">
-      <!-- Title -->
-      <div class="h-20 flex flex-col justify-center w-fit">
-        <div
-          class="mt-5 font-extrabold text-2xl flex items-center gap-2 text-white"
-        >
-          Immersion in the last 30 days
-        </div>
-        <div class="font-extrabold flex items-center text-gray-400">
-          {{ dateString }}
+    <div class="flex p-5">
+      <!-- Left Section -->
+      <div class="flex flex-col px-10 flex-1 justify-center">
+        <!-- Title -->
+        <div class="flex flex-col justify-center w-fit gap-5">
+          <div class="font-extrabold text-2xl flex items-center text-white">
+            Immersion in the last 30 days
+          </div>
+          <div class="font-extrabold flex items-center text-gray-400">
+            {{ dateString }}
+          </div>
+          <!-- ApexCharts Section -->
+          <div
+            class="flex flex-col items-center justify-center flex-none relative"
+          >
+            <div class="absolute flex flex-col items-center">
+              <div class="font-bold text-xl 1820:text-3xl text-white">
+                {{ totalHours }} hours
+              </div>
+              <div class="text-sm 1820:text-xl">
+                From {{ props.sources.length }}
+                {{ pluralize("source", props.sources.length) }}
+              </div>
+            </div>
+            <ApexCharts
+              type="donut"
+              :options="options"
+              :series="series"
+              @click.stop
+            />
+          </div>
         </div>
       </div>
 
       <!-- List Section -->
       <div
-        class="text-white flex flex-col justify-start w-full overflow-hidden"
+        class="text-white flex flex-col justify-center w-full overflow-hidden mt-5"
       >
         <div
           v-for="(x, i) in computedSources"
@@ -247,25 +267,6 @@ function immersionSourceTitleClick(x: DashboardImmersionSource) {
           </p>
         </div>
       </div>
-    </div>
-
-    <!-- ApexCharts Section -->
-    <div class="flex flex-col items-center justify-center flex-none relative">
-      <div class="absolute flex flex-col items-center">
-        <div class="font-bold text-xl 1820:text-3xl text-white">
-          {{ totalHours }} hours
-        </div>
-        <div class="text-sm 1820:text-xl">
-          From {{ props.sources.length }}
-          {{ pluralize("source", props.sources.length) }}
-        </div>
-      </div>
-      <ApexCharts
-        type="donut"
-        :options="options"
-        :series="series"
-        @click.stop
-      />
     </div>
   </div>
 </template>

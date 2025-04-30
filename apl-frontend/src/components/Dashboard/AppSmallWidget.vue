@@ -52,7 +52,7 @@ const props = defineProps<SmallWidgetProps>();
       <SmallIcon :image="image"></SmallIcon>
     </div>
     <div class="flex w-4/5 justify-center h-20">
-      <div class="flex-grow flex flex-col justify-center gap-2">
+      <div class="flex-grow flex flex-col justify-center py-12">
         <div class="font-extrabold flex items-center text-gray-400">
           {{ title }}
         </div>
