@@ -171,23 +171,6 @@ const toastValue = ref<UserDialog>();
       ></Button>
     </div>
   </Dialog>
-  <div
-    class="h-screen w-screen absolute overflow-hidden pointer-events-none"
-    v-if="glow"
-  >
-    <div class="flex absolute w-full h-full items-end justify-end">
-      <div
-        style="filter: blur(75px)"
-        class="glow glow-delay w-96 h-96 absolute rounded-full bg-[#24CAFF] z-0 -mr-64 -mb-64"
-      />
-    </div>
-    <div class="w-24 xl:w-72 transition-all duration-250 h-full">
-      <div
-        style="filter: blur(75px)"
-        class="glow w-96 h-96 rounded-full bg-[#24CAFF] z-0 -ml-64 -mt-64"
-      ></div>
-    </div>
-  </div>
 
   <div class="flex w-screen h-screen overflow-hidden">
     <div
@@ -195,9 +178,32 @@ const toastValue = ref<UserDialog>();
     >
       <!-- Sidebar here -->
       <!-- Logo  -->
-      <div class="w-full z-10">
-        <img :src="Logo" class="w-[4.5rem]" />
+      <div class="flex">
+        <div class="w-full z-10 p-3">
+          <img :src="Logo" class="w-[4rem]" />
+        </div>
+        <button>sidebar close</button>
       </div>
+
+      <!-- glow -->
+      <div
+        class="h-screen w-screen absolute overflow-hidden pointer-events-none"
+        v-if="glow"
+      >
+        <div class="flex absolute w-full h-full justify-end">
+          <div
+            style="filter: blur(75px)"
+            class="glow glow-delay w-96 h-96 absolute rounded-full bg-[#24CAFF] -z-30 -mt-32"
+          />
+        </div>
+        <!-- <div class="w-24 xl:w-72 transition-all duration-250 h-full">
+          <div
+            style="filter: blur(75px)"
+            class="glow w-96 h-96 rounded-full bg-[#24CAFF] z-0 -ml-64 -mt-64"
+          ></div>
+        </div> -->
+      </div>
+
       <!-- Navigation  -->
       <div class="flex flex-col gap-4 w-full mt-20 flex-grow">
         <div
@@ -205,15 +211,15 @@ const toastValue = ref<UserDialog>();
           :style="{
             cursor: route.path != null ? 'pointer' : 'default',
             opacity: route.path == null ? 0.5 : 1,
-            backgroundColor: route.path == props.currentRoute ? '#24CAFF' : '',
+            backgroundColor: route.path == props.currentRoute ? '#1295BF' : '',
           }"
           :key="route.path"
-          class="xl:justify-start justify-center rounded-[14px] p-2 flex items-center gap-2 w-full h-12"
+          class="xl:justify-start justify-center rounded-[5px] p-1 flex items-center gap-2 w-full"
           v-on:click="(e) => handleClick(route.path)"
           @click.stop
         >
           <img :src="route.image" class="w-6 h-6" />
-          <div class="font-bold text-white xl:block hidden">
+          <div class="font-bold text-white xl:block hidden text-lg">
             {{ route.name }}
           </div>
         </div>
@@ -228,7 +234,7 @@ const toastValue = ref<UserDialog>();
             class="flex items-center xl:justify-start justify-center gap-2 w-full h-10 rounded-xl px-2"
             :style="{
               backgroundColor:
-                props.currentRoute == '/app/settings' ? '#24CAFF' : '',
+                props.currentRoute == '/app/settings' ? '#1295BF' : '',
             }"
           >
             <img :src="Settings" class="w-6 h-6" />
@@ -243,7 +249,7 @@ const toastValue = ref<UserDialog>();
             class="flex items-center xl:justify-start justify-center gap-2 w-full h-10 rounded-xl px-2"
             :style="{
               backgroundColor:
-                props.currentRoute == '/app/help' ? '#24CAFF' : '',
+                props.currentRoute == '/app/help' ? '#1295BF' : '',
             }"
           >
             <img :src="Help" class="w-6 h-6" />

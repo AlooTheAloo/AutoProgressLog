@@ -192,13 +192,13 @@ const closeFirstDialog = () => {
           <div v-else>
             <img
               :src="'data:image/png;base64,' + dto.profile_picture.buffer"
-              class="w-14 h-14 sm:w-20 sm:h-20 rounded-full"
+              class="w-16 h-16 rounded-full"
             />
           </div>
         </div>
         <div class="flex flex-col w-0 flex-grow">
           <h1
-            class="flex items-center gap-2 bg-gradient-to-r text-xl xl:text-4xl font-bold"
+            class="flex items-center gap-2 bg-gradient-to-r text-lg xl:text-2xl font-bold"
           >
             <span class="w-f">Welcome back,</span>
 
@@ -208,7 +208,7 @@ const closeFirstDialog = () => {
             <div class="flex-grow truncate" v-else>{{ dto.userName }} !</div>
           </h1>
           <div class="flex items-center">
-            <div class="text-xl flex items-center gap-1.5">
+            <div class="text-md font-bold flex items-center gap-1.5">
               Last synced
               <div v-if="lastSyncTime == ''">
                 <Skeleton width="10.2rem" height="1.5rem" />
@@ -259,6 +259,7 @@ const closeFirstDialog = () => {
           </div>
         </div>
       </div>
+
       <div class="flex w-full px-10 flex-grow">
         <DashboardBody :dto="dto" :syncing="generating_report" />
       </div>

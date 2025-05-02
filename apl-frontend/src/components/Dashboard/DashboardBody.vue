@@ -15,6 +15,7 @@ import { useWindowSize } from "@vueuse/core";
 import Dialog from "primevue/dialog";
 import { DashboardDTO } from "../../../electron/main/Electron-Backend/types/Dashboard";
 import AccountDisplay from "../Common/AccountDisplay.vue";
+import PlaceholderStat from "./PlaceholderStat.vue";
 
 const props = defineProps<{
   dto: DashboardDTO;

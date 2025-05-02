@@ -123,12 +123,12 @@ const colors = computed(() => {
   return ret;
 });
 
-let gradient = new NWayInterpol("#ff0000", "#00ff00", "#0000ff");
+let gradient = new NWayInterpol("#ff0000", "#00ff00", "#0000ff", "#ff00ff");
 
 let options: ComputedRef<ApexOptions> = computed(() => {
   const ret: ApexOptions = {
     chart: {
-      width: width.value >= 1820 ? 500 : 300,
+      width: 300,
     },
     states: {
       active: {
@@ -205,37 +205,37 @@ function immersionSourceTitleClick(x: DashboardImmersionSource) {
 </script>
 
 <template>
-  <div class="flex bg-black 1820:h-[40rem] h-96 rounded-lg w-full">
-    <div class="flex p-5">
+  <div class="flex flex-col bg-black rounded-lg w-1/2 max-w-[50%] p-5">
+    <div class="flex font-extrabold text-3xl text-white">
+      Immersion in the last 30 days
+    </div>
+    <div class="font-extrabold text-gray-400">
+      {{ dateString }}
+    </div>
+    <div class="flex">
       <!-- Left Section -->
-      <div class="flex flex-col px-10 flex-1 justify-center">
+      <div class="flex flex-col px-5 flex-1 justify-center">
         <!-- Title -->
         <div class="flex flex-col justify-center w-fit gap-5">
-          <div class="font-extrabold text-2xl flex items-center text-white">
-            Immersion in the last 30 days
-          </div>
-          <div class="font-extrabold flex items-center text-gray-400">
-            {{ dateString }}
-          </div>
           <!-- ApexCharts Section -->
-          <div
-            class="flex flex-col items-center justify-center flex-none relative"
-          >
+          <div class="flex flex-col items-center justify-center flex-none">
             <div class="absolute flex flex-col items-center">
-              <div class="font-bold text-xl 1820:text-3xl text-white">
+              <div class="font-bold text-xl 1820:text-2xl text-white">
                 {{ totalHours }} hours
               </div>
-              <div class="text-sm 1820:text-xl">
+              <div class="text-sm 1820:text-lg">
                 From {{ props.sources.length }}
                 {{ pluralize("source", props.sources.length) }}
               </div>
             </div>
-            <ApexCharts
-              type="donut"
-              :options="options"
-              :series="series"
-              @click.stop
-            />
+            <div class="w-full h-full">
+              <ApexCharts
+                type="donut"
+                :options="options"
+                :series="series"
+                @click.stop
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -253,7 +253,7 @@ function immersionSourceTitleClick(x: DashboardImmersionSource) {
             :style="{
               backgroundColor: x.enabled ? colors[x.colorIndex] : '',
             }"
-            class="w-3 h-3 rounded-full"
+            class="w-3 h-3 rounded-full min-w-3"
           />
           <p
             role="button"
