@@ -2,7 +2,7 @@
 import { useRouter } from "vue-router";
 import Logo from "../../assets/Logo.png";
 import { appPath as AppPath } from "../../pages/routes/appRoutes";
-import { onMounted, onUnmounted, ref } from "vue";
+import { computed, onMounted, onUnmounted, ref } from "vue";
 import Dialog from "primevue/dialog";
 import {
   Overview,
@@ -20,6 +20,8 @@ import Toast from "primevue/toast";
 import { marked } from "marked";
 import "github-markdown-css/github-markdown-dark.css";
 import { Options } from "../../../apl-backend/types/options";
+import { useWindowSize } from "@vueuse/core";
+import { AnimatePresence, motion } from "motion-v";
 
 const HELP_PAGE_URL = "https://www.aplapp.dev/#/";
 const router = useRouter();
@@ -50,6 +52,18 @@ const routes: route[] = [
     name: "Statistics",
   },
 ];
+
+const { width } = useWindowSize();
+const requestedSidebarState = ref<boolean>(false);
+
+const sidebarState = computed(() => {
+  console.log("Sidebar state caca");
+  if (width.value < 1280) {
+    return false;
+  } else {
+    return requestedSidebarState.value;
+  }
+});
 
 const handleClick = (path: string | undefined) => {
   if (!path) return;
@@ -171,10 +185,34 @@ const toastValue = ref<UserDialog>();
       ></Button>
     </div>
   </Dialog>
+  <!-- glow -->
+  <div
+    class="h-screen w-screen absolute overflow-hidden pointer-events-none"
+    v-if="glow"
+  >
+    <div class="flex absolute w-full h-full justify-end">
+      <div
+        style="filter: blur(150px)"
+        class="glow glow-delay w-[30rem] h-[30rem] absolute rounded-full bg-[#24CAFF] -z-30 -mt-52 -mr-52"
+      />
+    </div>
+    <!-- <div class="w-24 xl:w-72 transition-all duration-250 h-full">
+          <div
+            style="filter: blur(75px)"
+            class="glow w-96 h-96 rounded-full bg-[#24CAFF] z-0 -ml-64 -mt-64"
+          ></div>
+        </div> -->
+  </div>
 
   <div class="flex w-screen h-screen overflow-hidden">
     <div
-      class="flex flex-col bg-[#1B1B1B] p-3 w-20 xl:w-72 items-center xl:items-start transition-all duration-250"
+      class="flex flex-col bg-[#1B1B1B] p-3 transition-all duration-250"
+      :class="{
+        'w-20': !sidebarState,
+        'items-center': !sidebarState,
+        'w-72': sidebarState,
+        'items-start': sidebarState,
+      }"
     >
       <!-- Sidebar here -->
       <!-- Logo  -->
@@ -182,27 +220,10 @@ const toastValue = ref<UserDialog>();
         <div class="w-full z-10 p-3">
           <img :src="Logo" class="w-[4rem]" />
         </div>
-        <button>sidebar close</button>
       </div>
-
-      <!-- glow -->
-      <div
-        class="h-screen w-screen absolute overflow-hidden pointer-events-none"
-        v-if="glow"
-      >
-        <div class="flex absolute w-full h-full justify-end">
-          <div
-            style="filter: blur(75px)"
-            class="glow glow-delay w-96 h-96 absolute rounded-full bg-[#24CAFF] -z-30 -mt-32"
-          />
-        </div>
-        <!-- <div class="w-24 xl:w-72 transition-all duration-250 h-full">
-          <div
-            style="filter: blur(75px)"
-            class="glow w-96 h-96 rounded-full bg-[#24CAFF] z-0 -ml-64 -mt-64"
-          ></div>
-        </div> -->
-      </div>
+      <button @click="requestedSidebarState = !requestedSidebarState">
+        <i class="pi pi-bars text-white"></i>
+      </button>
 
       <!-- Navigation  -->
       <div class="flex flex-col gap-4 w-full mt-20 flex-grow">
@@ -214,46 +235,107 @@ const toastValue = ref<UserDialog>();
             backgroundColor: route.path == props.currentRoute ? '#1295BF' : '',
           }"
           :key="route.path"
-          class="xl:justify-start justify-center rounded-[5px] p-1 flex items-center gap-2 w-full"
+          class="rounded-[5px] p-1 flex items-center gap-2 w-full transition-all duration-200"
+          :class="{
+            'justify-start': sidebarState,
+            'justify-center': !sidebarState,
+          }"
           v-on:click="(e) => handleClick(route.path)"
           @click.stop
         >
           <img :src="route.image" class="w-6 h-6" />
-          <div class="font-bold text-white xl:block hidden text-lg">
-            {{ route.name }}
-          </div>
+          <AnimatePresence>
+            <motion.div
+              v-if="sidebarState"
+              key="caca"
+              class="font-bold text-white text-lg"
+              :initial="{
+                opacity: 0,
+                filter: 'blur(10px)',
+              }"
+              :while-in-view="{
+                x: 0,
+                opacity: 1,
+                filter: 'blur(0px)',
+              }"
+              :exit="{
+                opacity: 0,
+                filter: 'blur(10px)',
+                position: 'absolute',
+                transition: {
+                  duration: 0,
+                },
+              }"
+              :transition="{
+                duration: 0.2,
+                ease: 'easeInOut',
+              }"
+            >
+              {{ route.name }}
+            </motion.div>
+          </AnimatePresence>
         </div>
       </div>
       <!-- Settings and help  -->
       <div class="flex flex-col gap-2 w-full justify-end flex-grow">
         <router-link
           to="/app/settings"
-          class="flex items-center xl:justify-start justify-center gap-2 w-full"
+          class="flex items-center gap-2 w-full"
+          :class="{
+            'justify-start': sidebarState,
+            'justify-center': !sidebarState,
+          }"
         >
           <div
-            class="flex items-center xl:justify-start justify-center gap-2 w-full h-10 rounded-xl px-2"
+            class="flex items-center gap-2 w-full h-10 rounded-xl px-2"
+            :class="{
+              'justify-start': sidebarState,
+              'justify-center': !sidebarState,
+            }"
             :style="{
               backgroundColor:
                 props.currentRoute == '/app/settings' ? '#1295BF' : '',
             }"
           >
             <img :src="Settings" class="w-6 h-6" />
-            <div class="font-semibold text-white xl:block hidden">Settings</div>
+            <div
+              class="font-semibold text-white"
+              :class="{
+                block: sidebarState,
+                hidden: !sidebarState,
+              }"
+            >
+              Settings
+            </div>
           </div>
         </router-link>
         <router-link
           to="/app/help"
-          class="flex items-center xl:justify-start justify-center gap-2 w-full"
+          class="flex items-center gap-2 w-full"
+          :class="{
+            'justify-start': sidebarState,
+            'justify-center': !sidebarState,
+          }"
         >
           <div
-            class="flex items-center xl:justify-start justify-center gap-2 w-full h-10 rounded-xl px-2"
+            class="flex items-center gap-2 w-full h-10 rounded-xl px-2"
             :style="{
               backgroundColor:
                 props.currentRoute == '/app/help' ? '#1295BF' : '',
             }"
+            :class="{
+              'justify-start': sidebarState,
+              'justify-center': !sidebarState,
+            }"
           >
             <img :src="Help" class="w-6 h-6" />
-            <div class="font-semibold text-white xl:block hidden">
+            <div
+              class="font-semibold text-white min-w-40"
+              :class="{
+                block: sidebarState,
+                hidden: !sidebarState,
+              }"
+            >
               Help Center
             </div>
           </div>

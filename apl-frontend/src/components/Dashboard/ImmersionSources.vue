@@ -29,9 +29,7 @@ type DashboardImmersionSource = {
 
 const { width, height } = useWindowSize();
 
-const limit /* As x goes to infinity ∫sqrt(tan x) dx ??? */ = ref<number>(
-  width.value >= 1820 ? 50 : 12
-);
+const limit /* As x goes to infinity ∫sqrt(tan x) dx ??? */ = ref<number>(4);
 const props = defineProps<{
   sources: ImmersionSource[];
 }>();
@@ -40,10 +38,6 @@ const totalHours = computed(() => {
   return (
     props.sources.reduce((acc, x) => acc + x.relativeValue, 0) / 3600
   ).toFixed(2);
-});
-
-watch(width, () => {
-  width.value >= 1820 ? (limit.value = 25) : (limit.value = 12);
 });
 
 const computedSources = ref<DashboardImmersionSource[]>([]);
@@ -180,28 +174,6 @@ let options: ComputedRef<ApexOptions> = computed(() => {
 let series /* Literally a calculus reference */ = computed(() => {
   return sortedSources.value.map((x) => x.relativeValue);
 });
-
-function immersionSourceTitleClick(x: DashboardImmersionSource) {
-  const element = computedSources.value.find((prout) => prout.name == x.name);
-  if (!element) return;
-
-  const index = computedSources.value.indexOf(element);
-  if (index == -1) return;
-
-  const killyourself = computedSources.value[index];
-  if (!killyourself) return;
-
-  killyourself.enabled = !killyourself.enabled;
-  computedSources.value[index] = killyourself;
-
-  let colorIndex = 0;
-  computedSources.value.forEach((element) => {
-    if (!element.enabled) return;
-
-    element.colorIndex = colorIndex;
-    colorIndex++;
-  });
-}
 </script>
 
 <template>
@@ -218,7 +190,9 @@ function immersionSourceTitleClick(x: DashboardImmersionSource) {
         <!-- Title -->
         <div class="flex flex-col justify-center w-fit gap-5">
           <!-- ApexCharts Section -->
-          <div class="flex flex-col items-center justify-center flex-none">
+          <div
+            class="flex flex-col items-center justify-center flex-none relative"
+          >
             <div class="absolute flex flex-col items-center">
               <div class="font-bold text-xl 1820:text-2xl text-white">
                 {{ totalHours }} hours
@@ -245,22 +219,17 @@ function immersionSourceTitleClick(x: DashboardImmersionSource) {
         class="text-white flex flex-col justify-center w-full overflow-hidden mt-5"
       >
         <div
-          v-for="(x, i) in computedSources"
+          v-for="(x, i) in sortedSources"
           :key="x.name"
           class="flex flex-row items-center gap-2 w-full"
         >
           <div
             :style="{
-              backgroundColor: x.enabled ? colors[x.colorIndex] : '',
+              backgroundColor: colors[i],
             }"
             class="w-3 h-3 rounded-full min-w-3"
           />
           <p
-            role="button"
-            tabindex="0"
-            @click="immersionSourceTitleClick(x)"
-            @keydown.space="immersionSourceTitleClick(x)"
-            @keydown.enter="immersionSourceTitleClick(x)"
             class="text-ellipsis overflow-hidden whitespace-nowrap text-sm font-normal"
           >
             {{ x.name }}

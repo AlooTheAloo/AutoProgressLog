@@ -178,12 +178,12 @@ const closeFirstDialog = () => {
   >
     <ProgressSpinner />
   </div>
-  <div v-else class="flex flex-col w-full h-full">
+  <div v-else class="flex flex-col w-full h-full overflow-auto">
     <div class="flex flex-col flex-grow w-full h-full">
       <div
         class="flex w-full h-20 items-center px-10 my-5 justify-between gap-5"
       >
-        <div class="ml-14">
+        <div>
           <img
             v-if="dto.profile_picture.isUrl"
             :src="dto.profile_picture.buffer"

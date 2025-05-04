@@ -13,9 +13,9 @@ import { useConfirm } from "primevue/useconfirm";
 import { CopyReportToast } from "../../../electron/main/Electron-Backend/ReportsListeners";
 import Toast from "primevue/toast";
 import { useToast } from "primevue/usetoast";
-import { AnimatePresence, motion } from "motion-v";
 import InputText from "primevue/inputtext";
 import Dialog from "primevue/dialog";
+import { motion, AnimatePresence } from "motion-v";
 
 const rows = 6;
 const router = useRouter();

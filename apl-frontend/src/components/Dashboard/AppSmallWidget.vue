@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, useTemplateRef, watchEffect } from "vue";
+import { computed, ref, watchEffect } from "vue";
 import Delta from "../Common/Delta.vue";
 import SmallIcon from "./SmallIcon.vue";
 import { abbreviateNumber } from "js-abbreviation-number";
@@ -40,7 +40,7 @@ const props = defineProps<SmallWidgetProps>();
 
 <template>
   <div
-    class="w-96 h-36 bg-black rounded-xl flex items-center justify-center text-white"
+    class="w-96 h-36 relative bg-black rounded-xl flex items-center justify-center text-white"
     ref="parent"
   >
     <div
