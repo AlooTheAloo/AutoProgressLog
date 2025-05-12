@@ -27,8 +27,10 @@ export default class NormalSyncer {
     const pending_usn = await this.startAndProcessDeletions();
     console.log("Got USN in ", dayjs().diff(start, "ms") + " ms");
     if (!pending_usn) return false;
+    console.log("Continuing...");
     const proceeded = await this.processChunksFromServer(pending_usn);
     console.log("Got chunks ", dayjs().diff(start, "ms") + " ms");
+    console.log("Proceeded ", proceeded);
     if (!proceeded) return false;
     await this.stopConnection(pending_usn);
     await this.col.close();
@@ -51,6 +53,7 @@ export default class NormalSyncer {
       while (true) {
         const chunk = await this.client.getChunk();
         if (chunk == undefined) {
+          console.log("chunk was undefined...");
           s(false);
           return;
         }

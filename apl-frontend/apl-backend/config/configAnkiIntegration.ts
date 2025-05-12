@@ -47,6 +47,11 @@ export async function getDecksCards(): Promise<deck[]> {
                 prefsDB.all(
                   `SELECT name FROM decks WHERE id = ${row.did};`,
                   (err, rows: any) => {
+                    if (rows == undefined) return;
+                    console.log("all rows" + JSON.stringify(rows));
+
+                    console.log("err", err);
+                    console.log("rows len", rows.length);
                     res({
                       cardCount: row.cardCount,
                       name: rows[0].name,

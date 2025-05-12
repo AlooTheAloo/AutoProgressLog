@@ -27,12 +27,14 @@ function updateValue() {
         severity: "success",
         summary: "Profile picture uploaded!",
         detail: "Your profile picture was uploaded successfully.",
+        life: 5000,
       });
     } else {
       toast.add({
         severity: "error",
         summary: "Profile picture upload failed!",
         detail: "Your profile picture could not be uploaded. Please try again.",
+        life: 5000,
       });
     }
   });

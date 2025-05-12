@@ -22,6 +22,7 @@ import "github-markdown-css/github-markdown-dark.css";
 import { Options } from "../../../apl-backend/types/options";
 import { useWindowSize } from "@vueuse/core";
 import { AnimatePresence, motion } from "motion-v";
+import path from "path";
 
 const HELP_PAGE_URL = "https://www.aplapp.dev/#/";
 const router = useRouter();
@@ -53,11 +54,23 @@ const routes: route[] = [
   },
 ];
 
+const bottomRoutes = [
+  {
+    path: "/app/settings",
+    image: Settings,
+    name: "Settings",
+  },
+  {
+    path: "/app/help",
+    image: Help,
+    name: "Help",
+  },
+];
+
 const { width } = useWindowSize();
 const requestedSidebarState = ref<boolean>(false);
 
 const sidebarState = computed(() => {
-  console.log("Sidebar state caca");
   if (width.value < 1280) {
     return false;
   } else {
@@ -209,25 +222,50 @@ const toastValue = ref<UserDialog>();
       class="flex flex-col bg-[#1B1B1B] p-3 transition-all duration-250"
       :class="{
         'w-20': !sidebarState,
-        'items-center': !sidebarState,
         'w-72': sidebarState,
-        'items-start': sidebarState,
       }"
     >
-      <!-- Sidebar here -->
-      <!-- Logo  -->
-      <div class="flex">
-        <div class="w-full z-10 p-3">
-          <img :src="Logo" class="w-[4rem]" />
+      <motion.div
+        layoutRoot
+        :transition="{
+          type: 'spring',
+          ease: 'easeInOut',
+          duration: 5,
+        }"
+        class="flex justify-between h-24"
+        :class="{
+          'flex-col': !sidebarState,
+        }"
+      >
+        <!-- Logo  -->
+        <!-- Sidebar here -->
+        <div class="flex">
+          <div class="w-full z-10 p-3">
+            <img
+              :src="Logo"
+              class="transition-all duration-200"
+              :class="{ 'w-[2rem]': !sidebarState, 'w-16': sidebarState }"
+            />
+          </div>
         </div>
-      </div>
-      <button @click="requestedSidebarState = !requestedSidebarState">
-        <i class="pi pi-bars text-white"></i>
-      </button>
+        <AnimatePresence>
+          <motion.button
+            :initial="{ opacity: 0, filter: 'blur(10px)' }"
+            :animate="{ opacity: 1, filter: 'blur(0px)' }"
+            :exit="{ opacity: 0, filter: 'blur(10px)' }"
+            :transition="{ duration: 0.5, ease: 'easeInOut' }"
+            v-if="width >= 1280"
+            key="sidebar-button"
+            @click="requestedSidebarState = !requestedSidebarState"
+          >
+            <i class="pi pi-bars text-white" key="bars"></i>
+          </motion.button>
+        </AnimatePresence>
+      </motion.div>
 
       <!-- Navigation  -->
       <div class="flex flex-col gap-4 w-full mt-20 flex-grow">
-        <div
+        <button
           v-for="route in routes"
           :style="{
             cursor: route.path != null ? 'pointer' : 'default',
@@ -235,20 +273,17 @@ const toastValue = ref<UserDialog>();
             backgroundColor: route.path == props.currentRoute ? '#1295BF' : '',
           }"
           :key="route.path"
-          class="rounded-[5px] p-1 flex items-center gap-2 w-full transition-all duration-200"
-          :class="{
-            'justify-start': sidebarState,
-            'justify-center': !sidebarState,
-          }"
+          class="rounded-[5px] px-4 py-1 flex items-center gap-2 w-full transition-all duration-200"
           v-on:click="(e) => handleClick(route.path)"
           @click.stop
+          :tabindex="route.path == null ? -1 : 0"
         >
           <img :src="route.image" class="w-6 h-6" />
           <AnimatePresence>
             <motion.div
               v-if="sidebarState"
               key="caca"
-              class="font-bold text-white text-lg"
+              class="font-bold text-white text-md"
               :initial="{
                 opacity: 0,
                 filter: 'blur(10px)',
@@ -262,84 +297,62 @@ const toastValue = ref<UserDialog>();
                 opacity: 0,
                 filter: 'blur(10px)',
                 position: 'absolute',
-                transition: {
-                  duration: 0,
-                },
               }"
               :transition="{
-                duration: 0.2,
+                duration: 0,
                 ease: 'easeInOut',
               }"
             >
               {{ route.name }}
             </motion.div>
           </AnimatePresence>
-        </div>
+        </button>
       </div>
+
       <!-- Settings and help  -->
-      <div class="flex flex-col gap-2 w-full justify-end flex-grow">
-        <router-link
-          to="/app/settings"
-          class="flex items-center gap-2 w-full"
-          :class="{
-            'justify-start': sidebarState,
-            'justify-center': !sidebarState,
+
+      <div class="flex flex-col gap-4 w-full flex-grow justify-end">
+        <button
+          v-for="route in bottomRoutes"
+          :style="{
+            cursor: route.path != null ? 'pointer' : 'default',
+            opacity: route.path == null ? 0.5 : 1,
+            backgroundColor: route.path == props.currentRoute ? '#1295BF' : '',
           }"
+          :key="route.path"
+          class="rounded-[5px] px-4 py-1 flex items-center gap-2 w-full transition-all duration-200"
+          v-on:click="(e) => handleClick(route.path)"
+          @click.stop
         >
-          <div
-            class="flex items-center gap-2 w-full h-10 rounded-xl px-2"
-            :class="{
-              'justify-start': sidebarState,
-              'justify-center': !sidebarState,
-            }"
-            :style="{
-              backgroundColor:
-                props.currentRoute == '/app/settings' ? '#1295BF' : '',
-            }"
-          >
-            <img :src="Settings" class="w-6 h-6" />
-            <div
-              class="font-semibold text-white"
-              :class="{
-                block: sidebarState,
-                hidden: !sidebarState,
+          <img :src="route.image" class="w-6 h-6" />
+          <AnimatePresence>
+            <motion.div
+              v-if="sidebarState"
+              key="caca"
+              class="font-bold text-white text-md"
+              :initial="{
+                opacity: 0,
+                filter: 'blur(10px)',
+              }"
+              :while-in-view="{
+                x: 0,
+                opacity: 1,
+                filter: 'blur(0px)',
+              }"
+              :exit="{
+                opacity: 0,
+                filter: 'blur(10px)',
+                position: 'absolute',
+              }"
+              :transition="{
+                duration: 0,
+                ease: 'easeInOut',
               }"
             >
-              Settings
-            </div>
-          </div>
-        </router-link>
-        <router-link
-          to="/app/help"
-          class="flex items-center gap-2 w-full"
-          :class="{
-            'justify-start': sidebarState,
-            'justify-center': !sidebarState,
-          }"
-        >
-          <div
-            class="flex items-center gap-2 w-full h-10 rounded-xl px-2"
-            :style="{
-              backgroundColor:
-                props.currentRoute == '/app/help' ? '#1295BF' : '',
-            }"
-            :class="{
-              'justify-start': sidebarState,
-              'justify-center': !sidebarState,
-            }"
-          >
-            <img :src="Help" class="w-6 h-6" />
-            <div
-              class="font-semibold text-white min-w-40"
-              :class="{
-                block: sidebarState,
-                hidden: !sidebarState,
-              }"
-            >
-              Help Center
-            </div>
-          </div>
-        </router-link>
+              {{ route.name }}
+            </motion.div>
+          </AnimatePresence>
+        </button>
       </div>
     </div>
     <div class="flex-1">

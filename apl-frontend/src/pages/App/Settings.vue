@@ -88,7 +88,7 @@ function ankiTest(worked: boolean) {
 </script>
 
 <template>
-  <Toast />
+  <Toast class="z-10" />
   <Dialog
     :header="warningData?.title"
     :visible="warningData != undefined"

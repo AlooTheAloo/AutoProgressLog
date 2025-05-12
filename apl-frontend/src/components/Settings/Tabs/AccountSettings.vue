@@ -32,7 +32,7 @@ const emit = defineEmits<{
 
     <SettingsFileUpload
       label="Profile picture"
-      help-text="Enables glow effects on the top left and bottom right corners of the app. Can cause slight performance dips."
+      help-text="Changes the profile picture in the app. This will automatically be uploaded and applied."
     />
   </div>
 </template>

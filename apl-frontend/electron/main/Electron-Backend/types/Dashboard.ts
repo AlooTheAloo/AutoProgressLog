@@ -1,3 +1,5 @@
+import dayjs from "dayjs";
+
 export type DashboardDTO = {
   userName: string;
   profile_picture: ProfilePicture;
@@ -7,7 +9,7 @@ export type DashboardDTO = {
   ankiDTO?: AnkiDTO;
   monthlyScore: number;
   syncCount: number;
-  nextReport: string;
+  nextReport: number | null;
 };
 
 export type ProfilePicture = {

@@ -1,18 +1,7 @@
 <script setup lang="ts">
-import play from "../../assets/Icons/play.png";
 import ApexCharts from "vue3-apexcharts";
 import { ApexOptions } from "apexcharts";
-import { interpolateLab } from "d3-interpolate";
-import {
-  computed,
-  ComputedRef,
-  onMounted,
-  onUnmounted,
-  Ref,
-  ref,
-  toRef,
-  watch,
-} from "vue";
+import { computed, ComputedRef, ref, watch } from "vue";
 import dayjs from "dayjs";
 import { useWindowSize } from "@vueuse/core";
 import { NWayInterpol } from "../../util/n-way-interpol";
@@ -117,7 +106,13 @@ const colors = computed(() => {
   return ret;
 });
 
-let gradient = new NWayInterpol("#ff0000", "#00ff00", "#0000ff", "#ff00ff");
+let gradient = new NWayInterpol(
+  "#24CAFF",
+  "#73D562",
+  "#D57AFF",
+  "#F74E8F",
+  "#FF964F"
+);
 
 let options: ComputedRef<ApexOptions> = computed(() => {
   const ret: ApexOptions = {
@@ -177,16 +172,16 @@ let series /* Literally a calculus reference */ = computed(() => {
 </script>
 
 <template>
-  <div class="flex flex-col bg-black rounded-lg w-1/2 max-w-[50%] p-5">
-    <div class="flex font-extrabold text-3xl text-white">
+  <div class="flex flex-col bg-black rounded-lg w-0 flex-grow pt-5">
+    <div class="flex font-extrabold 1820:text-2xl text-xl text-white px-5">
       Immersion in the last 30 days
     </div>
-    <div class="font-extrabold text-gray-400">
+    <div class="font-extrabold text-gray-400 px-5 1820:text-lg text-sm">
       {{ dateString }}
     </div>
     <div class="flex">
       <!-- Left Section -->
-      <div class="flex flex-col px-5 flex-1 justify-center">
+      <div class="flex flex-col px-5 justify-center w-1/2">
         <!-- Title -->
         <div class="flex flex-col justify-center w-fit gap-5">
           <!-- ApexCharts Section -->
@@ -215,27 +210,25 @@ let series /* Literally a calculus reference */ = computed(() => {
       </div>
 
       <!-- List Section -->
-      <div
-        class="text-white flex flex-col justify-center w-full overflow-hidden mt-5"
+      <ul
+        class="max-w-[21.5rem] 1820:flex hidden divide-white/60 w-fit mr-4 divide-y divide-dashed text-white flex-col justify-center"
       >
-        <div
+        <li
           v-for="(x, i) in sortedSources"
           :key="x.name"
-          class="flex flex-row items-center gap-2 w-full"
+          class="flex flex-row items-center gap-3 py-2.5 truncate"
         >
           <div
             :style="{
               backgroundColor: colors[i],
             }"
-            class="w-3 h-3 rounded-full min-w-3"
+            class="w-5 h-3 rounded-md min-w-5"
           />
-          <p
-            class="text-ellipsis overflow-hidden whitespace-nowrap text-sm font-normal"
-          >
+          <p class="overflow-hidden truncate text-base font-normal">
             {{ x.name }}
           </p>
-        </div>
-      </div>
+        </li>
+      </ul>
     </div>
   </div>
 </template>

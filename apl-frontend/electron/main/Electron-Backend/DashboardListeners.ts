@@ -70,7 +70,7 @@ export async function runChecks(): Promise<boolean> {
 
 function getNextReportTime() {
   const config = getConfig();
-  if (!config?.general?.autogen?.enabled) return "";
+  if (!config?.general?.autogen?.enabled) return null;
   const time = config.general.autogen.options.generationTime;
   const now = dayjs();
 
@@ -83,7 +83,7 @@ function getNextReportTime() {
   }
 
   // Format the time as "MMM D, YYYY at h:mm A"
-  return reportTime.format("MMM D, YYYY [at] h:mm A");
+  return reportTime.valueOf();
 }
 
 export async function CreateDTO() {

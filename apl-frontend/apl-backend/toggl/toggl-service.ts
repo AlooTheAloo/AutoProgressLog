@@ -52,8 +52,9 @@ export async function getTimeEntries(
       since: dayjs(since).unix().toString(),
     });
 
-    entries = entries.filter((x) => dayjs(x.stop).isBefore(beforeDayjs));
+    console.log("Entries are " + JSON.stringify(entries));
 
+    entries = entries.filter((x) => dayjs(x.stop).isBefore(beforeDayjs));
     // TODO : Telemetry maybe
     console.log("Fetch took " + dayjs().diff(start, "ms") + " ms");
     const entriesAfterLastGen = entries.filter((x) => {
@@ -88,6 +89,7 @@ export async function getTimeEntries(
 
     return { entriesAfterLastGen, allEvents };
   } catch (e) {
+    console.log("error fetching entries", e);
     return null;
   }
 }

@@ -192,7 +192,7 @@ const closeFirstDialog = () => {
           <div v-else>
             <img
               :src="'data:image/png;base64,' + dto.profile_picture.buffer"
-              class="w-16 h-16 rounded-full"
+              class="w-16 h-16 rounded-full bg-black"
             />
           </div>
         </div>
@@ -208,7 +208,9 @@ const closeFirstDialog = () => {
             <div class="flex-grow truncate" v-else>{{ dto.userName }} !</div>
           </h1>
           <div class="flex items-center">
-            <div class="text-md font-bold flex items-center gap-1.5">
+            <div
+              class="xl:text-base text-sm font-bold flex items-center gap-1.5"
+            >
               Last synced
               <div v-if="lastSyncTime == ''">
                 <Skeleton width="10.2rem" height="1.5rem" />
@@ -224,7 +226,9 @@ const closeFirstDialog = () => {
               @click="() => sync()"
               :loading="disableActionButtons"
             >
-              <span class="font-semibold text-[#22A7D1]">Sync Now</span>
+              <span class="font-semibold text-[#22A7D1] xl:text-base text-sm"
+                >Sync Now</span
+              >
               <i
                 :class="[
                   'pi',
@@ -245,7 +249,7 @@ const closeFirstDialog = () => {
             <span class="text-white font-bold">Generate Report</span>
           </Button>
           <div
-            :class="`flex  h-8 rounded-full text-black bg-white overflow-hidden ${
+            :class="`flex rounded-md  h-8 text-black bg-white overflow-hidden ${
               disableActionButtons ? 'opacity-50' : ''
             }`"
             v-if="config?.general.autogen.enabled"
@@ -253,14 +257,19 @@ const closeFirstDialog = () => {
             <div class="bg-[#22A7D1] p-2">
               <img :src="Report" class="w-full h-full" />
             </div>
-            <div :class="`flex items-center px-2 font-bold lg:text-lg text-xs`">
-              <div>Next report : {{ dto.nextReport }}</div>
+            <div
+              :class="`flex items-center px-2 font-semibold xl:text-base xl:mx-2 text-xs`"
+            >
+              <div>
+                New generated report
+                {{ dayjs(dto.nextReport).fromNow() }}
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="flex w-full px-10 flex-grow">
+      <div class="flex w-full px-10 flex-grow 1820:mt-10">
         <DashboardBody :dto="dto" :syncing="generating_report" />
       </div>
     </div>

@@ -16,6 +16,7 @@ import Dialog from "primevue/dialog";
 import { DashboardDTO } from "../../../electron/main/Electron-Backend/types/Dashboard";
 import AccountDisplay from "../Common/AccountDisplay.vue";
 import PlaceholderStat from "./PlaceholderStat.vue";
+import ImmersionLog from "./ImmersionLog.vue";
 
 const props = defineProps<{
   dto: DashboardDTO;
@@ -73,16 +74,16 @@ const bottomText = computed(() => {
         </div>
       </div>
       <!-- Immersion Sources Section -->
-      <div class="flex-grow flex justify-start w-[45rem] 1820:w-full">
-        <Skeleton :height="width > 1820 ? '40rem' : '24rem'" />
+      <div class="flex-grow flex justify-start w-[45rem] xl:w-full">
+        <Skeleton :height="width > 1280 ? '40rem' : '24rem'" />
       </div>
     </div>
   </div>
 
   <div v-else class="flex flex-col flex-grow items-center">
     <AccountDisplay></AccountDisplay>
-    <div class="flex-col justify-center gap-14 flex h-fit w-fit items-center">
-      <div class="flex flex-wrap gap-3 justify-center">
+    <div class="flex-col justify-center gap-10 flex h-fit w-fit items-center">
+      <div class="flex 1820:flex-row flex-col gap-3 justify-center">
         <div class="flex flex-row gap-3 w-[45rem]">
           <AppSmallWidget
             title="Immersion time this month"
@@ -145,7 +146,7 @@ const bottomText = computed(() => {
             />
           </div>
           <div v-else>
-            <div class="hidden 1820:flex">
+            <div class="hidden xl:flex">
               <div
                 class="flex flex-col flex-grow h-36 bg-black rounded-xl items-center justify-center text-white text-center"
               >
@@ -159,8 +160,9 @@ const bottomText = computed(() => {
           </div>
         </div>
       </div>
-      <div class="flex-grow flex justify-start 1820:w-full w-[45rem]">
+      <div class="flex-grow flex justify-start w-[45rem] 1820:w-full gap-3">
         <ImmersionSources :sources="dto.immersionDTO.immersionSources" />
+        <ImmersionLog :sources="dto.immersionDTO.immersionSources" />
       </div>
     </div>
   </div>
