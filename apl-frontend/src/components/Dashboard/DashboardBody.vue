@@ -17,6 +17,7 @@ import { DashboardDTO } from "../../../electron/main/Electron-Backend/types/Dash
 import AccountDisplay from "../Common/AccountDisplay.vue";
 import PlaceholderStat from "./PlaceholderStat.vue";
 import ImmersionStreak from "./ImmersionStreak.vue";
+import { motion } from "motion-v";
 
 const props = defineProps<{
   dto: DashboardDTO;
@@ -83,7 +84,7 @@ const bottomText = computed(() => {
   <div v-else class="flex flex-col flex-grow items-center">
     <AccountDisplay></AccountDisplay>
     <div class="flex-col justify-center gap-10 flex h-fit w-fit items-center">
-      <div class="flex 1820:flex-row flex-col gap-3 justify-center">
+      <div class="flex 1720:flex-row flex-col gap-3 justify-center">
         <div class="flex flex-row gap-3 w-[45rem]">
           <AppSmallWidget
             title="Immersion time this month"
@@ -99,6 +100,7 @@ const bottomText = computed(() => {
             :direction="0"
             :hideDelta="true"
             :bottomText="bottomText"
+            :index="0"
           />
 
           <AppSmallWidget
@@ -114,6 +116,7 @@ const bottomText = computed(() => {
             :image="Time"
             :direction="dto.immersionDTO.immersionSinceLastReport"
             :hideDelta="dto.immersionDTO.immersionSinceLastReport === 0"
+            :index="1"
           />
         </div>
         <div class="w-[45rem]">
@@ -129,6 +132,7 @@ const bottomText = computed(() => {
               :image="Brain"
               :direction="dto.ankiDTO.retentionRateDelta"
               :hideDelta="dto.ankiDTO.retentionRateDelta === 0"
+              :index="2"
             />
 
             <AppSmallWidget
@@ -143,6 +147,7 @@ const bottomText = computed(() => {
               :image="Eye"
               :direction="dto.ankiDTO.reviewsDelta"
               :hideDelta="dto.ankiDTO.reviewsDelta === 0"
+              :index="3"
             />
           </div>
           <div v-else>
@@ -160,10 +165,25 @@ const bottomText = computed(() => {
           </div>
         </div>
       </div>
-      <div class="flex-grow flex justify-start w-[45rem] 1820:w-full gap-3">
+      <motion.div
+        :initial="{
+          opacity: 0,
+          y: 20,
+          filter: 'blur(10px)',
+        }"
+        :while-in-view="{
+          y: 0,
+          opacity: 1,
+          filter: 'blur(0px)',
+        }"
+        :transition="{
+          delay: 0.1,
+        }"
+        class="flex-grow flex justify-start w-[45rem] 1720:w-full gap-3"
+      >
         <ImmersionSources :sources="dto.immersionDTO.immersionSources" />
         <ImmersionStreak :streak="dto.immersionDTO.immersionStreak" />
-      </div>
+      </motion.div>
     </div>
   </div>
 </template>

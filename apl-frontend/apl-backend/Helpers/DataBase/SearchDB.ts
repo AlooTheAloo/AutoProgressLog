@@ -155,6 +155,7 @@ export async function GetImmersionStreak(days: number = 7): Promise<number[]> {
         console.error("SQLite error:", err);
         return reject(err);
       }
+      console.log("Got rows from ImmersionSourceSince", JSON.stringify(rows));
       resolve(rows.map((x) => x.total_seconds / 3600));
     });
   });

@@ -2,6 +2,8 @@
 import ApexCharts from "vue3-apexcharts";
 import { ApexOptions } from "apexcharts";
 import dayjs from "dayjs";
+import { computed, onMounted, ref } from "vue";
+import { watch } from "fs";
 const options: ApexOptions = {
   colors: [],
   grid: {
@@ -50,6 +52,7 @@ const options: ApexOptions = {
     toolbar: {
       show: false,
     },
+    width: "900px",
   },
 
   dataLabels: {
@@ -64,19 +67,23 @@ const props = defineProps<{
   streak: number[];
 }>();
 
-const series = [
-  {
-    data: props.streak,
-  },
-];
+const series = computed(() => {
+  return [
+    {
+      data: props.streak,
+    },
+  ];
+});
 </script>
 
 <template>
-  <div class="flex flex-col bg-black rounded-lg w-0 flex-grow pt-5">
-    <div class="flex font-extrabold 1820:text-2xl text-xl text-white px-5">
+  <div
+    class="flex flex-col bg-black rounded-lg w-0 flex-grow pt-5 overflow-hidden"
+  >
+    <div class="flex font-extrabold 1720:text-2xl text-xl text-white px-5">
       Immersion Time
     </div>
-    <div class="font-extrabold text-gray-400 px-5 1820:text-lg text-sm">
+    <div class="font-extrabold text-gray-400 px-5 1720:text-lg text-sm">
       From the last 7 days
     </div>
     <div class="flex flex-grow">
@@ -91,6 +98,7 @@ const series = [
             <div class="w-full h-full pointer-events-none">
               <ApexCharts
                 height="100%"
+                width="100%"
                 type="bar"
                 :options="options"
                 :series="series"

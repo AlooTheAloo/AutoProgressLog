@@ -119,7 +119,7 @@ export default async function upgrade_1_0_1() {
   const hadIntegration = config.anki.ankiIntegration != undefined;
   delete config.anki.ankiIntegration;
 
-  const new_config: new_config = getConfig() as new_config;
+  const new_config: new_config = getConfig() as any as new_config;
   if (hadIntegration) {
     new_config.anki.ankiIntegration = {
       url: DEFAULT_ANKI_URL,

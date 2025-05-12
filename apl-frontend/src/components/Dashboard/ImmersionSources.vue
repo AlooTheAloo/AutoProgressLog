@@ -173,10 +173,10 @@ let series /* Literally a calculus reference */ = computed(() => {
 
 <template>
   <div class="flex flex-col bg-black rounded-lg w-0 flex-grow pt-5">
-    <div class="flex font-extrabold 1820:text-2xl text-xl text-white px-5">
+    <div class="flex font-extrabold 1720:text-2xl text-xl text-white px-5">
       Immersion in the last 30 days
     </div>
-    <div class="font-extrabold text-gray-400 px-5 1820:text-lg text-sm">
+    <div class="font-extrabold text-gray-400 px-5 1720:text-lg text-sm">
       {{ dateString }}
     </div>
     <div class="flex">
@@ -189,10 +189,10 @@ let series /* Literally a calculus reference */ = computed(() => {
             class="flex flex-col items-center justify-center flex-none relative"
           >
             <div class="absolute flex flex-col items-center">
-              <div class="font-bold text-xl 1820:text-2xl text-white">
+              <div class="font-bold text-xl 1720:text-2xl text-white">
                 {{ totalHours }} hours
               </div>
-              <div class="text-sm 1820:text-lg">
+              <div class="text-sm 1720:text-lg">
                 From {{ props.sources.length }}
                 {{ pluralize("source", props.sources.length) }}
               </div>
@@ -211,7 +211,7 @@ let series /* Literally a calculus reference */ = computed(() => {
 
       <!-- List Section -->
       <ul
-        class="max-w-[21.5rem] 1820:flex hidden divide-white/60 w-fit mr-4 divide-y divide-dashed text-white flex-col justify-center"
+        class="max-w-[21.5rem] 1720:flex hidden divide-white/60 w-fit mr-4 divide-y divide-dashed text-white flex-col justify-center"
       >
         <li
           v-for="(x, i) in sortedSources"

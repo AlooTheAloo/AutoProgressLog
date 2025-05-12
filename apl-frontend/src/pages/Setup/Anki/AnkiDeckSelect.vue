@@ -20,7 +20,7 @@ interface Deck {
 }
 
 const router = useRouter();
-const decks = ref<Deck[]>(undefined);
+const decks = ref<Deck[] | undefined>(undefined);
 const selectedDecks = ref<Deck[]>([]);
 
 onMounted(async () => {

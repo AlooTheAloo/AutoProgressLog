@@ -19,7 +19,7 @@ export async function buildContextMenu() {
       type: "normal",
       click: async () => {
         if (process.platform == "darwin") {
-          app.dock.show();
+          app.dock?.show();
         } else if (process.platform == "win32" && !win?.isDestroyed) {
           win?.setSkipTaskbar(false);
         }

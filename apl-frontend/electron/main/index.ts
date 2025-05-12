@@ -124,7 +124,7 @@ app
   .then(createAppBackend);
 app.on("window-all-closed", () => {
   if (process.platform == "darwin") {
-    app.dock.hide();
+    app.dock?.hide();
   } else if (process.platform == "win32") {
     if (!win?.isDestroyed) win?.setSkipTaskbar(true);
   } else {
@@ -138,7 +138,7 @@ app.on("second-instance", async () => {
   console.log("second instance");
   if (win) {
     if (process.platform == "darwin") {
-      app.dock.show();
+      app.dock?.show();
     } else if (process.platform == "win32" && !win?.isDestroyed) {
       win?.setSkipTaskbar(false);
     }

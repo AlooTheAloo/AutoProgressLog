@@ -4,7 +4,7 @@ export default {
   theme: {
     extend: {
       screens: {
-        1820: "1820px", // Custom media query for exactly 1820px
+        1720: "1720px", // Custom media query for exactly 1820px
       },
     },
   },

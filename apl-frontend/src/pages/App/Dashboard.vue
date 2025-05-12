@@ -269,7 +269,7 @@ const closeFirstDialog = () => {
         </div>
       </div>
 
-      <div class="flex w-full px-10 flex-grow 1820:mt-10">
+      <div class="flex w-full px-10 flex-grow 1720:mt-10">
         <DashboardBody :dto="dto" :syncing="generating_report" />
       </div>
     </div>

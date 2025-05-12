@@ -222,7 +222,7 @@ const toastValue = ref<UserDialog>();
       class="flex flex-col bg-[#1B1B1B] p-3 transition-all duration-250"
       :class="{
         'w-20': !sidebarState,
-        'w-72': sidebarState,
+        'w-48': sidebarState,
       }"
     >
       <motion.div
