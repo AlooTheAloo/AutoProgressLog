@@ -16,7 +16,7 @@ import Dialog from "primevue/dialog";
 import { DashboardDTO } from "../../../electron/main/Electron-Backend/types/Dashboard";
 import AccountDisplay from "../Common/AccountDisplay.vue";
 import PlaceholderStat from "./PlaceholderStat.vue";
-import ImmersionLog from "./ImmersionLog.vue";
+import ImmersionStreak from "./ImmersionStreak.vue";
 
 const props = defineProps<{
   dto: DashboardDTO;
@@ -162,7 +162,7 @@ const bottomText = computed(() => {
       </div>
       <div class="flex-grow flex justify-start w-[45rem] 1820:w-full gap-3">
         <ImmersionSources :sources="dto.immersionDTO.immersionSources" />
-        <ImmersionLog :sources="dto.immersionDTO.immersionSources" />
+        <ImmersionStreak :streak="dto.immersionDTO.immersionStreak" />
       </div>
     </div>
   </div>

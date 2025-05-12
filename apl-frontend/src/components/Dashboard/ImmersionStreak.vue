@@ -4,7 +4,10 @@ import { ApexOptions } from "apexcharts";
 import dayjs from "dayjs";
 const options: ApexOptions = {
   colors: [],
-
+  grid: {
+    borderColor: "#555",
+    strokeDashArray: 3,
+  },
   yaxis: {
     labels: {
       style: {
@@ -29,7 +32,8 @@ const options: ApexOptions = {
     bar: {
       borderRadius: 7.5,
       distributed: true,
-      columnWidth: "15px",
+      columnWidth: "45%",
+      barHeight: "10px",
     },
   },
   fill: {
@@ -56,9 +60,13 @@ const options: ApexOptions = {
   },
 };
 
+const props = defineProps<{
+  streak: number[];
+}>();
+
 const series = [
   {
-    data: [1, 2, 2.12, 0.2, 1, 1.5, 2],
+    data: props.streak,
   },
 ];
 </script>
@@ -66,7 +74,7 @@ const series = [
 <template>
   <div class="flex flex-col bg-black rounded-lg w-0 flex-grow pt-5">
     <div class="flex font-extrabold 1820:text-2xl text-xl text-white px-5">
-      Immersion Streak
+      Immersion Time
     </div>
     <div class="font-extrabold text-gray-400 px-5 1820:text-lg text-sm">
       From the last 7 days

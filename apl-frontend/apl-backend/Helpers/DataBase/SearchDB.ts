@@ -117,6 +117,49 @@ export async function GetImmersionTimeBetween(
   });
 }
 
+// I LOVE VIBE CODING
+export async function GetImmersionStreak(days: number = 7): Promise<number[]> {
+  const offset = days - 1; // e.g. 7 days ⇒ start = now - 6 days
+  const db = new sqlite3.Database(syncDataPath);
+
+  const sql = `
+    WITH RECURSIVE
+      dates(day) AS (
+        SELECT date('now', '-' || ? || ' days')
+        UNION ALL
+        SELECT date(day, '+1 day')
+          FROM dates
+         WHERE day < date('now')
+      ),
+      agg AS (
+        SELECT
+          date(time, 'unixepoch', 'localtime') AS day,
+          SUM(seconds)                         AS total_seconds
+        FROM immersionActivity
+        WHERE date(time, 'unixepoch', 'localtime')
+          >= date('now', '-' || ? || ' days')
+        GROUP BY day
+      )
+    SELECT
+      dates.day,
+      COALESCE(agg.total_seconds, 0) AS total_seconds
+    FROM dates
+    LEFT JOIN agg USING(day)
+    ORDER BY dates.day;
+  `;
+
+  return new Promise((resolve, reject) => {
+    // we bind `offset` twice (once for generating dates, once for filtering agg)
+    db.all(sql, [offset, offset], (err, rows: any[]) => {
+      if (err) {
+        console.error("SQLite error:", err);
+        return reject(err);
+      }
+      resolve(rows.map((x) => x.total_seconds / 3600));
+    });
+  });
+}
+
 export async function GetImmersionSourcesSince(
   since: dayjs.Dayjs
 ): Promise<ImmersionSource[]> {

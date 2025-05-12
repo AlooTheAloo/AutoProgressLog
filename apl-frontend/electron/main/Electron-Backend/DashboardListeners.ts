@@ -14,6 +14,7 @@ import { CacheManager } from "../../../apl-backend/Helpers/cache";
 import { DashboardDTO } from "./types/Dashboard";
 import {
   GetImmersionSourcesSince,
+  GetImmersionStreak,
   GetImmersionTimeBetween,
   GetImmersionTimeSince,
   GetLastEntry,
@@ -87,6 +88,7 @@ function getNextReportTime() {
 }
 
 export async function CreateDTO() {
+  console.log("creating dto");
   const lastEntry = await GetLastEntry();
   const lastReport = await CacheManager.peek();
   const config = getConfig();
@@ -129,6 +131,7 @@ export async function CreateDTO() {
       immersionSources: await GetImmersionSourcesSince(
         dayjs().subtract(1, "month")
       ),
+      immersionStreak: await GetImmersionStreak(),
     },
     monthlyScore: 0,
     syncCount: await GetSyncCount(),
