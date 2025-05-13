@@ -23,14 +23,6 @@ interface SmallWidgetProps {
 const parent = ref();
 const { width } = useElementSize(parent);
 
-watchEffect(() => {
-  if (width) {
-    console.log(width.value);
-  } else {
-    console.log("doesnt exist :()");
-  }
-});
-
 const hrValue = computed(() => {
   return props.condense
     ? abbreviateNumber(roundToDown(props.value.current, 2), 2)

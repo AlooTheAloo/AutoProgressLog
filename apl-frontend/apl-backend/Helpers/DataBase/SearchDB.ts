@@ -124,22 +124,24 @@ export async function GetImmersionStreak(days: number = 7): Promise<number[]> {
 
   const sql = `
     WITH RECURSIVE
-      dates(day) AS (
-        SELECT date('now', '-' || ? || ' days')
-        UNION ALL
-        SELECT date(day, '+1 day')
-          FROM dates
-         WHERE day < date('now')
-      ),
-      agg AS (
-        SELECT
-          date(time, 'unixepoch', 'localtime') AS day,
-          SUM(seconds)                         AS total_seconds
-        FROM immersionActivity
-        WHERE date(time, 'unixepoch', 'localtime')
-          >= date('now', '-' || ? || ' days')
-        GROUP BY day
-      )
+    dates(day) AS (
+      -- start from N days ago (local)
+      SELECT date('now','localtime','-' || ? || ' days')
+      UNION ALL
+      -- keep adding one day until *local* today
+      SELECT date(day, '+1 day')
+        FROM dates
+      WHERE day < date('now','localtime')
+    ),
+    agg AS (
+      SELECT
+        date(time, 'unixepoch', 'localtime') AS day,
+        SUM(seconds)                         AS total_seconds
+      FROM immersionActivity
+      WHERE date(time, 'unixepoch', 'localtime')
+        >= date('now','localtime','-' || ? || ' days')
+      GROUP BY day
+    )
     SELECT
       dates.day,
       COALESCE(agg.total_seconds, 0) AS total_seconds
@@ -155,7 +157,6 @@ export async function GetImmersionStreak(days: number = 7): Promise<number[]> {
         console.error("SQLite error:", err);
         return reject(err);
       }
-      console.log("Got rows from ImmersionSourceSince", JSON.stringify(rows));
       resolve(rows.map((x) => x.total_seconds / 3600));
     });
   });

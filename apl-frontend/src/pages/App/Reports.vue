@@ -236,7 +236,7 @@ function nf(num: number) {
                   >
                     <div class="py-2 flex">
                       <div
-                        class="w-full flex flex-col sm:flex-row sm:items-center gap-4 bg-[#121212] overflow-hidden rounded-md pr-5"
+                        class="w-full flex flex-col sm:flex-row sm:items-center gap-4 bg-black overflow-hidden rounded-md pr-5"
                       >
                         <div class="w-3 h-full bg-[#24CAFF]"></div>
                         <div class="w-14 py-4">

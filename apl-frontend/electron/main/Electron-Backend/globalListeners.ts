@@ -52,7 +52,6 @@ export function globalListeners() {
     const skipped = existsSync(f)
       ? readFileSync(f).toString() ?? "0.0.0"
       : "0.0.0";
-    console.log(skipped);
     if (
       result?.updateInfo.version != (semver.gt(v1, skipped) ? v1 : skipped) &&
       result?.updateInfo != null

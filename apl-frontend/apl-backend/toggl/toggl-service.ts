@@ -52,8 +52,6 @@ export async function getTimeEntries(
       since: dayjs(since).unix().toString(),
     });
 
-    console.log("Entries are " + JSON.stringify(entries));
-
     entries = entries.filter((x) => dayjs(x.stop).isBefore(beforeDayjs));
     // TODO : Telemetry maybe
     console.log("Fetch took " + dayjs().diff(start, "ms") + " ms");

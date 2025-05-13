@@ -82,17 +82,12 @@ const sortedSources = computed(() => {
   return arr
     .filter((x) => x.enabled)
     .map((x) => {
-      console.log(x);
       return {
         name: x.name,
         relativeValue: x.relativeValue,
         hr: formatTime(x.relativeValue),
       };
     });
-});
-
-const totalTime = computed(() => {
-  return sortedSources.value.reduce((acc, x) => acc + x.relativeValue, 0);
 });
 
 const colors = computed(() => {
@@ -118,6 +113,9 @@ let options: ComputedRef<ApexOptions> = computed(() => {
   const ret: ApexOptions = {
     chart: {
       width: 300,
+      animations: {
+        enabled: false,
+      },
     },
     states: {
       active: {
@@ -172,7 +170,9 @@ let series /* Literally a calculus reference */ = computed(() => {
 </script>
 
 <template>
-  <div class="flex flex-col bg-black rounded-lg w-0 flex-grow pt-5">
+  <div
+    class="flex flex-col bg-black rounded-lg w-0 flex-grow pt-5 border-2 border-transparent hover:border-[#22A7D1] trantiton-all duration-200"
+  >
     <div class="flex font-extrabold 1720:text-2xl text-xl text-white px-5">
       Immersion in the last 30 days
     </div>

@@ -10,14 +10,10 @@ export async function CreateDB(
     dayjs().subtract(3, "month").add(1, "day"),
     dayjs().startOf("day")
   );
-
-  console.log("entries are " + JSON.stringify(entries));
   const fullTime = entries?.allEvents.reduce((acc, x) => {
     return acc + x.activitySeconds;
   }, 0);
 
-  console.log("Full Time : " + fullTime);
-  console.log("Anki data is " + JSON.stringify(ankiData));
   db.run(
     `
       CREATE TABLE IF NOT EXISTS syncData 

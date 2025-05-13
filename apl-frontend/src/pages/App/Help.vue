@@ -15,6 +15,7 @@ import Toast from "primevue/toast";
 import { useToast } from "primevue/usetoast";
 import { getHelpCenter, helpPage } from "../../services/helpService";
 import { AnimatePresence, motion } from "motion-v";
+import BackButton from "../../components/Common/BackButton.vue";
 
 type ListReport = {
   id: string;
@@ -37,12 +38,12 @@ function onPageSelect(page: helpPage) {
 <template>
   <Toast />
   <ConfirmPopup />
-  <div class="flex-grow h-full flex relative">
+  <div class="flex-grow h-full flex relative w-full">
     <AnimatePresence :initial="false">
       <motion.div
         v-if="selectedGuide != undefined"
-        key="caca"
-        class="flex flex-col w-[100%] h-full absolute"
+        key="help-page"
+        class="flex flex-col absolute h-[calc(100vh-5rem)] lg:mx-20 mx-10 mt-10 overflow-y-scroll flex-grow w-5/6"
         :initial="{
           x: 50,
           opacity: 0,
@@ -64,8 +65,17 @@ function onPageSelect(page: helpPage) {
           ease: 'easeInOut',
         }"
       >
-        LITERALLY GUIDE MOMENT WHAT :zamn: :zamn: :zamn:
-        <Button @click="selectedGuide = undefined">go back</Button>
+        <div class="w-fit h-8">
+          <Button
+            link
+            style="padding: 0"
+            label="Go back"
+            icon="pi-angle-left pi"
+            @click="selectedGuide = undefined"
+            class="p-0 h-8"
+          />
+          <component :is="selectedGuide.component"></component>
+        </div>
       </motion.div>
     </AnimatePresence>
     <AnimatePresence :initial="false">
@@ -94,7 +104,7 @@ function onPageSelect(page: helpPage) {
           ease: 'easeInOut',
         }"
       >
-        <div class="flex flex-col w-full h-screen px-10">
+        <div class="flex flex-col w-full h-screen px-40 py-20">
           <div class="flex w-full h-20 items-center my-5 justify-between">
             <div class="flex flex-col">
               <h1 class="text-white text-4xl font-extrabold">Help center</h1>
@@ -112,7 +122,7 @@ function onPageSelect(page: helpPage) {
                 :initial="{ opacity: 0 }"
                 :while-in-view="{ opacity: 1 }"
                 :inViewOptions="{ amount: 0, once: false }"
-                class="flex justify-between items-center gap-2 h-20 w-full bg-[#121212] rounded-xl p-5"
+                class="flex justify-between items-center gap-2 h-20 w-full bg-[#242424] rounded-xl p-5"
               >
                 <div class="flex flex-col w-0 flex-grow">
                   <h1 class="text-white text-xl font-extrabold truncate">

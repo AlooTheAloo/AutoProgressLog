@@ -5,9 +5,7 @@ import dayjs from "dayjs";
 import { SyncData } from "../../types/sync";
 
 export async function WriteEntries(entries: entry[], syncDataId: number = -1) {
-  console.log("Writing, entries len is " + entries.length);
   if (entries.length == 0) return;
-  console.log("Adding " + entries.length + " entries");
   const db = new sqlite3.Database(syncDataPath);
   const stmt = db.prepare(
     "INSERT OR IGNORE INTO immersionActivity (id, syncDataId, time, seconds, activityName) VALUES (?, ?, ?, ?, ?)"

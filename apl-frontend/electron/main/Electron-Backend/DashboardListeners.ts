@@ -88,7 +88,6 @@ function getNextReportTime() {
 }
 
 export async function CreateDTO() {
-  console.log("creating dto");
   const lastEntry = await GetLastEntry();
   const lastReport = await CacheManager.peek();
   const config = getConfig();

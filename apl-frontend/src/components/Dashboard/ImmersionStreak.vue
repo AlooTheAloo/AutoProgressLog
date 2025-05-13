@@ -78,7 +78,7 @@ const series = computed(() => {
 
 <template>
   <div
-    class="flex flex-col bg-black rounded-lg w-0 flex-grow pt-5 overflow-hidden"
+    class="flex flex-col bg-black rounded-lg w-0 flex-grow pt-5 overflow-hidden border-2 border-transparent hover:border-[#22A7D1] trantiton-all duration-200"
   >
     <div class="flex font-extrabold 1720:text-2xl text-xl text-white px-5">
       Immersion Time

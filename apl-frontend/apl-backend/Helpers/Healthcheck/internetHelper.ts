@@ -5,7 +5,6 @@ import nodeScheduler from "node-schedule";
 let hasInternet = false;
 
 export async function setInternet(value: boolean) {
-  console.log("setting internet to " + value);
   hasInternet = value;
 }
 

@@ -45,7 +45,6 @@ export function createAutoRPC() {
 }
 
 async function createJob() {
-  console.log("Creating job");
   const config = getConfig();
   if (config == undefined || !config.general.discordIntegration) return;
 

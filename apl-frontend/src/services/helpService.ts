@@ -1,5 +1,6 @@
 import { Component } from "vue";
 import GeneratingReports from "../components/Help/GeneratingReports.vue";
+import DashboardPageHelp from "../components/Help/DashboardPageHelp.vue";
 
 export interface helpPage {
   title: string;
@@ -12,7 +13,7 @@ const helpPages: helpPage[] = [
     title: "Dashboard",
     description:
       "The dashboard is where you can view your progress and generate reports.",
-    component: GeneratingReports,
+    component: DashboardPageHelp,
   },
   {
     title: "Reports",

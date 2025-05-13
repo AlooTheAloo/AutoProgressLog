@@ -22,8 +22,6 @@ import {
   resolveBuildId,
 } from "@puppeteer/browsers";
 
-console.log("Listerlly here");
-
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 registerEvents();
@@ -54,17 +52,16 @@ if (os.release().startsWith("6.1")) app.disableHardwareAcceleration();
 // Set application name for Windows 10+ notifications
 if (process.platform === "win32") app.setAppUserModelId(app.getName());
 
-// if (!app.requestSingleInstanceLock()) {
-//   console.log("dead");
-//   app.quit();
-//   process.exit(0);
-// }
+if (!app.requestSingleInstanceLock()) {
+  console.log("dead");
+  app.quit();
+  process.exit(0);
+}
 
 export let win: BrowserWindow | null = null;
 const preload = path.join(__dirname, "../preload/index.mjs");
 export const indexHtml = path.join(RENDERER_DIST, "index.html");
 export async function createWindow() {
-  console.log("Creating window");
   win = new BrowserWindow({
     show: true,
     minHeight: 600,

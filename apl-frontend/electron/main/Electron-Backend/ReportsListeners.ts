@@ -106,9 +106,7 @@ export function reportsListeners() {
   });
 
   ipcMain.handle("loadReportsPage", async (evt) => {
-    console.log("Isgenerating is " + isGenerating);
     while (isGenerating) {
-      console.log("nope");
       await new Promise((res) => setTimeout(res, 50));
     }
     return true;
