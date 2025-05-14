@@ -187,7 +187,7 @@ const closeFirstDialog = () => {
           <img
             v-if="dto.profile_picture.isUrl"
             :src="dto.profile_picture.buffer"
-            class="rounded-full"
+            class="w-16 h-16 rounded-full bg-black"
           />
           <div v-else>
             <img

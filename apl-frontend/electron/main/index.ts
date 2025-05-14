@@ -177,8 +177,13 @@ import {
 import fs from "fs";
 import { getTimeEntries } from "../../apl-backend/toggl/toggl-service";
 import dayjs from "dayjs";
+import { CacheManager } from "../../apl-backend/Helpers/cache";
 
 app.on("ready", async () => {
+  if (CacheManager.verifyVersion()) {
+    await checkHealth();
+  }
+
   buildMenu(app);
   createAutoReport();
   createAutoRPC();

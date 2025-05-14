@@ -5,6 +5,7 @@ import { win } from "..";
 
 export function routeListeners() {
   ipcMain.handle("PageSelect", (event, args) => {
+    console.log("PageSelect called");
     if (getConfig() === null) {
       win?.webContents.send("is-setup-complete", false);
       return "/setup/index";

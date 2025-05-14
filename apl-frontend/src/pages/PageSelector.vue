@@ -6,6 +6,7 @@ if (!window.ipcRenderer) {
   console.log("No IPC Renderer");
   router.push("/about");
 } else {
+  console.log("IPC Renderer exists");
   window.ipcRenderer.invoke("PageSelect").then((route: RouteLocationRaw) => {
     router.push(route);
   });

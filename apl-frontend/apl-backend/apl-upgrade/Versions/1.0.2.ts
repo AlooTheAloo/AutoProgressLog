@@ -5,25 +5,9 @@ import { CacheManager } from "../../Helpers/cache";
 import { getConfig } from "../../Helpers/getConfig";
 import { Options } from "../../types/options";
 import { setConfig } from "../../config/configManager";
+import upgrade_1_0_1 from "./1.0.1";
 
 interface previous_config {
-  general: {
-    autogen: ConditionalOption<ServerOptions>;
-    discordIntegration: boolean;
-  };
-  account: {
-    userName: string;
-  };
-  toggl: {
-    togglToken: string;
-  };
-  anki: ConditionalOption<AnkiOptions> & {
-    ankiIntegration?: ankiIntegration;
-  };
-  outputOptions: OutputOptions;
-}
-
-interface new_config {
   general: {
     autogen: ConditionalOption<ServerOptions>;
     discordIntegration: boolean;
@@ -43,15 +27,30 @@ interface new_config {
   outputOptions: OutputOptions;
 }
 
+interface new_config {
+  general: {
+    autogen: ConditionalOption<ServerOptions>;
+    discordIntegration: boolean;
+  };
+  account: {
+    userName: string;
+    profilePicture: string;
+  };
+  appearance: {
+    glow: boolean;
+  };
+  toggl: {
+    togglToken: string;
+  };
+  anki: ConditionalOption<AnkiOptions> & {
+    ankiIntegration?: ankiIntegration;
+  };
+  outputOptions: OutputOptions;
+}
+
 type ConditionalOption<T> =
   | { enabled: true; options: T }
   | { enabled: false; options?: undefined };
-
-interface AnkiIntegration {
-  ankiPath?: string;
-  ankiDB?: string;
-  profile?: string;
-}
 
 type AnkiOptions = {
   retentionMode: RetentionMode;
@@ -59,27 +58,8 @@ type AnkiOptions = {
 };
 
 type ReportExtension = ".png" | ".jpg" | ".jpeg" | ".webp";
-const reportExtensions = [".png", ".jpg", ".jpeg", ".webp"];
 
 type OutputOptions = {
-  outputFile: {
-    path: string;
-    name: string;
-    extension: ReportExtension;
-  };
-  outputQuality: number;
-};
-
-interface ankiOptions {
-  enabled: boolean;
-  ankiIntegration?: ankiIntegration;
-  options?: {
-    retentionMode: RetentionMode;
-    trackedDecks: number[];
-  };
-}
-
-type outputOptions = {
   outputFile: {
     path: string;
     name: string;
@@ -107,27 +87,28 @@ interface ankiIntegration {
 const defaultProfilePicture =
   "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR4aJxpLDs-i-t-xiNj4uNHz1mhNpCJpR21DQ&s";
 
-export default async function upgrade_1_0_1() {
-  if (new SemVer(CacheManager.get().version).compare("1.0.1") > -1) {
+export default async function upgrade_1_0_2() {
+  console.log("Checking");
+  console.log("version is " + CacheManager.get().version);
+  console.log(
+    "Compare is " + new SemVer(CacheManager.get().version).compare("1.0.2")
+  );
+
+  if (new SemVer(CacheManager.get().version).compare("1.0.2") > -1) {
     return;
   }
-  const config: previous_config = getConfig() as previous_config;
+  upgrade_1_0_1();
+
+  const config: previous_config = getConfig() as any as previous_config;
   if (config == undefined) return;
 
-  const hadIntegration = config.anki.ankiIntegration != undefined;
-  delete config.anki.ankiIntegration;
-
-  const new_config: new_config = getConfig() as any as new_config;
-  if (hadIntegration) {
-    new_config.anki.ankiIntegration = {
-      url: DEFAULT_ANKI_URL,
-      key: "",
-    };
-  }
-  new_config.appreance = {
-    glow: true,
+  const newConfig: new_config = {
+    ...config,
+    appearance: config.appreance,
+    account: { ...config.account, profilePicture: defaultProfilePicture },
   };
+  delete (newConfig as any).appreance;
 
-  setConfig(new_config);
+  setConfig(newConfig);
   return;
 }
