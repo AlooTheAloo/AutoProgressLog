@@ -98,7 +98,7 @@ export const optionsSchema = z.object({
 // derive the TS type if you like:
 export type Options = z.infer<typeof optionsSchema>;
 
-async function checkHealth(rawInput: unknown) {
+export default async function checkHealth(rawInput: unknown) {
   const result = optionsSchema.safeParse(rawInput);
   if (!result.success) {
     console.error(result.error.format());
