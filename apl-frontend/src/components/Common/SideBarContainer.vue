@@ -131,7 +131,7 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  window.ipcRenderer.removeAllListeners();
+  // window.ipcRenderer.removeAllListeners();
   window.ipcRenderer.removeAllListeners("update-available");
 });
 
