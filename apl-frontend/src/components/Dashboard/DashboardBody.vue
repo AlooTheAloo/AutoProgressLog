@@ -7,15 +7,12 @@ import Brain from "../../assets/Icons/brain.png";
 import Calendar from "../../assets/Icons/calendar.png";
 
 import AppSmallWidget from "./AppSmallWidget.vue";
-import { computed, onMounted, ref } from "vue";
-import pluralize, { plural } from "pluralize";
+import { computed } from "vue";
+import pluralize from "pluralize";
 import ImmersionSources from "./ImmersionSources.vue";
 import Skeleton from "primevue/skeleton";
 import { useWindowSize } from "@vueuse/core";
-import Dialog from "primevue/dialog";
 import { DashboardDTO } from "../../../electron/main/Electron-Backend/types/Dashboard";
-import AccountDisplay from "../Common/AccountDisplay.vue";
-import PlaceholderStat from "./PlaceholderStat.vue";
 import ImmersionStreak from "./ImmersionStreak.vue";
 import { motion } from "motion-v";
 
@@ -82,7 +79,6 @@ const bottomText = computed(() => {
   </div>
 
   <div v-else class="flex flex-col flex-grow items-center">
-    <AccountDisplay></AccountDisplay>
     <div class="flex-col justify-center gap-10 flex h-fit w-fit items-center">
       <div class="flex 1720:flex-row flex-col gap-3 justify-center">
         <div class="flex flex-row gap-3 w-[45rem]">
@@ -152,7 +148,20 @@ const bottomText = computed(() => {
           </div>
           <div v-else>
             <div class="hidden xl:flex">
-              <div
+              <motion.div
+                :initial="{
+                  opacity: 0,
+                  y: 20,
+                  filter: 'blur(10px)',
+                }"
+                :while-in-view="{
+                  y: 0,
+                  opacity: 1,
+                  filter: 'blur(0px)',
+                }"
+                :transition="{
+                  delay: 0.15,
+                }"
                 class="flex flex-col flex-grow h-36 bg-black rounded-xl items-center justify-center text-white text-center"
               >
                 <div class="font-semibold text-2xl">Want more data?</div>
@@ -160,7 +169,7 @@ const bottomText = computed(() => {
                   Enable anki integration in the settings page to see your
                   statistics.
                 </div>
-              </div>
+              </motion.div>
             </div>
           </div>
         </div>
