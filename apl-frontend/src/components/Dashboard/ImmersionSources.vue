@@ -123,6 +123,11 @@ let options: ComputedRef<ApexOptions> = computed(() => {
           type: "none",
         },
       },
+      hover: {
+        filter: {
+          type: "none",
+        },
+      },
     },
     plotOptions: {
       pie: {

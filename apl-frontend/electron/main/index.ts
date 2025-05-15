@@ -88,6 +88,7 @@ export async function createWindow() {
     // #298
     win.loadURL(VITE_DEV_SERVER_URL);
     // Open devTool if the app is not packaged
+    console.log("opening devt");
     win.webContents.openDevTools();
   } else {
     win.loadFile(indexHtml);
