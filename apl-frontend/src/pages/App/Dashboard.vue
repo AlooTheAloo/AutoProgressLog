@@ -239,11 +239,14 @@ const closeFirstDialog = () => {
             </Button>
           </div>
         </div>
-        <div class="flex flex-col items-end gap-2 w-fit flex-shrink-0">
+        <div
+          class="flex flex-col items-end gap-2 w-fit flex-shrink-0 generateButton"
+        >
           <Button
             severity="info"
             @click="generateReport"
             :disabled="disableActionButtons"
+            aschild
           >
             <i class="pi pi-plus-circle text-white mr-2" />
             <span class="text-white font-bold">Generate Report</span>
@@ -275,3 +278,10 @@ const closeFirstDialog = () => {
     </div>
   </div>
 </template>
+
+<style>
+.generateButton > .p-button-info {
+  background-color: #22a7d1 !important;
+  border: 1px solid #22a7d1 !important;
+}
+</style>
