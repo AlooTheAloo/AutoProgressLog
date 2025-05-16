@@ -65,7 +65,7 @@ function onPageSelect(page: helpPage) {
           ease: 'easeInOut',
         }"
       >
-        <div class="w-fit h-8">
+        <div class=" flex flex-col items-start">
           <Button
             link
             style="padding: 0"
