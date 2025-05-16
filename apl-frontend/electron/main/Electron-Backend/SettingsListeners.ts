@@ -5,12 +5,13 @@ import {
   getFileInAPLData,
   updateConfig,
 } from "../../../apl-backend/Helpers/getConfig";
-import { writeFileSync } from "fs";
+import { writeFileSync, rmdirSync } from "fs";
 import { Options } from "../../../apl-backend/types/options";
 import { EventEmitter } from "node:events";
 import { win } from "..";
+import { app } from "electron";
 import path from "node:path";
-import { cpSync } from "node:fs";
+import { cpSync, rmSync } from "node:fs";
 import { setConfig } from "../../../apl-backend/config/configManager";
 
 export const onConfigChange = new EventEmitter();
@@ -34,6 +35,16 @@ export function settingsListeners() {
       win?.webContents.send("config-change", newConfig);
     }
   );
+
+  ipcMain.handle("reset-settings", async () => {
+    console.log("reset settings handled in the electron process");
+    rmSync(path.resolve(configPath, "../"), {
+      recursive: true,
+      force: true,
+    });
+    app.relaunch();
+    app.exit();
+  });
 
   ipcMain.handle("Upload-Profile-Picture", async () => {
     console.log("caca time");
