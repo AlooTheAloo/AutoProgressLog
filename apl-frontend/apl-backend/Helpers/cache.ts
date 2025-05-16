@@ -90,6 +90,8 @@ export class CacheManager {
   };
 
   public static get = (createIfNull = true): cacheList => {
+    if (!fs.existsSync(cache_location))
+      return { list: [], version: appVersion };
     return JSON.parse(fs.readFileSync(cache_location).toString());
   };
 }

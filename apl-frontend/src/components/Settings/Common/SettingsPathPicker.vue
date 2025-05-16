@@ -23,6 +23,7 @@ function updateValue(value: any) {
 }
 
 function chooseFilePath() {
+  console.log("props folder is " + props.folder);
   window.ipcRenderer
     .invoke(!!props.folder ? "OpenPathDialog" : "OpenFileDialog", value.value)
     .then((path) => {
