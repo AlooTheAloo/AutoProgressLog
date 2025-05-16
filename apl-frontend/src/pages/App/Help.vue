@@ -13,7 +13,7 @@ import { useConfirm } from "primevue/useconfirm";
 import { CopyReportToast } from "../../../electron/main/Electron-Backend/ReportsListeners";
 import Toast from "primevue/toast";
 import { useToast } from "primevue/usetoast";
-import { getHelpCenter, helpPage } from "../../services/helpService";
+import { getHelpCenter, HelpPage } from "../../services/helpService";
 import { AnimatePresence, motion } from "motion-v";
 import BackButton from "../../components/Common/BackButton.vue";
 
@@ -27,10 +27,10 @@ type ListReport = {
 
 onMounted(() => {});
 
-const guides = ref<helpPage[]>(getHelpCenter());
-const selectedGuide = shallowRef<helpPage | undefined>(undefined);
+const guides = ref<HelpPage[]>(getHelpCenter());
+const selectedGuide = shallowRef<HelpPage | undefined>(undefined);
 
-function onPageSelect(page: helpPage) {
+function onPageSelect(page: HelpPage) {
   selectedGuide.value = page;
 }
 </script>
@@ -124,6 +124,7 @@ function onPageSelect(page: helpPage) {
                 :inViewOptions="{ amount: 0, once: false }"
                 class="flex justify-between items-center gap-2 h-20 w-full bg-[#242424] rounded-xl p-5"
               >
+                <img :src="page.icon" class="w-6 h-6 pr-1"  alt="icon"/>
                 <div class="flex flex-col w-0 flex-grow">
                   <h1 class="text-white text-xl font-extrabold truncate">
                     {{ page.title }}
