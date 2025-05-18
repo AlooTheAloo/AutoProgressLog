@@ -184,11 +184,14 @@ import { getTimeEntries } from "../../apl-backend/toggl/toggl-service";
 import dayjs from "dayjs";
 import { CacheManager } from "../../apl-backend/Helpers/cache";
 import checkHealth from "./Electron-App/HealthCheck";
+import { init } from "@bokuweb/zstd-wasm";
 
 app.on("ready", async () => {
   if (CacheManager.verifyVersion()) {
     await checkHealth(getConfig());
   }
+
+  await init();
 
   buildMenu(app);
   createAutoReport();
