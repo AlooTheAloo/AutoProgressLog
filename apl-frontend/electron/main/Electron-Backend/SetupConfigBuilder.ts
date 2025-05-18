@@ -23,7 +23,7 @@ import { CacheManager } from "../../../apl-backend/Helpers/cache";
 import { getAnkiCardReviewCount } from "../../../apl-backend/anki/db";
 import dayjs from "dayjs";
 
-let account: TogglAccount;
+let account: TogglAccount | undefined;
 const DEFAULT_CONFIG: Options = {
   account: {
     userName: "",
@@ -192,6 +192,7 @@ export function setupListeners() {
   });
 
   ipcMain.handle("toggl-api-key-set", async (event: any, arg: any) => {
+    account = undefined;
     const me = await new Toggl({
       auth: {
         token: arg,

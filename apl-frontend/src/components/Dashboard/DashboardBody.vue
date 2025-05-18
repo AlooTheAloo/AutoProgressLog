@@ -160,7 +160,7 @@ const bottomText = computed(() => {
                   filter: 'blur(0px)',
                 }"
                 :transition="{
-                  delay: 0.15,
+                  delay: 0.1,
                 }"
                 class="flex flex-col flex-grow h-36 bg-black rounded-xl items-center justify-center text-white text-center"
               >

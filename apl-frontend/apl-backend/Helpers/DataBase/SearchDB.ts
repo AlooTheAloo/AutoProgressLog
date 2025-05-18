@@ -16,6 +16,21 @@ interface flatSyncData {
   lastAnkiUpdate: number;
 }
 
+export async function getTotalTime(): Promise<number> {
+  return new Promise((resolve, reject) => {
+    new sqlite3.Database(syncDataPath).all(
+      `
+        SELECT SUM(seconds) as "sum" FROM immersionActivity
+      `,
+      (err, rows: any[]) => {
+        if (err) {
+          reject(err);
+        } else resolve(rows[0].sum ?? 0);
+      }
+    );
+  });
+}
+
 export async function GetLastEntry(type?: SyncType): Promise<SyncData | null> {
   return new Promise((resolve, reject) => {
     new sqlite3.Database(syncDataPath).all(
@@ -73,8 +88,7 @@ export async function getreadinghours() {
       (err, rows: any[]) => {
         if (err) {
           reject(err);
-        }
-        resolve(rows[0].time ?? 0);
+        } else resolve(rows[0].time ?? 0);
       }
     );
   });

@@ -117,7 +117,7 @@ function ToggleAutogen(value: boolean) {
     />
 
     <SettingsResetSettings
-      label="Reset application settings"
+      label="Reset all application data"
       help-text="CAUTION! This will reset the entire application data, any data WILL be erased and WILL NOT be recoverable."
     />
   </div>

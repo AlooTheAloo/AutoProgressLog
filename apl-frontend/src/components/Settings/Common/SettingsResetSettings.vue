@@ -44,7 +44,7 @@ function resetSettings() {
       <Button
         severity="danger"
         type="button"
-        label="RESET SETTINGS"
+        label="Yes, delete all app data"
         @click="resetSettings"
       ></Button>
     </div>
@@ -64,7 +64,7 @@ function resetSettings() {
     </div>
     <div class="w-96 flex">
       <Button severity="danger" @click="resetDialogVisible = true" :auto="true">
-        RESET SETTINGS
+        Reset app data
       </Button>
     </div>
   </div>

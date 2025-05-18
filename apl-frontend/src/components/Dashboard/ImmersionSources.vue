@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import ApexCharts from "vue3-apexcharts";
 import { ApexOptions } from "apexcharts";
-import { computed, ComputedRef, ref, watch } from "vue";
+import { computed, ComputedRef, reactive, ref, watch, watchEffect } from "vue";
 import dayjs from "dayjs";
-import { useWindowSize } from "@vueuse/core";
 import { NWayInterpol } from "../../util/n-way-interpol";
 import { ImmersionSource } from "../../../electron/main/Electron-Backend/types/Dashboard";
 import pluralize from "pluralize";
@@ -15,8 +14,6 @@ type DashboardImmersionSource = {
   enabled: boolean;
   colorIndex: number;
 };
-
-const { width, height } = useWindowSize();
 
 const limit /* As x goes to infinity ∫sqrt(tan x) dx ??? */ = ref<number>(4);
 const props = defineProps<{
@@ -31,25 +28,21 @@ const totalHours = computed(() => {
 
 const computedSources = ref<DashboardImmersionSource[]>([]);
 
-watch(
-  props.sources,
-  () => {
-    computedSources.value = props.sources
-      .sort((a, b) => b.relativeValue - a.relativeValue)
-      .map((x: ImmersionSource, i) => {
-        return {
-          name: x.name,
-          relativeValue: x.relativeValue,
-          enabled: true,
-          colorIndex: i,
-        };
-      });
-  },
-  {
-    deep: true,
-    immediate: true,
-  }
-);
+const reactiveSources = ref(props.sources);
+watchEffect(() => {
+  console.log("sources changed", reactiveSources.value);
+  console.log("It is " + props.sources);
+  computedSources.value = props.sources
+    .sort((a, b) => b.relativeValue - a.relativeValue)
+    .map((x: ImmersionSource, i) => {
+      return {
+        name: x.name,
+        relativeValue: x.relativeValue,
+        enabled: true,
+        colorIndex: i,
+      };
+    });
+});
 
 const dateString = computed(() => {
   const now = dayjs();
@@ -62,6 +55,7 @@ const dateString = computed(() => {
 });
 
 const sortedSources = computed(() => {
+  console.log("time to sort" + computedSources.value);
   const sort = computedSources.value.sort(
     (a, b) => b.relativeValue - a.relativeValue
   );
@@ -79,6 +73,7 @@ const sortedSources = computed(() => {
       colorIndex: 727,
     });
   }
+  console.log("We're done !!" + arr);
   return arr
     .filter((x) => x.enabled)
     .map((x) => {
@@ -170,6 +165,7 @@ let options: ComputedRef<ApexOptions> = computed(() => {
 });
 
 let series /* Literally a calculus reference */ = computed(() => {
+  console.log("caca " + sortedSources.value);
   return sortedSources.value.map((x) => x.relativeValue);
 });
 </script>

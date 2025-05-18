@@ -33,9 +33,6 @@ export async function getAnkiCardReviewCount(
 ) {
   console.log("getting reviews since : " + startTime.valueOf());
   return new Promise<number | null>((res, rej) => {
-    console.log(
-      `SELECT COUNT(*) as "reviews" FROM revlog ${JoinTrackedDecks()} AND revlog.id > ${startTime.valueOf()}`
-    );
     // Create a database connection
     const db = open();
     // Execute SQL query

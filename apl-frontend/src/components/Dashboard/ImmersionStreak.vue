@@ -37,8 +37,10 @@ const options: ApexOptions = {
       style: {
         colors: "#fff",
       },
-      formatter: (value: any, i) => {
-        return dayjs().subtract(value, "day").format("ddd");
+      formatter: (value: any) => {
+        return dayjs()
+          .subtract(7 - value, "day")
+          .format("ddd");
       },
     },
   },
