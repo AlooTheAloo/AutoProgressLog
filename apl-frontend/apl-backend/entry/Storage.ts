@@ -25,7 +25,6 @@ export default class Storage {
   }
 
   public async close() {
-    console.log("close");
     await new Promise((res, rej) => {
       // Close the database connection when done
       this.db.close((err) => {
@@ -83,45 +82,32 @@ export default class Storage {
   }
 
   public async applyChunk(chunk: Chunk, pending_usn: number) {
-    console.log("Applying chunk...");
-    console.log("Chunk is " + JSON.stringify(chunk));
     await this.mergeRevlog(chunk.revlog ?? []);
-    console.log("Applied revlog");
     await this.mergeCards(chunk.cards ?? [], pending_usn);
-    console.log("Applied cards");
     await this.mergeNotes(chunk.notes ?? [], pending_usn);
-    console.log("Applied notes");
   }
 
   async mergeRevlog(entries: RevlogEntry[]): Promise<void[]> {
-    if (entries.length != 0) {
-      console.log(`Applying chunk with ${entries.length} reviews`);
-    } else return [];
+    if (entries.length == 0) return [];
 
     return Promise.all(entries.map((x) => this.addRevlogEntry(x)));
   }
 
   async mergeCards(entries: CardEntry[], pendingUsn: number): Promise<void[]> {
-    if (entries.length != 0) {
-      console.log(`Applying chunk with ${entries.length} cards`);
-    } else return [];
+    if (entries.length == 0) return [];
     return Promise.all(
       entries.map((x) => this.addOrUpdateCardIfNewer(x, pendingUsn))
     );
   }
 
   async mergeNotes(entries: NoteEntry[], pendingUsn: number): Promise<void[]> {
-    if (entries.length != 0) {
-      console.log(`Applying chunk with ${entries.length} notes`);
-    } else return [];
-
+    if (entries.length == 0) return [];
     return Promise.all(
       entries.map((x) => this.addOrUpdateNoteIfNewer(x, pendingUsn))
     );
   }
 
   async addRevlogEntry(entry: RevlogEntry) {
-    console.log("adding revlog entry", entry);
     return new Promise<void>((s, j) => {
       this.db
         .prepare(
@@ -135,8 +121,6 @@ export default class Storage {
   }
 
   async addOrUpdateCardIfNewer(entry: CardEntry, pendingUsn: number) {
-    console.log("adding/updating card " + entry);
-
     return new Promise<void>((s, j) => {
       this.db
         .prepare(
@@ -154,7 +138,6 @@ export default class Storage {
   }
 
   async addOrUpdateNoteIfNewer(entry: NoteEntry, pendingUsn: number) {
-    console.log("adding/updating " + entry);
     return new Promise<void>((s, j) => {
       this.db
         .prepare(
