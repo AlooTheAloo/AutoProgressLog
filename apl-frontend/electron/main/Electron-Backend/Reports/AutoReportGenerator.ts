@@ -2,8 +2,8 @@ import { runGeneration } from "../../../../apl-backend/generate/generate";
 import { setSyncing } from "../../../../apl-backend/generate/sync";
 import { getConfig } from "../../../../apl-backend/Helpers/getConfig";
 import nodeScheduler, { Job } from "node-schedule";
-import { runChecks } from "../dashboardListeners";
-import { onConfigChange } from "../settingsListeners";
+import { runChecks } from "../DashboardListeners";
+import { onConfigChange } from "../SettingsListeners";
 import { Options } from "../../../../apl-backend/types/options";
 import { powerSaveBlocker } from "electron";
 

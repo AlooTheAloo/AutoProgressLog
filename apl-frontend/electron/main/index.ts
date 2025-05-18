@@ -52,7 +52,7 @@ if (os.release().startsWith("6.1")) app.disableHardwareAcceleration();
 // Set application name for Windows 10+ notifications
 if (process.platform === "win32") app.setAppUserModelId(app.getName());
 
-if (VITE_DEV_SERVER_URL) {
+if (!VITE_DEV_SERVER_URL) {
   if (!app.requestSingleInstanceLock()) {
     console.log("dead");
     app.quit();
@@ -136,8 +136,6 @@ app.on("window-all-closed", () => {
 
 app.on("second-instance", async () => {
   if (VITE_DEV_SERVER_URL) return;
-
-  console.log("second instance");
   if (win) {
     if (process.platform == "darwin") {
       app.dock?.show();

@@ -21,7 +21,7 @@ import {
 } from "../anki/db";
 import dayjs from "dayjs";
 import { sumTime } from "../Helpers/entryHelper";
-import { CreateDTO } from "../../electron/main/Electron-Backend/dashboardListeners";
+import { CreateDTO } from "../../electron/main/Electron-Backend/DashboardListeners";
 import { SyncData } from "../types/sync";
 import { CacheManager } from "../Helpers/cache";
 import { win } from "../../electron/main";

@@ -10,12 +10,12 @@ import Skeleton from "primevue/skeleton";
 import score from "../../../src/assets/rewarded.png";
 import ConfirmPopup from "primevue/confirmpopup";
 import { useConfirm } from "primevue/useconfirm";
-import { CopyReportToast } from "../../../electron/main/Electron-Backend/reportsListeners";
 import Toast from "primevue/toast";
 import { useToast } from "primevue/usetoast";
 import InputText from "primevue/inputtext";
 import Dialog from "primevue/dialog";
 import { motion, AnimatePresence } from "motion-v";
+import { CopyReportToast } from "../../../electron/main/Electron-Backend/ReportsListeners";
 
 const rows = 6;
 const router = useRouter();

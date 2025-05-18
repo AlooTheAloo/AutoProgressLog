@@ -8,7 +8,7 @@ import dayjs from "dayjs";
 import { runSync } from "../../../../apl-backend/generate/sync";
 import { checkInternet } from "../../../../apl-backend/Helpers/Healthcheck/internetHelper";
 import { getConfig } from "../../../../apl-backend/Helpers/getConfig";
-import { onConfigChange } from "../settingsListeners";
+import { onConfigChange } from "../SettingsListeners";
 import { Options } from "../../../../apl-backend/types/options";
 
 const clientId = "1330290329261445221";

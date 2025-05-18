@@ -4,7 +4,7 @@ import { ankiIntegration, Options } from "../../../apl-backend/types/options";
 import {
   getSetupAnkiIntegration,
   setAnkiIntegration,
-} from "./setupConfigBuilder";
+} from "./SetupConfigBuilder";
 import {
   DeleteAnkiData,
   getAnkiCardReviewCount,
@@ -17,7 +17,7 @@ import {
   createAnkiIntegration,
   getDecksCards,
 } from "../../../apl-backend/config/configAnkiIntegration";
-import { onConfigChange } from "./settingsListeners";
+import { onConfigChange } from "./SettingsListeners";
 import AnkiHTTPClient from "../../../apl-backend/entry/AnkiHTTPClient";
 import { ankiPath } from "../../../apl-backend/Helpers/getConfig";
 

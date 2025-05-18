@@ -1,8 +1,8 @@
 import dayjs, { Dayjs } from "dayjs";
 import sqlite3, { Database } from "sqlite3";
-import { ankiPath, getConfig, syncDataPath } from "../Helpers/getConfig.js";
-import { RetentionMode } from "../types/options.js";
-import { getSetupAnki } from "../../electron/main/Electron-Backend/setupConfigBuilder.js";
+import { ankiPath, getConfig, syncDataPath } from "../Helpers/getConfig";
+import { RetentionMode } from "../types/options";
+import { getSetupAnki } from "../../electron/main/Electron-Backend/SetupConfigBuilder";
 
 interface reviewsrow {
   reviews: number;
