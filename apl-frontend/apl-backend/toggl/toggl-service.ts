@@ -6,7 +6,7 @@ import { compareActivities } from "../Helpers/activityHelper";
 import { Toggl } from "toggl-track";
 import { getConfig } from "../Helpers/getConfig";
 import { activity } from "../types/activity";
-import { onConfigChange } from "../../electron/main/Electron-Backend/SettingsListeners";
+import { onConfigChange } from "../../electron/main/Electron-Backend/settingsListeners";
 import { Options } from "../types/options";
 
 const ignore = (tags: string[]) =>

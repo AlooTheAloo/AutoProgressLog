@@ -2,7 +2,7 @@ import dayjs, { Dayjs } from "dayjs";
 import sqlite3, { Database } from "sqlite3";
 import { ankiPath, getConfig, syncDataPath } from "../Helpers/getConfig.js";
 import { RetentionMode } from "../types/options.js";
-import { getSetupAnki } from "../../electron/main/Electron-Backend/SetupConfigBuilder.js";
+import { getSetupAnki } from "../../electron/main/Electron-Backend/setupConfigBuilder.js";
 
 interface reviewsrow {
   reviews: number;

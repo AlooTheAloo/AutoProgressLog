@@ -30,7 +30,7 @@ import { readFile } from "fs";
 import { promises as fsPromises } from "fs";
 import sharp from "sharp";
 
-export function DashboardListeners() {
+export function dashboardListeners() {
   ipcMain.handle("isSyncing", async (event: any) => {
     return isSyncing();
   });
