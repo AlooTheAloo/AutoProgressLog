@@ -71,7 +71,7 @@ function SelectProfile() {
         <p class="text-xs sm:text-sm lg:text-base text-[#C0C0C0]">
           {{
             profiles.length === 0
-              ? "An Anki window may launch and shut down during this process."
+              ? "If this process is taking too long, please verify your Internet connection and AnkiWeb connection settings"
               : "Please select the profile you would like to connect to."
           }}
         </p>
