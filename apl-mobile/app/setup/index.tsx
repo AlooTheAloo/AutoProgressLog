@@ -16,7 +16,6 @@ export default function SetupScreen() {
     >
       <ThemedText
         style={{
-          color: "white",
           fontWeight: "bold",
           fontSize: 25,
         }}

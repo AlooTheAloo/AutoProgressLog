@@ -12,6 +12,8 @@ const MAPPING = {
   "chart.bar.xaxis": "bar-chart",
   "trophy.fill": "stars",
   "gearshape.fill": "settings",
+  "person.crop.circle.fill": "account-circle",
+  "paintbrush.pointed.fill": "format-paint",
 } as Partial<
   Record<
     import("expo-symbols").SymbolViewProps["name"],

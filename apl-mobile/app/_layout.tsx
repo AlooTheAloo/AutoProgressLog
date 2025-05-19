@@ -27,21 +27,16 @@ export default function RootLayout() {
     getFlag();
   }, []);
 
-  // 2) load your fonts
-  const [fontsLoaded] = useFonts({
-    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
-  });
-
   // 3) once *both* are ready, hide splash & navigate
   useEffect(() => {
-    if (fontsLoaded && didSetup !== null) {
+    if (didSetup !== null) {
       SplashScreen.hideAsync();
       router.replace(didSetup ? "/(tabs)" : "/setup");
     }
-  }, [fontsLoaded, didSetup]);
+  }, [didSetup]);
 
   // don’t render anything until we know both flags
-  if (!fontsLoaded || didSetup === null) {
+  if (didSetup === null) {
     return null;
   }
 

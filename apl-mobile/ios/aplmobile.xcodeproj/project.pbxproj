@@ -16,6 +16,8 @@
 		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
 		C1B16AEBBE7CDE35DD262453 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 20F68B73DAEC2279CDAACA5B /* PrivacyInfo.xcprivacy */; };
 		E9CAF3B65E35435CB0724C30 /* noop-file.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A039D77177C411CBE018918 /* noop-file.swift */; };
+		5E8922B201EF4FBB9A44779E /* Inter_700Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 32A0BE5B6F4040DA95CD7359 /* Inter_700Bold.ttf */; };
+		51D16F3DD9E84B5A8C0D30E9 /* Inter_900Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 82D0A2E7EA86424780B57B04 /* Inter_900Black.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -35,6 +37,8 @@
 		BB2F792C24A3F905000567C9 /* Expo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Expo.plist; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		FAC715A2D49A985799AEE119 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-aplmobile/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
+		32A0BE5B6F4040DA95CD7359 /* Inter_700Bold.ttf */ = {isa = PBXFileReference; name = "Inter_700Bold.ttf"; path = "../node_modules/@expo-google-fonts/inter/700Bold/Inter_700Bold.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		82D0A2E7EA86424780B57B04 /* Inter_900Black.ttf */ = {isa = PBXFileReference; name = "Inter_900Black.ttf"; path = "../node_modules/@expo-google-fonts/inter/900Black/Inter_900Black.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -91,6 +95,7 @@
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				D65327D7A22EEC0BE12398D9 /* Pods */,
 				D7E4C46ADA2E9064B798F356 /* ExpoModulesProviders */,
+				25B2F277F4E3467DBA0B0848 /* Resources */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -138,6 +143,16 @@
 			);
 			name = ExpoModulesProviders;
 			sourceTree = "<group>";
+		};
+		25B2F277F4E3467DBA0B0848 /* Resources */ = {
+			isa = "PBXGroup";
+			children = (
+				32A0BE5B6F4040DA95CD7359 /* Inter_700Bold.ttf */,
+				82D0A2E7EA86424780B57B04 /* Inter_900Black.ttf */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+			path = "";
 		};
 /* End PBXGroup section */
 
@@ -206,6 +221,8 @@
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */,
 				C1B16AEBBE7CDE35DD262453 /* PrivacyInfo.xcprivacy in Resources */,
+				5E8922B201EF4FBB9A44779E /* Inter_700Bold.ttf in Resources */,
+				51D16F3DD9E84B5A8C0D30E9 /* Inter_900Black.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -370,7 +387,7 @@
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
 				PRODUCT_BUNDLE_IDENTIFIER = com.stsapps.aplmobile;
-				PRODUCT_NAME = aplmobile;
+				PRODUCT_NAME = "aplmobile";
 				SWIFT_OBJC_BRIDGING_HEADER = "aplmobile/aplmobile-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -401,7 +418,7 @@
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
 				PRODUCT_BUNDLE_IDENTIFIER = com.stsapps.aplmobile;
-				PRODUCT_NAME = aplmobile;
+				PRODUCT_NAME = "aplmobile";
 				SWIFT_OBJC_BRIDGING_HEADER = "aplmobile/aplmobile-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
