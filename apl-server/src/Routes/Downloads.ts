@@ -15,8 +15,8 @@ interface Release {
 }
 
 export default new Elysia().get("/downloadLinks", async ({ set, body }) => {
-  const owner = "727apps";
-  const repo = "AutoUpdateTest";
+  const owner = "AlooTheAloo";
+  const repo = "AutoProgressLog";
 
   const windowsUrl = await getInstallerUrl(owner, repo, "windows");
   const macUrl = await getInstallerUrl(owner, repo, "mac");
