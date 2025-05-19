@@ -1,13 +1,5 @@
 import { ankiIntegration } from "../types/options";
-import fs, { existsSync } from "fs";
 import sqlite3 from "sqlite3";
-import { exec } from "child_process";
-import proc from "find-process";
-import { app, shell } from "electron";
-import path, { basename } from "path";
-import { kill } from "process";
-import { getSetupAnkiIntegration } from "../../electron/main/Electron-Backend/SetupConfigBuilder";
-import { win } from "../../electron/main/index";
 import { ankiPath } from "../Helpers/getConfig";
 import AnkiHTTPClient from "../entry/AnkiHTTPClient";
 

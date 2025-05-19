@@ -85,7 +85,7 @@ createApp(App)
     theme: {
       preset: Noir,
       options: {
-        darkModeSelector: ".my-app-dark",
+        darkModeSelector: ".dark",
       },
     },
     ripple: true,

@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router";
 import Logo from "../../assets/Logo.png";
+import LogoDark from "../../assets/Logo-Dark.png";
+
 import { appPath as AppPath } from "../../pages/routes/appRoutes";
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import Dialog from "primevue/dialog";
@@ -22,7 +24,6 @@ import "github-markdown-css/github-markdown-dark.css";
 import { Options } from "../../../apl-backend/types/options";
 import { useWindowSize } from "@vueuse/core";
 import { AnimatePresence, motion } from "motion-v";
-import path from "path";
 
 const HELP_PAGE_URL = "https://www.aplapp.dev/#/";
 const router = useRouter();
@@ -219,7 +220,7 @@ const toastValue = ref<UserDialog>();
 
   <div class="flex w-screen h-screen overflow-hidden">
     <div
-      class="flex flex-col bg-[#1B1B1B] p-3 transition-all duration-250"
+      class="flex flex-col border-r-[1px] border-[#e0e0e0] dark:border-[#3d3e42] bg-[#f3f3f4] dark:bg-[#1B1B1B] p-3 transition-all duration-250"
       :class="{
         'w-20': !sidebarState,
         'w-48': sidebarState,
@@ -243,7 +244,13 @@ const toastValue = ref<UserDialog>();
           <div class="w-full z-10 p-3">
             <img
               :src="Logo"
-              class="transition-all duration-200"
+              class="transition-all duration-200 hidden dark:block"
+              :class="{ 'w-[2rem]': !sidebarState, 'w-16': sidebarState }"
+            />
+
+            <img
+              :src="LogoDark"
+              class="transition-all duration-200 dark:hidden"
               :class="{ 'w-[2rem]': !sidebarState, 'w-16': sidebarState }"
             />
           </div>
@@ -258,7 +265,7 @@ const toastValue = ref<UserDialog>();
             key="sidebar-button"
             @click="requestedSidebarState = !requestedSidebarState"
           >
-            <i class="pi pi-bars text-white" key="bars"></i>
+            <i class="pi pi-bars text-black dark:text-white" key="bars"></i>
           </motion.button>
         </AnimatePresence>
       </motion.div>
@@ -278,12 +285,12 @@ const toastValue = ref<UserDialog>();
           @click.stop
           :tabindex="route.path == null ? -1 : 0"
         >
-          <img :src="route.image" class="w-6 h-6" />
+          <img :src="route.image" class="invert dark:invert-0 w-6 h-6" />
           <AnimatePresence>
             <motion.div
               v-if="sidebarState"
               key="caca"
-              class="font-bold text-white text-md"
+              class="font-bold text-black dark:text-white text-md"
               :initial="{
                 opacity: 0,
                 filter: 'blur(10px)',
@@ -324,12 +331,12 @@ const toastValue = ref<UserDialog>();
           v-on:click="(e) => handleClick(route.path)"
           @click.stop
         >
-          <img :src="route.image" class="w-6 h-6" />
+          <img :src="route.image" class="invert dark:invert-0 w-6 h-6" />
           <AnimatePresence>
             <motion.div
               v-if="sidebarState"
               key="caca"
-              class="font-bold text-white text-md"
+              class="font-bold dark:text-white text-black text-md"
               :initial="{
                 opacity: 0,
                 filter: 'blur(10px)',
@@ -355,7 +362,7 @@ const toastValue = ref<UserDialog>();
         </button>
       </div>
     </div>
-    <div class="flex-1">
+    <div class="flex-1 dark:bg-[#0e0e0e35] bg-[#fbfbfb]">
       <slot />
     </div>
   </div>

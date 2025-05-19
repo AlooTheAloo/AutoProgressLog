@@ -47,7 +47,7 @@ const props = defineProps<SmallWidgetProps>();
     :transition="{
       delay: 0.05 * props.index,
     }"
-    class="w-96 h-36 relative bg-black rounded-xl flex items-center justify-center text-white"
+    class="w-96 h-36 relative bg-[#ebebec] dark:bg-black rounded-xl flex items-center justify-center text-white"
     ref="parent"
   >
     <div
@@ -60,11 +60,13 @@ const props = defineProps<SmallWidgetProps>();
     </div>
 
     <div
-      class="w-full h-36 relative rounded-xl flex items-center justify-center text-white border-2 border-transparent hover:border-[#22A7D1] trantiton-all duration-200"
+      class="w-full h-36 relative rounded-xl flex items-center justify-center text-black dark:text-white border-2 border-transparent hover:border-[#22A7D1] trantiton-all duration-200"
     >
       <div class="flex w-4/5 justify-center">
         <div class="flex-grow flex flex-col justify-center py-12">
-          <div class="font-extrabold flex items-center text-gray-400">
+          <div
+            class="font-extrabold flex items-center text-gray-600 dark:text-gray-400"
+          >
             {{ title }}
           </div>
           <div class="font-extrabold text-2xl">

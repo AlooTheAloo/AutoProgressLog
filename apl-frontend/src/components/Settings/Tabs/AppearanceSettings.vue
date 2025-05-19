@@ -4,6 +4,7 @@ import { Options } from "../../../../apl-backend/types/options";
 import SettingsFileUpload from "../Common/SettingsFileUpload.vue";
 import Toast from "primevue/toast";
 import { useToast } from "primevue/usetoast";
+import AppearanceOptions from "../Common/AppearanceOptions.vue";
 
 defineProps<{
   config: Options | undefined;
@@ -31,5 +32,7 @@ const emit = defineEmits<{
         })
       "
     />
+
+    <AppearanceOptions />
   </div>
 </template>

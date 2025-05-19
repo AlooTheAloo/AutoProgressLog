@@ -103,10 +103,14 @@ function onPageSelect(page: HelpPage) {
           ease: 'easeInOut',
         }"
       >
-        <div class="flex flex-col w-full h-screen px-40 py-20">
+        <div class="flex flex-col w-full h-screen px-10 py-3">
           <div class="flex w-full h-20 items-center my-5 justify-between">
             <div class="flex flex-col">
-              <h1 class="text-white text-4xl font-extrabold">Help center</h1>
+              <h1
+                class="bg-gradient-to-r bg-clip-text text-4xl font-extrabold text-transparent from-[#89BDFF] to-[#40ffff]"
+              >
+                Help center
+              </h1>
               <h2>Explore guides and find answers to your questions here.</h2>
             </div>
           </div>
@@ -121,11 +125,15 @@ function onPageSelect(page: HelpPage) {
                 :initial="{ opacity: 0 }"
                 :while-in-view="{ opacity: 1 }"
                 :inViewOptions="{ amount: 0, once: false }"
-                class="flex justify-between items-center gap-2 h-20 w-full bg-[#242424] rounded-xl p-5"
+                class="flex justify-between items-center gap-2 h-20 w-full dark:bg-black bg-[#eeeeef] dark:text-white text-black rounded-xl p-5"
               >
-                <img :src="page.icon" class="w-6 h-6 pr-1" alt="icon" />
+                <img
+                  :src="page.icon"
+                  class="w-6 h-6 pr-1 dark:invert-0 invert"
+                  alt="icon"
+                />
                 <div class="flex flex-col w-0 flex-grow">
-                  <h1 class="text-white text-xl font-extrabold truncate">
+                  <h1 class="text-xl font-extrabold truncate">
                     {{ page.title }}
                   </h1>
                   <h2 class="truncate">

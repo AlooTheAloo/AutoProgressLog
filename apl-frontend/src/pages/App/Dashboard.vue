@@ -197,7 +197,7 @@ const closeFirstDialog = () => {
             />
           </div>
         </div>
-        <div class="flex flex-col w-0 flex-grow">
+        <div class="flex flex-col w-0 flex-grow text-black dark:text-white">
           <h1
             class="flex items-center gap-2 bg-gradient-to-r text-lg xl:text-2xl font-bold"
           >
@@ -208,7 +208,7 @@ const closeFirstDialog = () => {
             </div>
             <div class="flex-grow truncate" v-else>{{ dto.userName }} !</div>
           </h1>
-          <div class="flex items-center">
+          <div class="flex items-center syncNowButton">
             <div
               class="xl:text-base text-sm font-bold flex items-center gap-1.5"
             >
@@ -221,7 +221,7 @@ const closeFirstDialog = () => {
               </div>
             </div>
             <Button
-              class="h-6"
+              class="h-6 mx-1"
               plain
               text
               @click="() => sync()"
@@ -253,7 +253,7 @@ const closeFirstDialog = () => {
             <span class="text-white font-bold">Generate Report</span>
           </Button>
           <div
-            :class="`flex rounded-md  h-8 text-black bg-white overflow-hidden ${
+            :class="`flex rounded-md bg-white h-8 text-black overflow-hidden ${
               disableActionButtons ? 'opacity-50' : ''
             }`"
             v-if="config?.general.autogen.enabled"
@@ -284,5 +284,10 @@ const closeFirstDialog = () => {
 .generateButton > .p-button-info {
   background-color: #22a7d1 !important;
   border: 1px solid #22a7d1 !important;
+}
+
+.syncNowButton > .p-button {
+  padding-left: 0.25rem;
+  padding-right: 0.25rem;
 }
 </style>

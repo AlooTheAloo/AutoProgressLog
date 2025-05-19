@@ -280,7 +280,9 @@ function updateAnki(value: boolean) {
 
   <div class="flex flex-col w-full gap-5 flex-grow" v-if="config != undefined">
     <div class="flex items-center h-12 gap-3">
-      <h1 class="text-2xl font-bold text-white">Connection settings</h1>
+      <h1 class="text-2xl font-bold dark:text-white text-black">
+        Connection settings
+      </h1>
       <Button
         class="w-fit h-10"
         v-on:click="easyAnkiVisible = true"
@@ -317,7 +319,9 @@ function updateAnki(value: boolean) {
     </SettingsField>
 
     <div class="flex items-center h-12 gap-3">
-      <h1 class="text-2xl font-bold text-white">Synchronization settings</h1>
+      <h1 class="text-2xl font-bold dark:text-white text-black">
+        Synchronization settings
+      </h1>
       <Button
         class="w-fit h-10"
         v-on:click="testKey"

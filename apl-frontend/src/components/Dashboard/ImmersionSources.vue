@@ -1,12 +1,21 @@
 <script setup lang="ts">
 import ApexCharts from "vue3-apexcharts";
 import { ApexOptions } from "apexcharts";
-import { computed, ComputedRef, reactive, ref, watch, watchEffect } from "vue";
+import {
+  computed,
+  ComputedRef,
+  onUnmounted,
+  reactive,
+  ref,
+  watch,
+  watchEffect,
+} from "vue";
 import dayjs from "dayjs";
 import { NWayInterpol } from "../../util/n-way-interpol";
 import { ImmersionSource } from "../../../electron/main/Electron-Backend/types/Dashboard";
 import pluralize from "pluralize";
 import formatTime from "../../util/timeFormat";
+import { ThemeManager } from "../../util/theme-manager";
 
 type DashboardImmersionSource = {
   name: string;
@@ -30,8 +39,6 @@ const computedSources = ref<DashboardImmersionSource[]>([]);
 
 const reactiveSources = ref(props.sources);
 watchEffect(() => {
-  console.log("sources changed", reactiveSources.value);
-  console.log("It is " + props.sources);
   computedSources.value = props.sources
     .sort((a, b) => b.relativeValue - a.relativeValue)
     .map((x: ImmersionSource, i) => {
@@ -146,7 +153,7 @@ let options: ComputedRef<ApexOptions> = computed(() => {
       custom: function ({ seriesIndex }: { seriesIndex: number }) {
         {
           const value = sortedSources.value[seriesIndex];
-          return `<div class="flex flex-col gap-2">
+          return `<div class="flex flex-col gap-2 bg-white dark:bg-gray-900 text-black dark:text-white">
               <div class="flex flex-row gap-2 items-center p-2">
                   <div class="w-3 h-3 rounded-full" style="background-color: ${colors.value[seriesIndex]}">
               </div>
@@ -164,20 +171,31 @@ let options: ComputedRef<ApexOptions> = computed(() => {
   return ret;
 });
 
+const theme = ref<string>(ThemeManager.getTheme());
+
+const unsubscribe = ThemeManager.onThemeChange((newTheme) => {
+  theme.value = newTheme;
+});
+
+onUnmounted(() => {
+  unsubscribe();
+});
+
 let series /* Literally a calculus reference */ = computed(() => {
-  console.log("caca " + sortedSources.value);
   return sortedSources.value.map((x) => x.relativeValue);
 });
 </script>
 
 <template>
   <div
-    class="flex flex-col bg-black rounded-lg w-0 flex-grow pt-5 border-2 border-transparent hover:border-[#22A7D1] trantiton-all duration-200"
+    class="flex flex-col text-black dark:text-white bg-[#ebebec] dark:bg-black rounded-lg w-0 flex-grow pt-5 border-2 border-transparent hover:border-[#22A7D1] trantiton-all duration-200"
   >
-    <div class="flex font-extrabold 1720:text-2xl text-xl text-white px-5">
+    <div class="flex font-extrabold 1720:text-2xl text-xl px-5">
       Immersion in the last 30 days
     </div>
-    <div class="font-extrabold text-gray-400 px-5 1720:text-lg text-sm">
+    <div
+      class="font-extrabold text-gray-600 dark:text-gray-400 px-5 1720:text-lg text-sm"
+    >
       {{ dateString }}
     </div>
     <div class="flex">
@@ -190,7 +208,7 @@ let series /* Literally a calculus reference */ = computed(() => {
             class="flex flex-col items-center justify-center flex-none relative"
           >
             <div class="absolute flex flex-col items-center">
-              <div class="font-bold text-xl 1720:text-2xl text-white">
+              <div class="font-bold text-xl 1720:text-2xl">
                 {{ totalHours }} hours
               </div>
               <div class="text-sm 1720:text-lg">
@@ -212,7 +230,7 @@ let series /* Literally a calculus reference */ = computed(() => {
 
       <!-- List Section -->
       <ul
-        class="max-w-[21.5rem] 1720:flex hidden divide-white/60 w-fit mr-4 divide-y divide-dashed text-white flex-col justify-center"
+        class="max-w-[21.5rem] 1720:flex hidden divide-black/60 dark:divide-white/60 w-fit mr-4 divide-y divide-dashed dark:text-white text-black flex-col justify-center"
       >
         <li
           v-for="(x, i) in sortedSources"

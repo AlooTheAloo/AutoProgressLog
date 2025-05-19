@@ -21,7 +21,7 @@ function resetSettings() {
   <Dialog
     v-model:visible="resetDialogVisible"
     modal
-    header="Reset account settings"
+    header="Reset all application data"
     :style="{ width: '30rem' }"
     :closeOnEscape="true"
     :closable="true"
