@@ -59,6 +59,7 @@
     <array>
       <string>Inter_700Bold.ttf</string>
       <string>Inter_900Black.ttf</string>
+      <string>Inter_500Medium.ttf</string>
     </array>
     <key>UILaunchStoryboardName</key>
     <string>SplashScreen</string>

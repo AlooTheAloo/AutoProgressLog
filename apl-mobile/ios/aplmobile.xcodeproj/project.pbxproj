@@ -18,6 +18,7 @@
 		E9CAF3B65E35435CB0724C30 /* noop-file.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A039D77177C411CBE018918 /* noop-file.swift */; };
 		5E8922B201EF4FBB9A44779E /* Inter_700Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 32A0BE5B6F4040DA95CD7359 /* Inter_700Bold.ttf */; };
 		51D16F3DD9E84B5A8C0D30E9 /* Inter_900Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 82D0A2E7EA86424780B57B04 /* Inter_900Black.ttf */; };
+		B0F795FDF4704F49B3C1C103 /* Inter_500Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AF26F60AACB5426CBCEDC960 /* Inter_500Medium.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -39,6 +40,7 @@
 		FAC715A2D49A985799AEE119 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-aplmobile/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
 		32A0BE5B6F4040DA95CD7359 /* Inter_700Bold.ttf */ = {isa = PBXFileReference; name = "Inter_700Bold.ttf"; path = "../node_modules/@expo-google-fonts/inter/700Bold/Inter_700Bold.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 		82D0A2E7EA86424780B57B04 /* Inter_900Black.ttf */ = {isa = PBXFileReference; name = "Inter_900Black.ttf"; path = "../node_modules/@expo-google-fonts/inter/900Black/Inter_900Black.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		AF26F60AACB5426CBCEDC960 /* Inter_500Medium.ttf */ = {isa = PBXFileReference; name = "Inter_500Medium.ttf"; path = "../node_modules/@expo-google-fonts/inter/500Medium/Inter_500Medium.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -149,6 +151,7 @@
 			children = (
 				32A0BE5B6F4040DA95CD7359 /* Inter_700Bold.ttf */,
 				82D0A2E7EA86424780B57B04 /* Inter_900Black.ttf */,
+				AF26F60AACB5426CBCEDC960 /* Inter_500Medium.ttf */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -223,6 +226,7 @@
 				C1B16AEBBE7CDE35DD262453 /* PrivacyInfo.xcprivacy in Resources */,
 				5E8922B201EF4FBB9A44779E /* Inter_700Bold.ttf in Resources */,
 				51D16F3DD9E84B5A8C0D30E9 /* Inter_900Black.ttf in Resources */,
+				B0F795FDF4704F49B3C1C103 /* Inter_500Medium.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

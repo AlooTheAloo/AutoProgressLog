@@ -9,3 +9,4 @@ apl-frontend/apl-backend/apl-visuals/visuals/report-layout.json
 apl-frontend/apl-backend/apl-visuals/visuals/assets/**
 
 .idea
+apl-mobile/android/app/my-upload-key.keystore

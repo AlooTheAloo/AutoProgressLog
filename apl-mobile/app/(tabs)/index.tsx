@@ -6,6 +6,9 @@ import {
   View,
   Text,
   Button,
+  useColorScheme,
+  ScrollView,
+  RefreshControl,
 } from "react-native";
 
 import { HelloWave } from "@/components/HelloWave";
@@ -13,27 +16,67 @@ import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { TitleThemedText } from "@/components/TitleThemedText";
-import { useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { MMKVLoader, useMMKVStorage } from "react-native-mmkv-storage";
+import dayjs from "dayjs";
+import duration from "dayjs/plugin/duration";
+import { IconSymbol } from "@/components/ui/IconSymbol";
+
+dayjs.extend(duration);
 
 const storage = new MMKVLoader().initialize();
+const currentTime = dayjs();
 
 export default function HomeScreen() {
   const [user, setUser] = useMMKVStorage("user", storage, "undefined");
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 500);
+  }, []);
+  const colorScheme = useColorScheme();
 
   return (
-    <View style={styles.container}>
-      <View className="flex flex-col">
-        <TitleThemedText
-          fontSize={25}
-          string={"Welcome back, " + user}
-        ></TitleThemedText>
-        <TitleThemedText
-          fontSize={15}
-          string={"Last synced 2 minutes ago"}
-        ></TitleThemedText>
+    <ScrollView
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+      style={styles.container}
+    >
+      <View className="flex flex-row justify-between">
+        <View className="flex flex-col">
+          <TitleThemedText
+            fontSize={22}
+            string={"Welcome back, " + user}
+          ></TitleThemedText>
+          <ThemedText
+            style={{
+              fontFamily: Platform.select({
+                android: "Inter_500Medium",
+                ios: "Inter-Medium",
+              }),
+              fontSize: 15,
+            }}
+          >
+            Last synced {dayjs() + ""}
+          </ThemedText>
+        </View>
+        <View className="flex flex-row justify-center items-center gap-5">
+          <IconSymbol
+            size={24}
+            name="bell"
+            color={colorScheme === "dark" ? "white" : "black"}
+          />
+          <Image
+            source={require("@/assets/images/icon.png")}
+            className="w-14 h-14 rounded-full"
+          ></Image>
+        </View>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 

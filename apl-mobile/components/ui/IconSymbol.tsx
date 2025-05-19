@@ -14,6 +14,8 @@ const MAPPING = {
   "gearshape.fill": "settings",
   "person.crop.circle.fill": "account-circle",
   "paintbrush.pointed.fill": "format-paint",
+  bell: "notifications-none",
+  "chevron.right": "chevron-right",
 } as Partial<
   Record<
     import("expo-symbols").SymbolViewProps["name"],

@@ -6,6 +6,9 @@ import {
   View,
   Text,
   useColorScheme,
+  TouchableHighlight,
+  ScrollView,
+  TouchableOpacity,
 } from "react-native";
 
 import { HelloWave } from "@/components/HelloWave";
@@ -17,12 +20,13 @@ import { TitleThemedText } from "@/components/TitleThemedText";
 import { useEffect } from "react";
 import { IconSymbol, IconSymbolName } from "@/components/ui/IconSymbol";
 import { useThemeColor } from "@/hooks/useThemeColor";
-import { router } from "expo-router";
+import { Href, router } from "expo-router";
 
 type SettingOption = {
   title: string;
   description: string;
   icon: IconSymbolName;
+  route: Href;
 };
 
 const settingOptions: SettingOption[] = [
@@ -30,44 +34,52 @@ const settingOptions: SettingOption[] = [
     title: "General",
     description: "General app settings.",
     icon: "gearshape.fill",
+    route: "/settings/general",
   },
   {
     title: "Account",
     description: "APL account settings.",
     icon: "person.crop.circle.fill",
+    route: "/settings/account",
   },
   {
     title: "Appearance",
     description: "Customize the app's appearance.",
     icon: "paintbrush.pointed.fill",
+    route: "/settings/appearance",
   },
 ];
 
 export default function Settings() {
-  const colorScheme = useColorScheme();
-
   const settingOptionsViews = settingOptions.map((settingOption, i) => {
     return (
-      <ThemedView
+      <TouchableOpacity
         key={i}
-        className="flex flex-row gap-4 rounded-xl p-3 justify-center items-center"
+        onPress={() => router.push(settingOption.route)}
       >
-        <IconSymbol
-          size={24}
-          name={settingOption.icon}
-          color={colorScheme == "light" ? "black" : "white"}
-          weight="bold"
-        />
-        <ThemedView className="flex flex-col flex-grow">
-          <TitleThemedText
-            fontSize={20}
-            string={settingOption.title}
-          ></TitleThemedText>
-          <ThemedText className="truncate text-gray-400">
-            {settingOption.description}
-          </ThemedText>
+        <ThemedView className="flex flex-row gap-4 rounded-xl p-3 justify-center items-center mb-5">
+          <IconSymbol size={24} name={settingOption.icon} color="#22A7D1" />
+          <ThemedView className="flex flex-col flex-grow">
+            <TitleThemedText
+              fontSize={20}
+              string={settingOption.title}
+            ></TitleThemedText>
+            <ThemedText
+              style={{
+                fontFamily: Platform.select({
+                  android: "Inter_500Medium",
+                  ios: "Inter-Medium",
+                }),
+                fontSize: 15,
+              }}
+              className="truncate"
+            >
+              {settingOption.description}
+            </ThemedText>
+          </ThemedView>
+          <IconSymbol size={32} name="chevron.right" color="#22A7D1" />
         </ThemedView>
-      </ThemedView>
+      </TouchableOpacity>
     );
   });
 
@@ -75,9 +87,9 @@ export default function Settings() {
     <View style={styles.container}>
       <TitleThemedText fontSize={25} string={"Settings"}></TitleThemedText>
 
-      <View className="flex flex-col flex-grow gap-5 mt-5">
+      <ScrollView className="flex flex-col flex-grow mt-5">
         {settingOptionsViews}
-      </View>
+      </ScrollView>
     </View>
   );
 }
