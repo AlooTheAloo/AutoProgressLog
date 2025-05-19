@@ -17,7 +17,7 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <div class="flex flex-col w-full gap-2" v-if="config != undefined">
+  <div class="flex flex-col w-full gap-6 pt-6" v-if="config != undefined">
     <SettingsField
       :value="config?.account?.userName"
       label="Username"

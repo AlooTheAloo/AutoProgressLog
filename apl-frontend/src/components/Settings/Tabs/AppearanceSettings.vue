@@ -17,7 +17,7 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <div class="flex flex-col w-full gap-2" v-if="config != undefined">
+  <div class="flex flex-col w-full gap-6 pt-6" v-if="config != undefined">
     <SettingsToggle
       :value="config?.appearance.glow"
       label="Enable glow"
