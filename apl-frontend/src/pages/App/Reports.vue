@@ -16,6 +16,7 @@ import InputText from "primevue/inputtext";
 import Dialog from "primevue/dialog";
 import { motion, AnimatePresence } from "motion-v";
 import { CopyReportToast } from "../../../electron/main/Electron-Backend/ReportsListeners";
+import pluralize from "pluralize";
 
 const rows = 6;
 const router = useRouter();
@@ -227,8 +228,8 @@ function nf(num: number) {
                   <motion.div
                     v-for="(item, index) in slotProps.items as ListReport[]"
                     :key="index + first"
-                    :initial="{ x: 50 }"
-                    :while-in-view="{ x: 0 }"
+                    :initial="{ x: 50, opacity: 0, filter: 'blur(10px)' }"
+                    :while-in-view="{ x: 0, opacity: 1, filter: 'blur(0px)' }"
                     :transition="{
                       delay: index * 0.01,
                     }"
@@ -312,7 +313,9 @@ function nf(num: number) {
                                 <img :src="score" class="w-4 h-4 invert" />
                                 <span
                                   class="ml-2 font-medium text-black text-sm"
-                                  >{{ nf(item.score) }}</span
+                                  >{{
+                                    nf(item.score) + " " + pluralize("pt")
+                                  }}</span
                                 >
                               </div>
                             </div>

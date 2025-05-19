@@ -201,7 +201,7 @@ const toastValue = ref<UserDialog>();
   </Dialog>
   <!-- glow -->
   <div
-    class="h-screen w-screen absolute overflow-hidden pointer-events-none"
+    class="h-screen w-screen absolute overflow-hidden pointer-events-none z-10"
     v-if="glow"
   >
     <div class="flex absolute w-full h-full justify-end">
@@ -218,7 +218,9 @@ const toastValue = ref<UserDialog>();
         </div> -->
   </div>
 
-  <div class="flex w-screen h-screen overflow-hidden">
+  <div
+    class="flex w-screen h-screen overflow-hidden dark:bg-[#0e0e0e35] bg-[#fbfbfb]"
+  >
     <div
       class="flex flex-col border-r-[1px] border-[#e0e0e0] dark:border-[#3d3e42] bg-[#f3f3f4] dark:bg-[#1B1B1B] p-3 transition-all duration-250"
       :class="{
@@ -362,7 +364,7 @@ const toastValue = ref<UserDialog>();
         </button>
       </div>
     </div>
-    <div class="flex-1 dark:bg-[#0e0e0e35] bg-[#fbfbfb]">
+    <div class="flex-1">
       <slot />
     </div>
   </div>
