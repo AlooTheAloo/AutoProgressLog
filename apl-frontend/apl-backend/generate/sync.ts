@@ -169,7 +169,7 @@ export async function syncAnki(isReport = false): Promise<AnkiSyncData | null> {
   const worked = await syncer.start();
   if (!worked) {
     NotificationManager.notify({
-      header: "Invalid anki key!",
+      header: "Cannot connect to Anki!",
       content:
         "APL is unable to connect with your anki account. <br> <b>Potential cause of error : Invalid anki key or high server load</b> ",
     });

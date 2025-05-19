@@ -188,12 +188,12 @@ const closeFirstDialog = () => {
           <img
             v-if="dto.profile_picture.isUrl"
             :src="dto.profile_picture.buffer"
-            class="w-16 h-16 rounded-full bg-black"
+            class="w-16 h-16 rounded-full dark:bg-black bg-white border-2 dark:border-[#e0e0e0] border-[#3d3e42]"
           />
           <div v-else>
             <img
               :src="'data:image/png;base64,' + dto.profile_picture.buffer"
-              class="w-16 h-16 rounded-full bg-black"
+              class="w-16 h-16 rounded-full dark:bg-black bg-white border-2 dark:border-[#e0e0e0] border-[#3d3e42]"
             />
           </div>
         </div>
