@@ -206,14 +206,14 @@ function updateAnki(value: boolean) {
   <Dialog
     v-model:visible="easyAnkiVisible"
     modal
-    header="Easy anki setup"
+    header="Easy Anki setup"
     :style="{ width: '30rem' }"
     :closeOnEscape="false"
     :closable="!testing_connection"
   >
     <div v-if="!testing_connection">
       <span class="text-surface-500 dark:text-surface-400 block mb-8">
-        Enter your anki username and password.
+        Enter your Anki username and password.
       </span>
       <div class="flex items-center gap-4 mb-4">
         <label for="username" class="font-semibold w-24">Username</label>
@@ -280,13 +280,15 @@ function updateAnki(value: boolean) {
 
   <div class="flex flex-col w-full gap-5 flex-grow" v-if="config != undefined">
     <div class="flex items-center h-12 gap-3">
-      <h1 class="text-2xl font-bold text-white">Connection settings</h1>
+      <h1 class="text-2xl font-bold dark:text-white text-black">
+        Connection settings
+      </h1>
       <Button
         class="w-fit h-10"
         v-on:click="easyAnkiVisible = true"
         :loading="testing_connection"
       >
-        Easy anki setup
+        Easy Anki setup
       </Button>
     </div>
 
@@ -317,7 +319,9 @@ function updateAnki(value: boolean) {
     </SettingsField>
 
     <div class="flex items-center h-12 gap-3">
-      <h1 class="text-2xl font-bold text-white">Synchronization settings</h1>
+      <h1 class="text-2xl font-bold dark:text-white text-black">
+        Synchronization settings
+      </h1>
       <Button
         class="w-fit h-10"
         v-on:click="testKey"

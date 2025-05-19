@@ -15,7 +15,7 @@ const hrTotal = computed(() => {
 });
 const sortedActivities = computed(() => {
   const sorted = [...props.log].sort(
-    (a, b) => b.relativeValue - a.relativeValue,
+    (a, b) => b.relativeValue - a.relativeValue
   );
 
   if (sorted.length <= limit)
@@ -31,7 +31,9 @@ const sortedActivities = computed(() => {
     .slice(limit)
     .reduce((a, b) => a + b.relativeValue, 0);
   const othersActivity: relativeActivity = {
-    name: `${sorted.length - limit} other${sorted.length - limit > 1 ? "s" : ""}`,
+    name: `${sorted.length - limit} other${
+      sorted.length - limit > 1 ? "s" : ""
+    }`,
     relativeValue: bottomActivitiesSeconds,
   };
 

@@ -26,7 +26,14 @@ export async function getLiveActivity() {
   return entries;
 }
 
-export async function getTimeEntries(sinceDayjs: dayjs.Dayjs) {
+export async function getTimeEntries(
+  sinceDayjs: dayjs.Dayjs,
+  beforeDayjs: dayjs.Dayjs | undefined = undefined
+) {
+  if (sinceDayjs.isSame(beforeDayjs)) {
+    beforeDayjs = undefined;
+  }
+
   let since = sinceDayjs.valueOf();
   try {
     toggl = new Toggl({
@@ -41,10 +48,11 @@ export async function getTimeEntries(sinceDayjs: dayjs.Dayjs) {
     }
 
     const start = dayjs();
-    const entries: entry[] = await toggl.timeEntry.list({
+    let entries: entry[] = await toggl.timeEntry.list({
       since: dayjs(since).unix().toString(),
     });
 
+    entries = entries.filter((x) => dayjs(x.stop).isBefore(beforeDayjs));
     // TODO : Telemetry maybe
     console.log("Fetch took " + dayjs().diff(start, "ms") + " ms");
     const entriesAfterLastGen = entries.filter((x) => {
@@ -79,6 +87,7 @@ export async function getTimeEntries(sinceDayjs: dayjs.Dayjs) {
 
     return { entriesAfterLastGen, allEvents };
   } catch (e) {
+    console.log("error fetching entries", e);
     return null;
   }
 }

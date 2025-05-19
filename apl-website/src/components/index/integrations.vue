@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { Motion, animate } from "motion-v";
-import FlickeringGrid from "../ui/flickering-grid/FlickeringGrid.vue";
+import { Motion } from "motion-v";
 import { useWindowSize } from "@vueuse/core";
 import { onMounted, ref, watch } from "vue";
 import AnimatedBeam from "../ui/animated-beam/AnimatedBeam.vue";
@@ -34,7 +33,6 @@ watch(containerRef, () => {
   >
     <div class="w-screen flex justify-center items-center">
       <div class="absolute w-[1000px]">
-
         <!-- add background pls thanx u-->
       </div>
     </div>

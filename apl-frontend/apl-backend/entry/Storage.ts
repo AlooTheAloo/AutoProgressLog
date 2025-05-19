@@ -14,37 +14,14 @@ export default class Storage {
 
   public apply_graves(graves: Graves, usn: number) {
     for (const nid in graves.notes) {
-      this.remove_note(nid);
       this.addNoteGrave(nid, usn);
     }
-
     for (const cid in graves.cards) {
-      this.remove_card(cid);
       this.addCardGrave(cid, usn);
     }
-
-    for (const cid in graves.cards) {
-      this.remove_deck(cid);
-      this.addDeckGrave(cid, usn);
+    for (const did in graves.decks) {
+      this.addDeckGrave(did, usn);
     }
-  }
-
-  public remove_note(nid: string) {
-    const stmt = this.db.prepare("delete from notes where id = ?");
-    stmt.run(nid);
-    stmt.finalize();
-  }
-
-  public remove_card(cid: string) {
-    const stmt = this.db.prepare("delete from cards where id = ?");
-    stmt.run(cid);
-    stmt.finalize();
-  }
-
-  public remove_deck(did: string) {
-    const stmt = this.db.prepare("delete from decks where id = ?");
-    stmt.run(did);
-    stmt.finalize();
   }
 
   public async close() {
@@ -83,7 +60,7 @@ export default class Storage {
   private addGrave(id: string, kind: GraveKind, usn: number): Promise<void> {
     return new Promise((r, rj) => {
       const stmt = this.db.prepare(
-        "INSERT OR IGNORE INTO graves (usn, oid, type) VALUES (?, ?, ?)",
+        "INSERT OR IGNORE INTO graves (usn, oid, type) VALUES (?, ?, ?)"
       );
       stmt.run(usn, id, kind);
       stmt.finalize(() => {
@@ -95,7 +72,7 @@ export default class Storage {
   private removeGrave(id: string, kind: GraveKind): Promise<void> {
     return new Promise((r, rj) => {
       const stmt = this.db.prepare(
-        "DELETE FROM graves WHERE oid = ? AND type = ?",
+        "DELETE FROM graves WHERE oid = ? AND type = ?"
       );
       stmt.run(id, kind);
       stmt.finalize(() => {
@@ -111,28 +88,22 @@ export default class Storage {
   }
 
   async mergeRevlog(entries: RevlogEntry[]): Promise<void[]> {
-    if (entries.length != 0) {
-      console.log(`Applying chunk with ${entries.length} reviews`);
-    }
+    if (entries.length == 0) return [];
+
     return Promise.all(entries.map((x) => this.addRevlogEntry(x)));
   }
 
   async mergeCards(entries: CardEntry[], pendingUsn: number): Promise<void[]> {
-    if (entries.length != 0) {
-      console.log(`Applying chunk with ${entries.length} cards`);
-    }
+    if (entries.length == 0) return [];
     return Promise.all(
-      entries.map((x) => this.addOrUpdateCardIfNewer(x, pendingUsn)),
+      entries.map((x) => this.addOrUpdateCardIfNewer(x, pendingUsn))
     );
   }
 
   async mergeNotes(entries: NoteEntry[], pendingUsn: number): Promise<void[]> {
-    if (entries.length != 0) {
-      console.log(`Applying chunk with ${entries.length} notes`);
-    }
-
+    if (entries.length == 0) return [];
     return Promise.all(
-      entries.map((x) => this.addOrUpdateNoteIfNewer(x, pendingUsn)),
+      entries.map((x) => this.addOrUpdateNoteIfNewer(x, pendingUsn))
     );
   }
 
@@ -140,7 +111,7 @@ export default class Storage {
     return new Promise<void>((s, j) => {
       this.db
         .prepare(
-          `INSERT OR IGNORE INTO revlog (id, cid, usn, ease, ivl, lastIvl, factor, time, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          `INSERT OR IGNORE INTO revlog (id, cid, usn, ease, ivl, lastIvl, factor, time, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
         )
         .run(entry)
         .finalize(() => {
@@ -150,12 +121,10 @@ export default class Storage {
   }
 
   async addOrUpdateCardIfNewer(entry: CardEntry, pendingUsn: number) {
-    console.log("adding/updating card " + entry);
-
     return new Promise<void>((s, j) => {
       this.db
         .prepare(
-          `INSERT OR REPLACE INTO cards (id, nid, did, ord, mod, usn, type, queue, due, ivl, factor, reps, lapses, left, odue, odid, flags, data) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+          `INSERT OR REPLACE INTO cards (id, nid, did, ord, mod, usn, type, queue, due, ivl, factor, reps, lapses, left, odue, odid, flags, data) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`
         )
         .run(entry, (err: any, data: any) => {
           if (err) {
@@ -169,11 +138,10 @@ export default class Storage {
   }
 
   async addOrUpdateNoteIfNewer(entry: NoteEntry, pendingUsn: number) {
-    console.log("adding/updating " + entry);
     return new Promise<void>((s, j) => {
       this.db
         .prepare(
-          `INSERT OR REPLACE INTO notes (id,guid,mid,mod,usn,tags,flds,sfld,csum,flags,data) VALUES (?,?,?,?,?,?,?,?,?,?,?)`,
+          `INSERT OR REPLACE INTO notes (id,guid,mid,mod,usn,tags,flds,sfld,csum,flags,data) VALUES (?,?,?,?,?,?,?,?,?,?,?)`
         )
         .run(entry, (err: any, data: any) => {
           if (err) {

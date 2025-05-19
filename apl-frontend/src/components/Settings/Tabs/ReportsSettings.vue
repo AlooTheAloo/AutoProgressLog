@@ -8,9 +8,9 @@ import {
   ReportExtension,
   reportExtensions,
 } from "../../../../apl-backend/types/options";
-import SettingsPathPicker from "../Common/SettingsPathPicker.vue";
 import SettingsSlider from "../Common/SettingsSlider.vue";
 import SettingsList from "../Common/SettingsList.vue";
+import SettingsPathPicker from "../Common/SettingsPathPicker.vue";
 
 const props = defineProps<{
   config: Options | undefined;
@@ -114,6 +114,7 @@ function updateQuality(value: number) {
       label="Filepath"
       @update:value="updateFilepath"
       help-text="The path to save the report to."
+      folder
     >
     </SettingsPathPicker>
 

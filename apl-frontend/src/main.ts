@@ -85,16 +85,15 @@ createApp(App)
     theme: {
       preset: Noir,
       options: {
-        darkModeSelector: ".my-app-dark",
+        darkModeSelector: ".dark",
       },
     },
     ripple: true,
   })
-  .use(VueApexCharts)
+  .use(VueApexCharts as any)
   .directive("ripple", Ripple)
   .directive("tooltip", Tooltip)
   .mount("#app")
   .$nextTick(() => {
     postMessage({ payload: "removeLoading" }, "*");
   });
-

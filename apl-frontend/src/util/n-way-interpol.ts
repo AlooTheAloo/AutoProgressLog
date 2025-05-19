@@ -1,19 +1,28 @@
-import { interpolateLab } from "d3-interpolate";
+import { interpolateHcl, piecewise } from "d3-interpolate";
 
 export class NWayInterpol {
-  private spaces: ((t: number) => string)[] = [];
+  private interp: (t: number) => string;
 
+  /**
+   * @param colors an array of CSS-color strings, e.g. ["red", "#0f0", "blue"]
+   */
   constructor(...colors: string[]) {
-    for (let i = 0; i < colors.length; i++) {
-      this.spaces.push(
-        interpolateLab(colors[i], colors[(i + 1) % colors.length]),
-      );
+    if (colors.length < 2) {
+      throw new Error("Need at least two colors");
     }
+    // append first color at end to close loop
+    const looped = [...colors, colors[0]];
+    // build one continuous piecewise HCL interp over [0,1]
+    this.interp = piecewise(interpolateHcl, looped);
   }
 
+  /**
+   * @param t a number in [0,1), wraps modulo 1 if out of range
+   * @returns interpolated CSS-color string
+   */
   interpolate(t: number): string {
-    const floorNumber = Math.floor(t * this.spaces.length);
-    const distanceOfFloor = t * this.spaces.length - floorNumber;
-    return this.spaces[floorNumber](distanceOfFloor);
+    // wrap into [0,1)
+    const u = ((t % 1) + 1) % 1;
+    return this.interp(u);
   }
 }

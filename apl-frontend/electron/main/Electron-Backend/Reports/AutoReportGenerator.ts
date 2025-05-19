@@ -5,7 +5,9 @@ import nodeScheduler, { Job } from "node-schedule";
 import { runChecks } from "../DashboardListeners";
 import { onConfigChange } from "../SettingsListeners";
 import { Options } from "../../../../apl-backend/types/options";
+import { powerSaveBlocker } from "electron";
 
+let id: number | null = null;
 let currentJob: Job | null = null;
 
 export async function createAutoReport() {
@@ -22,7 +24,7 @@ export async function createAutoReport() {
           currentJob = null;
         }
       }
-    },
+    }
   );
 }
 
@@ -35,16 +37,21 @@ async function createJob() {
     return;
 
   if (currentJob != null) {
+    if (id != null) {
+      powerSaveBlocker.stop(id);
+      id = null;
+    }
     currentJob.cancel();
   }
 
+  id = powerSaveBlocker.start("prevent-app-suspension");
+  console.log("id is " + id);
   currentJob = nodeScheduler.scheduleJob(
     `0 ${config.general.autogen.options?.generationTime.minutes} ${config.general.autogen.options?.generationTime.hours} * * *`,
     async () => {
       if (await runChecks()) {
-        setSyncing(true);
         return await runGeneration();
       }
-    },
+    }
   );
 }

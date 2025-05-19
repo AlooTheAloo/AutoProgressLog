@@ -22,8 +22,6 @@ import {
   resolveBuildId,
 } from "@puppeteer/browsers";
 
-console.log("Listerlly here");
-
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 registerEvents();
@@ -54,17 +52,18 @@ if (os.release().startsWith("6.1")) app.disableHardwareAcceleration();
 // Set application name for Windows 10+ notifications
 if (process.platform === "win32") app.setAppUserModelId(app.getName());
 
-// if (!app.requestSingleInstanceLock()) {
-//   console.log("dead");
-//   app.quit();
-//   process.exit(0);
-// }
+if (!VITE_DEV_SERVER_URL) {
+  if (!app.requestSingleInstanceLock()) {
+    console.log("dead");
+    app.quit();
+    process.exit(0);
+  }
+}
 
 export let win: BrowserWindow | null = null;
 const preload = path.join(__dirname, "../preload/index.mjs");
 export const indexHtml = path.join(RENDERER_DIST, "index.html");
 export async function createWindow() {
-  console.log("Creating window");
   win = new BrowserWindow({
     show: true,
     minHeight: 600,
@@ -91,6 +90,7 @@ export async function createWindow() {
     // #298
     win.loadURL(VITE_DEV_SERVER_URL);
     // Open devTool if the app is not packaged
+    console.log("opening devt");
     win.webContents.openDevTools();
   } else {
     win.loadFile(indexHtml);
@@ -124,7 +124,7 @@ app
   .then(createAppBackend);
 app.on("window-all-closed", () => {
   if (process.platform == "darwin") {
-    app.dock.hide();
+    app.dock?.hide();
   } else if (process.platform == "win32") {
     if (!win?.isDestroyed) win?.setSkipTaskbar(true);
   } else {
@@ -135,10 +135,10 @@ app.on("window-all-closed", () => {
 });
 
 app.on("second-instance", async () => {
-  console.log("second instance");
+  if (VITE_DEV_SERVER_URL) return;
   if (win) {
     if (process.platform == "darwin") {
-      app.dock.show();
+      app.dock?.show();
     } else if (process.platform == "win32" && !win?.isDestroyed) {
       win?.setSkipTaskbar(false);
     }
@@ -180,8 +180,17 @@ import {
 import fs from "fs";
 import { getTimeEntries } from "../../apl-backend/toggl/toggl-service";
 import dayjs from "dayjs";
+import { CacheManager } from "../../apl-backend/Helpers/cache";
+import checkHealth from "./Electron-App/HealthCheck";
+import { init } from "@bokuweb/zstd-wasm";
 
 app.on("ready", async () => {
+  if (CacheManager.verifyVersion()) {
+    await checkHealth(getConfig());
+  }
+
+  await init();
+
   buildMenu(app);
   createAutoReport();
   createAutoRPC();

@@ -10,12 +10,13 @@ import Skeleton from "primevue/skeleton";
 import score from "../../../src/assets/rewarded.png";
 import ConfirmPopup from "primevue/confirmpopup";
 import { useConfirm } from "primevue/useconfirm";
-import { CopyReportToast } from "../../../electron/main/Electron-Backend/ReportsListeners";
 import Toast from "primevue/toast";
 import { useToast } from "primevue/usetoast";
-import { AnimatePresence, motion } from "motion-v";
 import InputText from "primevue/inputtext";
 import Dialog from "primevue/dialog";
+import { motion, AnimatePresence } from "motion-v";
+import { CopyReportToast } from "../../../electron/main/Electron-Backend/ReportsListeners";
+import pluralize from "pluralize";
 
 const rows = 6;
 const router = useRouter();
@@ -227,8 +228,8 @@ function nf(num: number) {
                   <motion.div
                     v-for="(item, index) in slotProps.items as ListReport[]"
                     :key="index + first"
-                    :initial="{ x: 50 }"
-                    :while-in-view="{ x: 0 }"
+                    :initial="{ x: 50, opacity: 0, filter: 'blur(10px)' }"
+                    :while-in-view="{ x: 0, opacity: 1, filter: 'blur(0px)' }"
                     :transition="{
                       delay: index * 0.01,
                     }"
@@ -236,7 +237,7 @@ function nf(num: number) {
                   >
                     <div class="py-2 flex">
                       <div
-                        class="w-full flex flex-col sm:flex-row sm:items-center gap-4 bg-[#121212] overflow-hidden rounded-md pr-5"
+                        class="w-full flex flex-col sm:flex-row sm:items-center gap-4 dark:bg-black bg-[#eeeeef] overflow-hidden rounded-md pr-5"
                       >
                         <div class="w-3 h-full bg-[#24CAFF]"></div>
                         <div class="w-14 py-4">
@@ -312,7 +313,9 @@ function nf(num: number) {
                                 <img :src="score" class="w-4 h-4 invert" />
                                 <span
                                   class="ml-2 font-medium text-black text-sm"
-                                  >{{ nf(item.score) }}</span
+                                  >{{
+                                    nf(item.score) + " " + pluralize("pt")
+                                  }}</span
                                 >
                               </div>
                             </div>

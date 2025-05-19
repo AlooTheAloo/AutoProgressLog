@@ -9,6 +9,8 @@ import TabPanels from "primevue/tabpanels";
 import TabPanel from "primevue/tabpanel";
 
 const router = useRouter();
+
+import { version } from "../../../package.json";
 </script>
 
 <template>
@@ -85,7 +87,7 @@ const router = useRouter();
                     </div>
                   </div>
                   <div class="text-sm text-gray-200">
-                    AutoProgressLog V1.0.0
+                    AutoProgressLog V{{ version }}
                   </div>
                 </div>
               </TabPanel>

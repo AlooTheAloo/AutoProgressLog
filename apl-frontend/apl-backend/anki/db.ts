@@ -1,8 +1,8 @@
 import dayjs, { Dayjs } from "dayjs";
 import sqlite3, { Database } from "sqlite3";
-import { ankiPath, getConfig, syncDataPath } from "../Helpers/getConfig.js";
-import { RetentionMode } from "../types/options.js";
-import { getSetupAnki } from "../../electron/main/Electron-Backend/SetupConfigBuilder.js";
+import { ankiPath, getConfig, syncDataPath } from "../Helpers/getConfig";
+import { RetentionMode } from "../types/options";
+import { getSetupAnki } from "../../electron/main/Electron-Backend/SetupConfigBuilder";
 
 interface reviewsrow {
   reviews: number;
@@ -27,18 +27,18 @@ function JoinTrackedDecks(table_primary_key: string = "revlog.cid") {
   )})`;
 }
 
-export async function getAnkiCardReviewCount(startTime: Dayjs) {
-  console.log(startTime.valueOf());
+export async function getAnkiCardReviewCount(
+  startTime: Dayjs,
+  endTime: Dayjs = dayjs()
+) {
+  console.log("getting reviews since : " + startTime.valueOf());
   return new Promise<number | null>((res, rej) => {
-    console.log(
-      `SELECT COUNT(*) as "reviews" FROM revlog ${JoinTrackedDecks()} AND revlog.id > ${startTime.valueOf()}`
-    );
     // Create a database connection
     const db = open();
     // Execute SQL query
     db.all(
-      `SELECT COUNT(*) as "reviews" FROM revlog ${JoinTrackedDecks()} AND revlog.id > ?`,
-      startTime.valueOf(),
+      `SELECT COUNT(*) as "reviews" FROM revlog ${JoinTrackedDecks()} AND revlog.id > ? AND revlog.id < ?`,
+      [startTime.valueOf(), endTime.valueOf()],
       (err, rows: reviewsrow[]) => {
         if (err) {
           console.log(err);
