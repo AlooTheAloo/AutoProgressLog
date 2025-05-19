@@ -62,6 +62,34 @@ const dateString = computed(() => {
 });
 
 const sortedSources = computed(() => {
+  return [
+    {
+      name: "Youtube",
+      relativeValue: 300,
+      hr: "caca",
+    },
+    {
+      name: "Tiktok",
+      relativeValue: 300,
+      hr: "caca",
+    },
+    {
+      name: "Netflix",
+      relativeValue: 300,
+      hr: "caca",
+    },
+    {
+      name: "Anime",
+      relativeValue: 200,
+      hr: "pipi",
+    },
+    {
+      name: "Podcasts",
+      relativeValue: 100,
+      hr: "prout",
+    },
+  ];
+
   console.log("time to sort" + computedSources.value);
   const sort = computedSources.value.sort(
     (a, b) => b.relativeValue - a.relativeValue
