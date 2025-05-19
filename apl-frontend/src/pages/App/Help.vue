@@ -37,32 +37,20 @@ function onPageSelect(page: HelpPage) {
 <template>
   <Toast />
   <ConfirmPopup />
+
   <div class="flex-grow h-full flex relative w-full">
+    <!-- DETAIL PANEL -->
     <AnimatePresence :initial="false">
       <motion.div
         v-if="selectedGuide != undefined"
         key="help-page"
-        class="flex flex-col absolute h-[calc(100vh-5rem)] lg:mx-20 mx-10 mt-10 overflow-y-scroll flex-grow w-5/6"
-        :initial="{
-          x: 50,
-          opacity: 0,
-          filter: 'blur(10px)',
-        }"
-        :while-in-view="{
-          x: 0,
-          opacity: 1,
-          filter: 'blur(0px)',
-        }"
-        :exit="{
-          x: 50,
-          opacity: 0,
-          filter: 'blur(10px)',
-        }"
-        :transition="{
-          duration: 0.25,
-
-          ease: 'easeInOut',
-        }"
+        class="flex flex-col absolute 
+               h-[calc(100vh-5rem)] lg:mx-20 mx-10 mt-10 
+               overflow-y-scroll flex-grow w-5/6"
+        :initial="{ x: 50, opacity: 0, filter: 'blur(10px)' }"
+        :while-in-view="{ x: 0, opacity: 1, filter: 'blur(0px)' }"
+        :exit="{ x: 50, opacity: 0, filter: 'blur(10px)' }"
+        :transition="{ duration: 0.25, ease: 'easeInOut' }"
       >
         <div class="flex flex-col items-start">
           <Button
@@ -73,95 +61,81 @@ function onPageSelect(page: HelpPage) {
             @click="selectedGuide = undefined"
             class="p-0 h-8"
           />
-          <component :is="selectedGuide.component"></component>
+          <component :is="selectedGuide.component" />
         </div>
       </motion.div>
     </AnimatePresence>
+
+    <!-- LIST PANEL -->
     <AnimatePresence :initial="false">
       <motion.div
         v-if="selectedGuide == undefined"
         key="default"
         class="flex flex-col flex-grow h-full"
-        :initial="{
-          x: -50,
-          opacity: 0,
-          filter: 'blur(10px)',
-        }"
-        :while-in-view="{
-          x: 0,
-          opacity: 1,
-          filter: 'blur(0px)',
-        }"
-        :exit="{
-          x: -50,
-          opacity: 0,
-          filter: 'blur(10px)',
-        }"
-        :transition="{
-          duration: 0.25,
-
-          ease: 'easeInOut',
-        }"
+        :initial="{ x: -50, opacity: 0, filter: 'blur(10px)' }"
+        :while-in-view="{ x: 0, opacity: 1, filter: 'blur(0px)' }"
+        :exit="{ x: -50, opacity: 0, filter: 'blur(10px)' }"
+        :transition="{ duration: 0.25, ease: 'easeInOut' }"
       >
-        <div class="flex flex-col w-full h-screen px-10 py-3">
-          <div class="flex w-full h-20 items-center my-5 justify-between">
-            <div class="flex flex-col">
-              <h1
-                class="bg-gradient-to-r bg-clip-text text-4xl font-extrabold text-transparent from-[#89BDFF] to-[#40ffff]"
-              >
-                Help Center
-              </h1>
-              <h2>Explore guides and find answers to your questions here.</h2>
-            </div>
-          </div>
-          <div class="flex w-full h-0 flex-grow mb-10">
-            <div
-              class="flex w-full px-2 flex-grow overflow-y-auto overflow-x-hidden rounded-lg flex-col gap-4"
+        <div class="flex flex-col w-full h-screen px-12 pt-12 pb-6 space-y-6">
+          <!-- header aligned with cards -->
+          <div class="space-y-2">
+            <h1
+              class="bg-gradient-to-r bg-clip-text text-4xl font-extrabold text-transparent 
+                     from-[#89BDFF] to-[#40ffff]"
             >
-              <motion.div
-                style="opacity: 0"
-                v-for="(page, i) in guides"
-                :key="i"
-                :initial="{ opacity: 0 }"
-                :while-in-view="{ opacity: 1 }"
-                :inViewOptions="{ amount: 0, once: false }"
-                class="flex justify-between items-center gap-2 h-20 w-full dark:bg-black bg-[#eeeeef] dark:text-white text-black rounded-xl p-5 border-2 border-transparent hover:border-[#22A7D1] transition-all duration-200"
+              Help Center
+            </h1>
+            <h2 class="text-lg text-[#C0C0C0]">
+              Explore guides and find answers to your questions here.
+            </h2>
+          </div>
+
+          <!-- cards list -->
+          <div class="flex flex-col flex-grow overflow-y-auto space-y-4">
+            <motion.div
+              v-for="(page, i) in guides"
+              :key="i"
+              class="flex justify-between items-center gap-4 h-20 w-full 
+                     bg-[#18181B] text-white rounded-xl p-5 border-2 border-transparent 
+                     hover:border-[#22A7D1] transition-all duration-200"
+              :initial="{ opacity: 0 }"
+              :while-in-view="{ opacity: 1 }"
+              :inViewOptions="{ amount: 0, once: false }"
+            >
+              <img
+                :src="page.icon"
+                class="w-8 h-8"
+                alt="icon"
+              />
+              <div
+                @click="onPageSelect(page)"
+                role="button"
+                tabindex="0"
+                class="flex flex-col flex-grow cursor-pointer"
               >
-                <img
-                  :src="page.icon"
-                  class="w-8 h-8 pr-1 dark:invert-0 invert"
-                  alt="icon"
-                />
-                <div
-                  @click="onPageSelect(page)"
-                  role="button"
-                  tabindex="0"
-                  class="flex flex-col w-0 flex-grow"
-                >
-                  <h1 class="text-xl font-extrabold truncate">
-                    {{ page.title }}
-                  </h1>
-                  <h2 class="truncate">
-                    {{ page.description }}
-                  </h2>
-                </div>
-                <Button
-                  severity="info"
-                  class="w-12 h-8"
-                  @click="onPageSelect(page)"
-                >
-                  <div class="text-white">
-                    <i class="pi pi-arrow-right text-sm"></i>
-                  </div>
-                </Button>
-              </motion.div>
-            </div>
+                <h3 class="text-xl font-semibold truncate">
+                  {{ page.title }}
+                </h3>
+                <p class="truncate text-gray-400">
+                  {{ page.description }}
+                </p>
+              </div>
+              <Button
+                severity="info"
+                class="w-10 h-10 flex items-center justify-center p-0"
+                @click="onPageSelect(page)"
+              >
+                <i class="pi pi-arrow-right text-xl text-white"></i>
+              </Button>
+            </motion.div>
           </div>
         </div>
       </motion.div>
     </AnimatePresence>
   </div>
 </template>
+
 <style>
 /* For Webkit browsers (Chrome, Edge, Safari) */
 ::-webkit-scrollbar {

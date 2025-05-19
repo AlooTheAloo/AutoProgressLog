@@ -7,7 +7,7 @@ import BackButton from "../../../components/Common/BackButton.vue";
 import InputText from "primevue/inputtext";
 import Password from "primevue/password";
 import { ankiLogin } from "../../../../apl-backend/config/configAnkiIntegration";
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import AccordionPanel from "primevue/accordionpanel";
 import Accordion from "primevue/accordion";
 import AccordionHeader from "primevue/accordionheader";
