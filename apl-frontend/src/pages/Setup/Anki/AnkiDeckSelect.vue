@@ -70,6 +70,7 @@ function NextPage() {
         </p>
       </div>
       <motion.div
+      class="mt-10 flex flex-col items-start"
         :initial="{ opacity: 0, y: 20, filter: 'blur(10px)' }"
         :animate="{
           opacity: 1,
@@ -77,7 +78,7 @@ function NextPage() {
           filter: 'blur(0px)',
           transition: { duration: 0.6 },
         }"
-        class="flex flex-1 w-full justify-center items-center"
+       
       >
         <Listbox
           v-if="decks?.length"
@@ -85,7 +86,7 @@ function NextPage() {
           :options="decks"
           multiple
           optionLabel="name"
-          class="w-full max-w-[24rem] p-2 bg-[#18181B] rounded-lg"
+          class="w-full max-w-[54rem] p-2 bg-[#18181B] rounded-lg"
         >
           <template #option="{ option }">
             <div class="p-3 hover:bg-zinc-800 cursor-pointer rounded">
@@ -109,12 +110,13 @@ function NextPage() {
         </div>
       </motion.div>
       <div class="flex justify-end mt-auto">
-        <Button
-          label="Continue"
-          @click="NextPage"
-          class="w-[300px] p-3 !rounded-full"
-          :disabled="!selectedDecks.length && decks?.length != 0"
-        />
+      <Button
+        @click="NextPage"
+        class="w-[300px] p-3 !rounded-full"
+        :disabled="!selectedDecks.length && decks?.length != 0"
+      >
+        <span class="text-xl font-bold text-black">Continue</span>
+      </Button>
       </div>
     </div>
 
