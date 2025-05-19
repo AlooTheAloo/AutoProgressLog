@@ -241,7 +241,7 @@ const toastValue = ref<UserDialog>();
         <!-- Logo  -->
         <!-- Sidebar here -->
         <div class="flex">
-          <div class="w-full z-10 p-3">
+          <div class="w-full z-10 p-3 pointer-events-none">
             <img
               :src="Logo"
               class="transition-all duration-200 hidden dark:block"
@@ -285,7 +285,10 @@ const toastValue = ref<UserDialog>();
           @click.stop
           :tabindex="route.path == null ? -1 : 0"
         >
-          <img :src="route.image" class="invert dark:invert-0 w-6 h-6" />
+          <img
+            :src="route.image"
+            class="invert dark:invert-0 w-6 h-6 pointer-events-none"
+          />
           <AnimatePresence>
             <motion.div
               v-if="sidebarState"

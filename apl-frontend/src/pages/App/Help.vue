@@ -59,7 +59,7 @@ function onPageSelect(page: HelpPage) {
           filter: 'blur(10px)',
         }"
         :transition="{
-          duration: 0.5,
+          duration: 0.25,
 
           ease: 'easeInOut',
         }"
@@ -98,7 +98,7 @@ function onPageSelect(page: HelpPage) {
           filter: 'blur(10px)',
         }"
         :transition="{
-          duration: 0.5,
+          duration: 0.25,
 
           ease: 'easeInOut',
         }"
@@ -109,7 +109,7 @@ function onPageSelect(page: HelpPage) {
               <h1
                 class="bg-gradient-to-r bg-clip-text text-4xl font-extrabold text-transparent from-[#89BDFF] to-[#40ffff]"
               >
-                Help center
+                Help Center
               </h1>
               <h2>Explore guides and find answers to your questions here.</h2>
             </div>
@@ -125,14 +125,19 @@ function onPageSelect(page: HelpPage) {
                 :initial="{ opacity: 0 }"
                 :while-in-view="{ opacity: 1 }"
                 :inViewOptions="{ amount: 0, once: false }"
-                class="flex justify-between items-center gap-2 h-20 w-full dark:bg-black bg-[#eeeeef] dark:text-white text-black rounded-xl p-5"
+                class="flex justify-between items-center gap-2 h-20 w-full dark:bg-black bg-[#eeeeef] dark:text-white text-black rounded-xl p-5 border-2 border-transparent hover:border-[#22A7D1] transition-all duration-200"
               >
                 <img
                   :src="page.icon"
-                  class="w-6 h-6 pr-1 dark:invert-0 invert"
+                  class="w-8 h-8 pr-1 dark:invert-0 invert"
                   alt="icon"
                 />
-                <div class="flex flex-col w-0 flex-grow">
+                <div
+                  @click="onPageSelect(page)"
+                  role="button"
+                  tabindex="0"
+                  class="flex flex-col w-0 flex-grow"
+                >
                   <h1 class="text-xl font-extrabold truncate">
                     {{ page.title }}
                   </h1>
