@@ -22,17 +22,13 @@ export default class NormalSyncer {
   }
 
   public async start(): Promise<boolean> {
-    console.log("Starting sync");
     const start = dayjs();
     const pending_usn = await this.startAndProcessDeletions();
-    console.log("Got USN in ", dayjs().diff(start, "ms") + " ms");
     if (!pending_usn) return false;
     const proceeded = await this.processChunksFromServer(pending_usn);
-    console.log("Got chunks ", dayjs().diff(start, "ms") + " ms");
     if (!proceeded) return false;
     await this.stopConnection(pending_usn);
     await this.col.close();
-    console.log("Closed ", dayjs().diff(start, "ms") + " ms");
     return true;
   }
 
@@ -51,6 +47,7 @@ export default class NormalSyncer {
       while (true) {
         const chunk = await this.client.getChunk();
         if (chunk == undefined) {
+          console.log("chunk was undefined...");
           s(false);
           return;
         }

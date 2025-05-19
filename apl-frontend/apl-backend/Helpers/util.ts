@@ -3,6 +3,8 @@ export const addS = (value: number, text: string) => {
 };
 
 export function arithmeticWeightedMean(array: number[]): number {
+  if (array.length === 0) return 0;
+
   const n = array.length;
   const s = (n * (n + 1)) / 2;
   return (

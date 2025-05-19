@@ -60,6 +60,8 @@ async function sync() {
   syncing.value = true;
   try {
     const maybe: Maybe<DashboardDTO> = await window.ipcRenderer.invoke("Sync");
+
+    console.log(maybe);
     if (!("error" in maybe)) {
       dto.value = maybe;
       lastSyncTime.value = getLastSyncTime();
@@ -90,6 +92,7 @@ onMounted(async () => {
     const data: DashboardDTO = await window.ipcRenderer.invoke(
       "Get-Dashboard-DTO"
     );
+    console.log(data);
     dto.value = data;
 
     if (data.syncCount == 1) {
@@ -176,21 +179,39 @@ const closeFirstDialog = () => {
   >
     <ProgressSpinner />
   </div>
-  <div v-else class="flex flex-col w-full h-full">
+  <div v-else class="flex flex-col w-full h-full overflow-auto">
     <div class="flex flex-col flex-grow w-full h-full">
-      <div class="flex w-full h-20 items-center px-10 my-5 justify-between">
-        <div class="flex flex-col min-w-0 flex-grow">
+      <div
+        class="flex w-full h-20 items-center px-10 my-5 justify-between gap-5"
+      >
+        <div>
+          <img
+            v-if="dto.profile_picture.isUrl"
+            :src="dto.profile_picture.buffer"
+            class="w-16 h-16 rounded-full dark:bg-black bg-white border-2 dark:border-[#e0e0e0] border-[#3d3e42]"
+          />
+          <div v-else>
+            <img
+              :src="'data:image/png;base64,' + dto.profile_picture.buffer"
+              class="w-16 h-16 rounded-full dark:bg-black bg-white border-2 dark:border-[#e0e0e0] border-[#3d3e42]"
+            />
+          </div>
+        </div>
+        <div class="flex flex-col w-0 flex-grow text-black dark:text-white">
           <h1
-            class="flex items-center gap-2 bg-gradient-to-r bg-clip-text text-xl xl:text-4xl font-extrabold text-transparent from-[#89BDFF] to-[#40ffff]"
+            class="flex items-center gap-2 bg-gradient-to-r text-lg xl:text-2xl font-bold"
           >
-            Hi,
+            <span class="w-f">Welcome back,</span>
+
             <div v-if="dto.userName == undefined">
               <Skeleton width="10rem" height="2rem" />
             </div>
-            <div class="truncate w-full" v-else>{{ dto.userName }} !</div>
+            <div class="flex-grow truncate" v-else>{{ dto.userName }} !</div>
           </h1>
-          <div class="flex items-center">
-            <div class="text-xl flex items-center gap-1.5">
+          <div class="flex items-center syncNowButton">
+            <div
+              class="xl:text-base text-sm font-bold flex items-center gap-1.5"
+            >
               Last synced
               <div v-if="lastSyncTime == ''">
                 <Skeleton width="10.2rem" height="1.5rem" />
@@ -200,13 +221,15 @@ const closeFirstDialog = () => {
               </div>
             </div>
             <Button
-              class="h-6"
+              class="h-6 mx-1"
               plain
               text
               @click="() => sync()"
               :loading="disableActionButtons"
             >
-              <span class="font-semibold text-[#00E0FF]">Sync Now</span>
+              <span class="font-semibold text-[#22A7D1] xl:text-base text-sm"
+                >Sync Now</span
+              >
               <i
                 :class="[
                   'pi',
@@ -217,33 +240,54 @@ const closeFirstDialog = () => {
             </Button>
           </div>
         </div>
-        <div class="flex flex-col items-end gap-2 w-fit flex-shrink-0">
+        <div
+          class="flex flex-col items-end gap-2 w-fit flex-shrink-0 generateButton"
+        >
           <Button
             severity="info"
             @click="generateReport"
             :disabled="disableActionButtons"
+            aschild
           >
             <i class="pi pi-plus-circle text-white mr-2" />
             <span class="text-white font-bold">Generate Report</span>
           </Button>
           <div
-            :class="`flex  h-8 rounded-full text-black bg-white overflow-hidden ${
+            :class="`flex rounded-md bg-white h-8 text-black overflow-hidden ${
               disableActionButtons ? 'opacity-50' : ''
             }`"
             v-if="config?.general.autogen.enabled"
           >
-            <div class="bg-[#70bbf3] p-2">
+            <div class="bg-[#22A7D1] p-2">
               <img :src="Report" class="w-full h-full" />
             </div>
-            <div :class="`flex items-center px-2 font-bold lg:text-lg text-xs`">
-              <div>Next report : {{ dto.nextReport }}</div>
+            <div
+              :class="`flex items-center px-2 font-semibold xl:text-base xl:mx-2 text-xs`"
+            >
+              <div>
+                New generated report
+                {{ dayjs(dto.nextReport).fromNow() }}
+              </div>
             </div>
           </div>
         </div>
       </div>
-      <div class="flex w-full px-10 flex-grow">
+
+      <div class="flex w-full px-10 flex-grow 1720:mt-10">
         <DashboardBody :dto="dto" :syncing="generating_report" />
       </div>
     </div>
   </div>
 </template>
+
+<style>
+.generateButton > .p-button-info {
+  background-color: #22a7d1 !important;
+  border: 1px solid #22a7d1 !important;
+}
+
+.syncNowButton > .p-button {
+  padding-left: 0.25rem;
+  padding-right: 0.25rem;
+}
+</style>

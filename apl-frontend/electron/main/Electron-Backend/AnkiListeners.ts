@@ -82,6 +82,10 @@ export function ankiListeners() {
     login = data;
   });
 
+  ipcMain.handle("get-anki-credentials", async (event: any) => {
+    return login;
+  });
+
   ipcMain.handle("anki-connect-start", async (event: any) => {
     win?.webContents.send("anki-connect-message", "Authenticating");
     if (login == undefined) return false;
@@ -92,22 +96,15 @@ export function ankiListeners() {
   });
 
   async function connectFromClient(client: AnkiHTTPClient, login: ankiLogin) {
-    console.log(1);
     if (login == undefined) return false;
-    console.log(2);
     if (!client.isLoggedIn()) return false;
-    console.log(3);
     win?.webContents.send("anki-connect-message", "Downloading Anki Database");
-    console.log(4);
     await client.downloadInitialDatabase(ankiPath);
-    console.log(5);
     const integration = await createAnkiIntegration(login);
-    console.log("integration is " + JSON.stringify(integration));
 
     if (integration) {
       setAnkiIntegration(integration);
     }
-    console.log("!!integration" + !!integration);
     return !!integration;
   }
 

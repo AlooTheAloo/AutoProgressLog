@@ -1,6 +1,6 @@
 {
   "name": "autoprogresslog",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "author": "AlooTheAloo",
   "repository": "https://github.com/AlooTheAloo/AutoProgressLog",
   "main": "dist-electron/main/index.js",
@@ -69,9 +69,9 @@
     "@vitejs/plugin-vue": "^5.0.4",
     "autoprefixer": "^10.4.20",
     "bun": "^1.1.42",
-    "electron": "^33.1.0",
-    "electron-builder": "^25.1.8",
-    "node-abi": "^4.2.0",
+    "electron": "33.1.0",
+    "electron-builder": "25.1.8",
+    "node-abi": "4.2.0",
     "postcss": "^8.4.41",
     "tailwindcss": "^3.4.9",
     "tsx": "^4.19.1",
@@ -93,9 +93,9 @@
   "scripts": {
     "dev": "vite",
     "build": "bun run build-v && vue-tsc && vite build && electron-builder --config -c.mac.identity=null",
-    "release:windows": "bun run build-v && vue-tsc && vite build && electron-builder build -w",
-    "release:mac": "bun run build-v && vue-tsc && vite build && electron-builder build -m",
-    "release:linux": "bun run build-v && vue-tsc && vite build && electron-builder build -l",
+    "release:windows": "bun run build-v && vue-tsc && vite build && electron-builder build -w && npm rebuild",
+    "release:mac": "bun run build-v && vue-tsc && vite build && electron-builder build -m && npm rebuild",
+    "release:linux": "bun run build-v && vue-tsc && vite build && electron-builder build -l && npm rebuild",
     "preview": "vite preview",
     "play": "bun --watch ./apl-backend/entry/tests.ts",
     "build-v": "cd ./apl-backend/apl-visuals && vue-tsc -b && vite build"

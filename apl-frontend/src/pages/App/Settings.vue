@@ -88,7 +88,7 @@ function ankiTest(worked: boolean) {
 </script>
 
 <template>
-  <Toast />
+  <Toast class="z-10" />
   <Dialog
     :header="warningData?.title"
     :visible="warningData != undefined"
@@ -114,10 +114,14 @@ function ankiTest(worked: boolean) {
 
   <div class="flex flex-col w-full">
     <div class="flex flex-col flex-grow w-full h-full">
-      <div class="flex w-full h-20 items-center px-4 mt-8 justify-between">
-        <div class="flex flex-col text-white font-bold text-3xl">Settings</div>
+      <div class="flex w-full h-20 items-center px-10 mt-5 justify-between">
+        <h1
+          class="bg-gradient-to-r bg-clip-text text-4xl font-extrabold text-transparent from-[#89BDFF] to-[#40ffff]"
+        >
+          Settings
+        </h1>
       </div>
-      <div class="flex w-full px-4 flex-grow">
+      <div class="flex w-full px-10 flex-grow">
         <div class="flex w-full px-2 h-full rounded-lg">
           <Tabs
             value="0"

@@ -16,6 +16,21 @@ interface flatSyncData {
   lastAnkiUpdate: number;
 }
 
+export async function getTotalTime(): Promise<number> {
+  return new Promise((resolve, reject) => {
+    new sqlite3.Database(syncDataPath).all(
+      `
+        SELECT SUM(seconds) as "sum" FROM immersionActivity
+      `,
+      (err, rows: any[]) => {
+        if (err) {
+          reject(err);
+        } else resolve(rows[0].sum ?? 0);
+      }
+    );
+  });
+}
+
 export async function GetLastEntry(type?: SyncType): Promise<SyncData | null> {
   return new Promise((resolve, reject) => {
     new sqlite3.Database(syncDataPath).all(
@@ -73,8 +88,7 @@ export async function getreadinghours() {
       (err, rows: any[]) => {
         if (err) {
           reject(err);
-        }
-        resolve(rows[0].time ?? 0);
+        } else resolve(rows[0].time ?? 0);
       }
     );
   });
@@ -114,6 +128,51 @@ export async function GetImmersionTimeBetween(
         resolve(rows[0].sum ?? 0);
       }
     );
+  });
+}
+
+// I LOVE VIBE CODING
+export async function GetImmersionStreak(days: number = 7): Promise<number[]> {
+  const offset = days - 1; // e.g. 7 days ⇒ start = now - 6 days
+  const db = new sqlite3.Database(syncDataPath);
+
+  const sql = `
+    WITH RECURSIVE
+    dates(day) AS (
+      -- start from N days ago (local)
+      SELECT date('now','localtime','-' || ? || ' days')
+      UNION ALL
+      -- keep adding one day until *local* today
+      SELECT date(day, '+1 day')
+        FROM dates
+      WHERE day < date('now','localtime')
+    ),
+    agg AS (
+      SELECT
+        date(time, 'unixepoch', 'localtime') AS day,
+        SUM(seconds)                         AS total_seconds
+      FROM immersionActivity
+      WHERE date(time, 'unixepoch', 'localtime')
+        >= date('now','localtime','-' || ? || ' days')
+      GROUP BY day
+    )
+    SELECT
+      dates.day,
+      COALESCE(agg.total_seconds, 0) AS total_seconds
+    FROM dates
+    LEFT JOIN agg USING(day)
+    ORDER BY dates.day;
+  `;
+
+  return new Promise((resolve, reject) => {
+    // we bind `offset` twice (once for generating dates, once for filtering agg)
+    db.all(sql, [offset, offset], (err, rows: any[]) => {
+      if (err) {
+        console.error("SQLite error:", err);
+        return reject(err);
+      }
+      resolve(rows.map((x) => x.total_seconds / 3600));
+    });
   });
 }
 

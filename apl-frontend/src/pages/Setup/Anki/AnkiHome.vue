@@ -12,8 +12,8 @@ import AccordionPanel from "primevue/accordionpanel";
 import Accordion from "primevue/accordion";
 import AccordionHeader from "primevue/accordionheader";
 import AccordionContent from "primevue/accordioncontent";
-import Logo from "../../../assets/Logo.png"
-import { motion } from 'motion-v'
+import Logo from "../../../assets/Logo.png";
+import { motion } from "motion-v";
 
 const DEFAULT_URL = "https://sync.ankiweb.net";
 
@@ -45,39 +45,56 @@ function SkipAnki() {
   window.ipcRenderer.invoke("SkipAnki");
   router.push("/setup/pick-filename");
 }
+
+onMounted(() => {
+  window.ipcRenderer
+    .invoke("get-anki-credentials")
+    .then((credentials: ankiLogin) => {
+      if (credentials.username && credentials.password) {
+        email.value = credentials.username;
+        password.value = credentials.password;
+        url.value = credentials.url;
+      }
+    });
+});
 </script>
 
 <template>
-  <SetupBackground/>
+  <SetupBackground />
 
   <div class="flex w-screen">
     <div
-      class="p-4 sm:p-12
-             flex flex-col justify-between
-             w-full max-w-[60rem] bg-black min-h-screen"
+      class="p-4 sm:p-12 flex flex-col justify-between w-full max-w-[60rem] bg-black min-h-screen"
     >
       <div class="space-y-6 w-full">
         <div class="flex w-full items-center justify-between">
-          <img :src="Logo" alt="APL Logo" class="w-16 h-16 sm:w-20 sm:h-20"/>
-          <AccountDisplay/>
+          <img :src="Logo" alt="APL Logo" class="w-16 h-16 sm:w-20 sm:h-20" />
+          <AccountDisplay />
         </div>
 
         <motion.div
-          :initial="{ opacity:0, y:20, filter:'blur(10px)' }"
-          :animate="{ opacity:1, y:0, filter:'blur(0px)', transition:{ duration:0.6 } }"
+          :initial="{ opacity: 0, y: 20, filter: 'blur(10px)' }"
+          :animate="{
+            opacity: 1,
+            y: 0,
+            filter: 'blur(0px)',
+            transition: { duration: 0.6 },
+          }"
           class="flex flex-col items-start space-y-6 w-full"
         >
-          <BackButton route="/setup/toggl-success"/>
+          <BackButton route="/setup/toggl-success" />
 
           <h1
-            class="text-xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl
-                   font-semibold text-white leading-tight"
+            class="text-xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-semibold text-white leading-tight"
           >
             Time to connect to Anki.
           </h1>
 
-          <div class="text-xs sm:text-sm lg:text-base text-[#C0C0C0] leading-relaxed">
-            Support for other Spaced Repetition Software (SRS) will be added in the future.
+          <div
+            class="text-xs sm:text-sm lg:text-base text-[#C0C0C0] leading-relaxed"
+          >
+            Support for other Spaced Repetition Software (SRS) will be added in
+            the future.
           </div>
           <div class="flex flex-col gap-6 w-full">
             <div class="flex flex-col sm:flex-row sm:items-center gap-2 w-full">
@@ -93,9 +110,7 @@ function SkipAnki() {
             </div>
 
             <div class="flex flex-col sm:flex-row sm:items-center gap-2 w-full">
-              <div class="text-lg text-white sm:w-1/3">
-                AnkiWeb password
-              </div>
+              <div class="text-lg text-white sm:w-1/3">AnkiWeb password</div>
               <Password
                 v-model="password"
                 placeholder="Password"
@@ -112,7 +127,10 @@ function SkipAnki() {
                   <div
                     class="flex flex-col sm:flex-row items-start sm:items-center gap-4 pt-5 w-full"
                   >
-                    <label for="anki-url" class="font-semibold w-full sm:w-auto">
+                    <label
+                      for="anki-url"
+                      class="font-semibold w-full sm:w-auto"
+                    >
                       Anki Sync URL
                     </label>
                     <InputText
@@ -133,7 +151,7 @@ function SkipAnki() {
         <Button
           label="I don’t use Anki"
           link
-          style="font-size:12px; padding:0"
+          style="font-size: 12px; padding: 0"
           @click="SkipAnki"
         />
           <Button
@@ -150,7 +168,6 @@ function SkipAnki() {
     <div class="flex-grow"></div>
   </div>
 </template>
-
 
 <style scoped>
 .p-accordionheader,

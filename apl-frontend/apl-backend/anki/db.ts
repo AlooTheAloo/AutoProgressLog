@@ -1,8 +1,8 @@
 import dayjs, { Dayjs } from "dayjs";
 import sqlite3, { Database } from "sqlite3";
-import { ankiPath, getConfig, syncDataPath } from "../Helpers/getConfig.js";
-import { RetentionMode } from "../types/options.js";
-import { getSetupAnki } from "../../electron/main/Electron-Backend/SetupConfigBuilder.js";
+import { ankiPath, getConfig, syncDataPath } from "../Helpers/getConfig";
+import { RetentionMode } from "../types/options";
+import { getSetupAnki } from "../../electron/main/Electron-Backend/SetupConfigBuilder";
 
 interface reviewsrow {
   reviews: number;
@@ -23,21 +23,22 @@ function JoinTrackedDecks(table_primary_key: string = "revlog.cid") {
   if (options == undefined) return "";
   const trackedDecks = options.trackedDecks.map((x) => x.toString());
   return `JOIN cards c ON c.id = ${table_primary_key} WHERE c.did IN (${trackedDecks.join(
-    ",",
+    ","
   )})`;
 }
 
-export async function getAnkiCardReviewCount(startTime: Dayjs) {
+export async function getAnkiCardReviewCount(
+  startTime: Dayjs,
+  endTime: Dayjs = dayjs()
+) {
+  console.log("getting reviews since : " + startTime.valueOf());
   return new Promise<number | null>((res, rej) => {
-    console.log(
-      `SELECT COUNT(*) as "reviews" FROM revlog ${JoinTrackedDecks()} AND revlog.id > ${startTime.valueOf()}`,
-    );
     // Create a database connection
     const db = open();
     // Execute SQL query
     db.all(
-      `SELECT COUNT(*) as "reviews" FROM revlog ${JoinTrackedDecks()} AND revlog.id > ?`,
-      startTime.valueOf(),
+      `SELECT COUNT(*) as "reviews" FROM revlog ${JoinTrackedDecks()} AND revlog.id > ? AND revlog.id < ?`,
+      [startTime.valueOf(), endTime.valueOf()],
       (err, rows: reviewsrow[]) => {
         if (err) {
           console.log(err);
@@ -46,7 +47,7 @@ export async function getAnkiCardReviewCount(startTime: Dayjs) {
           // Process the results
           res(rows[0].reviews);
         }
-      },
+      }
     );
 
     close(db);
@@ -68,7 +69,7 @@ export async function getLastUpdate() {
           const latest = resp[0].latest ?? 0;
           res(latest);
         }
-      },
+      }
     );
     close(db);
   });
@@ -83,13 +84,13 @@ export async function DeleteAnkiData() {
           console.log(err);
         }
         return res();
-      },
+      }
     );
   });
 }
 
 export async function getRetention(
-  retentionMode: RetentionMode = "true_retention",
+  retentionMode: RetentionMode = "true_retention"
 ) {
   return new Promise<number | null>((res, rej) => {
     // A month ago
@@ -113,7 +114,7 @@ export async function getRetention(
           } else {
             db.all(
               `SELECT COUNT(*) as "reviews" FROM revlog r ${JoinTrackedDecks(
-                "r.cid",
+                "r.cid"
               )} AND r.lastIvl >= 21 AND r.id > ? AND ((r.type = 1 AND r.ease >= 2))`,
               aMonthAgo,
               (err, correctReviews: reviewsrow[]) => {
@@ -121,10 +122,10 @@ export async function getRetention(
                   (correctReviews[0].reviews / allReviews[0].reviews) * 100;
                 if (Number.isNaN(ret)) ret = 0;
                 res(ret);
-              },
+              }
             );
           }
-        },
+        }
       );
     }
 
@@ -150,7 +151,7 @@ export async function getRetention(
           } catch (err) {
             console.log(err);
           }
-        },
+        }
       );
     }
 
@@ -165,7 +166,7 @@ export async function getMatureCards() {
     // Execute SQL query
     db.all(
       `SELECT COUNT(*) as "mature" from cards ${JoinTrackedDecks(
-        "cards.id",
+        "cards.id"
       )} AND cards.ivl >= 21;`,
       (err, rows: maturerow[]) => {
         if (err) {
@@ -175,7 +176,7 @@ export async function getMatureCards() {
           // Process the results
           res(rows[0].mature);
         }
-      },
+      }
     );
     close(db);
   });

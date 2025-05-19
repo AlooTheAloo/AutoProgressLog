@@ -4,16 +4,15 @@ import { getTimeEntries } from "../../toggl/toggl-service";
 
 export async function CreateDB(
   db: sqlite3.Database,
+  ankiData: { cards: number } | undefined = undefined
 ): Promise<number | undefined> {
   const entries = await getTimeEntries(
-    dayjs().subtract(3, "month").add(1, "minute").valueOf(),
+    dayjs().subtract(3, "month").add(1, "day"),
+    dayjs().startOf("day")
   );
-
   const fullTime = entries?.allEvents.reduce((acc, x) => {
     return acc + x.activitySeconds;
   }, 0);
-
-  console.log("Full Time : " + fullTime);
 
   db.run(
     `
@@ -33,18 +32,19 @@ export async function CreateDB(
     () => {
       console.log('Table "syncData" created');
       db.run(
-        `INSERT INTO syncData (id, generationTime, totalSeconds, totalCardsStudied, cardsStudied, mature, retention, type) VALUES (
-              $id, $generationTime, $totalSeconds, $totalCardsStudied, $cardsStudied, $mature, $retention, $type)`,
+        `INSERT INTO syncData (id, generationTime, totalSeconds, totalCardsStudied, cardsStudied, mature, retention, type, lastAnkiUpdate) VALUES (
+              $id, $generationTime, $totalSeconds, $totalCardsStudied, $cardsStudied, $mature, $retention, $type, $lastAnkiUpdate)`,
         0,
         dayjs().startOf("day").valueOf(),
         fullTime,
-        0,
-        0,
+        ankiData?.cards ?? 0,
+        ankiData?.cards ?? 0,
         0,
         0,
         "Full",
+        dayjs().startOf("day").valueOf()
       );
-    },
+    }
   );
 
   db.run(
@@ -72,9 +72,9 @@ export async function CreateDB(
 
       db.run(
         `INSERT INTO immersionActivity (id, syncDataId, time, seconds, activityName) VALUES ${placeholders}`,
-        values,
+        values
       );
-    },
+    }
   );
 
   return fullTime;

@@ -2,7 +2,8 @@
 import { RouterView, useRouter } from "vue-router";
 import SideBarContainer from "./components/Common/SideBarContainer.vue";
 import { appPath } from "./pages/routes/appRoutes";
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
+import { ThemeManager } from "./util/theme-manager";
 const router = useRouter();
 const showSideBar = ref<boolean>(false);
 
@@ -28,6 +29,8 @@ window.addEventListener("online", updateOnlineStatus);
 window.addEventListener("offline", updateOnlineStatus);
 
 updateOnlineStatus();
+
+ThemeManager.init();
 </script>
 
 <template>

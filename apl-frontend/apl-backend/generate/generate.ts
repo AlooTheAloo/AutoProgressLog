@@ -23,6 +23,8 @@ import { runSync, setSyncing } from "./sync.js";
 import { Notification, shell } from "electron";
 import { get } from "http";
 import { TPlusDelta } from "../types/reportdata.js";
+import { win } from "../../electron/main/index.js";
+import { NotificationManager } from "../Helpers/notifications.js";
 
 dayjs.extend(duration);
 dayjs.extend(advancedFormat);
@@ -33,8 +35,16 @@ export let isGenerating = false;
 
 export async function runGeneration() {
   isGenerating = true;
-  await runSync(getSyncProps());
-
+  const worked = await runSync(getSyncProps());
+  if (!worked) {
+    NotificationManager.notify({
+      header: "Cannot complete sync!",
+      content:
+        "APL was unable to generate a report. Potential cause of error : <b> computer turned off or not connected to the internet</b> ",
+    });
+    isGenerating = false;
+    return;
+  }
   setSyncing(true);
   const sync = await GetLastEntry("Full");
   console.log("3");

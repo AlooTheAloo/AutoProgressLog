@@ -129,7 +129,7 @@ import {
   PATTERN_BACKGROUND_DIRECTION,
   PATTERN_BACKGROUND_VARIANT,
 } from "../ui/pattern-background";
-import apl_logo from "../../assets/Logo.png";
+import apl_logo from "../../assets/APL_Black.svg";
 
 import macos_apl from "../../assets/APL_Macbook.png";
 

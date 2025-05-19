@@ -42,5 +42,9 @@ const backend_url = "https://apl.chromaserver.net/";
 
 function sendSurveyAnswer() {
   console.log("Sending survey answer" + JSON.stringify(surveyAnswer));
-  axios.post(`${backend_url}survey-answer/v1`, surveyAnswer);
+  try {
+    axios.post(`${backend_url}survey-answer/v1`, surveyAnswer);
+  } catch (e) {
+    console.log("Error sending survey answer");
+  }
 }
