@@ -7,7 +7,7 @@ import BackButton from "../../../components/Common/BackButton.vue";
 import InputText from "primevue/inputtext";
 import Password from "primevue/password";
 import { ankiLogin } from "../../../../apl-backend/config/configAnkiIntegration";
-import { onMounted, ref, useModel } from "vue";
+import { ref, computed, onMounted } from "vue";
 import AccordionPanel from "primevue/accordionpanel";
 import Accordion from "primevue/accordion";
 import AccordionHeader from "primevue/accordionheader";
@@ -21,16 +21,24 @@ const email = ref<string>("");
 const password = ref<string>("");
 const url = ref<string>(DEFAULT_URL);
 
+const canContinue = computed(() => {
+  return email.value.trim() !== '' && password.value.trim() !== ''
+})
+
 const router = useRouter();
 function NextPage() {
+  if (!canContinue.value) {
+    return
+  }
+
   const login: ankiLogin = {
     username: email.value,
     password: password.value,
     url: url.value,
-  };
-  console.log(login);
-  window.ipcRenderer.invoke("anki-credentials", login);
-  router.push("/setup/anki-connect");
+  }
+  console.log(login)
+  window.ipcRenderer.invoke("anki-credentials", login)
+  router.push("/setup/anki-connect")
 }
 
 function SkipAnki() {
@@ -146,7 +154,12 @@ onMounted(() => {
           style="font-size: 12px; padding: 0"
           @click="SkipAnki"
         />
-        <Button @click="NextPage" class="w-[300px] p-3 !rounded-full">
+          <Button
+          @click="NextPage"
+          :disabled="!canContinue"
+          :class="canContinue ? 'opacity-100' : 'opacity-50 cursor-not-allowed'"
+          class="w-[300px] p-3 !rounded-full"
+        >
           <span class="text-xl font-bold text-black">Continue</span>
         </Button>
       </div>
