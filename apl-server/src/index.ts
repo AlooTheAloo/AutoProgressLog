@@ -10,6 +10,7 @@ initDB();
 const app = new Elysia()
   .use(
     cors({
+      origin: ["http://localhost:*", "https://www.aplapp.dev"],
       origin: ["http://localhost:*", "https://aplapp.dev"],
     })
   )
