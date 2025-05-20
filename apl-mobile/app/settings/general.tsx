@@ -17,7 +17,7 @@ import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { TitleThemedText } from "@/components/TitleThemedText";
 import { IconSymbolName } from "@/components/ui/IconSymbol";
-import { SettingElementType } from "./types";
+import { SettingElementType } from "../../types/settingElementType";
 import SettingElement from "@/components/SettingElement";
 import { useStorage } from "@/hooks/useStorage";
 

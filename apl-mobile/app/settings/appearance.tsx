@@ -15,7 +15,7 @@ import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { TitleThemedText } from "@/components/TitleThemedText";
-import { SettingElementType } from "./types";
+import { SettingElementType } from "../../types/settingElementType";
 import SettingElement from "@/components/SettingElement";
 
 const settings: SettingElementType[] = [

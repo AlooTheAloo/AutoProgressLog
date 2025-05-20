@@ -18,10 +18,12 @@ import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { TitleThemedText } from "@/components/TitleThemedText";
 import { IconSymbol, IconSymbolName } from "@/components/ui/IconSymbol";
-import { SettingElementType } from "@/app/settings/types";
+import { SettingElementType } from "@/types/settingElementType";
+import { useState } from "react";
 
 export default function InputSettingElement(props: SettingElementType) {
   const colorScheme = useColorScheme();
+  const [text, setText] = useState("");
 
   return (
     <View className="flex flex-col mb-5">
@@ -40,7 +42,10 @@ export default function InputSettingElement(props: SettingElementType) {
       <ThemedView className="flex flex-row gap-4 rounded-xl p-3 justify-center items-center mb-3">
         <ThemedView className="flex flex-col flex-grow">
           <TextInput
-            onChangeText={props.onChange}
+            onChangeText={(text: string) => {
+              setText(text);
+              props.onChange?.(text);
+            }}
             placeholder={props.placeholderText}
             placeholderTextColor={"#9ca3af"}
             style={{
@@ -51,9 +56,17 @@ export default function InputSettingElement(props: SettingElementType) {
               fontSize: 15,
               color: colorScheme === "dark" ? "white" : "black",
             }}
-          ></TextInput>
+          >
+            {text}
+          </TextInput>
         </ThemedView>
-        <IconSymbol size={25} name="delete.left" color="#22A7D1" />
+        <TouchableOpacity
+          onPress={() => {
+            setText("");
+          }}
+        >
+          <IconSymbol size={25} name="delete.left" color="#22A7D1" />
+        </TouchableOpacity>
       </ThemedView>
       <ThemedText
         style={{

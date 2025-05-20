@@ -17,9 +17,11 @@ import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { TitleThemedText } from "@/components/TitleThemedText";
 import { IconSymbol, IconSymbolName } from "@/components/ui/IconSymbol";
-import { SettingElementType } from "@/app/settings/types";
+import { SettingElementType } from "@/types/settingElementType";
 
 export default function SettingElement(props: SettingElementType) {
+  const colorScheme = useColorScheme();
+
   if (props.action) {
     return (
       <View className="flex flex-col mb-4">
@@ -44,7 +46,12 @@ export default function SettingElement(props: SettingElementType) {
                     android: "Inter_500Medium",
                     ios: "Inter-Medium",
                   }),
-                  color: props.textColor,
+                  color:
+                    props.textColor === undefined
+                      ? colorScheme === "dark"
+                        ? "white"
+                        : "black"
+                      : props.textColor,
                   fontSize: 15,
                 }}
               >

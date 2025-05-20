@@ -6,6 +6,7 @@ import {
   Platform,
   Text,
   Linking,
+  Alert,
 } from "react-native";
 
 import { useStorage } from "@/hooks/useStorage";
@@ -13,7 +14,8 @@ import { TitleThemedText } from "@/components/TitleThemedText";
 import InputSettingElement from "@/components/InputSettingElement";
 import SquircleButton from "@/components/ui/SquircleButton";
 import { useState } from "react";
-import { Toggl } from "toggl-track";
+import Toggl from "@/services/toggl/index";
+import { router } from "expo-router";
 
 export default function TogglSetup() {
   const [didSetup, setdidSetup] = useStorage("didSetup", "false"); // robert is the default value
@@ -78,10 +80,11 @@ export default function TogglSetup() {
               token: apiKey,
             },
           });
-          console.log(toggl);
-
-          const entries = await toggl.timeEntry.list();
-          console.log(entries);
+          const me = await toggl.me.get();
+          console.log(me);
+          Alert.alert("WOW!", JSON.stringify(me));
+          setdidSetup("true");
+          router.replace("/(tabs)");
         }}
         title={"Continue"}
       ></SquircleButton>
