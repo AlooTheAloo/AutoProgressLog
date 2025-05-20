@@ -1,0 +1,58 @@
+// @see https://www.electron.build/configuration/configuration
+{
+  $schema: "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
+  appId: "727.AlooTheAloo.727",
+  asar: true,
+  asarUnpack: [
+    "apl-backend/apl-visuals/visuals/**",
+    "src/assets/**",
+    "node_modules/puppeteer/.local-chromium/**/*",
+    "**/node_modules/sharp/**/*",
+    "**/node_modules/@img/**/*",
+  ],
+  files: ["dist*/**", "apl-backend/apl-visuals/visuals/**", "src/assets/**"],
+  productName: "AutoProgressLog",
+  directories: {
+    output: "release/${version}",
+  },
+  dmg: {
+    window: {
+      width: 540,
+      height: 540,
+    },
+  },
+  mac: {
+    target: ["dmg"],
+    artifactName: "${productName}_MacOS_${version}_Installer.${ext}",
+    entitlements: "build/entitlements.mac.plist",
+    entitlementsInherit: "build/entitlements.mac.plist",
+    hardenedRuntime: true,
+    gatekeeperAssess: false,
+  },
+  win: {
+    target: [
+      {
+        target: "nsis",
+        arch: ["x64"],
+      },
+    ],
+    artifactName: "${productName}-Windows-${version}-Setup.${ext}",
+  },
+  nsis: {
+    oneClick: false,
+    perMachine: false,
+    allowToChangeInstallationDirectory: true,
+    deleteAppDataOnUninstall: false,
+  },
+  linux: {
+    target: ["AppImage"],
+    artifactName: "${productName}-Linux-${version}.${ext}",
+  },
+  publish: [
+    {
+      provider: "github",
+      owner: "AlooTheAloo",
+      repo: "AutoProgressLog",
+    },
+  ],
+}

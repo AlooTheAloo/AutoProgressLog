@@ -1,0 +1,4 @@
+{
+  "files.associations": { "*.scss": "postcss" },
+  "typescript.preferences.importModuleSpecifierEnding": "js"
+}

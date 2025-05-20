@@ -1,0 +1,84 @@
+name: Release APL
+
+on:
+  push:
+    branches:
+      - main # Adjust this to match your branch, usually 'main' or 'master'
+      - UIFixes/Settings_Reports
+
+jobs:
+  release:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "21.4.0" # Adjust the Node.js version as needed
+
+      - name: Install Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.x"
+
+      - name: Install dependencies
+        run: |
+          python3 -m pip install setuptools
+          cd apl-frontend
+          npm install
+
+      - name: Build for Windows
+        if: matrix.os == 'windows-latest'
+        run: |
+          cd apl-frontend
+          npm run release:windows
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+      - name: Build for macOS
+        if: matrix.os == 'macos-latest'
+        run: |
+          cd apl-frontend
+          npm run release:mac
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+      - name: Build for Linux
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          cd apl-frontend
+          npm run release:linux
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+      - name: Get version from package.json
+        id: version
+        shell: bash
+        run: |
+          cd apl-frontend
+          VERSION=$(node -p "require('./package.json').version")
+          echo "Version: $VERSION"
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Create a Release
+        uses: softprops/action-gh-release@v2
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          name: AutoProgressLog v${{ env.VERSION }}
+          tag_name: ${{ env.VERSION }}
+          body_path: ${{ github.workspace }}/CHANGELOG.md
+          files: |
+            apl-frontend/release/**/AutoProgressLog-Windows*.exe
+            apl-frontend/release/**/AutoProgressLog_MacOS*.dmg
+            apl-frontend/release/**/AutoProgressLog-Linux*.AppImage
+            apl-frontend/release/**/latest*.yml
+
+permissions:
+  contents: write
