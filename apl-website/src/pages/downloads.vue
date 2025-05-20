@@ -61,18 +61,17 @@
 
         <div class="lg:block hidden">
           <div class="flex">
-            <img v-if="platform == 'mac'" :src="macos_apl" class="w-72" />
+            <img v-if="platform == 'mac'" :src="macos_apl" class="w-[60rem]" />
             <img
               v-else-if="platform == 'windows'"
               :src="windows_apl"
-              class="w-72"
+              class="w-[60rem]"
             />
             <img
               v-else-if="platform == 'linux'"
               :src="linux_apl"
-              class="w-72"
+              class="w-[60rem]"
             />
-
           </div>
         </div>
       </div>
