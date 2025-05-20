@@ -72,7 +72,6 @@
               :src="linux_apl"
               class="w-[60rem]"
             />
-
           </div>
         </div>
       </div>
