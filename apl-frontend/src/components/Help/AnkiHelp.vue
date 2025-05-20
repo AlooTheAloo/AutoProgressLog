@@ -14,6 +14,7 @@ const router = useRouter();
 const $dialog = useDialog();
 
 const navigateTo = (path: string) => {
+  console.log("Navigating to", path);
   router.push(path);
 };
 const openExplanation = () => {
@@ -24,7 +25,7 @@ const openExplanation = () => {
 </script>
 
 <template>
-  <div class="flex flex-col min-w-full h-full flex-grow mt-10">
+  <div class="flex flex-col min-w-full flex-grow mt-10 accordion">
     <Accordion :value="[]" multiple fluid class="w-full">
       <AccordionPanel value="0">
         <AccordionHeader class="w-full">Generating a report</AccordionHeader>
@@ -104,9 +105,47 @@ const openExplanation = () => {
         </AccordionContent>
       </AccordionPanel>
       <AccordionPanel value="2">
-        <AccordionHeader>Very important info !!!!!!</AccordionHeader>
+        <AccordionHeader> Reverting a report </AccordionHeader>
         <AccordionContent>
-          <p class="m-0">caca</p>
+          <div
+            class="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md space-y-4 text-gray-900 dark:text-gray-100"
+          >
+            <p class="m-0">
+              Made a mistake in your last report? No worries, you can roll it
+              back.
+            </p>
+
+            <ol class="list-decimal list-inside space-y-2">
+              <li class="questionButton">
+                Find your most recent report in the
+                <Button
+                  class="h-2"
+                  text
+                  variant="link"
+                  severity="info"
+                  @click="
+                    () => {
+                      navigateTo('/app/reports');
+                    }
+                  "
+                >
+                  reports page
+                </Button>
+              </li>
+              <li>
+                Click the <strong>Revert</strong> button on the right side of
+                that report.
+              </li>
+              <li>
+                APL will undo that report and restore your previous totals.
+              </li>
+            </ol>
+
+            <p class="m-0">
+              You can only revert the <em>latest</em> report at a time, but feel
+              free to repeat this process as many times as you need.
+            </p>
+          </div>
         </AccordionContent>
       </AccordionPanel>
     </Accordion>
@@ -117,5 +156,9 @@ const openExplanation = () => {
 .questionButton > .p-button {
   padding-left: 0rem !important;
   padding-right: 0rem !important;
+}
+
+.accordion > .p-accordion {
+  height: 0px;
 }
 </style>

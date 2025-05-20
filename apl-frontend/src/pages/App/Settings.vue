@@ -131,27 +131,26 @@ function ankiTest(worked: boolean) {
               tabActiveBorderColor: '#2BFAFA',
             }"
           >
-          <div class="relative w-full">
-          <div class="absolute bottom-0 left-0 w-full border-b border-gray-700 z-0"></div>
-          <div class="w-0 relative z-10">
-            <TabList
-              pt:activeBar="my-class"
-              pt:tabList="my-class-2"
-              class="w-0"
-            >
-              <Tab value="0">General</Tab>
-              <Tab value="1">Account</Tab>
-              <Tab value="2">Appearance</Tab>
-              <Tab value="3">Anki</Tab>
-              <Tab value="4">Time Tracking</Tab>
-              <Tab value="5" disabled>Notifications</Tab>
-              <Tab value="6">Reports</Tab>
-            </TabList>
-          </div>
-        </div>
-
-
-
+            <div class="relative w-full">
+              <div
+                class="absolute bottom-0 left-0 w-full border-b border-[#e2e8f0] dark:border-gray-700 z-0"
+              ></div>
+              <div class="w-0 relative z-10">
+                <TabList
+                  pt:activeBar="my-class"
+                  pt:tabList="my-class-2"
+                  class="w-0"
+                >
+                  <Tab value="0">General</Tab>
+                  <Tab value="1">Account</Tab>
+                  <Tab value="2">Appearance</Tab>
+                  <Tab value="3">Anki</Tab>
+                  <Tab value="4">Time Tracking</Tab>
+                  <Tab value="5" disabled>Notifications</Tab>
+                  <Tab value="6">Reports</Tab>
+                </TabList>
+              </div>
+            </div>
             <div
               class="overflow-y-auto"
               ref="settingsParent"
