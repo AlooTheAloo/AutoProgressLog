@@ -34,8 +34,8 @@ export default new Elysia().get("/downloadLinks", async ({ set, body }) => {
 
 async function getInstallerUrl(owner: string, repo: string, platform: string) {
   const octokit = new Octokit();
-
-  const assetName = `latest-${platform}.yml`;
+  const assetName =
+    platform == "windows" ? "latest.yml" : `latest-${platform}.yml`;
 
   // Fetch the latest release
   const release = await octokit.repos.getLatestRelease({ owner, repo });
