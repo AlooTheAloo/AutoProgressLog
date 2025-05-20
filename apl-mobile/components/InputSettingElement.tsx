@@ -39,7 +39,7 @@ export default function InputSettingElement(props: SettingElementType) {
       >
         {props.label}
       </ThemedText>
-      <ThemedView className="flex flex-row gap-4 rounded-xl p-3 justify-center items-center mb-3">
+      <ThemedView className="flex flex-row gap-4 rounded-xl p-3 justify-center items-center">
         <ThemedView className="flex flex-col flex-grow">
           <TextInput
             onChangeText={(text: string) => {

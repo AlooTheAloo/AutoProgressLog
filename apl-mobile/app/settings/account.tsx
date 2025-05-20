@@ -23,6 +23,8 @@ import InputSettingElement from "@/components/InputSettingElement";
 import * as ImagePicker from "expo-image-picker";
 import { useState } from "react";
 import { useStorage } from "@/hooks/useStorage";
+import { IconSymbol } from "@/components/ui/IconSymbol";
+import { router } from "expo-router";
 
 export default function Account() {
   const [user, setUser] = useStorage("user", "");
@@ -61,23 +63,25 @@ export default function Account() {
 
   return (
     <View style={styles.container}>
-      <TitleThemedText fontSize={25} string={"Account"}></TitleThemedText>
+      <View className="flex flex-row justify-items-center items-center">
+        <TouchableOpacity
+          onPress={() => {
+            router.back();
+          }}
+        >
+          <IconSymbol size={25} name="chevron.left" color="#22A7D1" />
+        </TouchableOpacity>
+        <TitleThemedText fontSize={25} string={"Account"}></TitleThemedText>
+      </View>
 
       <ScrollView className="mt-5">
         <InputSettingElement
           onChange={setAccountName}
           placeholderText={user}
           label={"NAME"}
-          description={"Enter your username."}
+          description={"Change your username."}
         ></InputSettingElement>
 
-        <Image
-          style={{
-            height: 50,
-            width: 50,
-          }}
-          source={{ uri: image! }}
-        />
         {settings.map((elem, i) => {
           return (
             <SettingElement

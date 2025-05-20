@@ -16,43 +16,11 @@ import SquircleButton from "@/components/ui/SquircleButton";
 import { useState } from "react";
 import Toggl from "@/services/toggl/index";
 import { router } from "expo-router";
-import { togglAccountInfo } from "@/types/toggl";
 
 export default function TogglSetup() {
-  const [tempTogglInfo, setTempTogglInfo] = useStorage<togglAccountInfo>(
-    "togglAccountInfo",
-    {
-      displayName: "",
-      emailAddress: "",
-      profilePicture: "",
-    }
-  ); // robert is the default value
+  const [didSetup, setdidSetup] = useStorage("didSetup", "false"); // robert is the default value
   const [apiKeyFilled, setapiKeyFilled] = useState(false);
   const [apiKey, setapiKey] = useState("");
-
-  async function tryTogglLogin() {
-    const toggl = new Toggl({
-      auth: {
-        token: apiKey,
-      },
-    });
-    const me = await toggl.me.get();
-    if (me.status === 200) {
-      const jsonYes = await me.json();
-      const togglAccountInfo: togglAccountInfo = {
-        displayName: jsonYes["fullname"],
-        emailAddress: jsonYes["email"],
-        profilePicture: jsonYes["image_url"],
-      };
-      setTempTogglInfo(togglAccountInfo);
-      router.push("/setup/toggl-setup-result");
-    } else {
-      Alert.alert(
-        "Error connecting to Toggl",
-        "There was an errror while connecting to Toggl. Make sure your device is connected to the network and that the API key provided is valid."
-      );
-    }
-  }
 
   return (
     <View
@@ -94,7 +62,7 @@ export default function TogglSetup() {
       </TouchableOpacity>
       <InputSettingElement
         onChange={(text: string) => {
-          console.log("API token changed");
+          console.log("wtf");
           setapiKeyFilled(text.length === 0);
           setapiKey(text);
         }}
@@ -106,7 +74,18 @@ export default function TogglSetup() {
       ></InputSettingElement>
       <SquircleButton
         enabled={apiKeyFilled}
-        action={tryTogglLogin}
+        action={async () => {
+          const toggl = new Toggl({
+            auth: {
+              token: apiKey,
+            },
+          });
+          const me = await toggl.me.get();
+          console.log(me);
+          Alert.alert("WOW!", JSON.stringify(me));
+          setdidSetup("true");
+          router.replace("/(tabs)");
+        }}
         title={"Continue"}
       ></SquircleButton>
     </View>

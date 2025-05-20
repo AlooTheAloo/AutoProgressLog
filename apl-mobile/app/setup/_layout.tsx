@@ -23,7 +23,7 @@ export default function SetupLayout() {
         <Stack.Screen
           name="index"
           options={{
-            title: "Connect to Toggl",
+            title: "Get Started",
             headerShown: false,
           }}
         />
@@ -31,6 +31,14 @@ export default function SetupLayout() {
           name="toggl-setup"
           options={{
             title: "Connect to Toggl",
+            headerShown: true,
+          }}
+        />
+        <Stack.Screen
+          name="toggl-setup-result"
+          options={{
+            title: "Confirm Toggl Account",
+            headerShown: true,
           }}
         />
       </Stack>

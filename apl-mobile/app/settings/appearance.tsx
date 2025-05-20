@@ -8,6 +8,7 @@ import {
   useColorScheme,
   TouchableHighlight,
   ScrollView,
+  TouchableOpacity,
 } from "react-native";
 
 import { HelloWave } from "@/components/HelloWave";
@@ -17,6 +18,8 @@ import { ThemedView } from "@/components/ThemedView";
 import { TitleThemedText } from "@/components/TitleThemedText";
 import { SettingElementType } from "../../types/settingElementType";
 import SettingElement from "@/components/SettingElement";
+import { router } from "expo-router";
+import { IconSymbol } from "@/components/ui/IconSymbol";
 
 const settings: SettingElementType[] = [
   {
@@ -30,7 +33,16 @@ const settings: SettingElementType[] = [
 export default function Appearance() {
   return (
     <View style={styles.container}>
-      <TitleThemedText fontSize={25} string={"Appearance"}></TitleThemedText>
+      <View className="flex flex-row items-center">
+        <TouchableOpacity
+          onPress={() => {
+            router.back();
+          }}
+        >
+          <IconSymbol size={25} name="chevron.left" color="#22A7D1" />
+        </TouchableOpacity>
+        <TitleThemedText fontSize={25} string={"Appearance"}></TitleThemedText>
+      </View>
 
       <ScrollView className=" mt-5">
         {settings.map((elem, i) => {

@@ -66,16 +66,14 @@ export class Toggl {
     const url = Array.from(params).length
       ? endpoint + `?${params.toString()}`
       : endpoint;
-    console.log(this.baseURL + "/" + url);
-    const caaca = await fetch(this.baseURL + "/" + url, {
+    const caaca = await window.fetch(this.baseURL + "/" + url, {
       method: method,
       headers: {
         Authorization: this.authHeadercaca,
         "Content-Type": "application/json",
       },
     });
-    const prout = await caaca.json();
-    return prout;
+    return caaca;
 
     // const { data } = await this.axios.request<T>({
     //   url,

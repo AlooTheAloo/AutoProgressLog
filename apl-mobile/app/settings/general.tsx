@@ -9,6 +9,7 @@ import {
   TouchableHighlight,
   ScrollView,
   BackHandler,
+  TouchableOpacity,
 } from "react-native";
 
 import { HelloWave } from "@/components/HelloWave";
@@ -16,10 +17,11 @@ import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { TitleThemedText } from "@/components/TitleThemedText";
-import { IconSymbolName } from "@/components/ui/IconSymbol";
+import { IconSymbol, IconSymbolName } from "@/components/ui/IconSymbol";
 import { SettingElementType } from "../../types/settingElementType";
 import SettingElement from "@/components/SettingElement";
 import { useStorage } from "@/hooks/useStorage";
+import { router } from "expo-router";
 
 export default function General() {
   const [didSetupDB, setdidSetup] = useStorage("didSetup", "false"); // robert is the default value
@@ -43,7 +45,8 @@ export default function General() {
               text: "LETS GO",
               onPress: () => {
                 setdidSetup("false");
-                BackHandler.exitApp();
+                console.log(didSetupDB);
+                throw {};
               },
             },
           ],
@@ -55,7 +58,16 @@ export default function General() {
 
   return (
     <View style={styles.container}>
-      <TitleThemedText fontSize={25} string={"General"}></TitleThemedText>
+      <View className="flex flex-row items-center">
+        <TouchableOpacity
+          onPress={() => {
+            router.back();
+          }}
+        >
+          <IconSymbol size={25} name="chevron.left" color="#22A7D1" />
+        </TouchableOpacity>
+        <TitleThemedText fontSize={25} string={"General"}></TitleThemedText>
+      </View>
 
       <ScrollView className="mt-5">
         {settings.map((elem, i) => {
