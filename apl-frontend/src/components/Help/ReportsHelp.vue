@@ -108,7 +108,7 @@ const openExplanation = () => {
         <AccordionHeader> Reverting a report </AccordionHeader>
         <AccordionContent>
           <div
-            class="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md space-y-4 text-gray-900 dark:text-gray-100"
+            class="p-6 bg-white dark:bg-zinc-800 rounded-lg shadow-md space-y-4 text-gray-900 dark:text-gray-100"
           >
             <p class="m-0">
               Made a mistake in your last report? No worries, you can roll it
