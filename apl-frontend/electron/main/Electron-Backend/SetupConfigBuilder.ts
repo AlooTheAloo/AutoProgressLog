@@ -11,6 +11,7 @@ import {
 import { existsSync, writeFileSync } from "fs";
 import {
   configPath,
+  getConfig,
   syncDataPath,
 } from "../../../apl-backend/Helpers/getConfig";
 import sqlite3 from "sqlite3";
@@ -19,11 +20,14 @@ import { win } from "..";
 import { buildContextMenu } from "./appBackend";
 import path from "path";
 import { CacheManager } from "../../../apl-backend/Helpers/cache";
+import { getAnkiCardReviewCount } from "../../../apl-backend/anki/db";
+import dayjs from "dayjs";
 
-let account: TogglAccount;
+let account: TogglAccount | undefined;
 const DEFAULT_CONFIG: Options = {
   account: {
     userName: "",
+    profilePicture: "",
   },
   general: {
     autogen: {
@@ -39,7 +43,7 @@ const DEFAULT_CONFIG: Options = {
     enabled: false,
     ankiIntegration: undefined,
   },
-  appreance: {
+  appearance: {
     glow: true,
   },
   outputOptions: {
@@ -83,26 +87,47 @@ export function setupListeners() {
   ipcMain.handle("anki-deck-select", async (event: any, arg: number[]) => {
     if (config?.anki?.options == undefined) return;
     config.anki.options.trackedDecks = arg;
+    if (arg.length == 0) {
+      config.anki = {
+        enabled: false,
+        options: undefined,
+      };
+    }
   });
 
   ipcMain.handle("SetupComplete", (event: any, arg: any) => {
-    console.log("setup complete :yippe:");
     win?.webContents.send("is-setup-complete", true);
   });
 
-  ipcMain.handle("SaveConfig", (event: any, arg: any) => {
+  ipcMain.handle("SaveConfig", async (event: any, arg: any) => {
     if (existsSync(configPath)) return;
     writeFileSync(configPath, JSON.stringify(config));
-    let db = new sqlite3.Database(
-      syncDataPath,
-      sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE,
-      async (err) => {
-        const time = await CreateDB(db);
-        if (time == undefined) return;
-        CacheManager.init(time);
-      }
-    );
-    buildContextMenu();
+    await new Promise<void>((res, rej) => {
+      let db = new sqlite3.Database(
+        syncDataPath,
+        sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE,
+        async (err) => {
+          let cards = 0;
+          if (config.anki?.enabled) {
+            cards =
+              (await getAnkiCardReviewCount(
+                dayjs(0),
+                dayjs().startOf("day")
+              )) ?? 0;
+          }
+          const time = await CreateDB(db, {
+            cards: cards,
+          });
+          if (time == undefined) return;
+
+          CacheManager.init(time, cards);
+          res();
+        }
+      );
+    });
+    await buildContextMenu();
+    console.log("Done!!");
+    return;
   });
 
   ipcMain.handle("SetOutputFile", (event: any, arg: any) => {
@@ -167,6 +192,7 @@ export function setupListeners() {
   });
 
   ipcMain.handle("toggl-api-key-set", async (event: any, arg: any) => {
+    account = undefined;
     const me = await new Toggl({
       auth: {
         token: arg,
@@ -178,6 +204,7 @@ export function setupListeners() {
     };
     config.account = {
       userName: me.fullname,
+      profilePicture: me.image_url,
     };
   });
 

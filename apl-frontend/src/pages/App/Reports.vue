@@ -10,9 +10,13 @@ import Skeleton from "primevue/skeleton";
 import score from "../../../src/assets/rewarded.png";
 import ConfirmPopup from "primevue/confirmpopup";
 import { useConfirm } from "primevue/useconfirm";
-import { CopyReportToast } from "../../../electron/main/Electron-Backend/reportsListeners";
 import Toast from "primevue/toast";
 import { useToast } from "primevue/usetoast";
+import InputText from "primevue/inputtext";
+import Dialog from "primevue/dialog";
+import { motion, AnimatePresence } from "motion-v";
+import { CopyReportToast } from "../../../electron/main/Electron-Backend/ReportsListeners";
+import pluralize from "pluralize";
 
 const rows = 6;
 const router = useRouter();
@@ -52,6 +56,16 @@ async function getImages(from: number, count: number) {
         }
         res();
       });
+  });
+}
+
+function openImage(id: string) {
+  window.ipcRenderer.invoke("Get-Image", id).then((x) => {
+    imageViewerImage.value = {
+      image: x,
+      id: id,
+      shown: true,
+    };
   });
 }
 
@@ -99,7 +113,6 @@ const images = ref<string[] | undefined>(undefined);
 const first = ref<number>(0);
 
 const pageChanged = (event: PageState) => {
-  images.value = undefined;
   getImages(event.first, event.rows);
   first.value = event.first;
 };
@@ -129,6 +142,12 @@ function copyReport(id: string) {
   });
 }
 
+const imageViewerImage = ref<{ image?: string; id?: string; shown: boolean }>({
+  image: undefined,
+  id: undefined,
+  shown: false,
+});
+
 function nf(num: number) {
   return new Intl.NumberFormat("en-US", { useGrouping: true }).format(num);
 }
@@ -136,6 +155,22 @@ function nf(num: number) {
 
 <template>
   <Toast />
+
+  <Dialog
+    v-model:visible="imageViewerImage.shown"
+    modal
+    :dismissableMask="true"
+    :draggable="false"
+    :header="`Report # ${imageViewerImage?.id}`"
+    :style="{ overflow: 'hidden' }"
+  >
+    <div class="flex-col flex h-[60vh]">
+      <img
+        class="mx-auto rounded-lg h-full"
+        :src="'data:image/png;base64,' + imageViewerImage?.image"
+      />
+    </div>
+  </Dialog>
 
   <ConfirmPopup />
   <div
@@ -189,155 +224,180 @@ function nf(num: number) {
           >
             <template #list="slotProps">
               <div class="flex flex-col">
-                <div
-                  v-for="(item, index) in slotProps.items as ListReport[]"
-                  :key="index"
-                >
-                  <div class="py-2 flex">
-                    <div
-                      class="w-full flex flex-col sm:flex-row sm:items-center gap-4 bg-[#121212] overflow-hidden rounded-md pr-5"
-                    >
-                      <div class="w-3 h-full bg-[#24CAFF]"></div>
-                      <div class="w-14 py-4">
-                        <div v-if="images == undefined" class="w-14 h-14">
-                          <Skeleton height="3.5rem"></Skeleton>
-                        </div>
-                        <div
-                          v-else
-                          class="h-14 flex items-center justify-center"
-                        >
-                          <img
-                            v-if="(images ?? [])[index] != ''"
-                            class="block xl:block mx-auto rounded-sm h-14"
-                            :src="
-                              'data:image/png;base64,' + (images ?? [])[index]
-                            "
-                            :alt="item.id"
-                          />
-                          <div v-else class="text-xs text-center">
-                            No image available
-                          </div>
-                        </div>
-                      </div>
+                <AnimatePresence :key="first">
+                  <motion.div
+                    v-for="(item, index) in slotProps.items as ListReport[]"
+                    :key="index + first"
+                    :initial="{ x: 50, opacity: 0, filter: 'blur(10px)' }"
+                    :while-in-view="{ x: 0, opacity: 1, filter: 'blur(0px)' }"
+                    :transition="{
+                      delay: index * 0.01,
+                    }"
+                    :exit="{ opacity: 0 }"
+                  >
+                    <div class="py-2 flex">
                       <div
-                        class="flex flex-col md:flex-row justify-between md:items-center flex-1 gap-6"
+                        class="w-full flex flex-col sm:flex-row sm:items-center gap-4 dark:bg-black bg-[#eeeeef] overflow-hidden rounded-md pr-5"
                       >
-                        <div
-                          class="flex flex-row md:flex-col justify-between items-start"
-                        >
-                          <div class="flex items-center gap-2">
-                            <div class="text-lg font-medium">
-                              Report #{{ item.id }}
-                            </div>
-
-                            <span
-                              class="font-medium text-surface-500 dark:text-surface-400 text-sm text-[#24CAFF] italic"
-                            >
-                              <span v-if="item.date.isSame(dayjs(), 'd')">
-                                Today
-                              </span>
-                              <span
-                                v-else-if="item.date.diff(dayjs(), 'd') == -1"
-                              >
-                                Yesterday
-                              </span>
-                              <span v-else>
-                                {{ item.date.format("Do") }}
-                                of
-                                {{ item.date.format("MMMM").toLowerCase() }}
-                                {{ item.date.format("YYYY") }}
-                              </span>
-
-                              at
-                              {{ item.date.format("h:mm a") }}
-                            </span>
+                        <div class="w-3 h-full bg-[#24CAFF]"></div>
+                        <div class="w-14 py-4">
+                          <div v-if="images == undefined" class="w-14 h-14">
+                            <Skeleton height="3.5rem"></Skeleton>
                           </div>
-                          <div class="gap-2 flex mt-1">
+                          <div
+                            v-else
+                            class="h-14 flex items-center justify-center"
+                          >
                             <div
-                              class="flex bg-white items-center px-2 rounded-lg h-6"
+                              role="button"
+                              @click="openImage(item.id)"
+                              class="z-10 text-neutral-100 opacity-0 hover:opacity-100 bg-black/20 w-full h-full flex justify-center items-center transition-all duration-200"
+                              v-if="(images ?? [])[index] != ''"
                             >
-                              <img :src="score" class="w-4 h-4 invert" />
-                              <span
-                                class="ml-2 font-medium text-black text-sm"
-                                >{{ nf(item.score) }}</span
-                              >
+                              <i class="pi pi-search-plus"></i>
+                            </div>
+                            <img
+                              role="button"
+                              tabindex="0"
+                              @keydown.enter="openImage(item.id)"
+                              @keydown.space.prevent="openImage(item.id)"
+                              v-if="(images ?? [])[index] != ''"
+                              class="absolute mx-auto rounded-sm h-14 hover:opacity-80 transition-all duration-200"
+                              :src="
+                                'data:image/png;base64,' + (images ?? [])[index]
+                              "
+                              :alt="item.id"
+                            />
+                            <div v-else class="text-xs text-center">
+                              No image available
                             </div>
                           </div>
                         </div>
-                        <div class="flex flex-col md:items-end gap-8">
-                          <div class="flex flex-col md:flex-row gap-2">
-                            <Button
-                              v-if="item.revertable"
-                              severity="danger"
-                              :disabled="reverting"
-                              @click="revertReport($event)"
-                              class="h-8"
-                            >
-                              <i
-                                v-if="reverting"
-                                :class="['pi', 'pi-spinner pi-spin text-white']"
-                              />
-                              <i v-else class="pi pi-undo text-white" />
-                            </Button>
+                        <div
+                          class="flex flex-col md:flex-row justify-between md:items-center flex-1 gap-6"
+                        >
+                          <div
+                            class="flex flex-row md:flex-col justify-between items-start"
+                          >
+                            <div class="flex items-center gap-2">
+                              <div class="text-lg font-medium">
+                                Report #{{ item.id }}
+                              </div>
 
-                            <Button
-                              v-on:click="copyReport(item.id)"
-                              icon="pi pi-clipboard"
-                              label=""
-                              :disabled="!item.fileExists"
-                              v-tooltip.top="{
-                                value: item.fileExists
-                                  ? ''
-                                  : 'Report file could not be found',
-                                pt: {
-                                  arrow: {
-                                    style: {
-                                      backgroundColor: '',
+                              <span
+                                class="font-medium text-surface-500 dark:text-surface-400 text-sm text-[#24CAFF] italic"
+                              >
+                                <span v-if="item.date.isSame(dayjs(), 'd')">
+                                  Today
+                                </span>
+                                <span
+                                  v-else-if="item.date.diff(dayjs(), 'd') == -1"
+                                >
+                                  Yesterday
+                                </span>
+                                <span v-else>
+                                  {{ item.date.format("Do") }}
+                                  of
+                                  {{ item.date.format("MMMM").toLowerCase() }}
+                                  {{ item.date.format("YYYY") }}
+                                </span>
+
+                                at
+                                {{ item.date.format("h:mm a") }}
+                              </span>
+                            </div>
+                            <div class="gap-2 flex mt-1">
+                              <div
+                                class="flex bg-white items-center px-2 rounded-lg h-6"
+                              >
+                                <img :src="score" class="w-4 h-4 invert" />
+                                <span
+                                  class="ml-2 font-medium text-black text-sm"
+                                  >{{
+                                    nf(item.score) + " " + pluralize("pt")
+                                  }}</span
+                                >
+                              </div>
+                            </div>
+                          </div>
+                          <div class="flex flex-col md:items-end gap-8">
+                            <div class="flex flex-col md:flex-row gap-2">
+                              <Button
+                                v-if="item.revertable"
+                                severity="danger"
+                                :disabled="reverting"
+                                @click="revertReport($event)"
+                                class="h-8"
+                              >
+                                <i
+                                  v-if="reverting"
+                                  :class="[
+                                    'pi',
+                                    'pi-spinner pi-spin text-white',
+                                  ]"
+                                />
+                                <i v-else class="pi pi-undo text-white" />
+                              </Button>
+
+                              <Button
+                                v-on:click="copyReport(item.id)"
+                                icon="pi pi-clipboard"
+                                label=""
+                                :disabled="!item.fileExists"
+                                v-tooltip.top="{
+                                  value: item.fileExists
+                                    ? ''
+                                    : 'Report file could not be found',
+                                  pt: {
+                                    arrow: {
+                                      style: {
+                                        backgroundColor: '',
+                                      },
+                                    },
+                                    text: {
+                                      style: {
+                                        fontSize: '0.6rem',
+                                        textAlign: 'center',
+                                        color: 'white',
+                                      },
                                     },
                                   },
-                                  text: {
-                                    style: {
-                                      fontSize: '0.6rem',
-                                      textAlign: 'center',
-                                      color: 'white',
+                                }"
+                                class="flex-auto md:flex-initial whitespace-nowrap h-8"
+                              ></Button>
+                              <Button
+                                v-on:click="openReport(item.id)"
+                                icon="pi pi-folder-open"
+                                label="Open"
+                                :disabled="!item.fileExists"
+                                v-tooltip.top="{
+                                  value: item.fileExists
+                                    ? ''
+                                    : 'Report file could not be found',
+                                  pt: {
+                                    arrow: {
+                                      style: {
+                                        backgroundColor: '',
+                                      },
+                                    },
+                                    text: {
+                                      style: {
+                                        fontSize: '0.6rem',
+                                        textAlign: 'center',
+                                        color: 'white',
+                                      },
                                     },
                                   },
-                                },
-                              }"
-                              class="flex-auto md:flex-initial whitespace-nowrap h-8"
-                            ></Button>
-                            <Button
-                              v-on:click="openReport(item.id)"
-                              icon="pi pi-folder-open"
-                              label="Open"
-                              :disabled="!item.fileExists"
-                              v-tooltip.top="{
-                                value: item.fileExists
-                                  ? ''
-                                  : 'Report file could not be found',
-                                pt: {
-                                  arrow: {
-                                    style: {
-                                      backgroundColor: '',
-                                    },
-                                  },
-                                  text: {
-                                    style: {
-                                      fontSize: '0.6rem',
-                                      textAlign: 'center',
-                                      color: 'white',
-                                    },
-                                  },
-                                },
-                              }"
-                              class="flex-auto md:flex-initial whitespace-nowrap h-8"
-                            ></Button>
+                                }"
+                                class="flex-auto md:flex-initial whitespace-nowrap h-8"
+                              ></Button>
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                </div>
+                  </motion.div>
+                </AnimatePresence>
               </div>
             </template>
           </DataView>

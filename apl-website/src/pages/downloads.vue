@@ -61,8 +61,13 @@
 
         <div class="lg:block hidden">
           <div class="flex">
-            <img v-if="platform == 'mac'" :src="macos_apl" width="300" />
-            <img v-if="platform == 'windows'" :src="windows_apl" width="300" />
+            <img v-if="platform == 'mac'" :src="macos_apl" width="800" />
+            <img
+              v-else-if="platform == 'windows'"
+              :src="windows_apl"
+              width="800"
+            />
+            <img v-else-if="platform == 'linux'" :src="linux_apl" width="200" />
           </div>
         </div>
       </div>
@@ -108,6 +113,8 @@ import Ripple from "@/components/ui/ripple/Ripple.vue";
 import { BoxIcon, DownloadIcon, RocketIcon } from "lucide-vue-next";
 import windows_apl from "../assets/APL_windows.png";
 import macos_apl from "../assets/APL_Macbook.png";
+import linux_apl from "../assets/APL_Linux.png";
+
 import { computed, onMounted, ref } from "vue";
 import RainbowButton from "@/components/ui/rainbow-button/RainbowButton.vue";
 import confetti from "canvas-confetti";
@@ -137,7 +144,7 @@ type Platform = "windows" | "mac" | "linux" | "other" | "all";
 const platform = ref<Platform>(getPlatform());
 
 function getPlatform(): Platform {
-  return "windows";
+  return "linux";
   const agent = window.navigator.userAgent;
   if (agent.indexOf("Windows") != -1) return "windows";
   if (agent.indexOf("Mac") != -1) return "mac";
@@ -168,7 +175,7 @@ const urls = ref<
 >([]);
 
 function externalOpen() {
-  const end = Date.now() + 0.1 * 1000; // 3 seconds
+  const end = Date.now() + 0.3 * 1000; // 3 seconds
   const colors = ["#a786ff", "#fd8bbc", "#eca184", "#f8deb1"];
 
   // Frame function to trigger confetti cannons

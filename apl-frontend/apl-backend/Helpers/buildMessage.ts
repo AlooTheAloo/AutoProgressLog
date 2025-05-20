@@ -76,11 +76,12 @@ export async function buildImage(
 
   console.log(11.4);
 
-  page.setViewport({
-    width: (2000 * options.outputQuality) / 2,
-    height: 5000,
+  await page.setViewport({
+    width: Math.round((2000 * options.outputQuality) / 2),
+    height, // ← use the same `height` you’ll pass to tryScreenshot
     deviceScaleFactor: options.outputQuality / 2,
   });
+
   console.log(11.5);
 
   const isDev = process.env.NODE_ENV === "development";
@@ -114,13 +115,10 @@ export async function buildImage(
   await tryScreenshot(
     page,
     outputPath,
-    {
-      width: 1586,
-      height,
-      x: 0,
-      y: 0,
-    },
-    extensionToType(options.outputFile.extension)
+    { width: 1586, height, x: 0, y: 0 },
+    extensionToType(options.outputFile.extension),
+    3, // maxRetries
+    30_000 // timeoutMs (30 s — Puppeteer default is 30 s anyway)
   );
 
   console.log(11.8);
@@ -138,6 +136,7 @@ async function tryScreenshot(
   maxRetries = 3,
   timeoutMs = 5000
 ) {
+  await page.evaluate(() => requestAnimationFrame(() => {}));
   for (let i = 0; i < maxRetries; i++) {
     try {
       await Promise.race([
@@ -203,14 +202,17 @@ export function buildJSON(
     (builderDTO.timeToAdd == 0 ? -lastCache.immersionStreak : 1);
 
   let lastnElements = lastCaches
+    .filter((x) => x.reportNo != 0)
     .slice(0, MOVING_AVERAGE_SIZE)
     .map((x) => x.seconds);
   const oldAverage = arithmeticWeightedMean(lastnElements);
-
+  console.log("LastnElements are " + JSON.stringify(lastnElements));
   const newnElements = [
     builderDTO.timeToAdd,
-    ...lastnElements.slice(0, lastnElements.length - 1),
+    ...lastnElements.slice(0, MOVING_AVERAGE_SIZE - 1),
   ];
+  console.log("NewnElements are " + JSON.stringify(newnElements));
+
   const newAverage = arithmeticWeightedMean(newnElements);
 
   const ImmersionScore = builderDTO.timeToAdd;

@@ -24,15 +24,17 @@ export class CacheManager {
   };
 
   static exists = fs.existsSync(cache_location);
-  static init = (time: number) => {
+  static init = (time: number, cards: number) => {
+    console.log("Init time");
+
     this.set({
       list: [
         {
           seconds: time,
           totalSeconds: time,
           generationTime: dayjs().startOf("day").toISOString(),
-          totalCardsStudied: 0,
-          cardsStudied: 0,
+          totalCardsStudied: cards,
+          cardsStudied: cards,
           ankiStreak: 0,
           immersionStreak: 0,
           reportNo: 0,
@@ -88,6 +90,8 @@ export class CacheManager {
   };
 
   public static get = (createIfNull = true): cacheList => {
+    if (!fs.existsSync(cache_location))
+      return { list: [], version: appVersion };
     return JSON.parse(fs.readFileSync(cache_location).toString());
   };
 }

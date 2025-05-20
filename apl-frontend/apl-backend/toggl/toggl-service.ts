@@ -6,7 +6,7 @@ import { compareActivities } from "../Helpers/activityHelper";
 import { Toggl } from "toggl-track";
 import { getConfig } from "../Helpers/getConfig";
 import { activity } from "../types/activity";
-import { onConfigChange } from "../../electron/main/Electron-Backend/settingsListeners";
+import { onConfigChange } from "../../electron/main/Electron-Backend/SettingsListeners";
 import { Options } from "../types/options";
 
 const ignore = (tags: string[]) =>
@@ -26,25 +26,33 @@ export async function getLiveActivity() {
   return entries;
 }
 
-export async function getTimeEntries(since: string | number) {
-  try {
-    if (toggl == undefined) {
-      toggl = new Toggl({
-        auth: {
-          token: getConfig()?.toggl.togglToken ?? "",
-        },
-      });
-    }
+export async function getTimeEntries(
+  sinceDayjs: dayjs.Dayjs,
+  beforeDayjs: dayjs.Dayjs | undefined = undefined
+) {
+  if (sinceDayjs.isSame(beforeDayjs)) {
+    beforeDayjs = undefined;
+  }
 
-    if (dayjs(since).isBefore(dayjs().subtract(3, "month").add(1, "minute"))) {
-      since = dayjs().subtract(3, "month").add(1, "minute").unix().toString();
+  let since = sinceDayjs.valueOf();
+  try {
+    toggl = new Toggl({
+      auth: {
+        token: getConfig()?.toggl.togglToken ?? "",
+      },
+    });
+
+    const compare = dayjs().subtract(3, "month").add(1, "day");
+    if (dayjs(since).isBefore(compare)) {
+      since = compare.valueOf();
     }
 
     const start = dayjs();
-    const entries: entry[] = await toggl.timeEntry.list({
+    let entries: entry[] = await toggl.timeEntry.list({
       since: dayjs(since).unix().toString(),
     });
 
+    entries = entries.filter((x) => dayjs(x.stop).isBefore(beforeDayjs));
     // TODO : Telemetry maybe
     console.log("Fetch took " + dayjs().diff(start, "ms") + " ms");
     const entriesAfterLastGen = entries.filter((x) => {
@@ -79,6 +87,7 @@ export async function getTimeEntries(since: string | number) {
 
     return { entriesAfterLastGen, allEvents };
   } catch (e) {
+    console.log("error fetching entries", e);
     return null;
   }
 }
@@ -90,6 +99,7 @@ onConfigChange.on(
       if (newConfig.toggl.togglToken == "") {
         toggl = undefined;
       } else {
+        console.log("creating new toggl");
         toggl = new Toggl({
           auth: {
             token: newConfig.toggl.togglToken,

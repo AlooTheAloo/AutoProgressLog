@@ -14,6 +14,7 @@ import { CacheManager } from "../../../apl-backend/Helpers/cache";
 import { DashboardDTO } from "./types/Dashboard";
 import {
   GetImmersionSourcesSince,
+  GetImmersionStreak,
   GetImmersionTimeBetween,
   GetImmersionTimeSince,
   GetLastEntry,
@@ -25,6 +26,9 @@ import {
   checkInternet,
   notifyNoInternet,
 } from "../../../apl-backend/Helpers/Healthcheck/internetHelper";
+import { readFile } from "fs";
+import { promises as fsPromises } from "fs";
+import sharp from "sharp";
 
 export function dashboardListeners() {
   ipcMain.handle("isSyncing", async (event: any) => {
@@ -39,8 +43,9 @@ export function dashboardListeners() {
 
   ipcMain.handle("Sync", async (event: any) => {
     if (await runChecks()) {
-      const sync = await runSync(getSyncProps());
-      if (sync == null) {
+      let sync = await runSync(getSyncProps());
+      if (sync == null || sync == false) {
+        sync = null;
         setSyncing(false);
       }
       return sync;
@@ -67,7 +72,7 @@ export async function runChecks(): Promise<boolean> {
 
 function getNextReportTime() {
   const config = getConfig();
-  if (!config?.general?.autogen?.enabled) return "";
+  if (!config?.general?.autogen?.enabled) return null;
   const time = config.general.autogen.options.generationTime;
   const now = dayjs();
 
@@ -80,7 +85,7 @@ function getNextReportTime() {
   }
 
   // Format the time as "MMM D, YYYY at h:mm A"
-  return reportTime.format("MMM D, YYYY [at] h:mm A");
+  return reportTime.valueOf();
 }
 
 export async function CreateDTO() {
@@ -93,8 +98,12 @@ export async function CreateDTO() {
     dayjs().subtract(1, "month").startOf("month"),
     dayjs().subtract(1, "month")
   );
+
+  const pfp_buffer = await createPfpBuffer(config.account.profilePicture);
+
   const DTO: DashboardDTO = {
     userName: config.account.userName,
+    profile_picture: pfp_buffer,
     lastSyncTime: dayjs(lastEntry?.generationTime).toISOString(),
     lastReportTime: lastReport.generationTime,
     ankiDTO: config.anki.enabled
@@ -122,10 +131,35 @@ export async function CreateDTO() {
       immersionSources: await GetImmersionSourcesSince(
         dayjs().subtract(1, "month")
       ),
+      immersionStreak: await GetImmersionStreak(),
     },
     monthlyScore: 0,
     syncCount: await GetSyncCount(),
     nextReport: getNextReportTime(),
   };
   return DTO;
+}
+
+async function createPfpBuffer(path: string) {
+  if (path.includes("profilePicture.apl")) {
+    // Read the image file
+    const file = await fsPromises.readFile(path);
+    const sharpFile = await sharp(file);
+    // Resize the image using sharp and convert it to base64
+    const resizedBase64 = await sharpFile
+      .toBuffer()
+      .then((buffer) => buffer.toString("base64")) // Convert buffer to base64
+      .catch((err) => {
+        throw new Error("Error resizing image");
+      });
+    return {
+      buffer: resizedBase64,
+      isUrl: false,
+    };
+  } else {
+    return {
+      buffer: path,
+      isUrl: true,
+    };
+  }
 }

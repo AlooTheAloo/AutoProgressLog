@@ -2,7 +2,9 @@
 import { RouterView, useRouter } from "vue-router";
 import SideBarContainer from "./components/Common/SideBarContainer.vue";
 import { appPath } from "./pages/routes/appRoutes";
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
+import { ThemeManager } from "./util/theme-manager";
+import GlobalDialogRenderer from "./util/DialogRenderer/GlobalDialogRenderer.vue";
 const router = useRouter();
 const showSideBar = ref<boolean>(false);
 
@@ -28,14 +30,16 @@ window.addEventListener("online", updateOnlineStatus);
 window.addEventListener("offline", updateOnlineStatus);
 
 updateOnlineStatus();
+
+ThemeManager.init();
 </script>
 
 <template>
-  <SideBarContainer
-    :currentRoute="router.currentRoute.value.path as appPath"
-    v-if="showSideBar"
-  >
-    <RouterView />
-  </SideBarContainer>
+  <div class="dark:bg-[#18181880] bg-[#fbfbfb]" v-if="showSideBar">
+    <SideBarContainer :currentRoute="router.currentRoute.value.path as appPath">
+      <RouterView />
+    </SideBarContainer>
+  </div>
   <RouterView v-else />
+  <GlobalDialogRenderer />
 </template>

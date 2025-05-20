@@ -23,6 +23,7 @@ function updateValue(value: any) {
 }
 
 function chooseFilePath() {
+  console.log("props folder is " + props.folder);
   window.ipcRenderer
     .invoke(!!props.folder ? "OpenPathDialog" : "OpenFileDialog", value.value)
     .then((path) => {
@@ -74,7 +75,7 @@ const value = ref<string>(props.value ?? "");
         <div class="flex w-full items-center justify-between h-8">
           <!-- The truncating text -->
           <div
-            class="flex-grow text-sm text-ellipsis overflow-hidden whitespace-nowrap truncate text-white"
+            class="flex-grow text-sm text-ellipsis overflow-hidden whitespace-nowrap truncate dark:text-white text-black"
           >
             {{ value }}
           </div>

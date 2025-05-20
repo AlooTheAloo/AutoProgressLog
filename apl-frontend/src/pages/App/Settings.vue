@@ -88,7 +88,7 @@ function ankiTest(worked: boolean) {
 </script>
 
 <template>
-  <Toast />
+  <Toast class="z-10" />
   <Dialog
     :header="warningData?.title"
     :visible="warningData != undefined"
@@ -114,10 +114,14 @@ function ankiTest(worked: boolean) {
 
   <div class="flex flex-col w-full">
     <div class="flex flex-col flex-grow w-full h-full">
-      <div class="flex w-full h-20 items-center px-4 mt-8 justify-between">
-        <div class="flex flex-col text-white font-bold text-3xl">Settings</div>
+      <div class="flex w-full h-20 items-center px-10 mt-5 justify-between">
+        <h1
+          class="bg-gradient-to-r bg-clip-text text-4xl font-extrabold text-transparent from-[#89BDFF] to-[#40ffff]"
+        >
+          Settings
+        </h1>
       </div>
-      <div class="flex w-full px-4 flex-grow">
+      <div class="flex w-full px-10 flex-grow">
         <div class="flex w-full px-2 h-full rounded-lg">
           <Tabs
             value="0"
@@ -127,21 +131,26 @@ function ankiTest(worked: boolean) {
               tabActiveBorderColor: '#2BFAFA',
             }"
           >
-            <div class="w-0">
-              <TabList
-                pt:activeBar="my-class"
-                pt:tabList="my-class-2"
-                class="w-0"
-              >
-                <Tab value="0">General</Tab>
-                <Tab value="1">Account</Tab>
-                <Tab value="2">Appearance</Tab>
-                <Tab value="3">Anki</Tab>
-                <Tab value="4">Time Tracking</Tab>
-                <Tab value="5" disabled>Notifications</Tab>
-                <Tab value="6">Reports</Tab>
-              </TabList>
-            </div>
+          <div class="relative w-full">
+          <div class="absolute bottom-0 left-0 w-full border-b border-gray-700 z-0"></div>
+          <div class="w-0 relative z-10">
+            <TabList
+              pt:activeBar="my-class"
+              pt:tabList="my-class-2"
+              class="w-0"
+            >
+              <Tab value="0">General</Tab>
+              <Tab value="1">Account</Tab>
+              <Tab value="2">Appearance</Tab>
+              <Tab value="3">Anki</Tab>
+              <Tab value="4">Time Tracking</Tab>
+              <Tab value="5" disabled>Notifications</Tab>
+              <Tab value="6">Reports</Tab>
+            </TabList>
+          </div>
+        </div>
+
+
 
             <div
               class="overflow-y-auto"
@@ -201,14 +210,14 @@ function ankiTest(worked: boolean) {
         JSON.stringify(originalConfig) == JSON.stringify(config) ? '4rem' : '',
     }"
   >
-    <div class=" ">
+    <div class="flex gap-4">
       <Button
         :aria-hidden="JSON.stringify(originalConfig) == JSON.stringify(config)"
         :tabindex="
           JSON.stringify(originalConfig) != JSON.stringify(config) ? '0' : '-1'
         "
         @click="save"
-        class="w-72"
+        class="w-48"
         >Save</Button
       >
       <Button

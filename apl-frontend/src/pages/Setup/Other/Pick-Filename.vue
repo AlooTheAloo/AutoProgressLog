@@ -10,6 +10,7 @@ import Dropdown from "primevue/dropdown";
 import AccountDisplay from "../../../components/Common/AccountDisplay.vue";
 import Panel from "primevue/panel";
 import { reportExtensions } from "../../../../apl-backend/types/options";
+import { motion } from 'motion-v'
 
 const extensions = reportExtensions;
 
@@ -45,53 +46,81 @@ function NextPage() {
 </script>
 
 <template>
-  <SetupBackground></SetupBackground>
-
+  <SetupBackground/>
   <div class="flex w-screen">
-    <div class="p-12 flex flex-col w-2/3 bg-black h-screen">
-      <div>
-        <AccountDisplay />
-      </div>
-      <div class="flex flex-col flex-grow py-5 justify-start gap-2 text-left">
-        <BackButton route="/setup/anki-home" />
-        <div class="font-semibold text-white text-4xl">
-          Select where to save your reports.
-        </div>
-        <p class="text-sm">
+    <div
+      class="p-4 sm:p-12
+             flex flex-col justify-between
+             w-full max-w-[60rem] bg-black min-h-screen"
+    >
+    <div class="flex flex-col items-start space-y-10 w-full">
+        <img
+          :src="Logo"
+          alt="APL Logo"
+          class="w-16 h-16 sm:w-20 sm:h-20 block"
+        />
+      <motion.div
+        :initial="{ opacity: 0, y: 20, filter: 'blur(10px)' }"
+        :animate="{ opacity: 1, y: 0, filter: 'blur(0px)', transition:{duration:0.6}}"
+        class="flex flex-col items-start space-y-6"
+      >
+        <BackButton route="/setup/anki-home"/>
+        <h1 class="text-xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl
+                   font-semibold text-white leading-tight">
+                   Select where to save your progress reports
+        </h1>
+        <div class="text-xs sm:text-sm lg:text-base text-[#C0C0C0] leading-relaxed">
           Your progress reports will be saved under this name with a number
-          suffix. For example, if you choose "MyReport.png", your reports will
-          be saved as "MyReport 1.png", "MyReport 2.png", etc.
-        </p>
-        <div class="flex flex-col gap-2 mt-2 h-12">
-          <div>
-            <Button class="w-full" @click="chooseFilePath">
-              <div class="flex flex-col w-full" style="direction: rtl">
-                <div
-                  class="text-sm text-ellipsis overflow-hidden whitespace-nowrap"
-                >
-                  {{ filePath }}
-                </div>
-                <div class="text-xs">(Click to edit)</div>
-              </div>
-            </Button>
-          </div>
-          <div class="flex gap-2">
-            <InputText
-              v-model="filename"
-              class="w-full text-white font-semibold rounded-xl p-2 h-12"
-            />
-            <Dropdown
-              v-model="selectedExtension"
-              :options="extensions"
-              class="w-1/4 text-white font-semibold text-lg rounded-xl h-12"
-            />
-          </div>
+            suffix. For example, if you choose “MyReport.png”, your reports
+            will be saved as “MyReport 1.png”, “MyReport 2.png”, etc.
         </div>
+        <div class="flex flex-col gap-3 w-full">
+  <Button
+    class="w-full text-left p-3 bg-[#18181B] rounded-xl"
+    @click="chooseFilePath"
+  >
+    <div class="flex flex-col w-full text-left">
+      <div class="text-sm truncate">{{ filePath }}</div>
+      <div class="text-xs text-[#C0C0C0]">(Click to edit)</div>
+    </div>
+  </Button>
 
-        <div class="flex flex-grow justify-end items-end">
-          <Button @click="NextPage" style="width: 120px" label="Continue" />
-        </div>
-      </div>
+    <div class="flex gap-2 w-full">
+    <div class="flex flex-col gap-1 flex-1">
+      <label class="text-lg text-white font-semibold">
+        Report name
+      </label>
+      <InputText
+        v-model="filename"
+        placeholder="Report name"
+        class="w-full text-white font-semibold rounded-xl p-2 h-12"
+      />
+    </div>
+    <div class="flex flex-col gap-1 w-1/4">
+      <label class="text-lg text-white font-semibold">
+        Extension
+      </label>
+      <Dropdown
+        v-model="selectedExtension"
+        :options="extensions"
+        class="w-full text-white font-semibold text-lg rounded-xl h-12"
+      />
     </div>
   </div>
+</div>
+      </motion.div>
+    </div>
+      <div class="flex justify-end">
+        <Button
+          @click="NextPage"
+          class="w-[300px] p-3 !rounded-full"
+          >
+          <span class="text-xl font-bold text-black">Continue</span>
+        </Button>
+      </div>
+    </div>
+    <div class="flex-grow"></div>
+  </div>
 </template>
+<style scoped>
+</style>

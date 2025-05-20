@@ -3,6 +3,7 @@ import Listbox from "primevue/listbox";
 import Logo from "../../assets/Logo.png";
 import Button from "primevue/button";
 import { useRouter } from "vue-router";
+import { motion } from 'motion-v'
 
 const options = [
   { label: "🫂 A friend's recommendation", value: "friend" },
@@ -28,48 +29,58 @@ function NextPage() {
 </script>
 
 <template>
+  <SetupBackground/>
+
   <div class="flex w-screen">
-    <div class="p-12 flex flex-col w-full bg-black h-screen">
-      <div class="pb-2">
-        <img :src="Logo" class="w-12 h-12" />
-      </div>
-      <div class="font-semibold text-white text-4xl">
-        How did you find out about AutoProgressLog?
-      </div>
-      <p class="text-sm"></p>
-      <div class="flex flex-grow items-center">
+    <div
+      class="p-4 sm:p-12
+             flex flex-col justify-between
+             h-screen w-full max-w-[60rem] bg-black"
+    >
+
+      <div class="flex w-full items-center justify-between">
+          <img :src="Logo" alt="APL Logo" class="w-16 h-16 sm:w-20 sm:h-20 mb"/>
+          <AccountDisplay/>
+        </div>
+      <motion.div
+        :initial="{ opacity: 0, y: 20, filter: 'blur(10px)' }"
+        :animate="{ opacity: 1, y: 0, filter: 'blur(0px)', transition:{ duration: 0.6 } }"
+        class="flex flex-col flex-1 space-y-6"
+      >
+      <BackButton route=""/>
+
+        <h1
+          class="text-xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl
+                 font-semibold text-white leading-tight"
+        >
+          How did you find out about AutoProgressLog?
+        </h1>
+        <p class="text-xs sm:text-sm lg:text-base text-[#C0C0C0] leading-relaxed">
+          Select the option that best applies:
+        </p>
         <Listbox
-          scroll-height="none"
           v-model="selectedOption"
           :options="options"
-          style="gap: 2px"
-          class="w-full"
+          optionLabel="label"
+          scroll-height="450px"
+          class="w-full p-2 bg-[#18181B] rounded-lg"
         >
-          <template
-            #option="slotProps: {
-              option: { label: string; value: string };
-              index: number;
-            }"
-          >
-            <div class="w-full flex flex-col">
-              <div class="flex flex-col jusitfy-center h-full">
-                <div class="font-semibold text-md">
-                  {{ slotProps.option.label }}
-                </div>
-                <div class="text-sm">
-                  {{}}
-                </div>
-              </div>
+          <template #option="{ option }">
+            <div class="w-full p-3 hover:bg-zinc-800 cursor-pointer rounded">
+              <div class="font-semibold text-white">{{ option.label }}</div>
             </div>
           </template>
         </Listbox>
+      </motion.div>
+      <div class="flex justify-end">
+        <Button
+          label="Continue"
+          @click="NextPage"
+          class="w-[300px] p-3 !rounded-full"
+          :disabled="!selectedOption"
+        />
       </div>
-
-      <Button
-        :disabled="selectedOption == null"
-        label="Continue"
-        @click="NextPage"
-      ></Button>
     </div>
+    <div class="flex-grow"></div>
   </div>
 </template>

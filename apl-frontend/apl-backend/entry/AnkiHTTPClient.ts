@@ -3,8 +3,6 @@ import { writeFileSync } from "fs";
 import { Chunk } from "./NormalSyncer";
 import { init, compress } from "@bokuweb/zstd-wasm";
 
-init();
-
 export interface Graves {
   cards: string[];
   notes: string[];
@@ -144,7 +142,6 @@ export default class AnkiHTTPClient {
       },
       true
     );
-
     if (obj == undefined) return false;
     writeFileSync(filePath, obj);
     return true;

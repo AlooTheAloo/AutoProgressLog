@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import { Motion } from "motion-v";
-import FlickeringGrid from "../ui/flickering-grid/FlickeringGrid.vue";
 import { useWindowSize } from "@vueuse/core";
 import { onMounted, ref, watch } from "vue";
 import AnimatedBeam from "../ui/animated-beam/AnimatedBeam.vue";
 import GlowBorder from "../ui/glow-border/GlowBorder.vue";
 import AplLogo from "../../assets/Logo.png";
-import TogglLogo from "../../assets/Toggl_LOGO.png";
-import AnkiLogo from "../../assets/Anki_LOGO.png";
+import TogglLogo from "../../assets/Toggl_logo.png";
+import AnkiLogo from "../../assets/Anki_logo.png";
 import DiscordLogo from "../../assets/discord_logo.webp";
 
 const { width } = useWindowSize();
@@ -34,16 +33,7 @@ watch(containerRef, () => {
   >
     <div class="w-screen flex justify-center items-center">
       <div class="absolute w-[1000px]">
-        <FlickeringGrid
-          class="h-[1000px] inset-0 z-0 [mask-image:radial-gradient(500px_400px_at_center,white,transparent)]"
-          :square-size="4"
-          :grid-gap="6"
-          color="#60A5FA"
-          :max-opacity="0.5"
-          :flicker-chance="0.05"
-          :height="1000"
-          :width="1000"
-        />
+        <!-- add background pls thanx u-->
       </div>
     </div>
 

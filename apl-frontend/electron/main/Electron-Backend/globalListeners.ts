@@ -44,20 +44,20 @@ export function globalListeners() {
   });
 
   ipcMain.handle("check-for-update", async (event, args) => {
-    return;
-    // const result = await electronUpdater.autoUpdater.checkForUpdates();
-    // console.log("result is " + result);
-    // const f = getFileInAPLData("skip.txt");
-    // const skipped = existsSync(f)
-    //   ? (readFileSync(f).toString() ?? "0.0.0")
-    //   : "0.0.0";
-    // console.log(skipped);
-    // if (
-    //   result?.updateInfo.version != (semver.gt(v1, skipped) ? v1 : skipped) &&
-    //   result?.updateInfo != null
-    // ) {
-    //   console.log("Update availeable !");
-    //   win?.webContents.send("update-available", result?.updateInfo);
-    // }
+    if (!CacheManager.exists) return;
+
+    const result = await electronUpdater.autoUpdater.checkForUpdates();
+    console.log("result is " + result);
+    const f = getFileInAPLData("skip.txt");
+    const skipped = existsSync(f)
+      ? readFileSync(f).toString() ?? "0.0.0"
+      : "0.0.0";
+    if (
+      result?.updateInfo.version != (semver.gt(v1, skipped) ? v1 : skipped) &&
+      result?.updateInfo != null
+    ) {
+      console.log("Update availeable !");
+      win?.webContents.send("update-available", result?.updateInfo);
+    }
   });
 }

@@ -9,6 +9,7 @@ import AnkiLogo from "../../../assets/AnkiLogo.png";
 import ProgressSpinner from "primevue/progressspinner";
 import { ref } from "vue";
 import Listbox from "primevue/listbox";
+import { motion } from "motion-v";
 
 const message = ref<string>();
 const router = useRouter();
@@ -28,7 +29,7 @@ window.ipcRenderer.on(
   "anki-multiple-profiles-detected",
   (sender, p: { name: string; deckCount: number }[]) => {
     profiles.value = p;
-  },
+  }
 );
 
 window.ipcRenderer.on("anki-connect-message", (sender, m: any) => {
@@ -47,78 +48,77 @@ function SelectProfile() {
 </script>
 
 <template>
-  <SetupBackground></SetupBackground>
+  <SetupBackground />
 
   <div class="flex w-screen">
-    <div class="p-12 flex flex-col w-2/3 bg-black h-screen">
-      <AccountDisplay />
-      <div
-        class="flex flex-col flex-grow py-5 gap-2 text-left font-semibold text-4xl"
-        v-if="profiles.length == 0"
-      >
-        <div class="h-8"></div>
-        <div class="font-semibold text-white">Connecting to Anki...</div>
-        <p class="text-sm">
-          An anki window may launch and shut down during this process.
-        </p>
-        <div class="flex justify-center flex-grow items-center">
-          <div class="flex flex-col gap-2 items-center w-[30rem]">
-            <div class="flex gap-4 items-center">
-              <img :src="AnkiLogo" class="w-12" />
-              <ProgressSpinner style="width: 50px; height: 50px" />
-              <img :src="Logo" class="w-14" />
-            </div>
-            <div class="text-2xl text-center text-white">{{ message }}...</div>
-          </div>
+    <div
+      class="p-4 sm:p-12 flex flex-col h-screen w-full max-w-[60rem] bg-black"
+    >
+      <div class="space-y-6">
+        <div class="flex w-full items-center justify-between">
+          <img :src="Logo" class="w-16 h-16 sm:w-20 sm:h-20" alt="APL logo" />
+          <AccountDisplay />
         </div>
-        <div class="h-12" />
+        <h1
+          class="text-xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-semibold text-white leading-tight"
+        >
+          {{
+            profiles.length === 0
+              ? "Connecting to Anki..."
+              : "We found multiple Anki profiles."
+          }}
+        </h1>
+        <p class="text-xs sm:text-sm lg:text-base text-[#C0C0C0]">
+          {{
+            profiles.length === 0
+              ? "If this process is taking too long, please verify your Internet connection and AnkiWeb connection settings"
+              : "Please select the profile you would like to connect to."
+          }}
+        </p>
       </div>
-      <div
-        v-else
-        class="flex flex-col flex-grow py-5 gap-2 text-left font-semibold text-4xl"
+      <motion.div
+        :initial="{ opacity: 0, y: 20, filter: 'blur(10px)' }"
+        :animate="{
+          opacity: 1,
+          y: 0,
+          filter: 'blur(0px)',
+          transition: { duration: 0.6 },
+        }"
+        class="flex flex-1 w-full justify-center items-center"
       >
-        <div class="h-8"></div>
-        <div class="font-semibold text-white">
-          We found multiple Anki profiles.
-        </div>
-        <p class="text-sm">
-          Please select the profile you would like to connect to.
-        </p>
-        <div class="flex flex-grow items-center w-full">
+        <template v-if="profiles.length === 0">
+          <div class="flex flex-col items-center gap-4 -mt-8">
+            <div class="flex gap-4 items-center">
+              <img :src="AnkiLogo" class="w-12" alt="Anki icon" />
+              <ProgressSpinner style="width: 50px; height: 50px" />
+              <img :src="Logo" class="w-14" alt="APL logo" />
+            </div>
+            <div class="text-2xl font-semibold text-white text-center">
+              {{ message }}...
+            </div>
+          </div>
+        </template>
+        <template v-else>
           <Listbox
-            scroll-height="none"
             v-model="selectedProfile"
             :options="profiles"
-            style="gap: 2px"
-            class="w-full"
+            optionLabel="name"
+            class="w-full max-w-[24rem]"
           >
-            <template
-              #option="slotProps: {
-                option: { name: string; deckCount: number };
-                index: number;
-              }"
-            >
-              <div class="w-full flex flex-col">
-                <div class="flex flex-col jusitfy-center h-full">
-                  <div class="font-semibold text-xl">
-                    {{ slotProps.option.name }}
-                  </div>
-                  <div class="text-sm">
-                    {{ slotProps.option.deckCount }} decks
-                  </div>
+            <template #option="{ option }">
+              <div
+                class="p-4 bg-[#18181B] rounded-lg hover:bg-zinc-800 cursor-pointer"
+              >
+                <div class="font-semibold text-white">{{ option.name }}</div>
+                <div class="text-sm text-gray-400">
+                  {{ option.deckCount }} decks
                 </div>
               </div>
             </template>
           </Listbox>
-        </div>
-
-        <Button
-          label="Select Profile"
-          @click="SelectProfile"
-          class="h-12"
-          :disabled="selectedProfile == null"
-        />
-      </div>
+        </template>
+      </motion.div>
     </div>
+    <div class="flex-grow"></div>
   </div>
 </template>

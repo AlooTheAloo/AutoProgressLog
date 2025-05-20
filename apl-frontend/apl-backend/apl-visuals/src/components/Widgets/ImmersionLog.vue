@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import MatureCards from "/Icons/MatureCards.png";
+import MatureCards from "../../../public/Icons/MatureCards.svg";
 import { computed } from "vue";
 import { relativeActivity } from "../../types/report-data";
 import formatTime from "../../util/timeFormat";
@@ -15,7 +15,7 @@ const hrTotal = computed(() => {
 });
 const sortedActivities = computed(() => {
   const sorted = [...props.log].sort(
-    (a, b) => b.relativeValue - a.relativeValue,
+    (a, b) => b.relativeValue - a.relativeValue
   );
 
   if (sorted.length <= limit)
@@ -31,7 +31,9 @@ const sortedActivities = computed(() => {
     .slice(limit)
     .reduce((a, b) => a + b.relativeValue, 0);
   const othersActivity: relativeActivity = {
-    name: `${sorted.length - limit} other${sorted.length - limit > 1 ? "s" : ""}`,
+    name: `${sorted.length - limit} other${
+      sorted.length - limit > 1 ? "s" : ""
+    }`,
     relativeValue: bottomActivitiesSeconds,
   };
 

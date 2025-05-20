@@ -6,6 +6,7 @@ import help from "../../../assets/Icons/help.png";
 import { ref } from "vue";
 import { watch } from "vue";
 import SettingsDatePicker from "../Common/SettingsDatePicker.vue";
+import SettingsResetSettings from "../Common/SettingsResetSettings.vue";
 
 const props = defineProps<{
   config: Options | undefined;
@@ -58,7 +59,7 @@ function updateTime(value: Date) {
               },
             },
           },
-        },
+        }
   );
 }
 
@@ -87,7 +88,7 @@ function ToggleAutogen(value: boolean) {
 </script>
 
 <template>
-  <div class="flex flex-col w-full gap-2" v-if="config != undefined">
+  <div class="flex flex-col w-full gap-6 pt-6" v-if="config != undefined">
     <SettingsToggle
       :value="config.general.autogen.enabled"
       label="Automatic Report Generation"
@@ -113,6 +114,11 @@ function ToggleAutogen(value: boolean) {
           general: { ...config.general, discordIntegration: $event },
         })
       "
+    />
+
+    <SettingsResetSettings
+      label="Reset all application data"
+      help-text="CAUTION! This will reset the entire application data, any data WILL be erased and WILL NOT be recoverable."
     />
   </div>
 </template>

@@ -1,15 +1,7 @@
-import { ankiIntegration } from "../types/options.js";
-import fs, { existsSync } from "fs";
+import { ankiIntegration } from "../types/options";
 import sqlite3 from "sqlite3";
-import { exec } from "child_process";
-import proc from "find-process";
-import { app, shell } from "electron";
-import path, { basename } from "path";
-import { kill } from "process";
-import { getSetupAnkiIntegration } from "../../electron/main/Electron-Backend/setupConfigBuilder.js";
-import { win } from "../../electron/main/index.js";
-import { ankiPath } from "../Helpers/getConfig.js";
-import AnkiHTTPClient from "../entry/AnkiHTTPClient.js";
+import { ankiPath } from "../Helpers/getConfig";
+import AnkiHTTPClient from "../entry/AnkiHTTPClient";
 
 export interface ankiLogin {
   username: string;
@@ -29,30 +21,43 @@ export async function getDecksCards(): Promise<deck[]> {
 
   const prefsDB = new sqlite3.Database(ankiDB, (err) => {});
   return await new Promise((res, rej) => {
-    prefsDB.all(
-      `SELECT COUNT(*) as "cardCount", did FROM cards group by did;`,
-      async (err, rowsTop: { cardCount: number; did: number }[]) => {
-        console.log("error was " + err);
-        const ret = await Promise.all(
-          rowsTop.map(async (row) => {
-            return await new Promise<deck>((res, rej) => {
-              prefsDB.all(
-                `SELECT name FROM decks WHERE id = ${row.did};`,
-                (err, rows: any) => {
-                  res({
-                    cardCount: row.cardCount,
-                    name: rows[0].name,
-                    id: row.did,
-                  });
-                }
-              );
-            });
-          })
-        );
-        prefsDB.close();
-        res(ret);
-      }
-    );
+    if (
+      prefsDB.all(
+        "SELECT name FROM sqlite_master WHERE type='table' AND name='cards'"
+      )
+    )
+      prefsDB.all(
+        `SELECT COUNT(*) as "cardCount", did FROM cards group by did;`,
+        async (err, rowsTop: { cardCount: number; did: number }[]) => {
+          if (err) {
+            res([]);
+            return;
+          }
+          const ret = await Promise.all(
+            rowsTop.map(async (row) => {
+              return await new Promise<deck>((res, rej) => {
+                prefsDB.all(
+                  `SELECT name FROM decks WHERE id = ${row.did};`,
+                  (err, rows: any) => {
+                    if (rows == undefined) return;
+                    console.log("all rows" + JSON.stringify(rows));
+
+                    console.log("err", err);
+                    console.log("rows len", rows.length);
+                    res({
+                      cardCount: row.cardCount,
+                      name: rows[0].name,
+                      id: row.did,
+                    });
+                  }
+                );
+              });
+            })
+          );
+          prefsDB.close();
+          res(ret);
+        }
+      );
   });
 }
 

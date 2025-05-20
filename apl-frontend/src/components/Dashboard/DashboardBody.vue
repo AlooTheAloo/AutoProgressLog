@@ -7,13 +7,14 @@ import Brain from "../../assets/Icons/brain.png";
 import Calendar from "../../assets/Icons/calendar.png";
 
 import AppSmallWidget from "./AppSmallWidget.vue";
-import { computed, onMounted, ref } from "vue";
-import pluralize, { plural } from "pluralize";
+import { computed } from "vue";
+import pluralize from "pluralize";
 import ImmersionSources from "./ImmersionSources.vue";
 import Skeleton from "primevue/skeleton";
 import { useWindowSize } from "@vueuse/core";
-import Dialog from "primevue/dialog";
 import { DashboardDTO } from "../../../electron/main/Electron-Backend/types/Dashboard";
+import ImmersionStreak from "./ImmersionStreak.vue";
+import { motion } from "motion-v";
 
 const props = defineProps<{
   dto: DashboardDTO;
@@ -58,7 +59,7 @@ const bottomText = computed(() => {
     <!-- Main Container -->
     <div class="flex flex-col justify-center gap-3 h-fit w-fit items-center">
       <!-- First Row -->
-      <div class="flex flex-wrap gap-3 justify-center">
+      <div class="flex gap-3 justify-center flex-col 1720:flex-row">
         <!-- Small Widgets Row -->
         <div class="flex flex-row gap-3 w-[45rem]">
           <Skeleton width="50%" height="9rem" />
@@ -71,14 +72,16 @@ const bottomText = computed(() => {
         </div>
       </div>
       <!-- Immersion Sources Section -->
-      <div class="flex-grow flex justify-start w-[45rem] 1820:w-full">
-        <Skeleton :height="width > 1820 ? '40rem' : '24rem'" />
+      <div class="flex-grow flex justify-start w-[45rem] 1720:w-full gap-3">
+        <Skeleton :height="'24rem'" />
+        <Skeleton :height="'24rem'" />
       </div>
     </div>
   </div>
+
   <div v-else class="flex flex-col flex-grow items-center">
-    <div class="flex-col justify-center gap-3 flex h-fit w-fit items-center">
-      <div class="flex flex-wrap gap-3 justify-center">
+    <div class="flex-col justify-center gap-10 flex h-fit w-fit items-center">
+      <div class="flex 1720:flex-row flex-col gap-3 justify-center">
         <div class="flex flex-row gap-3 w-[45rem]">
           <AppSmallWidget
             title="Immersion time this month"
@@ -94,6 +97,7 @@ const bottomText = computed(() => {
             :direction="0"
             :hideDelta="true"
             :bottomText="bottomText"
+            :index="0"
           />
 
           <AppSmallWidget
@@ -109,6 +113,7 @@ const bottomText = computed(() => {
             :image="Time"
             :direction="dto.immersionDTO.immersionSinceLastReport"
             :hideDelta="dto.immersionDTO.immersionSinceLastReport === 0"
+            :index="1"
           />
         </div>
         <div class="w-[45rem]">
@@ -124,6 +129,7 @@ const bottomText = computed(() => {
               :image="Brain"
               :direction="dto.ankiDTO.retentionRateDelta"
               :hideDelta="dto.ankiDTO.retentionRateDelta === 0"
+              :index="2"
             />
 
             <AppSmallWidget
@@ -138,11 +144,25 @@ const bottomText = computed(() => {
               :image="Eye"
               :direction="dto.ankiDTO.reviewsDelta"
               :hideDelta="dto.ankiDTO.reviewsDelta === 0"
+              :index="3"
             />
           </div>
           <div v-else>
-            <div class="hidden 1820:flex">
-              <div
+            <div class="hidden 1720:flex">
+              <motion.div
+                :initial="{
+                  opacity: 0,
+                  y: 20,
+                  filter: 'blur(10px)',
+                }"
+                :while-in-view="{
+                  y: 0,
+                  opacity: 1,
+                  filter: 'blur(0px)',
+                }"
+                :transition="{
+                  delay: 0.1,
+                }"
                 class="flex flex-col flex-grow h-36 bg-black rounded-xl items-center justify-center text-white text-center"
               >
                 <div class="font-semibold text-2xl">Want more data?</div>
@@ -150,14 +170,30 @@ const bottomText = computed(() => {
                   Enable anki integration in the settings page to see your
                   statistics.
                 </div>
-              </div>
+              </motion.div>
             </div>
           </div>
         </div>
       </div>
-      <div class="flex-grow flex justify-start 1820:w-full w-[45rem]">
+      <motion.div
+        :initial="{
+          opacity: 0,
+          y: 20,
+          filter: 'blur(10px)',
+        }"
+        :while-in-view="{
+          y: 0,
+          opacity: 1,
+          filter: 'blur(0px)',
+        }"
+        :transition="{
+          delay: 0.1,
+        }"
+        class="flex-grow flex justify-start w-[45rem] h-[25rem] 1720:w-full gap-3"
+      >
         <ImmersionSources :sources="dto.immersionDTO.immersionSources" />
-      </div>
+        <ImmersionStreak :streak="dto.immersionDTO.immersionStreak" />
+      </motion.div>
     </div>
   </div>
 </template>
