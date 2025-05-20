@@ -1,7 +1,8 @@
 import { Component } from "vue";
-import GeneratingReports from "../components/Help/GeneratingReports.vue";
-import DashboardPageHelp from "../components/Help/DashboardPageHelp.vue";
-import { Overview, Reports, Settings } from "../assets/Icons/Sidebar/Icons";
+import ReportsHelp from "../components/Help/ReportsHelp.vue";
+import Report from "../../src/assets/Icons/Sidebar/Reports.svg";
+import Settings from "../../src/assets/Icons/Sidebar/Settings.svg";
+
 
 export interface HelpPage {
   title: string;
@@ -12,24 +13,17 @@ export interface HelpPage {
 
 const helpPages: HelpPage[] = [
   {
-    title: "Dashboard",
-    description:
-      "The Dashboard is where you can view your progress and generate reports.",
-    component: DashboardPageHelp,
-    icon: Overview,
-  },
-  {
     title: "Reports",
     description:
-      "The Reports page is where you can view your generated reports.",
-    component: GeneratingReports,
-    icon: Reports,
+      "Learn about how to generate reports and how to use them to learn more efficiently.",
+    component: ReportsHelp,
+    icon: Report,
   },
   {
     title: "Settings",
     description:
-      "The Settings page is where you can configure your application.",
-    component: GeneratingReports,
+      "Learn about the different settings and features of APL and how to customize your experience.",
+    component: ReportsHelp,
     icon: Settings,
   },
 ];

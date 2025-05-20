@@ -114,7 +114,7 @@ export async function buildImage(
 
   await tryScreenshot(
     page,
-    outputPath,
+    outputPath as any,
     { width: 1586, height, x: 0, y: 0 },
     extensionToType(options.outputFile.extension),
     3, // maxRetries
@@ -130,7 +130,7 @@ export async function buildImage(
 }
 async function tryScreenshot(
   page: Page,
-  path: string,
+  path: `${string}.png` | `${string}.jpeg` | `${string}.webp`,
   clip: BoundingBox,
   type: "png" | "jpeg" | "webp" | undefined,
   maxRetries = 3,

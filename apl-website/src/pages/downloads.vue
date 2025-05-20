@@ -149,7 +149,6 @@ const platform = ref<Platform>(getPlatform());
 
 function getPlatform(): Platform {
   const agent = window.navigator.userAgent;
-
   if (agent.indexOf("Windows") != -1) return "windows";
   if (agent.indexOf("Mac") != -1) return "mac";
   if (agent.indexOf("Linux") != -1) return "linux";

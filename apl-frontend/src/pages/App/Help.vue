@@ -107,7 +107,7 @@ function onPageSelect(page: HelpPage) {
                 @click="onPageSelect(page)"
                 role="button"
                 tabindex="0"
-                class="flex flex-col flex-grow cursor-pointer text-black dark:text-white"
+                class="flex flex-col flex-grow cursor-pointer text-black dark:text-white w-0"
               >
                 <h3 class="text-xl font-semibold truncate">
                   {{ page.title }}
