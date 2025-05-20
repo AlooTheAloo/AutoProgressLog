@@ -72,6 +72,7 @@
               :src="linux_apl"
               class="w-72"
             />
+
           </div>
         </div>
       </div>
