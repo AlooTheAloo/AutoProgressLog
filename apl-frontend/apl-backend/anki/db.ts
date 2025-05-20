@@ -109,8 +109,8 @@ export async function getRetention(
         aMonthAgo,
         (err, allReviews: reviewsrow[]) => {
           if (err) {
-            console.log(err);
             res(null);
+            console.log(err);
           } else {
             db.all(
               `SELECT COUNT(*) as "reviews" FROM revlog r ${JoinTrackedDecks(
