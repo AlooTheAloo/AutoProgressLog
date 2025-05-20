@@ -153,7 +153,7 @@ const toastValue = ref<UserDialog>();
         </div>
 
         <div
-          class="markdown-body whitespace-normal"
+          class="markdown-body whitespace-normal text-black dark:text-white"
           v-html="toastValue?.content"
         ></div>
 
@@ -181,7 +181,7 @@ const toastValue = ref<UserDialog>();
     :modal="true"
     :dismissableMask="true"
   >
-    <div v-html="dialog?.content"></div>
+    <div v-html="dialog?.content" class="text-black dark:text-white"></div>
     <div class="flex gap-2">
       <Button
         v-if="dialog?.yes"

@@ -3,6 +3,7 @@ import ReportsHelp from "../components/Help/ReportsHelp.vue";
 import Report from "../../src/assets/Icons/Sidebar/Reports.svg";
 import Settings from "../../src/assets/Icons/Sidebar/Settings.svg";
 
+
 export interface HelpPage {
   title: string;
   description: string;

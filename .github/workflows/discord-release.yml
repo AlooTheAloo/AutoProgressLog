@@ -1,0 +1,22 @@
+# .github/workflows/discord-release.yml
+name: “Announce Release to Discord”
+on:
+  release:
+    types: [published]
+
+jobs:
+  notify-discord:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Discord notification
+        uses: appleboy/discord-action@v0.3.0
+        with:
+          webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
+          webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
+          username: "APL"
+          avatar_url: "https://cdn.discordapp.com/attachments/1374168459356934154/1374186143519735818/apl_white.png?ex=682d2213&is=682bd093&hm=881a4b05d797753f517d72e48f157145f1300d08c04c6ed98ca5e0ba79b8fa54&"
+          content: |
+            🚀 **New APL Release:** `v${{ github.event.release.tag_name }}`
+            **What’s New:**  
+            ${{ github.event.release.body }}
+            🔗 [Download here](${{ github.event.release.html_url }})
