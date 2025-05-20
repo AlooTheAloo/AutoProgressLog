@@ -278,7 +278,7 @@ function updateAnki(value: boolean) {
     </div>
   </Dialog>
 
-  <div class="flex flex-col w-full gap-5 flex-grow" v-if="config != undefined">
+  <div class="flex flex-col w-full gap-6 pt-6 flex-grow" v-if="config != undefined">
     <div class="flex items-center h-12 gap-3">
       <h1 class="text-2xl font-bold dark:text-white text-black">
         Connection settings

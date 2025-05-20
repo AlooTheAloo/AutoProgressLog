@@ -90,7 +90,7 @@ function updateQuality(value: number) {
 </script>
 
 <template>
-  <div class="flex flex-col w-full gap-2" v-if="config != undefined">
+  <div class="flex flex-col w-full gap-6 pt-6" v-if="config != undefined">
     <SettingsField
       :value="config.outputOptions.outputFile.name"
       label="Filename"

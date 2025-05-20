@@ -4,6 +4,7 @@ import SideBarContainer from "./components/Common/SideBarContainer.vue";
 import { appPath } from "./pages/routes/appRoutes";
 import { onMounted, ref } from "vue";
 import { ThemeManager } from "./util/theme-manager";
+import GlobalDialogRenderer from "./util/DialogRenderer/GlobalDialogRenderer.vue";
 const router = useRouter();
 const showSideBar = ref<boolean>(false);
 
@@ -42,5 +43,6 @@ ThemeManager.init();
       <RouterView />
     </SideBarContainer>
     <RouterView v-else />
+    <GlobalDialogRenderer/>
   </div>
 </template>
