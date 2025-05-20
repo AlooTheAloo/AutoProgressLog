@@ -214,7 +214,7 @@ const closeFirstDialog = () => {
             >
               Last synced
               <div v-if="lastSyncTime == ''">
-                <Skeleton width="10.2rem" height="1.5rem" />
+                <Skeleton width="8rem" height="1.5rem" />
               </div>
               <div v-else>
                 {{ lastSyncTime }}
