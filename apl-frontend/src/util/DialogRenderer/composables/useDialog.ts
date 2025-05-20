@@ -7,6 +7,8 @@ export function useDialog(): (options: DialogOptions) => DialogChainObject {
     if (!instance) {
         throw new Error("useDialog must be called inside setup()");
     }
+
+    // @ts-ignore
     const dialog = instance.proxy?.$dialog;
 
     if (!dialog) {
