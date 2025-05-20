@@ -19,7 +19,21 @@ export default function SetupLayout() {
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <Stack screenOptions={{ headerShown: true }} />
+      <Stack screenOptions={{ headerShown: true }}>
+        <Stack.Screen
+          name="index"
+          options={{
+            title: "Connect to Toggl",
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="toggl-setup"
+          options={{
+            title: "Connect to Toggl",
+          }}
+        />
+      </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>
   );

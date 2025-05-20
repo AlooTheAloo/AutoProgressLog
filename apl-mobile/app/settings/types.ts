@@ -4,6 +4,7 @@ export type SettingElementType = {
   label: string;
   description: string;
   placeholderText: string;
+  textColor?: string;
   action?: () => void;
-  onChange?: () => void;
+  onChange?: (text: string) => void;
 };

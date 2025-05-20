@@ -16,6 +16,8 @@ export function TitleThemedText(props: TitleThemedTextProps) {
           ios: "Inter-Black",
         }),
         fontSize: props.fontSize,
+        textOverflow: "ellipsis",
+        maxWidth: 350,
       }}
     >
       {props.string}

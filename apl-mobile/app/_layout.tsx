@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import { Stack, useRouter } from "expo-router";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import "../global.css";
+import { useStorage } from "@/hooks/useStorage";
 
 // prevent splash from auto-hiding
 SplashScreen.preventAutoHideAsync();
@@ -17,12 +18,13 @@ SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
   const router = useRouter();
   const colorScheme = useColorScheme();
+  const [didSetupDB, setdidSetup] = useStorage("didSetup", "false"); // robert is the default value
 
   // 1) load your “didSetup” flag
   const [didSetup, setDidSetup] = useState<boolean | null>(null);
   useEffect(() => {
     async function getFlag() {
-      setDidSetup(false);
+      setDidSetup(didSetupDB === "true");
     }
     getFlag();
   }, []);

@@ -16,6 +16,7 @@ const MAPPING = {
   "paintbrush.pointed.fill": "format-paint",
   bell: "notifications-none",
   "chevron.right": "chevron-right",
+  "delete.left": "backspace",
 } as Partial<
   Record<
     import("expo-symbols").SymbolViewProps["name"],

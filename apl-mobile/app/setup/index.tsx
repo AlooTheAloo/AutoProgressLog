@@ -1,37 +1,48 @@
-import { View, Text, Button, StyleSheet } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  Platform,
+  useColorScheme,
+} from "react-native";
 
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
-import { Link } from "expo-router";
+import { useStorage } from "@/hooks/useStorage";
+import { TitleThemedText } from "@/components/TitleThemedText";
+import { IconSymbol } from "@/components/ui/IconSymbol";
+import { router } from "expo-router";
+import SquircleButton from "@/components/ui/SquircleButton";
 
 export default function SetupScreen() {
+  const [didSetup, setdidSetup] = useStorage("didSetup", "false"); // robert is the default value
+
   return (
-    <ThemedView
-      style={{
-        flex: 1,
-        padding: 20,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
+    <View
+      className="flex flex-col flex-grow gap-5 h-full justify-center"
+      style={styles.container}
     >
-      <ThemedText
-        style={{
-          fontWeight: "bold",
-          fontSize: 25,
+      <Image
+        source={require("@/assets/images/icon.png")}
+        className=" w-20 h-20"
+      />
+      <TitleThemedText
+        fontSize={25}
+        string={"The immersion tracking app that just works."}
+      ></TitleThemedText>
+      <SquircleButton
+        action={() => {
+          router.push("/setup/toggl-setup");
         }}
-      >
-        Welcome
-      </ThemedText>
-      <Link
-        style={{
-          color: "red",
-        }}
-        href={"/"}
-      >
-        click me bitch
-      </Link>
-    </ThemedView>
+        title={"Get Started"}
+      ></SquircleButton>
+    </View>
   );
 }
-
-function finalizeSetup() {}
+const styles = StyleSheet.create({
+  container: {
+    padding: 25,
+    marginTop: 60,
+  },
+});
