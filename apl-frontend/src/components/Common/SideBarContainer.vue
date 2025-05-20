@@ -2,7 +2,7 @@
 import { useRouter } from "vue-router";
 import Logo from "../../assets/Logo.png";
 import LogoDark from "../../assets/Logo-Dark.png";
-
+import Tooltip from "primevue/tooltip";
 import { appPath as AppPath } from "../../pages/routes/appRoutes";
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import Dialog from "primevue/dialog";
@@ -201,13 +201,13 @@ const toastValue = ref<UserDialog>();
   </Dialog>
   <!-- glow -->
   <div
-    class="h-screen w-screen absolute overflow-hidden pointer-events-none z-10"
+    class="h-screen w-screen absolute overflow-hidden pointer-events-none"
     v-if="glow"
   >
     <div class="flex absolute w-full h-full justify-end">
       <div
         style="filter: blur(150px)"
-        class="glow glow-delay w-[30rem] h-[30rem] absolute rounded-full bg-[#24CAFF] -z-30 -mt-52 -mr-52"
+        class="glow glow-delay w-[30rem] h-[30rem] absolute rounded-full bg-[#24CAFF] -mt-52 -mr-52"
       />
     </div>
     <!-- <div class="w-24 xl:w-72 transition-all duration-250 h-full">
@@ -281,6 +281,7 @@ const toastValue = ref<UserDialog>();
             opacity: route.path == null ? 0.5 : 1,
             backgroundColor: route.path == props.currentRoute ? '#1295BF' : '',
           }"
+          v-tooltip.right="route.path == null ? 'Coming soon!' : undefined"
           :key="route.path"
           class="rounded-[5px] px-4 py-1 flex items-center gap-2 w-full transition-all duration-200"
           v-on:click="(e) => handleClick(route.path)"

@@ -34,11 +34,13 @@ ThemeManager.init();
 </script>
 
 <template>
-  <SideBarContainer
-    :currentRoute="router.currentRoute.value.path as appPath"
-    v-if="showSideBar"
-  >
-    <RouterView />
-  </SideBarContainer>
-  <RouterView v-else />
+  <div class="dark:bg-[#18181880] bg-[#fbfbfb]">
+    <SideBarContainer
+      :currentRoute="router.currentRoute.value.path as appPath"
+      v-if="showSideBar"
+    >
+      <RouterView />
+    </SideBarContainer>
+    <RouterView v-else />
+  </div>
 </template>

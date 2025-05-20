@@ -67,7 +67,7 @@
               :src="windows_apl"
               width="800"
             />
-            <img v-else-if="platform == 'linux'" :src="linux_apl" width="800" />
+            <img v-else-if="platform == 'linux'" :src="linux_apl" width="200" />
           </div>
         </div>
       </div>

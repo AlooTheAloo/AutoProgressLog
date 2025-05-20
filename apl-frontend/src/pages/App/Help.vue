@@ -44,15 +44,13 @@ function onPageSelect(page: HelpPage) {
       <motion.div
         v-if="selectedGuide != undefined"
         key="help-page"
-        class="flex flex-col absolute 
-               h-[calc(100vh-5rem)] lg:mx-20 mx-10 mt-10 
-               overflow-y-scroll flex-grow w-5/6"
+        class="flex absolute h-[calc(100vh-5rem)] w-[calc(87vw-5rem)] lg:mx-20 mx-10 mt-10 overflow-y-scroll flex-grow"
         :initial="{ x: 50, opacity: 0, filter: 'blur(10px)' }"
         :while-in-view="{ x: 0, opacity: 1, filter: 'blur(0px)' }"
         :exit="{ x: 50, opacity: 0, filter: 'blur(10px)' }"
         :transition="{ duration: 0.25, ease: 'easeInOut' }"
       >
-        <div class="flex flex-col items-start">
+        <div class="flex flex-col items-start w-[calc(87vw-5rem)]">
           <Button
             link
             style="padding: 0"
@@ -81,12 +79,11 @@ function onPageSelect(page: HelpPage) {
           <!-- header aligned with cards -->
           <div class="space-y-2">
             <h1
-              class="bg-gradient-to-r bg-clip-text text-4xl font-extrabold text-transparent 
-                     from-[#89BDFF] to-[#40ffff]"
+              class="bg-gradient-to-r bg-clip-text text-4xl font-extrabold text-transparent from-[#89BDFF] to-[#40ffff]"
             >
               Help Center
             </h1>
-            <h2 class="text-lg text-[#C0C0C0]">
+            <h2 class="text-lg dark:text-slate-200 text-slate-800">
               Explore guides and find answers to your questions here.
             </h2>
           </div>
@@ -96,28 +93,26 @@ function onPageSelect(page: HelpPage) {
             <motion.div
               v-for="(page, i) in guides"
               :key="i"
-              class="flex justify-between items-center gap-4 h-20 w-full 
-                     bg-[#18181B] text-white rounded-xl p-5 border-2 border-transparent 
-                     hover:border-[#22A7D1] transition-all duration-200"
+              class="flex justify-between items-center gap-4 h-20 w-full dark:bg-black bg-[#eeeeef] text-white rounded-xl p-5 border-2 border-transparent hover:border-[#22A7D1] transition-all duration-200"
               :initial="{ opacity: 0 }"
               :while-in-view="{ opacity: 1 }"
               :inViewOptions="{ amount: 0, once: false }"
             >
               <img
                 :src="page.icon"
-                class="w-8 h-8"
+                class="w-8 h-8 dark:invert-0 invert"
                 alt="icon"
               />
               <div
                 @click="onPageSelect(page)"
                 role="button"
                 tabindex="0"
-                class="flex flex-col flex-grow cursor-pointer"
+                class="flex flex-col flex-grow cursor-pointer text-black dark:text-white"
               >
                 <h3 class="text-xl font-semibold truncate">
                   {{ page.title }}
                 </h3>
-                <p class="truncate text-gray-400">
+                <p class="truncate text-gray-600 dark:text-gray-400">
                   {{ page.description }}
                 </p>
               </div>

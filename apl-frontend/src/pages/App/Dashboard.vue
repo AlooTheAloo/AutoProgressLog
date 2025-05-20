@@ -180,9 +180,9 @@ const closeFirstDialog = () => {
     <ProgressSpinner />
   </div>
   <div v-else class="flex flex-col w-full h-full overflow-auto">
-    <div class="flex flex-col flex-grow w-full h-full">
+    <div class="flex flex-col flex-grow w-full h-full items-center">
       <div
-        class="flex w-full h-20 items-center px-10 my-5 justify-between gap-5"
+        class="flex w-[45rem] 1720:w-[91rem] h-20 items-center my-5 justify-between gap-5"
       >
         <div>
           <img
@@ -199,9 +199,9 @@ const closeFirstDialog = () => {
         </div>
         <div class="flex flex-col w-0 flex-grow text-black dark:text-white">
           <h1
-            class="flex items-center gap-2 bg-gradient-to-r text-lg xl:text-2xl font-bold"
+            class="flex items-center gap-2 bg-gradient-to-r text-lg 1720:text-2xl font-bold"
           >
-            <span class="w-f">Welcome back,</span>
+            <span class="">Welcome back,</span>
 
             <div v-if="dto.userName == undefined">
               <Skeleton width="10rem" height="2rem" />
@@ -210,7 +210,7 @@ const closeFirstDialog = () => {
           </h1>
           <div class="flex items-center syncNowButton">
             <div
-              class="xl:text-base text-sm font-bold flex items-center gap-1.5"
+              class="1720:text-base text-sm font-bold flex items-center gap-1.5"
             >
               Last synced
               <div v-if="lastSyncTime == ''">
@@ -227,7 +227,7 @@ const closeFirstDialog = () => {
               @click="() => sync()"
               :loading="disableActionButtons"
             >
-              <span class="font-semibold text-[#22A7D1] xl:text-base text-sm"
+              <span class="font-semibold text-[#22A7D1] 1720:text-base text-sm"
                 >Sync Now</span
               >
               <i

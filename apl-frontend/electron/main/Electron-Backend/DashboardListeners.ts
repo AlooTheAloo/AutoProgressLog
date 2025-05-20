@@ -43,8 +43,9 @@ export function dashboardListeners() {
 
   ipcMain.handle("Sync", async (event: any) => {
     if (await runChecks()) {
-      const sync = await runSync(getSyncProps());
-      if (sync == null) {
+      let sync = await runSync(getSyncProps());
+      if (sync == null || sync == false) {
+        sync = null;
         setSyncing(false);
       }
       return sync;
