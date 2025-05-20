@@ -7,57 +7,23 @@ import Button from "primevue/button";
 import Dialog from "primevue/dialog";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import TimelineLight from "../../assets/Graphics/Timeline_Light.png";
-import TimelineDark from "../../assets/Graphics/Timeline_Dark.png";
-
-const explanationVisible = ref<boolean>(false);
-
-const openExplanation = () => {
-  explanationVisible.value = true;
-};
+import { useDialog } from "../../util/DialogRenderer/composables/useDialog";
+import ReportBlockingExplanationDialog from "./ReportBlockingExplanationDialog.vue";
 
 const router = useRouter();
+const $dialog = useDialog();
 
 const navigateTo = (path: string) => {
   router.push(path);
 };
+const openExplanation = () => {
+  $dialog({
+    component: ReportBlockingExplanationDialog,
+  });
+};
 </script>
 
 <template>
-  <Dialog
-    v-model:visible="explanationVisible"
-    modal
-    header="Explanation of report blocking"
-    :style="{ width: '45rem' }"
-  >
-    <div
-      class="p-6 bg-white dark:bg-zinc-900 rounded-lg shadow-md space-y-4 text-gray-900 dark:text-gray-100"
-    >
-      <p>
-        Let's say on <strong>Day 1</strong> you log
-        <strong>20 minutes</strong> of immersion.
-      </p>
-      <p>
-        At the end of Day 1, your report correctly shows
-        <strong>20 total minutes</strong>.
-      </p>
-      <hr class="border-gray-200 dark:border-gray-700" />
-      <p>Now on <strong>Day 2</strong>, you delete your Day 1 log.</p>
-      <p>
-        Without any safeguards, your Day 2 report would drop 0 to
-        <em>-20</em> minutes — which clearly doesn't make sense.
-      </p>
-      <hr class="border-gray-200 dark:border-gray-700" />
-      <p>
-        To prevent this paradox, APL simply <strong>ignores</strong> any edits
-        or deletions made <em>before</em> your last report generation. That way,
-        your totals always stay consistent.
-      </p>
-      <img :src="TimelineLight" class="dark:hidden block w-full" />
-      <img :src="TimelineDark" class="dark:block hidden w-full" />
-    </div>
-  </Dialog>
-
   <div class="flex flex-col min-w-full h-full flex-grow mt-10">
     <Accordion :value="[]" multiple fluid class="w-full">
       <AccordionPanel value="0">
@@ -96,7 +62,7 @@ const navigateTo = (path: string) => {
               </li>
               <li>
                 Any entries you add <strong>before</strong> the report is
-                generated won’t be included retroactively.
+                generated won't be included retroactively.
               </li>
             </ol>
             <div class="questionButton">

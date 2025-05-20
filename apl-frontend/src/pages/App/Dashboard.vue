@@ -253,7 +253,7 @@ const closeFirstDialog = () => {
             <span class="text-white font-bold">Generate Report</span>
           </Button>
           <div
-            :class="`flex rounded-md bg-white h-8 text-black overflow-hidden ${
+            :class="`flex rounded-md bg-white h-8 text-black overflow-hidden z-10 ${
               disableActionButtons ? 'opacity-50' : ''
             }`"
             v-if="config?.general.autogen.enabled"
@@ -262,7 +262,7 @@ const closeFirstDialog = () => {
               <img :src="Report" class="w-full h-full" />
             </div>
             <div
-              :class="`flex items-center px-2 font-semibold xl:text-base xl:mx-2 text-xs`"
+              :class="`flex items-center px-2 font-semibold 1720:text-base xl:mx-2 text-xs`"
             >
               <div>
                 New generated report

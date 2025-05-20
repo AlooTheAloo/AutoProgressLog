@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Delta from "../Delta.vue";
-import MatureCards from "/Icons/MatureCards.png";
+import MatureCards from "../../../public/Icons/MatureCards.svg";
 import { TPlusDelta, matureCardData } from "../../types/report-data";
 import { ComputedRef, computed, ref } from "vue";
 import pluralize from "pluralize";
@@ -11,10 +11,10 @@ interface MatureProps {
 
 const props = defineProps<MatureProps>();
 const sortedDataByReport = ref(
-  props.data.toSorted((a, b) => b.reportNo - a.reportNo),
+  props.data.toSorted((a, b) => b.reportNo - a.reportNo)
 );
 const sortedDataByMature = ref(
-  props.data.toSorted((a, b) => b.matureCardCount - a.matureCardCount),
+  props.data.toSorted((a, b) => b.matureCardCount - a.matureCardCount)
 );
 
 const value: ComputedRef<TPlusDelta<number>> = computed(() => {
@@ -39,7 +39,7 @@ const lineData = computed(() => {
   return {
     lines: sortedDataByReport.value.map((x) => {
       const lineNumber = Math.ceil(
-        (x.matureCardCount - (min.matureCardCount - lineValue)) / lineValue,
+        (x.matureCardCount - (min.matureCardCount - lineValue)) / lineValue
       );
       return {
         reportNo: x.reportNo,

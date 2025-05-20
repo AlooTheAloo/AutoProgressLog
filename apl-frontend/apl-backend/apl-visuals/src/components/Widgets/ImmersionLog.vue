@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import MatureCards from "/Icons/MatureCards.png";
+import MatureCards from "../../../public/Icons/MatureCards.svg";
 import { computed } from "vue";
 import { relativeActivity } from "../../types/report-data";
 import formatTime from "../../util/timeFormat";
