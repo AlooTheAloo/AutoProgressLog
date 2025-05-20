@@ -26,7 +26,6 @@ export async function buildContextMenu() {
         if (win?.isDestroyed()) await createWindow();
         if (win?.isMinimized()) win.restore();
         win?.focus();
-        buildContextMenu();
       },
     },
     {
