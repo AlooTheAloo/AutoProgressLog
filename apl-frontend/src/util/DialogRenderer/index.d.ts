@@ -15,9 +15,14 @@ export interface DialogOptions {
     component: Component;
 
     /**
-     * Props to pass to the component.
+     * Props to pass to your custom dialog component.
      */
     componentProps?: Record<string, any>;
+
+    /**
+     * Props to pass to the PrimeVue dialog component.
+     */
+    dialogProps?: Record<string, any>;
 }
 
 /**

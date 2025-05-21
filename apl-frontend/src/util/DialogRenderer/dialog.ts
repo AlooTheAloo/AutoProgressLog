@@ -2,6 +2,7 @@ import {ref} from 'vue';
 import type {DialogInstance} from "./types/DialogInstance";
 import {dialogs} from './DialogStore';
 import type {DialogChainObject} from "./types/DialogChainObject";
+import type {DialogProps} from "primevue";
 
 let dialogIdCounter = 0;
 
@@ -17,20 +18,22 @@ let dialogIdCounter = 0;
 export function dialog(opts: {
     component: any;
     componentProps?: Record<string, any>;
+    dialogProps?: DialogProps;
 }): DialogChainObject {
-    console.log('Opening dialog with component:', opts.component);
     const id = dialogIdCounter++;
 
     const dialogRef = ref<DialogInstance>({
         id,
         component: opts.component,
         componentProps: opts.componentProps || {},
+        dialogProps: opts.dialogProps || {},
         visible: true,
         okHandler: undefined,
         cancelHandler: undefined,
         dismissHandler: undefined,
     });
 
+    //@ts-ignore
     dialogs.value.push(dialogRef);
 
     const api: DialogChainObject = {
