@@ -16,78 +16,51 @@ import SquircleButton from "@/components/ui/SquircleButton";
 import { useState } from "react";
 import Toggl from "@/services/toggl/index";
 import { router } from "expo-router";
+import { togglAccountInfo } from "@/types/toggl";
+import AnkiHTTPClient from "@/helpers/ankiHTTPClientHelper";
 
-export default function TogglSetup() {
-  const [didSetup, setdidSetup] = useStorage("didSetup", "false"); // robert is the default value
-  const [apiKeyFilled, setapiKeyFilled] = useState(false);
-  const [apiKey, setapiKey] = useState("");
+export default function AnkiSetup() {
+  const [ankiUsernameField, setAnkiUsernameField] = useState("");
+  const [ankiPasswordField, setAnkiPasswordField] = useState("");
+
+  async function tryAnkiLogin() {
+    const httpClient = new AnkiHTTPClient("http://10.0.5.17:7272");
+    const myKey = await httpClient.login(ankiUsernameField, ankiPasswordField);
+    const realHttpClient = new AnkiHTTPClient(myKey, "http://10.0.5.17:7272");
+    console.log(myKey);
+    return await connectFromClient(realHttpClient);
+  }
+
+  async function connectFromClient(client: AnkiHTTPClient) {
+    if (!client.isLoggedIn()) return false;
+
+    await client.downloadInitialDatabase("caca");
+  }
 
   return (
     <View
-      className="flex flex-col gap-5 h-full justify-center"
+      className="flex flex-col gap-5 justify-center"
       style={styles.container}
     >
       <TitleThemedText
         fontSize={25}
-        string={"Connect to your Toggl Track account"}
+        string={"Time to connect to AnkiWeb."}
       ></TitleThemedText>
-      <TouchableOpacity
-        onPress={() => {
-          Linking.openURL("https://track.toggl.com/profile");
-        }}
-      >
-        <View
-          className="w-[300px] p-3 !rounded-full
-                   !bg-[#731768] !text-white flex flex-row items-center justify-center
-                   !border-none"
-        >
-          <Image
-            source={require("@/assets/images/toggl-icon.png")}
-            alt="Toggl Track"
-            className="w-8 h-8 mr-2"
-          />
-          <Text
-            style={{
-              fontFamily: Platform.select({
-                android: "Inter_500Medium",
-                ios: "Inter-Medium",
-              }),
-              fontSize: 15,
-              color: "white",
-            }}
-          >
-            Open Toggl Track profile page
-          </Text>
-        </View>
-      </TouchableOpacity>
       <InputSettingElement
-        onChange={(text: string) => {
-          console.log("wtf");
-          setapiKeyFilled(text.length === 0);
-          setapiKey(text);
-        }}
-        placeholderText="Enter your API token here"
-        label={"TOGGL API KEY"}
-        description={
-          "Please enter your Toggl Track API Token. This key can be found at the bottom of your profile settings page."
-        }
+        onChange={setAnkiUsernameField}
+        placeholderText="Enter your AnkiWeb email here."
+        label={"ANKIWEB EMAIL"}
+        entryType="email-address"
+        description={""}
       ></InputSettingElement>
-      <SquircleButton
-        enabled={apiKeyFilled}
-        action={async () => {
-          const toggl = new Toggl({
-            auth: {
-              token: apiKey,
-            },
-          });
-          const me = await toggl.me.get();
-          console.log(me);
-          Alert.alert("WOW!", JSON.stringify(me));
-          setdidSetup("true");
-          router.replace("/(tabs)");
-        }}
-        title={"Continue"}
-      ></SquircleButton>
+      <InputSettingElement
+        onChange={setAnkiPasswordField}
+        placeholderText="Enter your AnkiWeb password here."
+        label={"ANKIWEB PASSWORD"}
+        entryType="visible-password"
+        description={""}
+      ></InputSettingElement>
+      <SquircleButton action={tryAnkiLogin} title={"Continue"}></SquircleButton>
     </View>
   );
 }

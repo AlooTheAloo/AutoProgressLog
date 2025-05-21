@@ -26,7 +26,7 @@ export default function InputSettingElement(props: SettingElementType) {
   const [text, setText] = useState("");
 
   return (
-    <View className="flex flex-col mb-5">
+    <View className="flex flex-col mb-2">
       <ThemedText
         style={{
           fontFamily: Platform.select({
@@ -46,6 +46,8 @@ export default function InputSettingElement(props: SettingElementType) {
               setText(text);
               props.onChange?.(text);
             }}
+            keyboardType={props.entryType!}
+            secureTextEntry={props.entryType === "visible-password"}
             placeholder={props.placeholderText}
             placeholderTextColor={"#9ca3af"}
             style={{

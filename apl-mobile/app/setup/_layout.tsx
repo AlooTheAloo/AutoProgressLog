@@ -41,6 +41,20 @@ export default function SetupLayout() {
             headerShown: true,
           }}
         />
+        <Stack.Screen
+          name="anki-setup"
+          options={{
+            title: "Connect to AnkiWeb",
+            headerShown: true,
+          }}
+        />
+        <Stack.Screen
+          name="anki-setup-result"
+          options={{
+            title: "trol",
+            headerShown: true,
+          }}
+        />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>

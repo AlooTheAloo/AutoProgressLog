@@ -21,9 +21,9 @@ import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 
-export default function TogglSetupResult() {
+export default function AnkiSetupResult() {
   const [didSetup, setdidSetup] = useStorage("didSetup", "false"); // robert is the default value
-  const [togglAccountInfo, settogglAccountInfo] = useStorage<togglAccountInfo>(
+  const [tempTogglInfo, setTempTogglInfo] = useStorage<togglAccountInfo>(
     "togglAccountInfo",
     {
       displayName: "",
@@ -31,11 +31,6 @@ export default function TogglSetupResult() {
       profilePicture: "",
     }
   );
-
-  function commitTogglAccountInfo() {
-    // we kind of dont really need to commit anything because im based anyways
-    router.push("/setup/anki-setup");
-  }
 
   return (
     <View
@@ -52,7 +47,7 @@ export default function TogglSetupResult() {
             height={30}
             width={30}
             className="rounded-full"
-            source={{ uri: togglAccountInfo.profilePicture }}
+            source={{ uri: tempTogglInfo.profilePicture }}
           ></Image>
           <ThemedText
             style={{
@@ -63,10 +58,10 @@ export default function TogglSetupResult() {
               fontSize: 16,
             }}
           >
-            {togglAccountInfo.displayName}
+            {tempTogglInfo.displayName}
           </ThemedText>
         </View>
-        <IconSymbol size={25} name="checkmark.seal" color="#09db02" />
+        <IconSymbol size={25} name="checkmark.seal" color="green" />
       </ThemedView>
       <ThemedText
         style={{
@@ -79,13 +74,10 @@ export default function TogglSetupResult() {
         }}
         className="text-gray-500"
       >
-        User email : {togglAccountInfo.emailAddress}
+        User email : {tempTogglInfo.emailAddress}
       </ThemedText>
 
-      <SquircleButton
-        action={commitTogglAccountInfo}
-        title={"Continue"}
-      ></SquircleButton>
+      <SquircleButton action={() => {}} title={"Continue"}></SquircleButton>
     </View>
   );
 }
