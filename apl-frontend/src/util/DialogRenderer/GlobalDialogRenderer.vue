@@ -4,22 +4,14 @@
       <Dialog
           v-model:visible="dialogRef.value.visible"
           modal
-          @hide="() => {
-          dialogRef.value.dismissHandler?.();
-          removeDialog(dialogRef.value.id);
-        }"
+          @hide="() => handleHide(dialogRef.value)"
+          v-bind="dialogRef.value.dialogProps"
       >
         <component
             :is="dialogRef.value.component"
             v-bind="dialogRef.value.componentProps"
-            @ok="(payload: any) => {
-            dialogRef.value.okHandler?.(payload);
-            removeDialog(dialogRef.value.id);
-          }"
-            @cancel="() => {
-            dialogRef.value.cancelHandler?.();
-            removeDialog(dialogRef.value.id);
-          }"
+            @ok="(payload: any) => handleOk(dialogRef.value, payload)"
+            @cancel="() => handleCancel(dialogRef.value)"
         />
       </Dialog>
     </div>
@@ -28,9 +20,25 @@
 
 <script setup lang="ts">
 import Dialog from 'primevue/dialog';
-import { dialogs } from './DialogStore';
+import {dialogs} from './DialogStore';
+import {DialogInstance} from "./types/DialogInstance";
 
 function removeDialog(id: number) {
   dialogs.value = dialogs.value.filter(d => d.value.id !== id);
+}
+
+function handleHide(dialogInstance: DialogInstance){
+  dialogInstance.dismissHandler?.();
+  removeDialog(dialogInstance.id);
+}
+
+function handleOk(dialogInstance: DialogInstance, payload: any) {
+  dialogInstance.okHandler?.(payload);
+  removeDialog(dialogInstance.id);
+}
+
+function handleCancel(dialogInstance: DialogInstance) {
+  dialogInstance.cancelHandler?.();
+  removeDialog(dialogInstance.id);
 }
 </script>
