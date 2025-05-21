@@ -157,9 +157,6 @@ function getPlatform(): Platform {
   // No arm64 support on windows (thanks sharp)
   if (uap.getCPU().architecture == "arm64" && os.is("windows")) return "other";
 
-  // No x86 support on mac (lol)
-  if (uap.getCPU().architecture != "arm64" && os.is("mac")) return "other";
-
   if (os.is("windows")) return "windows";
   if (os.is("mac") && uap.getDevice().type != "mobile") return "mac";
   if (os.is("linux")) return "linux";
@@ -223,7 +220,7 @@ function externalOpen() {
 }
 
 onMounted(() => {
-  const BACKEND_URL = "https://apl.chromaserver.net/";
+  const BACKEND_URL = "https://apl.chromaserver.net/downloadLinks";
   fetch(BACKEND_URL).then(async (x) => {
     const data: {
       windowsUrl: string;
