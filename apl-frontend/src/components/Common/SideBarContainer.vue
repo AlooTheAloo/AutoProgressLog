@@ -295,7 +295,7 @@ const toastValue = ref<UserDialog>();
           <AnimatePresence>
             <motion.div
               v-if="sidebarState"
-              key="caca"
+              key="routeName"
               class="font-bold text-black dark:text-white text-md"
               :initial="{
                 opacity: 0,
@@ -341,7 +341,7 @@ const toastValue = ref<UserDialog>();
           <AnimatePresence>
             <motion.div
               v-if="sidebarState"
-              key="caca"
+              key="bottomRouteNames"
               class="font-bold dark:text-white text-black text-md"
               :initial="{
                 opacity: 0,

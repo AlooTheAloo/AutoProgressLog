@@ -26,7 +26,6 @@ export async function buildContextMenu() {
         if (win?.isDestroyed()) await createWindow();
         if (win?.isMinimized()) win.restore();
         win?.focus();
-        buildContextMenu();
       },
     },
     {
@@ -57,7 +56,7 @@ export async function buildContextMenu() {
     },
   ]);
 
-  tray.setContextMenu(contextMenu);
+  tray?.setContextMenu(contextMenu);
 }
 
 export async function createAppBackend() {

@@ -28,20 +28,16 @@ const openExplanation = () => {
   <div class="flex flex-col min-w-full flex-grow mt-10 accordion">
     <Accordion :value="[]" multiple fluid class="w-full">
       <AccordionPanel value="0">
-        <AccordionHeader class="w-full">Generating a report</AccordionHeader>
+        <AccordionHeader class="w-full">Connecting to Anki</AccordionHeader>
         <AccordionContent>
           <div
             class="p-6 bg-white dark:bg-zinc-800 rounded-lg shadow-md space-y-4 text-gray-900 dark:text-gray-100"
           >
-            <p>
-              Reports are one of APL's core features. They let you monitor your
-              progress and visualize how you're improving over time.
-            </p>
-            <p>To generate a report:</p>
+            <p>To link your APL and Anki accounts:</p>
+
             <ol class="list-decimal list-inside space-y-2">
-              <li class="questionButton">
-                Click the <strong>Generate Report</strong> button in the
-                top-right of the
+              <li class="linkButton">
+                Open the
                 <Button
                   class="h-2"
                   text
@@ -49,101 +45,107 @@ const openExplanation = () => {
                   severity="info"
                   @click="
                     () => {
-                      navigateTo('/app/dashboard');
+                      navigateTo('/app/settings');
                     }
                   "
                 >
-                  dashboard page
+                  settings page
                 </Button>
+
+                and navigate to the <strong>Anki</strong> tab.
+              </li>
+              <li>Turn on the <strong>Synchronize Anki</strong> switch.</li>
+              <li>
+                If you use a self-hosted Anki server, paste its URL in the “Anki
+                Backend URL” field.
               </li>
               <li>
-                APL will gather all data entered
-                <em>since your last report</em> and compile it into a new
-                report.
+                Provide your Anki <strong>host key</strong> so APL can
+                authenticate.
               </li>
-              <li>
-                Any entries you add <strong>before</strong> the report is
-                generated won't be included retroactively.
-              </li>
+              <li>Click the <strong>Test Connection</strong> button.</li>
             </ol>
-            <div class="questionButton">
-              <Button
-                class="h-2"
-                text
-                variant="link"
-                severity="info"
-                @click="openExplanation"
-              >
-                What the heck does that mean?
-              </Button>
-            </div>
+
+            <p class="m-0">
+              Once verified, APL will synchronize with your Anki database. This
+              initial sync may take a few minutes, feel free to grab a coffee!
+            </p>
           </div>
         </AccordionContent>
       </AccordionPanel>
       <AccordionPanel value="1">
-        <AccordionHeader> Scheduling a report </AccordionHeader>
+        <AccordionHeader> Finding your anki host key </AccordionHeader>
         <AccordionContent>
           <div
             class="p-6 bg-white dark:bg-zinc-800 rounded-lg shadow-md space-y-4 text-gray-900 dark:text-gray-100"
           >
             <p>
-              Most users prefer a <strong>daily report</strong>. You can set
-              this up in your <strong>Settings → Reports</strong> page.
-            </p>
-            <ul class="list-disc list-inside space-y-2">
-              <li>Toggle on <strong>Automatic Daily Reports</strong>.</li>
-              <li>
-                Choose the exact time you'd like APL to generate your report
-                each day.
-              </li>
-              <li>
-                Note: If your computer is turned off, suspended, or offline at
-                that time, APL won't be able to run the report.
-              </li>
-            </ul>
-          </div>
-        </AccordionContent>
-      </AccordionPanel>
-      <AccordionPanel value="2">
-        <AccordionHeader> Reverting a report </AccordionHeader>
-        <AccordionContent>
-          <div
-            class="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md space-y-4 text-gray-900 dark:text-gray-100"
-          >
-            <p class="m-0">
-              Made a mistake in your last report? No worries, you can roll it
-              back.
+              Locating your Anki host key can be tricky. APL streamlines the
+              process, just follow these steps:
             </p>
 
             <ol class="list-decimal list-inside space-y-2">
-              <li class="questionButton">
-                Find your most recent report in the
+              <li class="linkButton">
+                Go to the
                 <Button
-                  class="h-2"
+                  class="h-2 inline-block"
                   text
                   variant="link"
                   severity="info"
                   @click="
                     () => {
-                      navigateTo('/app/reports');
+                      navigateTo('/app/settings');
                     }
                   "
                 >
-                  reports page
+                  Settings page
                 </Button>
+                and select the <strong>Anki</strong> tab.
               </li>
+              <li>Click the <strong>Easy Anki Setup</strong> button.</li>
               <li>
-                Click the <strong>Revert</strong> button on the right side of
-                that report.
+                Enter your Anki Web <strong>username</strong> &#38;
+                <strong>password</strong>.
               </li>
-              <li>
-                APL will undo that report and restore your previous totals.
-              </li>
+              <li>APL will fetch and store your host key automatically.</li>
             </ol>
 
             <p class="m-0">
-              You can only revert the <em>latest</em> report at a time, but feel
-              free to repeat this process as many times as you need.
+              This initial setup may take a few minutes, thanks for your
+              patience!
+            </p>
+          </div>
+        </AccordionContent>
+      </AccordionPanel>
+      <AccordionPanel value="2">
+        <AccordionHeader>
+          Determining your retention algorithm
+        </AccordionHeader>
+        <AccordionContent>
+          <div
+            class="p-6 bg-white dark:bg-zinc-800 rounded-lg shadow-md space-y-4 text-gray-900 dark:text-gray-100"
+          >
+            <p>APL offers two ways to calculate retention:</p>
+
+            <ul class="list-disc list-inside space-y-2">
+              <li>
+                <strong>True Retention:</strong>
+                The most accurate measure of how well you've remembered items.
+                <br />
+                <em>Note:</em> This won't match the retention numbers shown in
+                Anki's built-in stats.
+              </li>
+              <li>
+                <strong>Default Anki:</strong>
+                The familiar algorithm used by Anki by default. It's slightly
+                less precise, but aligns with the values you see in your Anki
+                statistics.
+              </li>
+            </ul>
+
+            <p class="mt-4">
+              <strong>Unsure which one to pick?</strong>
+              We recommend <strong>True Retention</strong> for its accuracy.
             </p>
           </div>
         </AccordionContent>
@@ -153,7 +155,7 @@ const openExplanation = () => {
 </template>
 
 <style>
-.questionButton > .p-button {
+.linkButton > .p-button {
   padding-left: 0rem !important;
   padding-right: 0rem !important;
 }

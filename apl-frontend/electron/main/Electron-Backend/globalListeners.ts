@@ -45,9 +45,7 @@ export function globalListeners() {
 
   ipcMain.handle("check-for-update", async (event, args) => {
     if (!CacheManager.exists) return;
-
     const result = await electronUpdater.autoUpdater.checkForUpdates();
-    console.log("result is " + result);
     const f = getFileInAPLData("skip.txt");
     const skipped = existsSync(f)
       ? readFileSync(f).toString() ?? "0.0.0"
@@ -56,7 +54,6 @@ export function globalListeners() {
       result?.updateInfo.version != (semver.gt(v1, skipped) ? v1 : skipped) &&
       result?.updateInfo != null
     ) {
-      console.log("Update availeable !");
       win?.webContents.send("update-available", result?.updateInfo);
     }
   });
