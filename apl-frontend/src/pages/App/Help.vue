@@ -1,30 +1,11 @@
 <script setup lang="ts">
 import Button from "primevue/button";
-import DataView from "primevue/dataview";
-import { ref, onMounted, shallowRef } from "vue";
-import { useRouter } from "vue-router";
-import dayjs, { Dayjs } from "dayjs";
-import ProgressSpinner from "primevue/progressspinner";
-import { PageState } from "primevue/paginator";
-import Skeleton from "primevue/skeleton";
-import score from "../../../src/assets/rewarded.png";
+import { ref, shallowRef } from "vue";
 import ConfirmPopup from "primevue/confirmpopup";
 import { useConfirm } from "primevue/useconfirm";
 import Toast from "primevue/toast";
-import { useToast } from "primevue/usetoast";
 import { getHelpCenter, HelpPage } from "../../services/helpService";
 import { AnimatePresence, motion } from "motion-v";
-import BackButton from "../../components/Common/BackButton.vue";
-
-type ListReport = {
-  id: string;
-  score: number;
-  date: Dayjs;
-  fileExists: boolean;
-  revertable?: boolean;
-};
-
-onMounted(() => {});
 
 const guides = ref<HelpPage[]>(getHelpCenter());
 const selectedGuide = shallowRef<HelpPage | undefined>(undefined);
