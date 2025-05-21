@@ -56,7 +56,7 @@ export async function buildContextMenu() {
     },
   ]);
 
-  tray.setContextMenu(contextMenu);
+  tray?.setContextMenu(contextMenu);
 }
 
 export async function createAppBackend() {

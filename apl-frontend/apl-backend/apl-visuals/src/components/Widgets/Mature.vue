@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Delta from "../Delta.vue";
-import MatureCards from "../../../public/Icons/MatureCards.svg";
+import MatureCards from "../../../public/Icons/MatureCards.png";
 import { TPlusDelta, matureCardData } from "../../types/report-data";
 import { ComputedRef, computed, ref } from "vue";
 import pluralize from "pluralize";
