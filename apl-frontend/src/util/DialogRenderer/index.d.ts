@@ -62,10 +62,10 @@ export declare function dialog(options: DialogOptions): DialogChainObject;
  * Composable for use inside dialog components.
  *
  * Provides:
- * - dialogRef (optional ref to base dialog)
- * - onDialogOK(payload)
- * - onDialogCancel()
- * - onDialogHide()
+ * - `dialogRef (optional ref to base dialog)`
+ * - `onDialogOK(payload)`
+ * - `onDialogCancel()`
+ * - `onDialogHide()`
  */
 export declare function useDialogComponent<T = any>(): {
     dialogRef: Ref<any | undefined>;

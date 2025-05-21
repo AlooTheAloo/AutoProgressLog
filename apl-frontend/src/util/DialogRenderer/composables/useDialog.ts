@@ -2,6 +2,11 @@ import {getCurrentInstance} from "vue";
 import type {DialogChainObject} from "../types/DialogChainObject";
 import type {DialogOptions} from "../index";
 
+/**
+ * useDialog is a composable function that provides access to the $dialog instance.
+ * It must be called within the setup() function of a Vue component.
+ * @returns A function that takes `DialogOptions` and returns a `DialogChainObject`.
+ */
 export function useDialog(): (options: DialogOptions) => DialogChainObject {
     const instance = getCurrentInstance();
     if (!instance) {
