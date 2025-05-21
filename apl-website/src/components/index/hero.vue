@@ -20,7 +20,6 @@
               duration: 1,
               ease: 'easeInOut',
             }"
-            class="flex justify-center md:justify-start"
           >
             <img
               :src="apl_logo"

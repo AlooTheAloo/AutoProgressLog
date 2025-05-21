@@ -61,7 +61,7 @@ import Storage from "./Storage";
 
 //   await client.login("", "");
 //   await client.getMetaUSN();
-//   await client.downloadInitialDatabase("db.sql");
+//   await client.downloadInitialDatabase("caca.sql");
 //   Syncer.start();
 // }
 

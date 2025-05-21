@@ -211,7 +211,7 @@ function nf(num: number) {
           </h1>
         </div>
       </div>
-      <div class="flex w-full px-10 flex-grow reportListview">
+      <div class="flex w-full px-10 flex-grow caca">
         <div class="flex w-full px-2 py-2 h-fit rounded-lg">
           <DataView
             dataKey=""
@@ -407,7 +407,7 @@ function nf(num: number) {
   </div>
 </template>
 <style>
-.reportListview {
+.caca {
   --p-dataview-content-background: transparent !important;
   --p-paginator-background: transparent !important;
   --p-dataview-paginator-bottom-border-width: 0px !important;

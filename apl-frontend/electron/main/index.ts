@@ -1,4 +1,14 @@
-import { app, BrowserWindow, shell } from "electron";
+import {
+  app,
+  BrowserWindow,
+  shell,
+  ipcMain,
+  Menu,
+  MenuItem,
+  dialog,
+  crashReporter,
+} from "electron";
+import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import registerEvents from "./Electron-Backend/";
 import path from "node:path";
@@ -54,7 +64,6 @@ export let win: BrowserWindow | null = null;
 const preload = path.join(__dirname, "../preload/index.mjs");
 export const indexHtml = path.join(RENDERER_DIST, "index.html");
 export async function createWindow() {
-  console.log("creating window");
   win = new BrowserWindow({
     show: true,
     minHeight: 600,
@@ -67,7 +76,6 @@ export async function createWindow() {
       preload,
     },
   });
-
   // Only show when ready (for first load)
   win.once("ready-to-show", () => {
     if (process.env.NODE_ENV !== "development") {
@@ -98,8 +106,6 @@ export async function createWindow() {
   });
   // win.webContents.on('will-navigate', (event, url) => { }) #344
   win.webContents.once("did-finish-load", () => {});
-
-  buildContextMenu();
 }
 
 app

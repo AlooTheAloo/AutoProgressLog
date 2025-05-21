@@ -2,7 +2,7 @@ import { Component } from "vue";
 import ReportsHelp from "../components/Help/ReportsHelp.vue";
 import Report from "../../src/assets/Icons/Sidebar/Reports.svg";
 import Settings from "../../src/assets/Icons/Sidebar/Settings.svg";
-import AnkiHelp from "../components/Help/AnkiHelp.vue";
+
 
 export interface HelpPage {
   title: string;
@@ -20,10 +20,10 @@ const helpPages: HelpPage[] = [
     icon: Report,
   },
   {
-    title: "Anki",
+    title: "Settings",
     description:
-      "Learn how to connect your Anki account to APL and how to use it to track your progress.",
-    component: AnkiHelp,
+      "Learn about the different settings and features of APL and how to customize your experience.",
+    component: ReportsHelp,
     icon: Settings,
   },
 ];
