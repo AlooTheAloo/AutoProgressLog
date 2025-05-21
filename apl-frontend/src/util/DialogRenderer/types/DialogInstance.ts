@@ -1,3 +1,5 @@
+import {DialogProps} from "primevue";
+
 /**
  * Represents the internal state of a single dialog instance.
  */
@@ -13,9 +15,14 @@ export interface DialogInstance {
     component: any;
 
     /**
-     * Props to pass to the dialog component.
+     * Props to pass to your custom dialog component.
      */
     componentProps: Record<string, any>;
+
+    /**
+     * Props to pass to the PrimeVue dialog component.
+     */
+    dialogProps: DialogProps;
 
     /**
      * Whether the dialog is currently visible.

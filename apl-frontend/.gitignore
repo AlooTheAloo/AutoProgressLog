@@ -30,5 +30,4 @@ pnpm-lock.yaml
 yarn.lock
 bun.lockb
 
-# caca
 apl-frontend/apl-backend/apl-visuals/visuals/assets/*
