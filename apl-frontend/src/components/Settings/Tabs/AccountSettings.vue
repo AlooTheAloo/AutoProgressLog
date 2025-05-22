@@ -33,6 +33,12 @@ const emit = defineEmits<{
     <SettingsFileUpload
       label="Profile picture"
       help-text="Changes the profile picture in the app. This will automatically be uploaded and applied."
+      @update:pfp="
+        $emit('update:config', {
+          ...config,
+          account: { ...config.account, profilePicture: $event },
+        })
+      "
     />
   </div>
 </template>

@@ -153,7 +153,7 @@ const toastValue = ref<UserDialog>();
         </div>
 
         <div
-          class="markdown-body whitespace-normal text-black dark:text-white"
+          class="markdown-body whitespace-normal text-black dark:text-white py-4"
           v-html="toastValue?.content"
         ></div>
 

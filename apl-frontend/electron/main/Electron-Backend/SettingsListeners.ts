@@ -73,6 +73,6 @@ export function settingsListeners() {
     if (config == undefined) return false;
     config.account.profilePicture = targetPath;
     setConfig(config);
-    return true;
+    return targetPath;
   });
 }

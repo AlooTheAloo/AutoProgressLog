@@ -15,7 +15,7 @@ const props = defineProps<{
   link?: string;
 }>();
 
-const emit = defineEmits(["update:value"]);
+const emit = defineEmits(["update:pfp"]);
 const toast = useToast();
 
 function updateValue() {
@@ -23,6 +23,7 @@ function updateValue() {
   window.ipcRenderer.invoke("Upload-Profile-Picture").then((x) => {
     if (x == null) return;
     if (x) {
+      emit("update:pfp", x);
       toast.add({
         severity: "success",
         summary: "Profile picture uploaded!",
