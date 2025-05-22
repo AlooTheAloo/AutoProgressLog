@@ -17,7 +17,7 @@ let anki_url = DEFAULT_ANKI_URL;
 
 export default class AnkiHTTPClient {
   public key: string = "";
-  public simpleRandom = "random-uuid-wysi";
+  public simpleRandom = "apl-mobile-is-real";
 
   constructor(key: string = "", url: string = DEFAULT_ANKI_URL) {
     if (url != DEFAULT_ANKI_URL) anki_url = url;
@@ -138,16 +138,17 @@ export default class AnkiHTTPClient {
     );
     if (obj == undefined) return false;
 
-    this.dumpObjectToFile(obj);
-    //writeFileSync(filePath, obj);
+    this.writeFileSync(obj);
     return true;
   }
 
-  public async dumpObjectToFile(obj: any, filename = "dump.apl") {
+  public async writeFileSync(obj: any, filename = "dump.apl") {
     try {
       const path = `${FileSystem.documentDirectory}${filename}`;
-      const decompressed = decompress(obj);
-      await FileSystem.writeAsStringAsync(path, decompressed);
+      const realObj = Buffer.Buffer.from(obj).toString("base64");
+      await FileSystem.writeAsStringAsync(path, realObj, {
+        encoding: "base64",
+      });
       console.log(`File written to: ${path}`);
       return path;
     } catch (error) {

@@ -19,6 +19,7 @@ export function TitleThemedText(props: TitleThemedTextProps) {
         textOverflow: "ellipsis",
         maxWidth: 350,
       }}
+      className=" align-middle"
     >
       {props.string}
     </ThemedText>

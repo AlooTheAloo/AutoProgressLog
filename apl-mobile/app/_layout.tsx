@@ -18,13 +18,12 @@ SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
   const router = useRouter();
   const colorScheme = useColorScheme();
-  const [didSetupDB, setdidSetup] = useStorage("didSetup", "false"); // robert is the default value
 
-  // 1) load your “didSetup” flag
-  const [didSetup, setDidSetup] = useState<boolean | null>(null);
+  const [didSetup, setdidSetup] = useStorage<boolean>("didSetup", false); // robert is the default value
+
   useEffect(() => {
     async function getFlag() {
-      setDidSetup(didSetupDB === "true");
+      setdidSetup(!didSetup);
     }
     getFlag();
   }, []);

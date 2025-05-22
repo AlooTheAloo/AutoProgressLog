@@ -8,6 +8,7 @@ interface PillShapeIconProps {
 export default function PillShapeIcon(props: PillShapeIconProps) {
   return (
     <View
+      className=""
       style={{
         backgroundColor: props.focused ? "#22A7D1" : "",
         borderRadius: 999,
@@ -15,6 +16,7 @@ export default function PillShapeIcon(props: PillShapeIconProps) {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
+        padding: 2,
       }}
     >
       {props.iconSymbol}

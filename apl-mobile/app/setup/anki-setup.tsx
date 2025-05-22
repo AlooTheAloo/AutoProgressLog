@@ -20,6 +20,8 @@ import { togglAccountInfo } from "@/types/toggl";
 import AnkiHTTPClient from "@/helpers/ankiHTTPClientHelper";
 
 export default function AnkiSetup() {
+  const [didSetup, setdidSetup] = useStorage<boolean>("didSetup", false); // robert is the default value
+
   const [ankiUsernameField, setAnkiUsernameField] = useState("");
   const [ankiPasswordField, setAnkiPasswordField] = useState("");
 
@@ -28,13 +30,22 @@ export default function AnkiSetup() {
     const myKey = await httpClient.login(ankiUsernameField, ankiPasswordField);
     const realHttpClient = new AnkiHTTPClient(myKey, "http://10.0.5.17:7272");
     console.log(myKey);
-    return await connectFromClient(realHttpClient);
+    const dbDownloadedSuccessfully = await connectFromClient(realHttpClient);
+    if (dbDownloadedSuccessfully) {
+      console.log("holy shit it just works");
+      router.push("/(tabs)");
+    } else {
+      Alert.alert(
+        "Error connecting to AnkiWeb",
+        "There was an errror while connecting to AnkiWeb. Make sure your device is connected to the network and that the credentials provided is valid."
+      );
+    }
   }
 
   async function connectFromClient(client: AnkiHTTPClient) {
     if (!client.isLoggedIn()) return false;
 
-    await client.downloadInitialDatabase("caca");
+    return await client.downloadInitialDatabase("caca");
   }
 
   return (

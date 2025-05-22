@@ -24,7 +24,7 @@ import { useStorage } from "@/hooks/useStorage";
 import { router } from "expo-router";
 
 export default function General() {
-  const [didSetupDB, setdidSetup] = useStorage("didSetup", "false"); // robert is the default value
+  const [didSetupDB, setdidSetup] = useStorage<boolean>("didSetup", false); // robert is the default value
 
   const settings: SettingElementType[] = [
     {
@@ -44,9 +44,9 @@ export default function General() {
             {
               text: "LETS GO",
               onPress: () => {
-                setdidSetup("false");
+                setdidSetup(false);
                 console.log(didSetupDB);
-                throw {};
+                router.replace("/setup");
               },
             },
           ],

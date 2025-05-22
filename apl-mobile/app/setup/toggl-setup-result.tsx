@@ -22,7 +22,6 @@ import { ThemedText } from "@/components/ThemedText";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 
 export default function TogglSetupResult() {
-  const [didSetup, setdidSetup] = useStorage("didSetup", "false"); // robert is the default value
   const [togglAccountInfo, settogglAccountInfo] = useStorage<togglAccountInfo>(
     "togglAccountInfo",
     {
