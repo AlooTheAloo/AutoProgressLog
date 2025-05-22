@@ -47,7 +47,6 @@ export function settingsListeners() {
   });
 
   ipcMain.handle("Upload-Profile-Picture", async () => {
-    console.log("caca time");
     if (!win) return;
     const image = await dialog.showOpenDialogSync(win, {
       properties: [

@@ -78,6 +78,9 @@ function onPageSelect(page: HelpPage) {
               :initial="{ opacity: 0 }"
               :while-in-view="{ opacity: 1 }"
               :inViewOptions="{ amount: 0, once: false }"
+              @click="onPageSelect(page)"
+              role="button"
+              tabindex="0"
             >
               <img
                 :src="page.icon"
@@ -85,9 +88,6 @@ function onPageSelect(page: HelpPage) {
                 alt="icon"
               />
               <div
-                @click="onPageSelect(page)"
-                role="button"
-                tabindex="0"
                 class="flex flex-col flex-grow cursor-pointer text-black dark:text-white w-0"
               >
                 <h3 class="text-xl font-semibold truncate">
@@ -101,6 +101,7 @@ function onPageSelect(page: HelpPage) {
                 severity="info"
                 class="w-10 h-10 flex items-center justify-center p-0"
                 @click="onPageSelect(page)"
+                tabindex="-1"
               >
                 <i class="pi pi-arrow-right text-xl text-white"></i>
               </Button>

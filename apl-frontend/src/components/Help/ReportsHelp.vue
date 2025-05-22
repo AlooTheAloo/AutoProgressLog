@@ -20,9 +20,6 @@ const navigateTo = (path: string) => {
 const openExplanation = () => {
   $dialog({
     component: ReportBlockingExplanationDialog,
-    dialogProps: {
-      header: "Explanation of report blocking",
-    },
   });
 };
 </script>

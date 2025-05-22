@@ -1,1 +1,2 @@
-Only a dev build
+- Fixed a bug where the server setup page wouldn't work
+- Fixed icons in reports

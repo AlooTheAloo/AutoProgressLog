@@ -21,8 +21,8 @@ const emits = defineEmits(useDialogComponent.emitsObject);
     <hr class="border-gray-200 dark:border-gray-700" />
     <p>Now on <strong>Day 2</strong>, you delete your Day 1 log.</p>
     <p>
-      Without any safeguards, your Day 2 report would drop 0 to
-      <em>-20</em> minutes — which clearly doesn't make sense.
+      Without any safeguards, your Day 2 report would drop from 0 to
+      <em>-20</em> minutes, which clearly doesn't make sense.
     </p>
     <hr class="border-gray-200 dark:border-gray-700" />
     <p>
