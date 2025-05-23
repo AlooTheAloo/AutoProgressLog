@@ -227,14 +227,15 @@ const closeFirstDialog = () => {
               @click="() => sync()"
               :loading="disableActionButtons"
             >
-              <span class="font-semibold text-[#22A7D1] 1720:text-base text-sm"
+              <span
+                class="font-semibold text-[var(--primary-color)] 1720:text-base text-sm"
                 >Sync Now</span
               >
               <i
                 :class="[
                   'pi',
                   disableActionButtons ? 'pi-spinner pi-spin' : 'pi-sync',
-                  'text-[#00E0FF]',
+                  'text-[var(--primary-color)]',
                 ]"
               />
             </Button>
@@ -258,7 +259,7 @@ const closeFirstDialog = () => {
             }`"
             v-if="config?.general.autogen.enabled"
           >
-            <div class="bg-[#22A7D1] p-2">
+            <div class="bg-[var(--primary-color)] p-2">
               <img :src="Report" class="w-full h-full" />
             </div>
             <div
@@ -282,8 +283,8 @@ const closeFirstDialog = () => {
 
 <style>
 .generateButton > .p-button-info {
-  background-color: #22a7d1 !important;
-  border: 1px solid #22a7d1 !important;
+  background-color: var(--primary-color) !important;
+  border: 1px solid var(--primary-color) !important;
 }
 
 .syncNowButton > .p-button {
