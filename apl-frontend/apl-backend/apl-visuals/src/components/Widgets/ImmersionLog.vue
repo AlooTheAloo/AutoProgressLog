@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import MatureCards from "../../../public/Icons/MatureCards.svg";
+import ImmersionLog from "../../../public/Icons/ImmersionLog.png";
 import { computed } from "vue";
 import { relativeActivity } from "../../types/report-data";
 import formatTime from "../../util/timeFormat";
@@ -65,7 +65,7 @@ const sortedActivities = computed(() => {
             </div>
           </div>
           <div class="w-10">
-            <img class="ml-[0.35rem]" v-bind:src="MatureCards" />
+            <img class="ml-[0.35rem]" v-bind:src="ImmersionLog" />
           </div>
         </div>
       </div>
