@@ -60,7 +60,7 @@ function onPageSelect(page: HelpPage) {
           <!-- header aligned with cards -->
           <div class="space-y-2">
             <h1
-              class="bg-gradient-to-r bg-clip-text text-4xl font-extrabold text-transparent from-[#89BDFF] to-[#40ffff]"
+              class="bg-gradient-to-r bg-clip-text text-4xl font-extrabold text-transparent from-[var(--primary-color)] to-[var(--primary-color)"
             >
               Help Center
             </h1>
@@ -74,7 +74,7 @@ function onPageSelect(page: HelpPage) {
             <motion.div
               v-for="(page, i) in guides"
               :key="i"
-              class="flex justify-between items-center gap-4 h-20 w-full dark:bg-black bg-[#eeeeef] text-white rounded-xl p-5 border-2 border-transparent hover:border-[var(--primary-color)] transition-all duration-200"
+              class="guideButton flex justify-between items-center gap-4 h-20 w-full dark:bg-black bg-[#eeeeef] text-white rounded-xl p-5 border-2 border-transparent hover:border-[var(--primary-color)] transition-all duration-200"
               :initial="{ opacity: 0 }"
               :while-in-view="{ opacity: 1 }"
               :inViewOptions="{ amount: 0, once: false }"
@@ -139,5 +139,10 @@ function onPageSelect(page: HelpPage) {
 /* Optional: hide scrollbar track shadow if needed */
 ::-webkit-scrollbar-track-piece {
   background: transparent;
+}
+
+.guideButton > .p-button-info {
+  border: 1px solid var(--primary-color) !important;
+  background-color: var(--primary-color) !important;
 }
 </style>
