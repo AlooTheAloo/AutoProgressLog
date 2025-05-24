@@ -41,11 +41,11 @@ const value = ref<string>(props.value ?? "");
         {{ label }}
       </p>
       <div class="h-full w-4">
-        <img
+        <i
           v-if="props.helpText != undefined"
           v-tooltip.top="props.helpText"
           place
-          :src="help"
+          class="pi pi-question-circle"
           :class="`h-4 w-4 mt-2 ${props.link ? 'cursor-pointer' : ''}`"
           @click="props.link ? openLink() : undefined"
         />

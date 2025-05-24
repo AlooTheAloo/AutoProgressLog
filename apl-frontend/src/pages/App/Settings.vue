@@ -116,7 +116,7 @@ function ankiTest(worked: boolean) {
     <div class="flex flex-col flex-grow w-full h-full">
       <div class="flex w-full h-20 items-center px-10 mt-5 justify-between">
         <h1
-          class="bg-gradient-to-r bg-clip-text text-4xl font-extrabold text-transparent from-[#89BDFF] to-[#40ffff]"
+          class="bg-gradient-to-r bg-clip-text text-4xl font-extrabold text-transparent from-[var(--primary-color)] to-[var(--primary-color)]"
         >
           Settings
         </h1>
@@ -127,8 +127,8 @@ function ankiTest(worked: boolean) {
             value="0"
             class="w-full"
             :dt="{
-              activeBarBackground: '#2BFAFA',
-              tabActiveBorderColor: '#2BFAFA',
+              activeBarBackground: 'var(--primary-color)',
+              tabActiveBorderColor: 'var(--primary-color)',
             }"
           >
             <div class="relative w-full">

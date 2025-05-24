@@ -74,7 +74,7 @@ function onPageSelect(page: HelpPage) {
             <motion.div
               v-for="(page, i) in guides"
               :key="i"
-              class="flex justify-between items-center gap-4 h-20 w-full dark:bg-black bg-[#eeeeef] text-white rounded-xl p-5 border-2 border-transparent hover:border-[#22A7D1] transition-all duration-200"
+              class="flex justify-between items-center gap-4 h-20 w-full dark:bg-black bg-[#eeeeef] text-white rounded-xl p-5 border-2 border-transparent hover:border-[var(--primary-color)] transition-all duration-200"
               :initial="{ opacity: 0 }"
               :while-in-view="{ opacity: 1 }"
               :inViewOptions="{ amount: 0, once: false }"
@@ -124,7 +124,7 @@ function onPageSelect(page: HelpPage) {
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: #24caff; /* Thumb color */
+  background-color: var(--primary-color); /* Thumb color */
   border-radius: 10px;
 }
 
