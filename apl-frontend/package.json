@@ -1,6 +1,6 @@
 {
   "name": "autoprogresslog",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "author": "AlooTheAloo",
   "repository": "https://github.com/AlooTheAloo/AutoProgressLog",
   "main": "dist-electron/main/index.js",

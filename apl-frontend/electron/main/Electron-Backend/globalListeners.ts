@@ -47,7 +47,6 @@ export function globalListeners() {
     if (!CacheManager.exists) return;
 
     const result = await electronUpdater.autoUpdater.checkForUpdates();
-    console.log("result is " + result);
     const f = getFileInAPLData("skip.txt");
     const skipped = existsSync(f)
       ? readFileSync(f).toString() ?? "0.0.0"

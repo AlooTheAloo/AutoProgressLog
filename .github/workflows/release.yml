@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main # Adjust this to match your branch, usually 'main' or 'master'
-      - UIFixes/Settings_Reports
 
 jobs:
   release:
