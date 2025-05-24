@@ -9,7 +9,6 @@ export const colorAccentOptions = [
   "#F74E8F",
   "#FF8329",
   "#FFCF25",
-  "#FFFFFF",
 ] as const;
 
 export type AccentColor = (typeof colorAccentOptions)[number];
@@ -31,8 +30,8 @@ export class ThemeManager {
     );
     // on init, read stored theme and apply it
     const stored = (localStorage.getItem("theme") as Theme) || "dark";
-    console.log("Initialized...");
     this.setTheme(stored);
+    this.setAccentColor(this.getAccentColor());
   }
 
   private static handleSystemChange(e: MediaQueryListEvent) {

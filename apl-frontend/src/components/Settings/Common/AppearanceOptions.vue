@@ -73,12 +73,5 @@ function changeAccentColor(color: AccentColor) {
         :class="color == colorAccent ? 'border-blue-400' : ''"
       />
     </div>
-    <p class="text-sm">
-      This will change the color of the buttons and other elements.
-      <br />
-      <span class="text-red-500">
-        Note: This will only work if you are using the light or dark theme.
-      </span>
-    </p>
   </div>
 </template>

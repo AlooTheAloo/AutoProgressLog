@@ -21,6 +21,10 @@ const unsubscribe = ThemeManager.onThemeChange((newTheme) => {
   theme.value = newTheme;
 });
 
+onMounted(() => {
+  console.log("Theme is " + theme.value);
+});
+
 onUnmounted(() => {
   unsubscribe();
 });
