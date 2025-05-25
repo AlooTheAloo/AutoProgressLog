@@ -1,1 +1,2 @@
-Only a dev build
+- Added accent color options
+- Various bug fixes

@@ -104,7 +104,7 @@ const colors = computed(() => {
 });
 
 let gradient = new NWayInterpol(
-  "#24CAFF",
+  "var(--primary-color)",
   "#73D562",
   "#D57AFF",
   "#F74E8F",
@@ -188,7 +188,7 @@ let series /* Literally a calculus reference */ = computed(() => {
 
 <template>
   <div
-    class="flex flex-col text-black dark:text-white bg-[#ebebec] dark:bg-black rounded-lg w-0 flex-grow pt-5 border-2 border-transparent hover:border-[#22A7D1] trantiton-all duration-200"
+    class="flex flex-col text-black dark:text-white bg-[#ebebec] dark:bg-black rounded-lg w-0 flex-grow pt-5 border-2 border-transparent hover:border-[var(--primary-color)] trantiton-all duration-200"
   >
     <div class="flex font-extrabold 1720:text-2xl text-xl px-5">
       Immersion in the last 30 days

@@ -153,7 +153,7 @@ const toastValue = ref<UserDialog>();
         </div>
 
         <div
-          class="markdown-body whitespace-normal text-black dark:text-white"
+          class="markdown-body whitespace-normal text-black dark:text-white py-4"
           v-html="toastValue?.content"
         ></div>
 
@@ -207,13 +207,13 @@ const toastValue = ref<UserDialog>();
     <div class="flex absolute w-full h-full justify-end">
       <div
         style="filter: blur(150px)"
-        class="glow glow-delay w-[30rem] h-[30rem] absolute rounded-full bg-[#24CAFF] -mt-52 -mr-52"
+        class="glow glow-delay w-[30rem] h-[30rem] absolute rounded-full bg-[var(--primary-color)] -mt-52 -mr-52"
       />
     </div>
     <!-- <div class="w-24 xl:w-72 transition-all duration-250 h-full">
           <div
             style="filter: blur(75px)"
-            class="glow w-96 h-96 rounded-full bg-[#24CAFF] z-0 -ml-64 -mt-64"
+            class="glow w-96 h-96 rounded-full bg-[var(--primary-color)] z-0 -ml-64 -mt-64"
           ></div>
         </div> -->
   </div>
@@ -279,7 +279,8 @@ const toastValue = ref<UserDialog>();
           :style="{
             cursor: route.path != null ? 'pointer' : 'default',
             opacity: route.path == null ? 0.5 : 1,
-            backgroundColor: route.path == props.currentRoute ? '#1295BF' : '',
+            backgroundColor:
+              route.path == props.currentRoute ? 'var(--primary-color)' : '',
           }"
           v-tooltip.right="route.path == null ? 'Coming soon!' : undefined"
           :key="route.path"
@@ -330,7 +331,8 @@ const toastValue = ref<UserDialog>();
           :style="{
             cursor: route.path != null ? 'pointer' : 'default',
             opacity: route.path == null ? 0.5 : 1,
-            backgroundColor: route.path == props.currentRoute ? '#1295BF' : '',
+            backgroundColor:
+              route.path == props.currentRoute ? 'var(--primary-color)' : '',
           }"
           :key="route.path"
           class="rounded-[5px] px-4 py-1 flex items-center gap-2 w-full transition-all duration-200"

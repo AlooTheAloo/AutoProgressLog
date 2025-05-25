@@ -3,7 +3,7 @@ name: Release APL
 on:
   push:
     branches:
-      - main
+      - main # Adjust this to match your branch, usually 'main' or 'master'
 
 jobs:
   release:
