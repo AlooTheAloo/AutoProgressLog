@@ -1,16 +1,15 @@
-import { Elysia } from "elysia";
-import HelloWorld from "./Routes/HelloWorld";
-import Downloads from "./Routes/Downloads";
+import {Elysia} from "elysia";
 import cors from "@elysiajs/cors";
+import {appRouter} from "./server/router";
+import {trpc} from "@elysiajs/trpc";
 
 const app = new Elysia()
-  .use(
-    cors({
-      origin: ["http://localhost:*", "https://www.aplapp.dev"],
-    })
-  )
-  .use(HelloWorld)
-  .use(Downloads);
+    .use(
+        cors({
+            origin: ["http://localhost:*", "https://www.aplapp.dev"],
+        })
+    )
+    .use(trpc(appRouter))
 
 app.listen(3000);
 

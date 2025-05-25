@@ -8,7 +8,10 @@
   },
   "dependencies": {
     "@elysiajs/cors": "^1.2.0",
+    "@elysiajs/trpc": "^1.1.0",
+    "@elysiajs/websocket": "^0.2.8",
     "@octokit/rest": "^21.1.1",
+    "@trpc/server": "^11.1.2",
     "canvas-confetti": "^1.9.3",
     "elysia": "latest",
     "js-yaml": "^4.1.0",
