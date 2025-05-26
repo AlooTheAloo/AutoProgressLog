@@ -12,6 +12,7 @@ const __dirname = path.dirname(__filename);
 let tray: Tray;
 
 export async function buildContextMenu() {
+  if (tray == undefined) return;
   const contextMenu = Menu.buildFromTemplate([
     {
       label: "Open AutoProgressLog",
