@@ -9,7 +9,7 @@ const app = new Elysia()
             origin: ["http://localhost:*", "https://www.aplapp.dev"],
         })
     )
-    .use(trpc(appRouter))
+    .use(trpc({router: appRouter, endpoint: '/api/trpc'}))
 
 app.listen(3000);
 
