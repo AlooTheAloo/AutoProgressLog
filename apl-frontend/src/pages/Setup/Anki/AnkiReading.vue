@@ -8,7 +8,7 @@ import RadioButton from "primevue/radiobutton";
 import { onMounted, ref, watch } from "vue";
 import { motion } from "motion-v";
 import pluralize from "pluralize";
-import MatureCardsIcon from "../../../../apl-backend/apl-visuals/public/Icons/MatureCards.svg";
+import MatureCardsIcon from "../../../../apl-backend/apl-visuals/public/Icons/MatureCards.png";
 import RetentionIcon from "../../../../apl-backend/apl-visuals/public/Icons/Retention.svg";
 import ProgressSpinner from "primevue/progressspinner";
 

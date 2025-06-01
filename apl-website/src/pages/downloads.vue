@@ -1,6 +1,6 @@
 <template>
   <div
-    class="absolute flex h-screen w-screen flex-col items-center justify-center overflow-hidden rounded-lg lg:w-full md:w-full pointer-events-none"
+    class="-z-10 absolute flex h-screen w-screen flex-col items-center justify-center overflow-hidden rounded-lg lg:w-full md:w-full pointer-events-none"
   >
     <Ripple
       :space-between-circle="200"
@@ -151,18 +151,17 @@ const platform = ref<Platform>(getPlatform());
 function getPlatform(): Platform {
   const uap = new UAParser();
   const os = uap.getOS();
+
   // No mobile support (yet...)
   if (uap.getDevice().type == "mobile") return "other";
 
   // No arm64 support on windows (thanks sharp)
   if (uap.getCPU().architecture == "arm64" && os.is("windows")) return "other";
 
-  // No x86 support on mac (lol)
-  if (uap.getCPU().architecture != "arm64" && os.is("mac")) return "other";
-
   if (os.is("windows")) return "windows";
   if (os.is("mac") && uap.getDevice().type != "mobile") return "mac";
   if (os.is("linux")) return "linux";
+  console.log("other");
   return "other";
 }
 
