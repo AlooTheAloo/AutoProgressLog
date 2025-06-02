@@ -1,24 +1,57 @@
-version: "3.8"
-
 services:
-  APL-Server:
-    image: oven/bun:1
-    container_name: apl-server
-    working_dir: /app
-    volumes:
-      - ./:/app
+  apl-db:
+    image: postgres:latest
+    hostname: apl-db
+    container_name: apl-db
+    restart: always
     ports:
-      - "11612:3000"
-    environment:
-      - DB_PATH=/data/prod.db
-    command: bun run start
+      - "5432:5432"
+    env_file:
+      - .env.db
     networks:
       - chromanet
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d postgres" ]
+      interval: 5s
+      timeout: 2s
+      retries: 20
+  apl-server:
+    build:
+      context: .
+      dockerfile: apl.Dockerfile
+    ports:
+      - "3000:3000"
+    stdin_open: true
+    tty: true
+    volumes:
+      - .:/app
+      - /app/node_modules
+    depends_on:
+      apl-db:
+        condition: service_healthy
+    env_file:
+      - .env.server
+    networks:
+      - chromanet
+  prisma-studio:
+    image: oven/bun:latest
+    working_dir: /app
+    volumes:
+      - .:/app
+    command: bunx prisma studio --port 5555 --browser none
+    ports:
+      - "5555:5555"
+    env_file:
+      - .env.server
+    networks:
+      - chromanet
+    depends_on:
+      apl-db:
+        condition: service_healthy
+      apl-server:
+        condition: service_started
+
 
 networks:
   chromanet:
-    external: true
-
-volumes:
-  elysia-db:
-    driver: local
+    name: chromanet

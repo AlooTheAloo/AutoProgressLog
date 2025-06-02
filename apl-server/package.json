@@ -4,13 +4,15 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "bun run --watch src/index.ts",
-    "start": "bun run src/index.ts"
+    "start": "bun run db:deploy && bun run dev",
+    "db:deploy": "bunx prisma migrate deploy && bunx prisma generate"
   },
   "dependencies": {
     "@elysiajs/cors": "^1.2.0",
     "@elysiajs/trpc": "^1.1.0",
     "@elysiajs/websocket": "^0.2.8",
     "@octokit/rest": "^21.1.1",
+    "@prisma/client": "^6.8.2",
     "@trpc/server": "^11.1.2",
     "canvas-confetti": "^1.9.3",
     "elysia": "latest",
@@ -19,7 +21,8 @@
   },
   "devDependencies": {
     "@types/js-yaml": "^4.0.9",
-    "bun-types": "latest"
+    "bun-types": "latest",
+    "prisma": "^6.8.2"
   },
   "module": "src/index.js"
 }
