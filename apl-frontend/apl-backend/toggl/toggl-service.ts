@@ -8,6 +8,7 @@ import { getConfig } from "../Helpers/getConfig";
 import { activity } from "../types/activity";
 import { onConfigChange } from "../../electron/main/Electron-Backend/SettingsListeners";
 import { Options } from "../types/options";
+import { TogglWebhookClient } from "toggl-webhook";
 
 const ignore = (tags: string[]) =>
   ["aplignore", "ignore", "autoprogresslogignore"].some((x) =>

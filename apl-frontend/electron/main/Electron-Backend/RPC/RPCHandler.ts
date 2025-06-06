@@ -1,6 +1,9 @@
 import nodeScheduler, { Job } from "node-schedule";
 import RPC from "@xhayper/discord-rpc";
-import { getLiveActivity } from "../../../../apl-backend/toggl/toggl-service";
+import {
+  getLiveActivity,
+  toggl,
+} from "../../../../apl-backend/toggl/toggl-service";
 import { app } from "electron";
 import { entry } from "../../../../apl-backend/types/entry";
 import { GetLastEntry } from "../../../../apl-backend/Helpers/DataBase/SearchDB";
