@@ -1,0 +1,8 @@
+node_modules
+*.env
+*.db
+.git
+.idea
+../apl-assets
+../apl-frontend
+../apl-website

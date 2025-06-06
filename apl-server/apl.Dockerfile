@@ -1,19 +1,25 @@
 FROM oven/bun:latest
 
-# Set working directory
 WORKDIR /app
 
-# Install OpenSSL
+# Install OS dependencies (e.g., OpenSSL for Prisma)
 RUN apt-get update -y && apt-get install -y openssl
 
-# Copy dependency files first to take advantage of Docker layer caching
+# Copy and install dependencies first
 COPY package.json bun.lockb ./
-
-# Install dependencies
 RUN bun install --verbose
 
-# Copy the rest of the project files
+# Copy the rest of the app
 COPY . .
 
-# Run the app
-CMD ["bun", "run", "start"]
+# Prisma client generation at build time (NEVER at runtime)
+RUN bunx prisma generate
+
+# Set default port (Heroku assigns $PORT)
+ENV PORT=3000
+EXPOSE 3000
+
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+
+ENTRYPOINT ["/app/entrypoint.sh"]

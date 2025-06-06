@@ -2,11 +2,13 @@
   "name": "apl-server",
   "version": "1.0.50",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "bun run --watch src/index.ts",
-    "start": "bun run db:deploy && bun run dev",
-    "db:deploy": "bunx prisma migrate deploy && bunx prisma generate"
+    "start": "bun run src/index.ts",
+    "db:generate": "bunx prisma generate",
+    "db:dev": "bunx prisma migrate dev && bunx prisma generate",
+    "db:deploy": "bunx prisma migrate deploy"
   },
+
   "dependencies": {
     "@elysiajs/cors": "^1.2.0",
     "@elysiajs/trpc": "^1.1.0",
