@@ -4,6 +4,7 @@ import SurveyAnswer from "./Routes/SurveyAnswer";
 import HelloWorld from "./Routes/HelloWorld";
 import Downloads from "./Routes/Downloads";
 import cors from "@elysiajs/cors";
+import toggl from "./Routes/WebHooks/toggl";
 
 initDB();
 
@@ -15,7 +16,8 @@ const app = new Elysia()
   )
   .use(HelloWorld)
   .use(SurveyAnswer)
-  .use(Downloads);
+  .use(Downloads)
+  .use(toggl);
 
 app.listen(3000);
 
