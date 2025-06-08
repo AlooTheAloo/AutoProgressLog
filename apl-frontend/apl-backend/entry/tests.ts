@@ -72,32 +72,3 @@ import Storage from "./Storage";
 // );
 
 // getTimeEntries(1738012699);
-
-import { TogglWebhookClient } from "toggl-webhook";
-import Toggl from "toggl-track";
-
-const client = new TogglWebhookClient({
-  apiToken: "b3f7c1e583889aa8964bd1d87b21a3e8",
-});
-
-const toggl = new Toggl({
-  auth: {
-    token: "b3f7c1e583889aa8964bd1d87b21a3e8",
-  },
-});
-
-async function caca() {
-  const me = await toggl.me.get();
-  console.log(me);
-
-  const subscription = await client.createSubscription({
-    workspace_id: 8279376,
-    url_callback: "https://dev.chromaserver.net/webhooks/toggl",
-    event_filters: [{ entity: "time_entry", action: "*" }],
-    description: "unique subscription description",
-    secret: "shhhh",
-    enabled: true,
-  });
-}
-
-caca();

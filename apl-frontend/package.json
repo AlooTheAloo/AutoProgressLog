@@ -45,6 +45,7 @@
     "puppeteer": "^24.1.1",
     "round-to": "^6.0.0",
     "sharp": "^0.33.5",
+    "socket.io-client": "^4.8.1",
     "sqlite3": "^5.1.7",
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
@@ -55,7 +56,8 @@
     "vue-markdown": "^2.2.4",
     "vue-router": "4",
     "vue-writer": "^2.0.2",
-    "vue3-apexcharts": "^1.8.0"
+    "vue3-apexcharts": "^1.8.0",
+    "ws": "^8.18.2"
   },
   "devDependencies": {
     "@types/bun": "latest",
@@ -67,6 +69,7 @@
     "@types/semver": "^7.5.8",
     "@types/sql.js": "^1.4.9",
     "@types/vue-writer": "^1.2.0",
+    "@types/ws": "^8.18.1",
     "@vitejs/plugin-vue": "^5.0.4",
     "autoprefixer": "^10.4.20",
     "bun": "^1.1.42",

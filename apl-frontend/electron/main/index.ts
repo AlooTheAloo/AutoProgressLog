@@ -172,11 +172,14 @@ import {
   getFileInAPLData,
 } from "../../apl-backend/Helpers/getConfig";
 import fs from "fs";
-import { getTimeEntries } from "../../apl-backend/toggl/toggl-service";
+import createWebhook, {
+  getTimeEntries,
+} from "../../apl-backend/toggl/toggl-service";
 import dayjs from "dayjs";
 import { CacheManager } from "../../apl-backend/Helpers/cache";
 import checkHealth from "./Electron-App/HealthCheck";
 import { init } from "@bokuweb/zstd-wasm";
+import { SocketClient } from "./Electron-Backend/Socket/SocketClient";
 
 app.on("ready", async () => {
   if (CacheManager.verifyVersion()) {
@@ -184,6 +187,9 @@ app.on("ready", async () => {
   }
 
   await init();
+  await createWebhook();
+  // Create the socket client, accessible through the singleton
+  await new SocketClient().init();
 
   buildMenu(app);
   createAutoReport();

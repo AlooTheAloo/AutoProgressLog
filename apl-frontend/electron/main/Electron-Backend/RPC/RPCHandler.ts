@@ -1,27 +1,21 @@
-import nodeScheduler, { Job } from "node-schedule";
 import RPC from "@xhayper/discord-rpc";
-import {
-  getLiveActivity,
-  toggl,
-} from "../../../../apl-backend/toggl/toggl-service";
 import { app } from "electron";
-import { entry } from "../../../../apl-backend/types/entry";
 import { GetLastEntry } from "../../../../apl-backend/Helpers/DataBase/SearchDB";
 import dayjs from "dayjs";
-import { runSync } from "../../../../apl-backend/generate/sync";
-import { checkInternet } from "../../../../apl-backend/Helpers/Healthcheck/internetHelper";
 import { getConfig } from "../../../../apl-backend/Helpers/getConfig";
 import { onConfigChange } from "../SettingsListeners";
 import { Options } from "../../../../apl-backend/types/options";
+import { SocketClient } from "../Socket/SocketClient";
+
+type miniEvent = {};
 
 const clientId = "1330290329261445221";
 let ready = false;
-let currentActivity: entry | null = null;
-let job: Job | null = null;
+let currentActivity: miniEvent | null = null;
 let rpc: RPC.Client | null = null;
 
 export function createAutoRPC() {
-  createJob();
+  createListeners();
 
   onConfigChange.on(
     "config-change",
@@ -31,10 +25,9 @@ export function createAutoRPC() {
         newConfig.general.discordIntegration
       ) {
         if (newConfig.general.discordIntegration) {
-          await createJob();
+          await createListeners();
         } else {
-          job?.cancel();
-          job = null;
+          killListeners();
         }
       }
     }
@@ -47,7 +40,12 @@ export function createAutoRPC() {
   });
 }
 
-async function createJob() {
+async function killListeners() {
+  SocketClient.instance.off("ActivityStart");
+  SocketClient.instance.off("ActivityStop");
+}
+
+async function createListeners() {
   const config = getConfig();
   if (config == undefined || !config.general.discordIntegration) return;
 
@@ -68,65 +66,37 @@ async function createJob() {
     console.warn("RPC disconnected. Reinitializing client...");
 
     ready = false;
-
-    // Clean up old client
     try {
       rpc?.destroy(); // Optional, just in case
     } catch (e) {
       console.warn("Failed to destroy old RPC client:", e);
     }
-
-    job?.cancel();
-
-    createJob();
+    killListeners();
+    createListeners();
   });
 
-  job = nodeScheduler.scheduleJob(`*/10 * * * * *`, async () => {
-    if (!ready || !(await checkInternet())) {
-      console.log("Not ready to run RPC job");
-      return;
-    }
-
-    const activity = await getLiveActivity();
-    if (!activity || activity.length === 0) {
-      rpc!.user?.clearActivity();
-      return;
-    }
-
-    const single = activity[0];
-    if (currentActivity && activity.length === 0) {
-      setTimeout(() => {
-        runSync();
-      }, 10000);
-      rpc?.user?.clearActivity();
-      currentActivity = null;
-    }
-
-    if (activity.length === 0) return;
-
+  SocketClient.instance.on("ActivityStart", async (event) => {
     const lastEntry = await GetLastEntry();
+
     const seconds =
       (lastEntry?.toggl?.totalSeconds ?? 0) +
-      Math.abs(dayjs(single.start).diff(dayjs(), "seconds"));
+      Math.abs(dayjs(event.start).diff(dayjs(), "seconds"));
 
     await rpc!.user?.setActivity({
       details: `Immersing | ${(seconds / 3600).toFixed(2)} hours`,
-      state: padToMinLength(single.description, 2),
+      state: padToMinLength(event.activity, 2),
       instance: false,
-      startTimestamp: new Date(single.start),
+      startTimestamp: new Date(event.start),
     });
 
-    console.log("Set current activity to ", single.description);
-    currentActivity = single;
+    console.log("Set current activity to ", event.activity);
+    currentActivity = event;
   });
 
-  job.invoke();
-}
-
-async function reconnectRPC() {
-  await tryLoginWithRetries(clientId);
-  ready = true;
-  console.log("Reconnected to Discord RPC");
+  SocketClient.instance.on("ActivityStop", (event) => {
+    currentActivity = null;
+    rpc?.user?.clearActivity();
+  });
 }
 
 async function tryLoginWithRetries(clientId: string) {
