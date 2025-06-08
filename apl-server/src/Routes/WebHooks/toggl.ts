@@ -62,7 +62,7 @@ export const togglWebhookBodySchema = t.Union([
   togglWebhookEventSchema,
 ]);
 
-export default new Elysia().post(
+export const togglWebhook = new Elysia({ name: "toggl-webhook" }).post(
   "/webhooks/toggl",
   async ({ body }) => {
     console.log("Received something !");
@@ -78,5 +78,10 @@ export default new Elysia().post(
   },
   {
     body: togglWebhookBodySchema,
+    detail: {
+      summary: "Toggl Time Tracking Webhook",
+      tags: ["Webhooks"],
+      description: "Used by Toggl to send time tracking data",
+    },
   }
 );

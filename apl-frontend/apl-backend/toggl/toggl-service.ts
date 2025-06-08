@@ -53,7 +53,10 @@ export async function getTimeEntries(
       since: dayjs(since).unix().toString(),
     });
 
-    entries = entries.filter((x) => dayjs(x.stop).isBefore(beforeDayjs));
+    entries = entries.filter(
+      (x) => dayjs(x.stop).isBefore(beforeDayjs) || x.stop != null
+    );
+
     // TODO : Telemetry maybe
     console.log("Fetch took " + dayjs().diff(start, "ms") + " ms");
     const entriesAfterLastGen = entries.filter((x) => {

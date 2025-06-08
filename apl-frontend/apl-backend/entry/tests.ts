@@ -2,7 +2,7 @@
 // import yaml from "js-yaml";
 import * as fzstd from "fzstd";
 import dayjs from "dayjs";
-import { getTimeEntries, toggl } from "../toggl/toggl-service";
+import { getTimeEntries } from "../toggl/toggl-service";
 import { writeFileSync } from "fs";
 import AnkiHTTPClient from "./AnkiHTTPClient";
 import NormalSyncer from "./NormalSyncer";
@@ -76,23 +76,28 @@ import Storage from "./Storage";
 import { TogglWebhookClient } from "toggl-webhook";
 import Toggl from "toggl-track";
 
-export async function createWebhook() {
-  const client = new TogglWebhookClient({
-    apiToken: "b3f7c1e583889aa8964bd1d87b21a3e8",
-  });
+const client = new TogglWebhookClient({
+  apiToken: "b3f7c1e583889aa8964bd1d87b21a3e8",
+});
 
-  const response = await client.createSubscription({
+const toggl = new Toggl({
+  auth: {
+    token: "b3f7c1e583889aa8964bd1d87b21a3e8",
+  },
+});
+
+async function caca() {
+  const me = await toggl.me.get();
+  console.log(me);
+
+  const subscription = await client.createSubscription({
     workspace_id: 8279376,
-    url_callback: "https://apl.chromaserver.net/webhooks/toggl",
-    event_filters: [
-      {
-        entity: "time_entry",
-        action: "*",
-      },
-    ],
-    description: "Event updates",
+    url_callback: "https://dev.chromaserver.net/webhooks/toggl",
+    event_filters: [{ entity: "time_entry", action: "*" }],
+    description: "unique subscription description",
+    secret: "shhhh",
     enabled: true,
   });
 }
 
-createWebhook();
+caca();

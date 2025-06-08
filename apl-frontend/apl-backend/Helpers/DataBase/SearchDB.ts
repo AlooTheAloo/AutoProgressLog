@@ -3,6 +3,7 @@ import { syncDataPath } from "../getConfig";
 import { ImmersionActivity, SyncData, SyncType } from "../../types/sync";
 import dayjs from "dayjs";
 import { ImmersionSource } from "../../../electron/main/Electron-Backend/types/Dashboard";
+import { entry } from "../../types/entry";
 
 interface flatSyncData {
   id: number;
@@ -62,6 +63,25 @@ export async function GetLastEntry(type?: SyncType): Promise<SyncData | null> {
   });
 }
 
+export async function removeDuplicates(entries: entry[]) {
+  return new Promise<entry[]>((resolve, reject) => {
+    const placeholders = entries.map(() => "?").join(",");
+
+    new sqlite3.Database(syncDataPath).all(
+      `
+        SELECT id FROM immersionActivity WHERE id IN (${placeholders})
+      `,
+      entries.map((x) => x.id), // now the array will fill in each ?
+      (err, rows: { id: number }[]) => {
+        const ids = rows.map((x) => x.id);
+        if (err) return reject(err);
+        entries = entries.filter((x) => !ids.includes(x.id));
+        resolve(entries);
+      }
+    );
+  });
+}
+
 export async function GetActivitiesBetween(
   since: dayjs.Dayjs,
   until: dayjs.Dayjs
@@ -70,6 +90,22 @@ export async function GetActivitiesBetween(
     new sqlite3.Database(syncDataPath).all(
       `
             SELECT * FROM immersionActivity WHERE time > '${since.unix()}' AND time < '${until.unix()}'
+        `,
+      (err, rows: ImmersionActivity[]) => {
+        if (err) reject(err);
+        resolve(rows);
+      }
+    );
+  });
+}
+
+export async function GetActivitiesSince(
+  since: dayjs.Dayjs
+): Promise<ImmersionActivity[]> {
+  return new Promise((resolve, reject) => {
+    new sqlite3.Database(syncDataPath).all(
+      `
+            SELECT * FROM immersionActivity WHERE time > '${since.unix()}'
         `,
       (err, rows: ImmersionActivity[]) => {
         if (err) reject(err);
