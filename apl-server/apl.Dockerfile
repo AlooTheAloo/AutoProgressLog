@@ -19,7 +19,6 @@ RUN bunx prisma generate
 ENV PORT=3000
 EXPOSE 3000
 
-COPY entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
 
 ENTRYPOINT ["/app/entrypoint.sh"]

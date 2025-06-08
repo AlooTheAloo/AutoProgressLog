@@ -12,9 +12,9 @@ if [ "$MODE" = "production" ]; then
   echo "Production environment detected. Skipping dev migrations."
 else
   echo "Development environment detected. Resetting DB and applying migrations..."
-  bunx prisma migrate dev
-  echo "Generating Prisma client..."
-  bunx prisma generate
+  (bunx prisma migrate dev &) && wait # Run migrations in the background
+  echo "Migrate finished with code $?"
+
 fi
 
 echo "Starting app..."
