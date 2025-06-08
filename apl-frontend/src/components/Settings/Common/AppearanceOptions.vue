@@ -49,7 +49,7 @@ function changeAccentColor(color: AccentColor) {
               role="button"
               :src="t.image"
               class="w-36 border-2 border-black rounded-xl"
-              :class="t.name == theme ? 'border-[var(--primary-color)]' : ''"
+              :class="t.name == theme ? '!border-[var(--primary-color)]' : ''"
             />
           </div>
         </div>
