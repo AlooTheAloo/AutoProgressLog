@@ -17,7 +17,12 @@ const app = new Elysia()
   .use(HelloWorld)
   .use(SurveyAnswer)
   .use(Downloads)
-  .use(toggl);
+  .use(toggl)
+  .onError(({ code, error }) => {
+    console.log(code);
+    console.log(error);
+    return 1;
+  });
 
 app.listen(3000);
 
