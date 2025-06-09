@@ -2,7 +2,7 @@ import { Elysia } from "elysia";
 import cors from "@elysiajs/cors";
 import swagger from "@elysiajs/swagger";
 import { downloadLinksRoute } from "./procedures/downloadLinks";
-import { togglWebhook } from "./Routes/WebHooks/toggl";
+import { initTogglNotifications, togglWebhook } from "./Routes/WebHooks/toggl";
 import { rootRoute } from "./procedures/rootProcedure";
 import { SocketManager } from "./socket/socketManager";
 
@@ -56,5 +56,8 @@ export const app = new Elysia()
   .listen(3000, () => {
     console.log("APL Server is running on http://localhost:3000/");
   });
+
+// TODO : Move this somewhere else
+initTogglNotifications();
 
 export type APLServer = typeof app;

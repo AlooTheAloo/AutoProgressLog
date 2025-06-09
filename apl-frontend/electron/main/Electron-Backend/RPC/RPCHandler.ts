@@ -75,9 +75,11 @@ async function createListeners() {
     createListeners();
   });
 
+  console.log("creating listener ");
   SocketClient.instance.on("ActivityStart", async (event) => {
+    console.log("--- ACTIVITY START ---");
     const lastEntry = await GetLastEntry();
-
+    console.log("evt " + event);
     const seconds =
       (lastEntry?.toggl?.totalSeconds ?? 0) +
       Math.abs(dayjs(event.start).diff(dayjs(), "seconds"));
@@ -94,6 +96,7 @@ async function createListeners() {
   });
 
   SocketClient.instance.on("ActivityStop", (event) => {
+    console.log("--- ACTIVITY STOP ---");
     currentActivity = null;
     rpc?.user?.clearActivity();
   });

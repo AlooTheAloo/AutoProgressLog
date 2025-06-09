@@ -83,10 +83,8 @@ export const togglWebhook = new Elysia({ name: "toggl-webhook" }).post(
 
     console.log(body);
     if (body.payload === "ping") {
-      console.log("Received ping");
       return { validation_code: body.validation_code };
     } else {
-      console.log("Received event");
       const { action, event_user_id, model, workspace_id } = body.metadata;
       const payload = body.payload;
       if (action === "created") {
@@ -125,7 +123,7 @@ export const togglWebhook = new Elysia({ name: "toggl-webhook" }).post(
   }
 );
 
-function initTogglNotifications() {
+export function initTogglNotifications() {
   SocketManager.instance.addAuthListener((ws) => {
     const id = sockToID(ws);
     if (id == undefined) return;

@@ -42,7 +42,6 @@ export class SocketClient {
       this.socket.addEventListener("message", (event) => {
         try {
           const parsed = JSON.parse(event.data.toString());
-
           const { type, payload } = parsed;
           const listener = this.eventListeners[type as keyof EventMap];
           if (listener) {
