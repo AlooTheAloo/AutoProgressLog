@@ -186,10 +186,14 @@ app.on("ready", async () => {
     await checkHealth(getConfig());
   }
 
-  await init();
-  await createWebhook();
-  // Create the socket client, accessible through the singleton
-  await new SocketClient().init();
+  if (CacheManager.exists) {
+    // Create the socket client, accessible through the singleton
+    await init();
+    await createWebhook();
+    await new SocketClient().init({
+      token: getConfig()?.toggl.togglToken ?? "",
+    });
+  }
 
   buildMenu(app);
   createAutoReport();

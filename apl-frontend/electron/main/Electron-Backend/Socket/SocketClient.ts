@@ -12,14 +12,25 @@ export class SocketClient {
     SocketClient.instance = this;
   }
 
-  async init() {
+  async init(authData: { token: string }) {
     console.log("Initializing WebSocket client");
 
     return new Promise<void>((resolve, reject) => {
       this.socket = new WebSocket(URL);
 
       this.socket.addEventListener("open", () => {
-        console.log("Connected to WebSocket");
+        console.log("Connected to WebSocket, sending auth");
+
+        this.socket?.send(
+          JSON.stringify({
+            type: "auth",
+            payload: authData,
+          }),
+          (err) => {
+            console.log("Sent auth" + err);
+          }
+        );
+
         resolve();
       });
 
@@ -30,6 +41,7 @@ export class SocketClient {
 
       this.socket.addEventListener("message", (event) => {
         try {
+          console.log("WE GOT A MESAG EJIOGWRSHIOJKG " + event);
           const parsed = JSON.parse(event.data.toString());
 
           const { type, payload } = parsed;

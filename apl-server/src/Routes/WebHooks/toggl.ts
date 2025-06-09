@@ -1,4 +1,5 @@
 import Elysia, { t } from "elysia";
+import { SocketManager } from "../../socket/socketManager";
 
 const metadataPingSchema = t.Object({
   request_type: t.Literal("POST"),
@@ -72,7 +73,15 @@ export const togglWebhook = new Elysia({ name: "toggl-webhook" }).post(
       console.log("Received ping");
       return { validation_code: body.validation_code };
     } else {
-      console.log(body.metadata.action);
+      console.log("Received event");
+      const { action, event_user_id, model, workspace_id } = body.metadata;
+      const payload = body.payload;
+      if (action === "created") {
+        if (payload.stop == undefined) {
+          SocketManager.instance.send(event_user_id, "ActivityStart", payload);
+        }
+      }
+
       return new Response("ok");
     }
   },
