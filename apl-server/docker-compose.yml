@@ -7,7 +7,7 @@ services:
     ports:
       - "5432:5432"
     env_file: .env.db
-    networks: [chromanet]
+    networks: [chromanet_dev]
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
       interval: 5s
@@ -19,7 +19,7 @@ services:
       context: .
       dockerfile: apl-dev.Dockerfile
     ports:
-      - "3000:3000"
+      - "8080:3000"
     stdin_open: true
     tty: true
     volumes:
@@ -29,7 +29,7 @@ services:
       apl-db:
         condition: service_healthy
     env_file: .env.server
-    networks: [chromanet]
+    networks: [chromanet_dev]
 
   prisma-studio:
     image: oven/bun:latest
@@ -40,7 +40,7 @@ services:
     ports:
       - "5555:5555"
     env_file: .env.server
-    networks: [chromanet]
+    networks: [chromanet_dev]
     depends_on:
       apl-db:
         condition: service_healthy
@@ -48,5 +48,5 @@ services:
         condition: service_started
 
 networks:
-  chromanet:
-    name: chromanet
+  chromanet_dev:
+    name: chromanet_dev
