@@ -1,5 +1,5 @@
 import WebSocket from "ws";
-const URL = "ws://localhost:3000/ws";
+const URL = "wss://dev.chromaserver.net/ws";
 
 export class SocketClient {
   static instance: SocketClient; // Singleton
@@ -41,11 +41,9 @@ export class SocketClient {
 
       this.socket.addEventListener("message", (event) => {
         try {
-          console.log("WE GOT A MESAG EJIOGWRSHIOJKG " + event);
           const parsed = JSON.parse(event.data.toString());
 
           const { type, payload } = parsed;
-
           const listener = this.eventListeners[type as keyof EventMap];
           if (listener) {
             listener(payload);

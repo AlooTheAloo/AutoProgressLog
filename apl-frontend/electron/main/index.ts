@@ -187,12 +187,20 @@ app.on("ready", async () => {
   }
 
   if (CacheManager.exists) {
-    // Create the socket client, accessible through the singleton
     await init();
-    await createWebhook();
-    await new SocketClient().init({
-      token: getConfig()?.toggl.togglToken ?? "",
-    });
+
+    try {
+      // Create the socket client, accessible through the singleton
+      await createWebhook();
+      console.log("Waiting for init...");
+      await new SocketClient().init({
+        token: getConfig()?.toggl.togglToken ?? "",
+      });
+      console.log("Init done");
+    } catch (e) {
+      console.log("Failed to init socket client");
+      console.log(e);
+    }
   }
 
   buildMenu(app);

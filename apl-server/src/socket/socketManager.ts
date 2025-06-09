@@ -2,6 +2,7 @@ import { ElysiaWS } from "elysia/dist/ws";
 import { addSocket, auth, removeSocket, sockToID } from "./socketAuth";
 
 export class SocketManager {
+  private authListeners: ((ws: ElysiaWS) => void)[] = [];
   static instance: SocketManager;
   private static clients: Map<string, ElysiaWS>;
 
@@ -18,10 +19,7 @@ export class SocketManager {
     };
   }
 
-  public open(ws: ElysiaWS) {
-    console.log("New client connected");
-    // Initialize ws.data to allow later mutation
-  }
+  public open(ws: ElysiaWS) {}
 
   public async message(ws: ElysiaWS, message: any) {
     console.log(ws);
@@ -35,10 +33,7 @@ export class SocketManager {
       } else {
         addSocket(id, ws);
         SocketManager.clients.set(id, ws);
-        setTimeout(() => {
-          console.log("Sending test message");
-          SocketManager.instance.send("10702235", "ActivityStart", "caca");
-        }, 1000);
+        this.authListeners.forEach((x) => x(ws));
       }
       return;
     }
@@ -63,5 +58,9 @@ export class SocketManager {
         paylioad: data,
       });
     }
+  }
+
+  public addAuthListener(callback: (ws: ElysiaWS) => void) {
+    this.authListeners.push(callback);
   }
 }

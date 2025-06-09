@@ -1,5 +1,7 @@
 import Elysia, { t } from "elysia";
 import { SocketManager } from "../../socket/socketManager";
+import { Socket } from "socket.io";
+import { sockToID } from "../../socket/socketAuth";
 
 const metadataPingSchema = t.Object({
   request_type: t.Literal("POST"),
@@ -63,6 +65,17 @@ export const togglWebhookBodySchema = t.Union([
   togglWebhookEventSchema,
 ]);
 
+export type MiniActivity = {
+  activity: string;
+  start: string;
+  id: number;
+};
+
+const current_Activities: Map<string, MiniActivity> = new Map<
+  string,
+  MiniActivity
+>();
+
 export const togglWebhook = new Elysia({ name: "toggl-webhook" }).post(
   "/webhooks/toggl",
   async ({ body }) => {
@@ -78,7 +91,24 @@ export const togglWebhook = new Elysia({ name: "toggl-webhook" }).post(
       const payload = body.payload;
       if (action === "created") {
         if (payload.stop == undefined) {
-          SocketManager.instance.send(event_user_id, "ActivityStart", payload);
+          SocketManager.instance.send(event_user_id, "ActivityStart", {
+            activity: payload.description,
+            start: payload.start,
+            id: payload.id,
+          });
+          current_Activities.set(event_user_id, {
+            activity: payload.description,
+            start: payload.start,
+            id: payload.id,
+          });
+        }
+      }
+
+      if (action === "updated") {
+        if (payload.stop != undefined) {
+          SocketManager.instance.send(event_user_id, "ActivityStop", {
+            id: payload.id,
+          });
         }
       }
 
@@ -94,3 +124,19 @@ export const togglWebhook = new Elysia({ name: "toggl-webhook" }).post(
     },
   }
 );
+
+function initTogglNotifications() {
+  SocketManager.instance.addAuthListener((ws) => {
+    const id = sockToID(ws);
+    if (id == undefined) return;
+    console.log("The current user is " + id);
+    if (current_Activities.has(id)) {
+      console.log("The user " + id + " has an activity, notifying...");
+      SocketManager.instance.send(
+        id,
+        "ActivityStart",
+        current_Activities.get(id)
+      );
+    }
+  });
+}
