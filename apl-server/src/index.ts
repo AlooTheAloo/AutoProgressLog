@@ -6,8 +6,7 @@ import { togglWebhook } from "./Routes/WebHooks/toggl";
 import { rootRoute } from "./procedures/rootProcedure";
 import { SocketManager } from "./socket/socketManager";
 
-const ws = new SocketManager();
-const init = await ws.init();
+const sm = new SocketManager();
 export const app = new Elysia()
   .use(
     cors({
@@ -43,7 +42,17 @@ export const app = new Elysia()
   .use(rootRoute)
   .use(downloadLinksRoute)
   .use(togglWebhook)
-  .ws("/ws", init as any) // It just works
+  .ws("/ws", {
+    open(ws) {
+      sm.open(ws);
+    },
+    message(ws, message) {
+      sm.message(ws, message);
+    },
+    close(ws) {
+      sm.close(ws);
+    },
+  })
   .listen(3000, () => {
     console.log("APL Server is running on http://localhost:3000/");
   });

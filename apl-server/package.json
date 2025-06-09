@@ -17,6 +17,8 @@
     "canvas-confetti": "^1.9.3",
     "elysia": "latest",
     "js-yaml": "^4.1.0",
+    "socket.io": "^4.8.1",
+    "toggl-track": "^0.8.0",
     "zod": "^3.25.56"
   },
   "devDependencies": {

@@ -1,27 +1,67 @@
+import { ElysiaWS } from "elysia/dist/ws";
+import { addSocket, auth, removeSocket, sockToID } from "./socketAuth";
+
 export class SocketManager {
   static instance: SocketManager;
-  private clients = new Set<WebSocket>();
+  private static clients: Map<string, ElysiaWS>;
 
-  constructor() {}
+  constructor() {
+    SocketManager.clients = new Map<string, ElysiaWS>();
+    SocketManager.instance = this;
+  }
+
   async init() {
     return {
-      open: this.open,
-      message: this.message,
-      close: this.close,
+      open: this.open.bind(this),
+      message: this.message.bind(this),
+      close: this.close.bind(this),
     };
   }
 
-  private open(ws: WebSocket) {
+  public open(ws: ElysiaWS) {
     console.log("New client connected");
-    this.clients.add(ws);
+    // Initialize ws.data to allow later mutation
   }
 
-  private message(ws: WebSocket, message: any) {
-    console.log("Received message:", message);
+  public async message(ws: ElysiaWS, message: any) {
+    console.log(ws);
+
+    if (message.type === "auth") {
+      const { token } = message.payload;
+      const id = await auth(token);
+
+      if (!id) {
+        ws.close(401);
+      } else {
+        addSocket(id, ws);
+        SocketManager.clients.set(id, ws);
+        setTimeout(() => {
+          console.log("Sending test message");
+          SocketManager.instance.send("10702235", "ActivityStart", "caca");
+        }, 1000);
+      }
+      return;
+    }
   }
 
-  private close(ws: WebSocket) {
-    console.log("Client disconnected");
-    this.clients.delete(ws);
+  public close(ws: ElysiaWS) {
+    console.log("Client left");
+    const id = sockToID(ws);
+    console.log(id);
+    if (id == undefined) return;
+    removeSocket(ws);
+    if (SocketManager.clients.has(id)) {
+      SocketManager.clients.delete(id);
+      console.log(SocketManager.clients);
+    }
+  }
+
+  public send<T>(to: string, message: string, data: T) {
+    if (SocketManager.clients.has(to)) {
+      SocketManager.clients.get(to)?.send({
+        type: message,
+        paylioad: data,
+      });
+    }
   }
 }
