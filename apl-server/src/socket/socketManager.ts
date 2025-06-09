@@ -26,13 +26,22 @@ export class SocketManager {
       const { token } = message.payload;
       const id = await auth(token);
 
+      console.log("Auth attempt for " + id);
+
       if (!id) {
         ws.close(401);
       } else {
+        console.log("Authenticated " + id);
         addSocket(id, ws);
         SocketManager.clients.set(id, ws);
         this.authListeners.forEach((x) => x(ws));
       }
+      return;
+    }
+
+    if (message.type === "ping") {
+      console.log("Ping !");
+      ws.send(JSON.stringify({ type: "pong", payload: {} }));
       return;
     }
   }
