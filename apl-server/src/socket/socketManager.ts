@@ -55,7 +55,7 @@ export class SocketManager {
     if (SocketManager.clients.has(to)) {
       SocketManager.clients.get(to)?.send({
         type: message,
-        paylioad: data,
+        payload: data,
       });
     }
   }
