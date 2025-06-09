@@ -80,6 +80,6 @@ export class SocketClient {
 }
 
 type EventMap = {
-  ActivityStart: { activity: string; start: number; id: string };
+  ActivityStart: { activity: string; start: string; id: string };
   ActivityStop: { id: string };
 };

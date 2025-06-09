@@ -102,11 +102,15 @@ export const togglWebhook = new Elysia({ name: "toggl-webhook" }).post(
         }
       }
 
-      if (action === "updated") {
+      if (
+        action === "updated" &&
+        current_Activities.get(event_user_id)?.id == payload.id
+      ) {
         if (payload.stop != undefined) {
           SocketManager.instance.send(event_user_id, "ActivityStop", {
             id: payload.id,
           });
+          current_Activities.delete(event_user_id);
         }
       }
 

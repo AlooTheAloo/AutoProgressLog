@@ -7,7 +7,11 @@ import { onConfigChange } from "../SettingsListeners";
 import { Options } from "../../../../apl-backend/types/options";
 import { SocketClient } from "../Socket/SocketClient";
 
-type miniEvent = {};
+type miniEvent = {
+  activity: string;
+  start: string;
+  id: string;
+};
 
 const clientId = "1330290329261445221";
 let ready = false;
@@ -75,7 +79,6 @@ async function createListeners() {
     createListeners();
   });
 
-  console.log("creating listener ");
   SocketClient.instance.on("ActivityStart", async (event) => {
     console.log("--- ACTIVITY START ---");
     const lastEntry = await GetLastEntry();
@@ -96,6 +99,8 @@ async function createListeners() {
   });
 
   SocketClient.instance.on("ActivityStop", (event) => {
+    if (event.id != currentActivity?.id) return;
+
     console.log("--- ACTIVITY STOP ---");
     currentActivity = null;
     rpc?.user?.clearActivity();
