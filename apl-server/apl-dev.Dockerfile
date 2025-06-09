@@ -11,10 +11,10 @@ RUN npm install -g bun
 
 RUN bun install
 
-RUN chmod +x /app/entrypoint_dev.sh
+RUN chmod +x /app/entrypoint.dev.sh
 
 EXPOSE 3000
 
-ENTRYPOINT ["/app/entrypoint_dev.sh"]
+ENTRYPOINT ["/app/entrypoint.dev.sh"]
 
 
