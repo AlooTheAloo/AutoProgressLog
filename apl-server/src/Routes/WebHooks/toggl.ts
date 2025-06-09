@@ -79,9 +79,6 @@ const current_Activities: Map<string, MiniActivity> = new Map<
 export const togglWebhook = new Elysia({ name: "toggl-webhook" }).post(
   "/webhooks/toggl",
   async ({ body }) => {
-    console.log("Received something !");
-
-    console.log(body);
     if (body.payload === "ping") {
       return { validation_code: body.validation_code };
     } else {
@@ -131,9 +128,7 @@ export function initTogglNotifications() {
   SocketManager.instance.addAuthListener((ws) => {
     const id = sockToID(ws);
     if (id == undefined) return;
-    console.log("The current user is " + id);
     if (current_Activities.has(id)) {
-      console.log("The user " + id + " has an activity, notifying...");
       SocketManager.instance.send(
         id,
         "ActivityStart",

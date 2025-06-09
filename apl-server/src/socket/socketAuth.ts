@@ -9,8 +9,7 @@ export async function auth(token: string) {
       },
     });
     const me = await tog.me.get();
-    console.log("Me is " + me.id);
-    return (me.id as string).toString();
+    return (me.id as number).toString();
   } catch (e) {
     return false;
   }
@@ -19,17 +18,13 @@ export async function auth(token: string) {
 const socketIDs = new Map<string, string>();
 
 export function sockToID(socket: ElysiaWS) {
-  console.log("Socket ids " + socketIDs.size);
   return socketIDs.get(socket.id);
 }
 
 export function addSocket(id: string, socket: ElysiaWS) {
-  console.log("Adding socket " + socket.id + " to " + id);
   socketIDs.set(socket.id, id);
-  console.log("Socket ids " + socketIDs.size);
 }
 
 export function removeSocket(socket: ElysiaWS) {
   socketIDs.delete(socket.id);
-  console.log("Socket ids " + socketIDs.size);
 }

@@ -22,8 +22,6 @@ export class SocketManager {
   public open(ws: ElysiaWS) {}
 
   public async message(ws: ElysiaWS, message: any) {
-    console.log(ws);
-
     if (message.type === "auth") {
       const { token } = message.payload;
       const id = await auth(token);
@@ -40,19 +38,18 @@ export class SocketManager {
   }
 
   public close(ws: ElysiaWS) {
-    console.log("Client left");
     const id = sockToID(ws);
-    console.log(id);
     if (id == undefined) return;
     removeSocket(ws);
     if (SocketManager.clients.has(id)) {
       SocketManager.clients.delete(id);
-      console.log(SocketManager.clients);
     }
   }
 
   public send<T>(to: string, message: string, data: T) {
+    console.log("Attempting to send message to " + to);
     if (SocketManager.clients.has(to)) {
+      console.log("Snding message to " + to);
       SocketManager.clients.get(to)?.send({
         type: message,
         payload: data,
