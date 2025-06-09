@@ -1,21 +1,10 @@
 #!/bin/sh
-
 set -e
 
-echo "Running Entrypoint Script..."
+echo "🚀 Booting container..."
 
-# Use NODE_ENV or default to development
-MODE=${NODE_ENV:-development}
-echo "Environment: $MODE"
+echo "📦 Running production migration..."
+bun run db:deploy
 
-if [ "$MODE" = "production" ]; then
-  echo "Production environment detected. Skipping dev migrations."
-else
-  echo "Development environment detected. Resetting DB and applying migrations..."
-  (bunx prisma migrate dev &) && wait # Run migrations in the background
-  echo "Migrate finished with code $?"
-
-fi
-
-echo "Starting app..."
-bun run start
+echo "🚀 Starting compiled server..."
+exec ./server
