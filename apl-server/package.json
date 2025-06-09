@@ -13,6 +13,7 @@
     "@elysiajs/swagger": "^1.3.0",
     "@octokit/rest": "^21.1.1",
     "@prisma/client": "^6.9.0",
+    "bun": "^1.2.15",
     "canvas-confetti": "^1.9.3",
     "elysia": "latest",
     "js-yaml": "^4.1.0",

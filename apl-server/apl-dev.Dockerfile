@@ -1,18 +1,20 @@
-FROM oven/bun:latest
+FROM node:lts-bullseye
 
 WORKDIR /app
 
 # Install OpenSSL for Prisma
 RUN apt-get update && apt-get install -y openssl
 
-COPY package.json bun.lockb ./
-RUN bun install
-
 COPY . .
 
-RUN bun run db:generate
+RUN npm install -g bun
+
+RUN bun install
+
+RUN chmod +x /app/entrypoint_dev.sh
 
 EXPOSE 3000
 
-CMD ["sh", "-c", "bun run dev"]
+ENTRYPOINT ["/app/entrypoint_dev.sh"]
+
 

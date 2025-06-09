@@ -3,7 +3,7 @@
 echo "🚀 Booting container..."
 
 echo "📦 Running production migration..."
-bun run db:deploy
+bun run db:generate
+bun run dev
 
-echo "🚀 Starting compiled server..."
-exec ./server
+echo "i am here now"
