@@ -46,7 +46,7 @@ const togglWebhookPingSchema = t.Object({
   subscription_id: t.Number(),
   timestamp: t.String(),
   url_callback: t.String(),
-  validation_code: t.String(),
+  validation_code: t.Optional(t.String()),
 });
 
 const togglWebhookEventSchema = t.Object({
@@ -81,7 +81,9 @@ export const togglWebhook = new Elysia({ name: "toggl-webhook" }).post(
   async ({ body }) => {
     console.log(body);
     if (body.payload === "ping") {
-      return { validation_code: body.validation_code };
+      return !body.validation_code
+        ? 200
+        : { validation_code: body.validation_code };
     } else {
       const { action, event_user_id, model, workspace_id } = body.metadata;
       const payload = body.payload;
@@ -116,7 +118,7 @@ export const togglWebhook = new Elysia({ name: "toggl-webhook" }).post(
     }
   },
   {
-    body: t.Any(),
+    body: togglWebhookBodySchema,
     detail: {
       summary: "Toggl Time Tracking Webhook",
       tags: ["Webhooks"],
