@@ -79,6 +79,7 @@ const current_Activities: Map<string, MiniActivity> = new Map<
 export const togglWebhook = new Elysia({ name: "toggl-webhook" }).post(
   "/webhooks/toggl",
   async ({ body }) => {
+    console.log(body);
     if (body.payload === "ping") {
       return { validation_code: body.validation_code };
     } else {
@@ -115,7 +116,7 @@ export const togglWebhook = new Elysia({ name: "toggl-webhook" }).post(
     }
   },
   {
-    body: togglWebhookBodySchema,
+    body: t.Any(),
     detail: {
       summary: "Toggl Time Tracking Webhook",
       tags: ["Webhooks"],

@@ -1,6 +1,6 @@
 import WebSocket from "ws";
 
-const URL = "ws://localhost:8080/ws";
+const URL = "wss://dev.chromaserver.net/ws";
 
 export class SocketClient {
   static instance: SocketClient; // Singleton
