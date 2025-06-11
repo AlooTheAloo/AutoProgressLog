@@ -2,7 +2,7 @@ import { Elysia } from "elysia";
 import cors from "@elysiajs/cors";
 import swagger from "@elysiajs/swagger";
 import { downloadLinksRoute } from "./procedures/downloadLinks";
-import { initTogglNotifications, togglWebhook } from "./Routes/WebHooks/toggl";
+import { initTogglNotifications, togglWebhook } from "./webhooks/toggl";
 import { rootRoute } from "./procedures/rootProcedure";
 import { SocketManager } from "./socket/socketManager";
 

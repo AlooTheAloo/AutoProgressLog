@@ -1,7 +1,6 @@
 import Elysia, { t } from "elysia";
-import { SocketManager } from "../../socket/socketManager";
-import { Socket } from "socket.io";
-import { sockToID } from "../../socket/socketAuth";
+import { SocketManager } from "../socket/socketManager";
+import { sockToID } from "../socket/socketAuth";
 
 const metadataPingSchema = t.Object({
   request_type: t.Literal("POST"),
