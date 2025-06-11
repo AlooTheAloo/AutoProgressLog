@@ -78,11 +78,11 @@ const current_Activities: Map<string, MiniActivity> = new Map<
 
 export const togglWebhook = new Elysia({ name: "toggl-webhook" }).post(
   "/webhooks/toggl",
-  async ({ body }) => {
+  async ({ body, status }) => {
     console.log(body);
     if (body.payload === "ping") {
       return !body.validation_code
-        ? 200
+        ? status(200)
         : { validation_code: body.validation_code };
     } else {
       const { action, event_user_id, model, workspace_id } = body.metadata;
