@@ -1,0 +1,21 @@
+services:
+  apl-db:
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    env_file: .env.db
+    networks: [chromanet]
+
+  apl-server:
+    build:
+      context: .
+      dockerfile: apl-prod.Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - apl-db
+    env_file: .env.server
+    networks: [chromanet]
+
+networks:
+  chromanet:

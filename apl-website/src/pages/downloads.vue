@@ -1,6 +1,6 @@
 <template>
   <div
-    class="absolute flex h-screen w-screen flex-col items-center justify-center overflow-hidden rounded-lg lg:w-full md:w-full pointer-events-none"
+    class="-z-10 absolute flex h-screen w-screen flex-col items-center justify-center overflow-hidden rounded-lg lg:w-full md:w-full pointer-events-none"
   >
     <Ripple
       :space-between-circle="200"
@@ -124,6 +124,7 @@ import RainbowButton from "@/components/ui/rainbow-button/RainbowButton.vue";
 import confetti from "canvas-confetti";
 import { Button } from "@/components/ui/button";
 import { Motion } from "motion-v";
+import { UAParser } from "ua-parser-js";
 
 const items = [
   {
@@ -148,10 +149,19 @@ type Platform = "windows" | "mac" | "linux" | "other" | "all";
 const platform = ref<Platform>(getPlatform());
 
 function getPlatform(): Platform {
-  const agent = window.navigator.userAgent;
-  if (agent.indexOf("Windows") != -1) return "windows";
-  if (agent.indexOf("Mac") != -1) return "mac";
-  if (agent.indexOf("Linux") != -1) return "linux";
+  const uap = new UAParser();
+  const os = uap.getOS();
+
+  // No mobile support (yet...)
+  if (uap.getDevice().type == "mobile") return "other";
+
+  // No arm64 support on windows (thanks sharp)
+  if (uap.getCPU().architecture == "arm64" && os.is("windows")) return "other";
+
+  if (os.is("windows")) return "windows";
+  if (os.is("mac") && uap.getDevice().type != "mobile") return "mac";
+  if (os.is("linux")) return "linux";
+  console.log("other");
   return "other";
 }
 
@@ -212,7 +222,7 @@ function externalOpen() {
 }
 
 onMounted(() => {
-  const BACKEND_URL = "https://apl.chromaserver.net/downloadLinks";
+  const BACKEND_URL = "https://apl.chromaserver.net/";
   fetch(BACKEND_URL).then(async (x) => {
     const data: {
       windowsUrl: string;

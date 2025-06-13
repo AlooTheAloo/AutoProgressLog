@@ -88,6 +88,9 @@ function onPageSelect(page: HelpPage) {
                 alt="icon"
               />
               <div
+                @click="onPageSelect(page)"
+                role="button"
+                tabindex="0"
                 class="flex flex-col flex-grow cursor-pointer text-black dark:text-white w-0"
               >
                 <h3 class="text-xl font-semibold truncate">

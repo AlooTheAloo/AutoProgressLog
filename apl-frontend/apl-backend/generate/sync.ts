@@ -1,8 +1,10 @@
 import {
   GetActivitiesBetween,
+  GetActivitiesSince,
   GetLastEntry,
   getreadinghours,
   getTotalTime,
+  removeDuplicates,
 } from "../Helpers/DataBase/SearchDB";
 import {
   DeleteActivity,
@@ -221,7 +223,7 @@ export async function VerifyPreviousActivities(
   togglEntries: entry[] = []
 ): Promise<number> {
   let delta = 0;
-  const dbEntries = await GetActivitiesBetween(from, to);
+  const dbEntries = await GetActivitiesSince(from);
 
   const dbIDs = dbEntries.map((x) => x.id);
   const togglIDs = togglEntries.map((x) => x.id);
@@ -282,7 +284,7 @@ export async function syncToggl(): Promise<{
   const startSync = await GetLastEntry();
 
   if (startSync == null) return null;
-  const entries = await getTimeEntries(dayjs(lastReportTime));
+  let entries = await getTimeEntries(dayjs(lastReportTime));
 
   if (entries == null) return null;
   const delta = await VerifyPreviousActivities(
@@ -290,11 +292,14 @@ export async function syncToggl(): Promise<{
     dayjs(startSync.generationTime),
     entries.entriesAfterLastGen
   );
+
+  entries.entriesAfterLastGen = await removeDuplicates(
+    entries?.entriesAfterLastGen
+  );
+
   return {
-    entries: entries.entriesAfterLastGen.filter(
-      (x) =>
-        dayjs(x.stop).isAfter(startSync.generationTime) &&
-        dayjs(x.stop).isBefore(dayjs())
+    entries: entries.entriesAfterLastGen.filter((x) =>
+      dayjs(x.stop).isAfter(startSync.generationTime)
     ),
     delta: delta,
   };

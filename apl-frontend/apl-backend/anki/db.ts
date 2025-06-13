@@ -31,7 +31,6 @@ export async function getAnkiCardReviewCount(
   startTime: Dayjs,
   endTime: Dayjs = dayjs()
 ) {
-  console.log("getting reviews since : " + startTime.valueOf());
   return new Promise<number | null>((res, rej) => {
     // Create a database connection
     const db = open();

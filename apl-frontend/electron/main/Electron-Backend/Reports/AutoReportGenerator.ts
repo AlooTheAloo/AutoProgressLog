@@ -29,6 +29,7 @@ export async function createAutoReport() {
 }
 
 async function createJob() {
+  console.log("Creating job");
   const config = getConfig();
   if (config == undefined) return;
 

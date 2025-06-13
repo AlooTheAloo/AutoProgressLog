@@ -8,6 +8,7 @@ import { getConfig } from "../Helpers/getConfig";
 import { activity } from "../types/activity";
 import { onConfigChange } from "../../electron/main/Electron-Backend/SettingsListeners";
 import { Options } from "../types/options";
+import { EventAction, TogglWebhookClient } from "toggl-webhook";
 
 const ignore = (tags: string[]) =>
   ["aplignore", "ignore", "autoprogresslogignore"].some((x) =>
@@ -15,16 +16,6 @@ const ignore = (tags: string[]) =>
   );
 
 export let toggl: Toggl | undefined = undefined;
-
-export async function getLiveActivity() {
-  const entries: entry[] = await toggl?.timeEntry.list({
-    since: dayjs().unix().toString(),
-  });
-  if (typeof entries == "string") {
-    return undefined;
-  }
-  return entries;
-}
 
 export async function getTimeEntries(
   sinceDayjs: dayjs.Dayjs,
@@ -52,7 +43,10 @@ export async function getTimeEntries(
       since: dayjs(since).unix().toString(),
     });
 
-    entries = entries.filter((x) => dayjs(x.stop).isBefore(beforeDayjs));
+    entries = entries.filter(
+      (x) => dayjs(x.stop).isBefore(beforeDayjs) || x.stop != null
+    );
+
     // TODO : Telemetry maybe
     console.log("Fetch took " + dayjs().diff(start, "ms") + " ms");
     const entriesAfterLastGen = entries.filter((x) => {
