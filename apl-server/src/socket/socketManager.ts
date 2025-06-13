@@ -5,6 +5,7 @@ import {
   removeSocket,
   sockToID,
 } from "./socketAuth";
+import createWebhook from "../util/toggl/createWebhook";
 
 export class SocketManager {
   private authListeners: ((ws: ElysiaWS) => void)[] = [];
@@ -37,6 +38,7 @@ export class SocketManager {
         ws.close(401);
       } else {
         console.log("Authenticated " + id);
+        createWebhook(-1, token); // TODO: move this to client when auth system is complete
         addSocket(id, ws);
         SocketManager.clients.set(id, ws);
         this.authListeners.forEach((x) => x(ws));
