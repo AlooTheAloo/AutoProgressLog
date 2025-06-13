@@ -1,7 +1,12 @@
 import { ElysiaWS } from "elysia/dist/ws";
 import Toggl from "toggl-track";
 
-export async function auth(token: string) {
+/**
+ * Converts a Toggl Token to a toggl user ID. Consumes 1 token.
+ * @param token The token to use.
+ * @returns The user ID or false if the token is invalid.
+ */
+export async function togglTokenToTogglID(token: string) {
   try {
     const tog = new Toggl({
       auth: {
