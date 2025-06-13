@@ -9,7 +9,6 @@ import { setupListeners } from "./SetupConfigBuilder";
 import { surveyListeners } from "./SurveyListeners";
 import { togglListeners } from "./togglListener";
 import keytar from "keytar";
-import { fetchToken, storeToken } from "./util/auth";
 const SERVICE = "MyElectronApp";
 const ACCOUNT = "my–decryption–key";
 
