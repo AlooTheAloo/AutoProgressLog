@@ -58,7 +58,8 @@
     "vue-router": "4",
     "vue-writer": "^2.0.2",
     "vue3-apexcharts": "^1.8.0",
-    "ws": "^8.18.2"
+    "ws": "^8.18.2",
+    "zod": "^3.25.64"
   },
   "devDependencies": {
     "@types/bun": "latest",
