@@ -4,6 +4,23 @@ import registerEvents from "./Electron-Backend/";
 import path from "node:path";
 import os from "node:os";
 import { buildMenu } from "./Electron-App/MenuBuilder";
+import electronUpdater, { type AppUpdater } from "electron-updater";
+import {
+  buildContextMenu,
+  createAppBackend,
+} from "./Electron-Backend/appBackend";
+import { createAutoReport } from "./Electron-Backend/Reports/AutoReportGenerator";
+import { createAutoRPC } from "./Electron-Backend/RPC/RPCHandler";
+import {
+  getConfig,
+  getFileInAPLData,
+} from "../../apl-backend/Helpers/getConfig";
+import fs from "fs";
+import { CacheManager } from "../../apl-backend/Helpers/cache";
+import checkHealth from "./Electron-App/HealthCheck";
+import { init } from "@bokuweb/zstd-wasm";
+import { SocketClient } from "./Electron-Backend/Socket/SocketClient";
+import { dialog } from "electron";
 import {
   Browser,
   detectBrowserPlatform,
@@ -128,7 +145,7 @@ app.on("window-all-closed", () => {
   buildContextMenu();
 });
 
-app.on("second-instance", async () => {
+app.on("second-instance", async (evt, cmd, wd) => {
   if (VITE_DEV_SERVER_URL) return;
   if (win) {
     if (process.platform == "darwin") {
@@ -140,7 +157,13 @@ app.on("second-instance", async () => {
     if (win?.isMinimized()) win.restore();
     win?.focus();
     buildContextMenu();
+
+    dialog.showErrorBox("Prout", "");
   }
+});
+
+app.on("open-url", (event, url) => {
+  dialog.showErrorBox("Prout", "");
 });
 
 app.on("activate", () => {
@@ -160,27 +183,6 @@ app.on("activate", () => {
   }
 });
 
-import electronUpdater, { type AppUpdater } from "electron-updater";
-import {
-  buildContextMenu,
-  createAppBackend,
-} from "./Electron-Backend/appBackend";
-import { createAutoReport } from "./Electron-Backend/Reports/AutoReportGenerator";
-import { createAutoRPC } from "./Electron-Backend/RPC/RPCHandler";
-import {
-  getConfig,
-  getFileInAPLData,
-} from "../../apl-backend/Helpers/getConfig";
-import fs from "fs";
-import createWebhook, {
-  getTimeEntries,
-} from "../../apl-backend/toggl/toggl-service";
-import dayjs from "dayjs";
-import { CacheManager } from "../../apl-backend/Helpers/cache";
-import checkHealth from "./Electron-App/HealthCheck";
-import { init } from "@bokuweb/zstd-wasm";
-import { SocketClient } from "./Electron-Backend/Socket/SocketClient";
-
 app.on("ready", async () => {
   if (CacheManager.verifyVersion()) {
     await checkHealth(getConfig());
@@ -190,8 +192,9 @@ app.on("ready", async () => {
     await init();
 
     try {
+      // TODO : Add an API call to create the webhook
+
       // Create the socket client, accessible through the singleton
-      await createWebhook();
       console.log("Waiting for init...");
       await new SocketClient().init({
         token: getConfig()?.toggl.togglToken ?? "",
@@ -217,14 +220,32 @@ app.on("ready", async () => {
     process.stdout.write(args.join(" ") + "\n");
   };
 
+  console.error = (...args) => {
+    logStream.write(
+      new Date().toISOString() + " ERROR : " + args.join(" ") + "\n"
+    );
+    process.stderr.write(args.join(" ") + "\n");
+  };
+
   const isDev = process.env.NODE_ENV === "development";
 
   // TODO : Make this into a setting
-  if (!app.getLoginItemSettings().openAtLogin) {
+  if (!app.getLoginItemSettings().openAtLogin && !isDev) {
     app.setLoginItemSettings({
       openAtLogin: !isDev,
       args: ["was-opened-at-login"],
     });
+  }
+
+  // Register the APL protocol
+  if (process.defaultApp && !isDev) {
+    if (process.argv.length >= 2) {
+      app.setAsDefaultProtocolClient("apl", process.execPath, [
+        path.resolve(process.argv[1]),
+      ]);
+    }
+  } else {
+    app.setAsDefaultProtocolClient("apl");
   }
 });
 

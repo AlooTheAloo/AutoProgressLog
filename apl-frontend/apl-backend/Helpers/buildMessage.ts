@@ -1,7 +1,6 @@
 import { relativeActivity } from "../types/activity.js";
 import { cache } from "../types/cache.js";
 import path from "path";
-import puppeteer, { BoundingBox, Page, Puppeteer } from "puppeteer";
 import { fileURLToPath } from "url";
 import { ReportData, TPlusDelta } from "../types/reportdata.js";
 import dayjs from "dayjs";
@@ -10,8 +9,9 @@ import { arithmeticWeightedMean } from "./util.js";
 import { getConfig } from "./getConfig.js";
 import color from "color";
 import { Layout } from "../apl-visuals/src/types/report-data.js";
-import { Browser, getInstalledBrowsers } from "@puppeteer/browsers";
 import { app } from "electron";
+import playwright, { Page } from "playwright";
+import { Browser, getInstalledBrowsers } from "@puppeteer/browsers";
 
 declare global {
   interface Window {
@@ -35,6 +35,7 @@ export async function getChromiumExecPath() {
   const browsers = await getInstalledBrowsers({
     cacheDir: cachedir,
   });
+
   return browsers.filter((x) => x.browser == Browser.CHROME).at(0)
     ?.executablePath;
 }
@@ -48,9 +49,8 @@ export async function buildImage(
   const outputPath = `${options.outputFile.path}${path.sep}${options.outputFile.name} ${reportData.reportNo}${options.outputFile.extension}`;
 
   const execpath = await getChromiumExecPath();
-  console.log("execpath is " + execpath);
-  console.log(11.1);
-  const browser = await puppeteer.launch({
+
+  const browser = await playwright.chromium.launch({
     headless: true,
     devtools: true,
     args: [
@@ -65,21 +65,40 @@ export async function buildImage(
   const page = await browser.newPage();
   console.log(11.3);
 
-  await page.evaluateOnNewDocument(
-    (data, layout) => {
-      window.apl_ReportData = data;
-      window.apl_ReportLayout = layout;
+  // 1) Log browser console messages:
+  page.on("console", (msg) => {
+    console.log(`⮞ console.${msg.type()}: ${msg.text()}`);
+  });
+
+  // 2) Log unhandled exceptions in the page context:
+  page.on("pageerror", (error) => {
+    console.error("⮞ pageerror:", error);
+  });
+
+  // 3) Log any failed network requests:
+  page.on("requestfailed", (request) => {
+    console.warn(
+      `⮞ requestfailed: ${request.url()} — ${request.failure()?.errorText}`
+    );
+  });
+
+  // 4) (Optional) Log all network requests/responses
+  page.on("request", (r) => console.log("⮞ request:", r.method(), r.url()));
+  page.on("response", (r) => console.log("⮞ response:", r.status(), r.url()));
+
+  await page.addInitScript(
+    ([data, layout]) => {
+      window.apl_ReportData = data as any;
+      window.apl_ReportLayout = layout as any;
     },
-    reportData,
-    reportLayout
+    [reportData, reportLayout]
   );
 
   console.log(11.4);
 
-  await page.setViewport({
+  await page.setViewportSize({
     width: Math.round((2000 * options.outputQuality) / 2),
     height, // ← use the same `height` you’ll pass to tryScreenshot
-    deviceScaleFactor: options.outputQuality / 2,
   });
 
   console.log(11.5);
@@ -105,11 +124,8 @@ export async function buildImage(
         "index.html"
       );
 
-  await page.goto(`file:${visualsPath}`);
-
-  console.log(11.6);
-
-  await page.waitForNetworkIdle();
+  console.log(`file:${visualsPath}`);
+  await page.goto(`file:${visualsPath}`, { waitUntil: "networkidle" });
   console.log(11.7);
 
   await tryScreenshot(
@@ -128,10 +144,18 @@ export async function buildImage(
 
   return outputPath;
 }
+
+type clip = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
 async function tryScreenshot(
   page: Page,
   path: `${string}.png` | `${string}.jpeg` | `${string}.webp`,
-  clip: BoundingBox,
+  clip: clip,
   type: "png" | "jpeg" | "webp" | undefined,
   maxRetries = 3,
   timeoutMs = 5000
@@ -140,7 +164,7 @@ async function tryScreenshot(
   for (let i = 0; i < maxRetries; i++) {
     try {
       await Promise.race([
-        page.screenshot({ path, type, clip }),
+        page.screenshot({ path, type: "png", clip }),
         new Promise((_, reject) =>
           setTimeout(() => reject(new Error("Screenshot timed out")), timeoutMs)
         ),

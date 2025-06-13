@@ -1,5 +1,10 @@
 import { ElysiaWS } from "elysia/dist/ws";
-import { addSocket, auth, removeSocket, sockToID } from "./socketAuth";
+import {
+  addSocket,
+  togglTokenToTogglID,
+  removeSocket,
+  sockToID,
+} from "./socketAuth";
 
 export class SocketManager {
   private authListeners: ((ws: ElysiaWS) => void)[] = [];
@@ -24,7 +29,7 @@ export class SocketManager {
   public async message(ws: ElysiaWS, message: any) {
     if (message.type === "auth") {
       const { token } = message.payload;
-      const id = await auth(token);
+      const id = await togglTokenToTogglID(token);
 
       console.log("Auth attempt for " + id);
 
