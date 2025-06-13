@@ -11,6 +11,7 @@ import semver from "semver";
 import { version as v1 } from "../../../package.json";
 import { upgrade_schema } from "../../../apl-backend/apl-upgrade";
 import { CacheManager } from "../../../apl-backend/Helpers/cache";
+import { version } from "../../../package.json";
 
 const APP_URL = "https://github.com/AlooTheAloo/AutoProgressLog/";
 
@@ -50,8 +51,12 @@ export function globalListeners() {
     const skipped = existsSync(f)
       ? readFileSync(f).toString() ?? "0.0.0"
       : "0.0.0";
+
     if (
-      result?.updateInfo.version != (semver.gt(v1, skipped) ? v1 : skipped) &&
+      semver.gt(
+        result?.updateInfo.version ?? "0.0.0",
+        semver.gt(v1, skipped) ? v1 : skipped
+      ) &&
       result?.updateInfo != null
     ) {
       win?.webContents.send("update-available", result?.updateInfo);
