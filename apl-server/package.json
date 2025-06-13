@@ -2,10 +2,10 @@
   "name": "apl-server",
   "version": "1.0.50",
   "scripts": {
-    "dev": "bun run db:deploy && bun run --watch src/index.ts",
+    "dev": "bun run db:dev && bun run --watch src/index.ts",
     "start": "bun run src/index.ts",
     "db:generate": "bunx prisma generate",
-    "db:dev": "bunx prisma migrate deploy && bunx prisma generate",
+    "db:dev": "bunx prisma migrate dev && bunx prisma generate",
     "db:deploy": "bunx prisma migrate deploy"
   },
   "dependencies": {
