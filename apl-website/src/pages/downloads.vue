@@ -222,7 +222,7 @@ function externalOpen() {
 }
 
 onMounted(() => {
-  const BACKEND_URL = "https://apl.chromaserver.net/";
+  const BACKEND_URL = "https://apl.chromaserver.net/download-links";
   fetch(BACKEND_URL).then(async (x) => {
     const data: {
       windowsUrl: string;
