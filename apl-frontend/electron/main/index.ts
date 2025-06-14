@@ -157,14 +157,10 @@ app.on("second-instance", async (evt, cmd, wd) => {
     if (win?.isMinimized()) win.restore();
     win?.focus();
     buildContextMenu();
-
-    dialog.showErrorBox("Prout", "");
   }
 });
 
-app.on("open-url", (event, url) => {
-  dialog.showErrorBox("Prout", "");
-});
+app.on("open-url", (event, url) => {});
 
 app.on("activate", () => {
   const allWindows = BrowserWindow.getAllWindows();
