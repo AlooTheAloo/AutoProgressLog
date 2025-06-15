@@ -184,9 +184,9 @@ app.on("ready", async () => {
     await checkHealth(getConfig());
   }
 
-  if (CacheManager.exists) {
-    await init();
+  await init();
 
+  if (CacheManager.exists) {
     try {
       // TODO : Add an API call to create the webhook
 

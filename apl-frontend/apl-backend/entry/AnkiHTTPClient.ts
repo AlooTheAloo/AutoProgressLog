@@ -133,7 +133,7 @@ export default class AnkiHTTPClient {
   }
 
   public async downloadInitialDatabase(filePath: string): Promise<boolean> {
-    await this.getMetaUSN();
+    const usn = await this.getMetaUSN();
 
     const obj = await this.executeRequest(
       "/sync/download",
