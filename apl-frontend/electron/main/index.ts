@@ -157,6 +157,8 @@ app.on("second-instance", async (evt, cmd, wd) => {
     if (win?.isMinimized()) win.restore();
     win?.focus();
     buildContextMenu();
+
+    dialog.showErrorBox("Prout", "");
   }
 });
 
@@ -184,7 +186,8 @@ app.on("ready", async () => {
     await checkHealth(getConfig());
   }
 
-  await init();
+  if (CacheManager.exists) {
+    await init();
 
   if (CacheManager.exists) {
     try {
