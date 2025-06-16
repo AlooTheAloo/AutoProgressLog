@@ -87,18 +87,24 @@ export function ankiListeners() {
   });
 
   ipcMain.handle("anki-connect-start", async (event: any) => {
-    win?.webContents.send("anki-connect-message", "Authenticating");
-    if (login == undefined) return false;
+    try {
+      win?.webContents.send("anki-connect-message", "Authenticating");
+      if (login == undefined) return false;
 
-    const httpClient = new AnkiHTTPClient(login.url);
-    await httpClient.login(login?.username, login?.password);
-    return await connectFromClient(httpClient, login);
+      const httpClient = new AnkiHTTPClient(login.url);
+      await httpClient.login(login?.username, login?.password);
+      return await connectFromClient(httpClient, login);
+    } catch (e) {
+      console.log("Error connecting to Anki" + e);
+      return false;
+    }
   });
 
   async function connectFromClient(client: AnkiHTTPClient, login: ankiLogin) {
     if (login == undefined) return false;
     if (!client.isLoggedIn()) return false;
     win?.webContents.send("anki-connect-message", "Downloading Anki Database");
+
     await client.downloadInitialDatabase(ankiPath);
     const integration = await createAnkiIntegration(login);
 

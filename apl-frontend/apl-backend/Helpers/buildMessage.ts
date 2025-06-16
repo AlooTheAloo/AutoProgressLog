@@ -154,9 +154,9 @@ type clip = {
 
 async function tryScreenshot(
   page: Page,
-  path: `${string}.png` | `${string}.jpeg` | `${string}.webp`,
+  path: `${string}.png` | `${string}.jpeg`,
   clip: clip,
-  type: "png" | "jpeg" | "webp" | undefined,
+  type: "png" | "jpeg" | undefined,
   maxRetries = 3,
   timeoutMs = 5000
 ) {
@@ -164,7 +164,7 @@ async function tryScreenshot(
   for (let i = 0; i < maxRetries; i++) {
     try {
       await Promise.race([
-        page.screenshot({ path, type: "png", clip }),
+        page.screenshot({ path, type: type, clip }),
         new Promise((_, reject) =>
           setTimeout(() => reject(new Error("Screenshot timed out")), timeoutMs)
         ),
@@ -182,7 +182,6 @@ const extensionToType = (ext: ReportExtension) => {
   if (ext == ".png") return "png";
   if (ext == ".jpg") return "jpeg";
   if (ext == ".jpeg") return "jpeg";
-  if (ext == ".webp") return "webp";
 };
 
 const MOVING_AVERAGE_SIZE = 7;

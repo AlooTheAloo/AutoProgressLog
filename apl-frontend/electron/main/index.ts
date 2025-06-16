@@ -162,9 +162,7 @@ app.on("second-instance", async (evt, cmd, wd) => {
   }
 });
 
-app.on("open-url", (event, url) => {
-  dialog.showErrorBox("Prout", "");
-});
+app.on("open-url", (event, url) => {});
 
 app.on("activate", () => {
   const allWindows = BrowserWindow.getAllWindows();
@@ -191,6 +189,7 @@ app.on("ready", async () => {
   if (CacheManager.exists) {
     await init();
 
+  if (CacheManager.exists) {
     try {
       // TODO : Add an API call to create the webhook
 

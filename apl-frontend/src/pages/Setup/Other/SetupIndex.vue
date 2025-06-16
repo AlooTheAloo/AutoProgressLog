@@ -4,28 +4,44 @@ import { useWindowSize } from "@vueuse/core";
 import SetupBackground from "../../../components/Setup/SetupBackground.vue";
 import Button from "primevue/button";
 import Logo from "../../../assets/Logo.png";
-import { motion } from 'motion-v';
+import { motion } from "motion-v";
+import { onMounted } from "vue";
+import { ThemeManager } from "../../../util/theme-manager";
 
 const router = useRouter();
 function NextPage() {
   router.push("/setup/client-server-selection");
 }
 const { height } = useWindowSize();
+
+onMounted(() => {
+  ThemeManager.setTheme("dark");
+});
 </script>
 <template>
   <SetupBackground />
   <div class="flex">
-
-    <div class="p-12 w-full max-w-[60rem] bg-black min-h-screen flex flex-col justify-center">
+    <div
+      class="p-12 w-full max-w-[60rem] bg-black min-h-screen flex flex-col justify-center"
+    >
       <motion.div
         :initial="{ opacity: 0, y: 20, filter: 'blur(10px)' }"
-        :animate="{ opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 1 } }"
+        :animate="{
+          opacity: 1,
+          y: 0,
+          filter: 'blur(0px)',
+          transition: { duration: 1 },
+        }"
         class="flex flex-col items-start space-y-8"
       >
-        <img :src="Logo"alt="APL Logo"class="w-24 h-24 md:w-20 md:h-20 sm:w-16 sm:h-16 block mb-4"/>
+        <img
+          :src="Logo"
+          alt="APL Logo"
+          class="w-24 h-24 md:w-20 md:h-20 sm:w-16 sm:h-16 block mb-4"
+        />
         <h1 class="text-6xl font-semibold text-white leading-tight">
-          The immersion tracking app
-          that <span class="text-[#0FB4EC]">just works.</span>
+          The immersion tracking app that
+          <span class="text-[#0FB4EC]">just works.</span>
         </h1>
         <Button
           @click="NextPage"
@@ -37,7 +53,6 @@ const { height } = useWindowSize();
     </div>
   </div>
 </template>
-
 
 <style scoped>
 .fade-up-enter-active {

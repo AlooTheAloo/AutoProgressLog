@@ -28,8 +28,8 @@ export type AnkiOptions = {
   trackedDecks: number[];
 };
 
-export type ReportExtension = ".png" | ".jpg" | ".jpeg" | ".webp";
-export const reportExtensions = [".png", ".jpg", ".jpeg", ".webp"];
+export type ReportExtension = ".png" | ".jpg" | ".jpeg";
+export const reportExtensions = [".png", ".jpg", ".jpeg"];
 
 export type OutputOptions = {
   outputFile: {
