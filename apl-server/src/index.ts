@@ -35,6 +35,10 @@ export const app = new Elysia()
                         name: "Webhooks",
                         description: "Webhook endpoints for external integrations",
                     },
+                    {
+                        name: "Auth",
+                        description: "Authentication endpoints",
+                    },
                 ],
             },
         })
