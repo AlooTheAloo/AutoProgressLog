@@ -4,7 +4,7 @@ import {PrismaClient} from "@prisma/client";
 
 const prisma = new PrismaClient()
 
-export const loginProcedure = new Elysia({name: "login"}).post(
+export const loginRoute = new Elysia({name: "login"}).post(
     '/login',
     async ({body, set}) => {
         const {email} = body
@@ -14,6 +14,7 @@ export const loginProcedure = new Elysia({name: "login"}).post(
             set.status = "Created"
         }
         await createEmailToken(user.id)
+        //TODO: Send email with magic link
         return
     },
     {

@@ -3,8 +3,11 @@ import cors from "@elysiajs/cors";
 import swagger from "@elysiajs/swagger";
 import {downloadLinksRoute} from "./procedures/downloadLinks";
 import {initTogglNotifications, togglWebhook} from "./webhooks/toggl";
-import {rootRoute} from "./procedures/rootProcedure";
+import {rootRoute} from "./procedures/root";
 import {SocketManager} from "./socket/socketManager";
+import {loginRoute} from "./procedures/user/auth/login";
+import {validateRoute} from "./procedures/user/auth/validate";
+import {RateLimiterFactory} from "./plugins/RateLimiterFactory";
 
 const sm = new SocketManager();
 export const app = new Elysia()
@@ -45,6 +48,8 @@ export const app = new Elysia()
     )
     .use(rootRoute)
     .use(downloadLinksRoute)
+    .use(loginRoute.use(RateLimiterFactory.for("login")))
+    .use(validateRoute.use(RateLimiterFactory.for("validate")))
     .use(togglWebhook)
     .ws("/ws", {
         open(ws) {

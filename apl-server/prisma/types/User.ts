@@ -20,14 +20,15 @@ export const UserRelations = t.Object(
       t.Object(
         {
           id: t.Integer(),
-          createdAt: t.Date(),
-          updatedAt: t.Date(),
           token: t.String(),
           type: t.Union([t.Literal("EMAIL"), t.Literal("SESSION")], {
             additionalProperties: false,
           }),
           valid: t.Boolean(),
-          expiration: __nullable__(t.Date()),
+          expiration: t.Date(),
+          createdAt: t.Date(),
+          lastUsedAt: t.Date(),
+          deviceId: __nullable__(t.String()),
           deviceName: __nullable__(t.String()),
           userAgent: __nullable__(t.String()),
           userId: t.Integer(),

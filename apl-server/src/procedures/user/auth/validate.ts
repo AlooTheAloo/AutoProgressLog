@@ -1,8 +1,8 @@
 import {Elysia, t} from 'elysia'
 import {exchangeEmailTokenForSession} from '../../../util/auth'
 
-export const authenticateProcedure = new Elysia({name: 'authenticate'}).post(
-    '/authenticate',
+export const validateRoute = new Elysia({name: 'validate-token'}).post(
+    '/validate',
     async ({body, set}) => {
         const {email, emailToken} = body
         const dbToken = await exchangeEmailTokenForSession(email, emailToken)

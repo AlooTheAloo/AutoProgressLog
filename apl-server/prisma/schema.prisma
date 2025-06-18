@@ -26,12 +26,13 @@ model User {
 
 model Token {
   id         Int       @id @default(autoincrement())
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
   token      String    @unique
   type       TokenType
   valid      Boolean   @default(true)
-  expiration DateTime?
+  expiration DateTime
+  createdAt  DateTime  @default(now())
+  lastUsedAt DateTime  @default(now())
+  deviceId   String?
   deviceName String?
   userAgent  String?
   userId     Int

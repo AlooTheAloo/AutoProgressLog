@@ -7,14 +7,15 @@ import { __nullable__ } from "./__nullable__";
 export const TokenPlain = t.Object(
   {
     id: t.Integer(),
-    createdAt: t.Date(),
-    updatedAt: t.Date(),
     token: t.String(),
     type: t.Union([t.Literal("EMAIL"), t.Literal("SESSION")], {
       additionalProperties: false,
     }),
     valid: t.Boolean(),
-    expiration: __nullable__(t.Date()),
+    expiration: t.Date(),
+    createdAt: t.Date(),
+    lastUsedAt: t.Date(),
+    deviceId: __nullable__(t.String()),
     deviceName: __nullable__(t.String()),
     userAgent: __nullable__(t.String()),
     userId: t.Integer(),
@@ -43,7 +44,8 @@ export const TokenPlainInputCreate = t.Object(
     type: t.Union([t.Literal("EMAIL"), t.Literal("SESSION")], {
       additionalProperties: false,
     }),
-    expiration: t.Optional(__nullable__(t.Date())),
+    expiration: t.Date(),
+    lastUsedAt: t.Optional(t.Date()),
     deviceName: t.Optional(__nullable__(t.String())),
     userAgent: t.Optional(__nullable__(t.String())),
   },
@@ -58,7 +60,8 @@ export const TokenPlainInputUpdate = t.Object(
         additionalProperties: false,
       }),
     ),
-    expiration: t.Optional(__nullable__(t.Date())),
+    expiration: t.Optional(t.Date()),
+    lastUsedAt: t.Optional(t.Date()),
     deviceName: t.Optional(__nullable__(t.String())),
     userAgent: t.Optional(__nullable__(t.String())),
   },
@@ -110,14 +113,15 @@ export const TokenWhere = t.Partial(
           NOT: t.Union([Self, t.Array(Self, { additionalProperties: false })]),
           OR: t.Array(Self, { additionalProperties: false }),
           id: t.Integer(),
-          createdAt: t.Date(),
-          updatedAt: t.Date(),
           token: t.String(),
           type: t.Union([t.Literal("EMAIL"), t.Literal("SESSION")], {
             additionalProperties: false,
           }),
           valid: t.Boolean(),
           expiration: t.Date(),
+          createdAt: t.Date(),
+          lastUsedAt: t.Date(),
+          deviceId: t.String(),
           deviceName: t.String(),
           userAgent: t.String(),
           userId: t.Integer(),
@@ -161,14 +165,15 @@ export const TokenWhereUnique = t.Recursive(
           t.Object(
             {
               id: t.Integer(),
-              createdAt: t.Date(),
-              updatedAt: t.Date(),
               token: t.String(),
               type: t.Union([t.Literal("EMAIL"), t.Literal("SESSION")], {
                 additionalProperties: false,
               }),
               valid: t.Boolean(),
               expiration: t.Date(),
+              createdAt: t.Date(),
+              lastUsedAt: t.Date(),
+              deviceId: t.String(),
               deviceName: t.String(),
               userAgent: t.String(),
               userId: t.Integer(),
@@ -186,12 +191,13 @@ export const TokenSelect = t.Partial(
   t.Object(
     {
       id: t.Boolean(),
-      createdAt: t.Boolean(),
-      updatedAt: t.Boolean(),
       token: t.Boolean(),
       type: t.Boolean(),
       valid: t.Boolean(),
       expiration: t.Boolean(),
+      createdAt: t.Boolean(),
+      lastUsedAt: t.Boolean(),
+      deviceId: t.Boolean(),
       deviceName: t.Boolean(),
       userAgent: t.Boolean(),
       userId: t.Boolean(),
@@ -215,12 +221,6 @@ export const TokenOrderBy = t.Partial(
       id: t.Union([t.Literal("asc"), t.Literal("desc")], {
         additionalProperties: false,
       }),
-      createdAt: t.Union([t.Literal("asc"), t.Literal("desc")], {
-        additionalProperties: false,
-      }),
-      updatedAt: t.Union([t.Literal("asc"), t.Literal("desc")], {
-        additionalProperties: false,
-      }),
       token: t.Union([t.Literal("asc"), t.Literal("desc")], {
         additionalProperties: false,
       }),
@@ -228,6 +228,15 @@ export const TokenOrderBy = t.Partial(
         additionalProperties: false,
       }),
       expiration: t.Union([t.Literal("asc"), t.Literal("desc")], {
+        additionalProperties: false,
+      }),
+      createdAt: t.Union([t.Literal("asc"), t.Literal("desc")], {
+        additionalProperties: false,
+      }),
+      lastUsedAt: t.Union([t.Literal("asc"), t.Literal("desc")], {
+        additionalProperties: false,
+      }),
+      deviceId: t.Union([t.Literal("asc"), t.Literal("desc")], {
         additionalProperties: false,
       }),
       deviceName: t.Union([t.Literal("asc"), t.Literal("desc")], {
