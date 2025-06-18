@@ -10,7 +10,8 @@ import { ThemeManager } from "../../../util/theme-manager";
 
 const router = useRouter();
 function NextPage() {
-  router.push("/setup/client-server-selection");
+  console.log("A");
+  router.push("/setup/auth");
 }
 const { height } = useWindowSize();
 
