@@ -80,11 +80,14 @@ async function createListeners() {
   });
 
   SocketClient.instance.on("ActivityStart", async (event) => {
+    console.log("AStart");
     const lastEntry = await GetLastEntry();
     const seconds =
       (lastEntry?.toggl?.totalSeconds ?? 0) +
       Math.abs(dayjs(event.start).diff(dayjs(), "seconds"));
 
+    console.log("Connected : " + rpc?.isConnected);
+    if (!rpc?.isConnected) rpc?.login();
     await rpc!.user?.setActivity({
       details: `Immersing | ${(seconds / 3600).toFixed(2)} hours`,
       state: padToMinLength(event.activity, 2),
