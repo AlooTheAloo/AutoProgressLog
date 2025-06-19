@@ -29,7 +29,7 @@ model Token {
   token      String    @unique
   type       TokenType
   valid      Boolean   @default(true)
-  expiration DateTime
+  expiration DateTime?
   createdAt  DateTime  @default(now())
   lastUsedAt DateTime  @default(now())
   deviceId   String?

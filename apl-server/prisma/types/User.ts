@@ -25,7 +25,7 @@ export const UserRelations = t.Object(
             additionalProperties: false,
           }),
           valid: t.Boolean(),
-          expiration: t.Date(),
+          expiration: __nullable__(t.Date()),
           createdAt: t.Date(),
           lastUsedAt: t.Date(),
           deviceId: __nullable__(t.String()),

@@ -1,9 +1,9 @@
-import {Elysia} from "elysia";
-import {PrismaClient} from "@prisma/client";
+import {Elysia} from 'elysia'
+import {PrismaClient} from '@prisma/client'
 
 const prisma = new PrismaClient()
 
-export const authGuard = new Elysia({name: "auth-guard"}).derive(async ({headers, set}) => {
+export const authGuard = new Elysia({name: 'auth-guard'}).derive(async ({headers, set}) => {
     const authHeader = headers.authorization
     if (!authHeader?.startsWith('Bearer ')) {
         set.status = 401
@@ -11,16 +11,28 @@ export const authGuard = new Elysia({name: "auth-guard"}).derive(async ({headers
     }
 
     const tokenValue = authHeader.split(' ')[1]
+
     const token = await prisma.token.findUnique({
         where: {token: tokenValue},
-        include: {user: true}
+        include: {user: true},
     })
 
-    //@ts-ignore
-    if (!token || !token.valid || token.expiration < Date.now()) {
+    const now = new Date()
+
+    if (
+        !token ||
+        !token.valid ||
+        token.type !== 'SESSION' ||
+        (token.expiration && token.expiration < now)
+    ) {
         set.status = 401
-        throw new Error('Invalid token')
+        throw new Error('Invalid or expired session token')
     }
 
-    return {user: token.user}
+    await prisma.token.update({
+        where: {id: token.id},
+        data: {lastUsedAt: now},
+    })
+
+    return {user: token.user, sessionToken: tokenValue}
 })

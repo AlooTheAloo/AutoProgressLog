@@ -1,6 +1,8 @@
 import {randomUUID} from 'crypto'
 import {PrismaClient} from "@prisma/client";
 
+const prisma = new PrismaClient()
+
 /**
  * Creates a short-lived magic link token for email login.
  *
@@ -8,7 +10,6 @@ import {PrismaClient} from "@prisma/client";
  * @returns A UUID token valid for 15 minutes
  */
 export async function createEmailToken(userId: number) {
-    const prisma = new PrismaClient()
     const token = randomUUID()
     await prisma.token.create({
         data: {
@@ -26,30 +27,36 @@ export async function createEmailToken(userId: number) {
  *
  * @param email - The user's email
  * @param emailToken - The magic link token
- * @returns A session token string if valid, otherwise null
+ * @param device - Optional device fingerprinting info
+ * @returns A new session token
+ * @throws If the user or token is invalid
  */
-export async function exchangeEmailTokenForSession(email: string, emailToken: string) {
-    const prisma = new PrismaClient()
-    const user = await prisma.user.findUnique({
-        where: {email}, include: {tokens: true}
-    })
-    if (!user) throw new Error("User not found")
 
-    // @ts-ignore
-    const validToken = user.tokens.find(t => t.token === emailToken && t.type === "EMAIL" && t.valid && (!t.expiration || t.expiration > Date.now()))
-    if (!validToken) throw new Error("Invalid token")
-
-    await prisma.token.update({
-        where: {token: emailToken},
-        data: {valid: false}
+export async function exchangeEmailTokenForSession(
+    email: string,
+    emailToken: string,
+    device?: { deviceId?: string; deviceName?: string; userAgent?: string }) {
+    const user = await prisma.user.findUniqueOrThrow({
+        where: {email},
+        include: {tokens: true}
     })
 
+    const dbToken = user.tokens.find(t => t.token === emailToken && t.type === "EMAIL" && (t.expiration && t.expiration > new Date()))
+
+    if (!dbToken) {
+        throw new Error("Invalid or expired token")
+    }
+
+    // Create a new session token
     const sessionToken = randomUUID()
     return prisma.token.create({
         data: {
             token: sessionToken,
             type: "SESSION",
-            userId: user.id
-        }
-    });
+            userId: user.id,
+            deviceId: device?.deviceId,
+            deviceName: device?.deviceName,
+            userAgent: device?.userAgent,
+        },
+    })
 }

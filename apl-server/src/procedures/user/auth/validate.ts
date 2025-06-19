@@ -4,31 +4,45 @@ import {exchangeEmailTokenForSession} from '../../../util/auth'
 export const validateRoute = new Elysia({name: 'validate-token'}).post(
     '/validate',
     async ({body, set}) => {
-        const {email, emailToken} = body
-        const dbToken = await exchangeEmailTokenForSession(email, emailToken)
+        const {email, emailToken, deviceId, deviceName, userAgent} = body
+
+        const dbToken = await exchangeEmailTokenForSession(email, emailToken, {
+            deviceId,
+            deviceName,
+            userAgent,
+        })
+
         if (!dbToken) {
             set.status = 401
             return {error: 'Invalid or expired token'}
         }
-        return {token: dbToken.token}
+
+        return {
+            token: dbToken.token,
+            createdAt: dbToken.createdAt,
+        }
     },
     {
         body: t.Object({
             email: t.String({format: 'email', example: 'youssef@youssef.dev'}),
             emailToken: t.String({example: '4f5c54c6-1234-abc123'}),
+            deviceId: t.String({example: 'device-uuid-xyz'}),
+            deviceName: t.String({example: 'Bob’s MacBook Air'}),
+            userAgent: t.String({example: 'Electron 28.0.0'}),
         }),
         response: t.Union([
             t.Object({
                 token: t.String({description: 'Persistent session token'}),
+                createdAt: t.Date(),
             }),
             t.Object({
                 error: t.String(),
             }),
         ]),
         detail: {
-            summary: 'Authenticate user with magic link',
+            summary: 'Validate magic link token and create session',
             tags: ['Auth'],
-            description: 'Exchanges a valid magic link for a long-lived session token',
+            description: `Validates a short-lived email token and issues a persistent session token with device fingerprinting info.`,
         },
     }
 )
