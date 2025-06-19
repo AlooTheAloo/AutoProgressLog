@@ -99,11 +99,11 @@ onMounted(() => {
           <div class="flex flex-col gap-6 w-full">
             <div class="flex flex-col sm:flex-row sm:items-center gap-2 w-full">
               <div class="text-lg text-white sm:w-1/3">
-                AnkiWeb username (usually your email)
+                AnkiWeb username/email
               </div>
               <InputText
                 v-model="email"
-                placeholder="Username"
+                placeholder="Username/email"
                 fluid
                 class="w-full sm:flex-1"
               />

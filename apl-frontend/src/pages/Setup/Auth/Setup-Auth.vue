@@ -35,6 +35,10 @@ function startTimer() {
   }, 1000)
 }
 
+function NextPage() {
+  router.push("/setup/anki-home");
+}
+
 function SendEmail() {
   if (!isEmailValid.value) return
   emailSent.value = true
