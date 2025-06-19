@@ -1,4 +1,4 @@
-import { app, BrowserWindow, shell } from "electron";
+import { app, BrowserWindow, ipcMain, shell } from "electron";
 import { fileURLToPath } from "node:url";
 import registerEvents from "./Electron-Backend/";
 import path from "node:path";
@@ -158,9 +158,18 @@ app.on("second-instance", async (evt, cmd, wd) => {
     win?.focus();
     buildContextMenu();
   }
+
+  const text = cmd.pop();
+  if (text?.startsWith("apl://")) {
+    win?.webContents.send("open-url", text.slice(6));
+  }
 });
 
-app.on("open-url", (event, url) => {});
+app.on("open-url", (event, url) => {
+  if (url.startsWith("apl://")) {
+    win?.webContents.send("open-url", url.slice(6));
+  }
+});
 
 app.on("activate", () => {
   const allWindows = BrowserWindow.getAllWindows();
@@ -184,6 +193,7 @@ app.on("ready", async () => {
     await checkHealth(getConfig());
   }
 
+  // ZFSTD
   await init();
 
   if (CacheManager.exists) {

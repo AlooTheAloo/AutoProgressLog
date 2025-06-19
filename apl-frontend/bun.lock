@@ -38,6 +38,7 @@
         "marked": "^15.0.7",
         "modclean": "^3.0.0-beta.1",
         "motion-v": "^1.1.0-alpha.1",
+        "node-machine-id": "^1.1.12",
         "node-schedule": "^2.1.1",
         "path": "^0.12.7",
         "pickleparser": "^0.2.1",
@@ -1143,6 +1144,8 @@
     "node-api-version": ["node-api-version@0.2.1", "", { "dependencies": { "semver": "^7.3.5" } }, "sha512-2xP/IGGMmmSQpI1+O/k72jF/ykvZ89JeuKX3TLJAYPDVLUalrshrLHkeVcCCZqG/eEa635cr8IBYzgnDvM2O8Q=="],
 
     "node-gyp": ["node-gyp@8.4.1", "", { "dependencies": { "env-paths": "^2.2.0", "glob": "^7.1.4", "graceful-fs": "^4.2.6", "make-fetch-happen": "^9.1.0", "nopt": "^5.0.0", "npmlog": "^6.0.0", "rimraf": "^3.0.2", "semver": "^7.3.5", "tar": "^6.1.2", "which": "^2.0.2" }, "bin": { "node-gyp": "bin/node-gyp.js" } }, "sha512-olTJRgUtAb/hOXG0E93wZDs5YiJlgbXxTwQAFHyNlRsXQnYzUaF2aGgujZbw+hR8aF4ZG/rST57bWMWD16jr9w=="],
+
+    "node-machine-id": ["node-machine-id@1.1.12", "", {}, "sha512-QNABxbrPa3qEIfrE6GOJ7BYIuignnJw7iQ2YPbc3Nla1HzRJjXzZOiikfF8m7eAMfichLt3M4VgLOetqgDmgGQ=="],
 
     "node-releases": ["node-releases@2.0.19", "", {}, "sha512-xxOWJsBKtzAq7DY0J+DTzuz58K8e7sJbdgwkbMWQe8UYB6ekmsQ45q0M/tJDsGaZmbC+l7n57UV8Hl5tHxO9uw=="],
 

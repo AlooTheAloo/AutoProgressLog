@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import { shuffle } from "../../util/shuffle";
+import { useRouter } from "vue-router";
 
 const update_names = [
   "updates",
@@ -13,6 +14,12 @@ const update_names = [
 ];
 
 const message = ref("Preparing");
+
+const router = useRouter();
+
+window.ipcRenderer.on("2_0_0_upgrade", (evt, data: string) => {
+  router.push("/update/2_0_0");
+});
 
 window.ipcRenderer.on("update-update-message", (evt, data: string) => {
   console.log("update available", data);
