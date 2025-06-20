@@ -7,6 +7,7 @@ import ProgressSpinner from "primevue/progressspinner";
 const router = useRouter();
 import { InputText } from "primevue";
 import Logo from "../../assets/Logo.png";
+import PlexusEffect from "../../components/Common/PlexusEffect.vue";
 
 function NextPage() {
   router.push("/setup/client-server-selection");
@@ -57,6 +58,7 @@ onUnmounted(() => {
 });
 </script>
 <template>
+  <PlexusEffect />
   <div
     :style="{
       'background-image': `linear-gradient(to bottom right, #add8e6, #d8b4fe)`,
@@ -85,13 +87,9 @@ onUnmounted(() => {
           class="flex flex-col items-start space-y-6"
         >
           <div class="flex items-center space-x-2">
-          <img
-            :src="Logo"
-            alt="APL Logo"
-            class="w-12 h-12 sm:w-12 sm:h-12"
-          />
-          <span class="text-white text-s font-semibold">Account</span>
-        </div>
+            <img :src="Logo" alt="APL Logo" class="w-12 h-12 sm:w-12 sm:h-12" />
+            <span class="text-white text-s font-semibold">Account</span>
+          </div>
           <h1
             class="text-3xl w-full text-left font-semibold text-white leading-tight"
           >
