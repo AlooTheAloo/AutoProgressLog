@@ -167,7 +167,7 @@ const closeFirstDialog = () => {
           We're super excited to see what your learning journey looks like!
         </div>
         <Button severity="info" v-on:click="closeFirstDialog">
-          <div class="text-white">Understood!</div>
+          <div class="text-black">Understood!</div>
         </Button>
       </div>
     </template>
