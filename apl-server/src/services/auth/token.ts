@@ -1,7 +1,5 @@
 import {randomUUID} from 'crypto'
-import {PrismaClient} from "@prisma/client";
-
-const prisma = new PrismaClient()
+import prisma from '../../db/client'
 
 /**
  * Creates a short-lived magic link token for email login.

@@ -1,7 +1,5 @@
 import {Elysia} from 'elysia'
-import {PrismaClient} from '@prisma/client'
-
-const prisma = new PrismaClient()
+import prisma from '../db/client'
 
 export const authGuard = new Elysia({name: 'auth-guard'}).derive(async ({headers, set}) => {
     const authHeader = headers.authorization
