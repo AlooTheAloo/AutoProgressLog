@@ -1,5 +1,5 @@
 import {Elysia, t} from 'elysia'
-import {exchangeEmailTokenForSession} from '../../../util/auth'
+import {exchangeEmailTokenForSession} from '../../services/auth/token'
 
 export const validateRoute = new Elysia({name: 'validate-token'}).post(
     '/validate',

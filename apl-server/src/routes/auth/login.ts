@@ -1,5 +1,5 @@
 import {Elysia, t} from "elysia";
-import {createEmailToken} from "../../../util/auth";
+import {createEmailToken} from "../../services/auth/token";
 import {PrismaClient} from "@prisma/client";
 
 const prisma = new PrismaClient()

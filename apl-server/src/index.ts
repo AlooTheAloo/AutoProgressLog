@@ -1,13 +1,13 @@
 import {Elysia} from "elysia";
 import cors from "@elysiajs/cors";
 import swagger from "@elysiajs/swagger";
-import {downloadLinksRoute} from "./procedures/downloadLinks";
+import {downloadLinksRoute} from "./routes/downloadLinks";
 import {initTogglNotifications, togglWebhook} from "./webhooks/toggl";
-import {rootRoute} from "./procedures/root";
-import {SocketManager} from "./socket/socketManager";
-import {loginRoute} from "./procedures/user/auth/login";
-import {validateRoute} from "./procedures/user/auth/validate";
-import {RateLimiterFactory} from "./plugins/RateLimiterFactory";
+import {rootRoute} from "./routes/root";
+import {SocketManager} from "./sockets/manager";
+import {loginRoute} from "./routes/auth/login";
+import {validateRoute} from "./routes/auth/validate";
+import {RateLimiterFactory} from "./middlewares/rateLimiter";
 
 const sm = new SocketManager();
 export const app = new Elysia()

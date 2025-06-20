@@ -4,8 +4,8 @@ import {
   togglTokenToTogglID,
   removeSocket,
   sockToID,
-} from "./socketAuth";
-import createWebhook from "../util/toggl/createWebhook";
+} from "./auth";
+import createWebhook from "../integrations/toggl/createWebhook";
 
 export class SocketManager {
   private authListeners: ((ws: ElysiaWS) => void)[] = [];
