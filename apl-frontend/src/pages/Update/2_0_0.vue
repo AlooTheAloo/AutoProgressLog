@@ -2,10 +2,11 @@
 import { useRouter } from "vue-router";
 import Button from "primevue/button";
 import { motion } from "motion-v";
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, onUnmounted, ref } from "vue";
 import ProgressSpinner from "primevue/progressspinner";
 const router = useRouter();
 import { InputText } from "primevue";
+import Logo from "../../assets/Logo.png";
 
 function NextPage() {
   router.push("/setup/client-server-selection");
@@ -18,12 +19,26 @@ onMounted(() => {
 });
 
 const email = ref("");
+const countdown = ref(0);
+let timerId: number | null = null;
 
 const isEmailValid = computed(() => {
   const re = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g;
   console.log(email.value);
   return re.test(String(email.value).toLowerCase());
 });
+
+function startTimer() {
+  countdown.value = 30;
+  timerId = window.setInterval(() => {
+    if (countdown.value > 0) {
+      countdown.value--;
+    } else {
+      clearInterval(timerId!);
+      timerId = null;
+    }
+  }, 1000);
+}
 
 const emailSent = ref(false);
 
@@ -34,7 +49,12 @@ function SendEmail() {
     email.value,
     window.navigator.userAgent
   );
+  startTimer();
 }
+
+onUnmounted(() => {
+  if (timerId !== null) clearInterval(timerId);
+});
 </script>
 <template>
   <div
@@ -64,8 +84,16 @@ function SendEmail() {
           }"
           class="flex flex-col items-start space-y-6"
         >
+          <div class="flex items-center space-x-2">
+          <img
+            :src="Logo"
+            alt="APL Logo"
+            class="w-12 h-12 sm:w-12 sm:h-12"
+          />
+          <span class="text-white text-s font-semibold">Account</span>
+        </div>
           <h1
-            class="text-3xl w-full text-center font-semibold text-white leading-tight"
+            class="text-3xl w-full text-left font-semibold text-white leading-tight"
           >
             Hey! Let's create your APL account!
           </h1>
@@ -83,12 +111,18 @@ function SendEmail() {
               placeholder="john.doe@example.com"
               v-model="email"
             />
+          </div>
+          <div class="w-full flex justify-end">
             <Button
               @click="SendEmail"
+              :disabled="!isEmailValid || countdown > 0"
               class="w-[200px] p-3 !rounded-full transition-all"
-              :disabled="!isEmailValid"
             >
-              <span class="text-md font-semibold text-black">Send Email</span>
+              <div class="inline-flex items-center space-x-2 whitespace-nowrap">
+                <span class="text-xl font-bold text-black">
+                  {{ countdown > 0 ? `Resend in ${countdown}s` : "Send Email" }}
+                </span>
+              </div>
             </Button>
           </div>
         </motion.div>

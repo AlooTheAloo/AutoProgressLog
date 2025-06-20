@@ -25,6 +25,18 @@ const handleWorked = (worked: boolean) => {
   }
 };
 
+function startTimer() {
+  countdown.value = 30;
+  timerId = window.setInterval(() => {
+    if (countdown.value > 0) {
+      countdown.value--;
+    } else {
+      clearInterval(timerId!);
+      timerId = null;
+    }
+  }, 1000);
+}
+
 window.ipcRenderer.on(
   "anki-multiple-profiles-detected",
   (sender, p: { name: string; deckCount: number }[]) => {

@@ -35,17 +35,15 @@ function Confirm() {
 
 <template>
   <SetupBackground></SetupBackground>
-<div class="flex w-screen">
+  <div class="flex w-screen">
     <div
-      class="p-4 sm:p-12 flex flex-col justify-between
-             w-full max-w-[60rem] bg-black min-h-screen"
+      class="p-4 sm:p-12 flex flex-col justify-between w-full max-w-[60rem] bg-black min-h-screen"
     >
       <div class="space-y-6">
-        <img :src="Logo" alt="APL Logo" class="w-16 h-16 sm:w-20 sm:h-20"/>
-        <BackButton route="/setup/index"/>
+        <img :src="Logo" alt="APL Logo" class="w-16 h-16 sm:w-20 sm:h-20" />
+        <BackButton route="/setup/index" />
         <h1
-          class="text-xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl
-                 font-semibold text-white leading-tight"
+          class="text-xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-semibold text-white leading-tight"
         >
           At what time will the reports be generated ?
         </h1>
@@ -57,26 +55,23 @@ function Confirm() {
         </p>
         <div class="flex flex-col gap-1 w-full">
           <p class="text-lg font-semibold">Generate at :</p>
-              <DatePicker
-                hour-format="12"
-                class="h-12"
-                id="datepicker-timeonly"
-                v-model="selectedTime"
-                timeOnly
-              />
+          <DatePicker
+            hour-format="12"
+            class="h-12"
+            id="datepicker-timeonly"
+            v-model="selectedTime"
+            timeOnly
+          />
         </div>
       </div>
-        <div class="flex justify-end">
-          <Button
-          @click="Confirm"
-          class="w-[300px] p-3 !rounded-full"
-        >
+      <div class="flex justify-end">
+        <Button @click="Confirm" class="w-[300px] p-3 !rounded-full">
           <span class="text-xl font-bold text-black">Continue</span>
         </Button>
       </div>
     </div>
     <div class="flex-grow"></div>
-  </div>  
+  </div>
 
   <!-- <SetupBackground/>
 
