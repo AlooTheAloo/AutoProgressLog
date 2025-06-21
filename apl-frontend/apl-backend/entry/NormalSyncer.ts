@@ -1,6 +1,8 @@
 import dayjs from "dayjs";
 import AnkiHTTPClient from "./AnkiHTTPClient";
 import Storage from "./Storage";
+import { fileURLToPath } from "url";
+import path from "path";
 
 export interface Chunk {
   done: boolean;

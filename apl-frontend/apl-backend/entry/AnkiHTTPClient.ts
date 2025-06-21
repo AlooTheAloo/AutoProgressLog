@@ -2,6 +2,8 @@ import * as fzstd from "fzstd";
 import { writeFileSync } from "fs";
 import { Chunk } from "./NormalSyncer";
 import { init, compress } from "@bokuweb/zstd-wasm";
+import path from "path";
+import { cleanAnkiDB } from "./DBOperations";
 
 export interface Graves {
   cards: string[];
@@ -144,6 +146,10 @@ export default class AnkiHTTPClient {
     );
     if (obj == undefined) return false;
     writeFileSync(filePath, obj);
+
+    // Slims down ~98% of the database size
+    await cleanAnkiDB();
+
     return true;
   }
 
