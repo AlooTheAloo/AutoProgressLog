@@ -244,14 +244,12 @@ app.on("ready", async () => {
   }
 
   // Register the APL protocol
-  if (process.defaultApp && !isDev) {
+  if (!isDev) {
     if (process.argv.length >= 2) {
       app.setAsDefaultProtocolClient("apl", process.execPath, [
         path.resolve(process.argv[1]),
       ]);
     }
-  } else {
-    app.setAsDefaultProtocolClient("apl");
   }
 });
 
