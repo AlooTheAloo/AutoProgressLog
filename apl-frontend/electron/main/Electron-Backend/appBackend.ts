@@ -6,6 +6,7 @@ import { runGeneration } from "../../../apl-backend/generate/generate";
 import { createWindow, win } from "..";
 import { setSyncing } from "../../../apl-backend/generate/sync";
 import { getConfig } from "../../../apl-backend/Helpers/getConfig";
+import { upgrading } from "../../../apl-backend/apl-upgrade";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -30,7 +31,7 @@ export async function buildContextMenu() {
     },
     {
       label: "Generate report",
-      enabled: getConfig() != undefined,
+      enabled: getConfig() != undefined && !upgrading,
       type: "normal",
       click: async () => {
         if (await runChecks()) {

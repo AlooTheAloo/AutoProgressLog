@@ -1,4 +1,4 @@
-import { app, BrowserWindow, shell } from "electron";
+import { app, BrowserWindow, ipcMain, shell } from "electron";
 import { fileURLToPath } from "node:url";
 import registerEvents from "./Electron-Backend/";
 import path from "node:path";
@@ -157,12 +157,19 @@ app.on("second-instance", async (evt, cmd, wd) => {
     if (win?.isMinimized()) win.restore();
     win?.focus();
     buildContextMenu();
+  }
 
-    dialog.showErrorBox("Prout", "");
+  const text = cmd.pop();
+  if (text?.startsWith("apl://")) {
+    win?.webContents.send("open-url", text.slice(6));
   }
 });
 
-app.on("open-url", (event, url) => {});
+app.on("open-url", (event, url) => {
+  if (url.startsWith("apl://")) {
+    win?.webContents.send("open-url", url.slice(6));
+  }
+});
 
 app.on("activate", () => {
   const allWindows = BrowserWindow.getAllWindows();
@@ -186,8 +193,8 @@ app.on("ready", async () => {
     await checkHealth(getConfig());
   }
 
-  if (CacheManager.exists) {
-    await init();
+  // ZFSTD
+  await init();
 
   if (CacheManager.exists) {
     try {
@@ -237,14 +244,12 @@ app.on("ready", async () => {
   }
 
   // Register the APL protocol
-  if (process.defaultApp && !isDev) {
+  if (!isDev) {
     if (process.argv.length >= 2) {
       app.setAsDefaultProtocolClient("apl", process.execPath, [
         path.resolve(process.argv[1]),
       ]);
     }
-  } else {
-    app.setAsDefaultProtocolClient("apl");
   }
 });
 

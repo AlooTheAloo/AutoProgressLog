@@ -15,6 +15,7 @@ import GrainyColor from "../../assets/GrainyColor.png";
 import Report from "../../assets/Report.png";
 
 import Logo from "../../assets/Logo.png";
+import Hey from "../../assets/Hey !.gif";
 import { Options } from "../../../apl-backend/types/options";
 import { DashboardDTO } from "../../../electron/main/Electron-Backend/types/Dashboard";
 
@@ -142,12 +143,10 @@ const closeFirstDialog = () => {
   >
     <template #container="{ closeCallback }">
       <div class="w-full relative">
-        <img :src="GrainyColor" class="rounded-lg w-full h-full" />
+        <img :src="Hey" class="rounded-lg w-full h-full" />
         <div
           class="absolute inset-0 flex items-center justify-center text-3xl font-bold gap-5"
         >
-          <img :src="Logo" class="w-14 h-14 mr-2 bg-black" />
-          <div>Hey! ✌️</div>
         </div>
       </div>
       <div
@@ -168,7 +167,7 @@ const closeFirstDialog = () => {
           We're super excited to see what your learning journey looks like!
         </div>
         <Button severity="info" v-on:click="closeFirstDialog">
-          <div class="text-white">Understood!</div>
+          <div class="text-black">Understood!</div>
         </Button>
       </div>
     </template>
