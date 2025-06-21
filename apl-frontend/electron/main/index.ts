@@ -271,4 +271,4 @@ app.on("ready", async () => {
       unpack: true,
     });
   }
-})();
+});
