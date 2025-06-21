@@ -3,7 +3,7 @@ import {downloadLinksRoute} from "./downloadLinks";
 import {rootRoute} from "./root";
 import {Elysia} from "elysia";
 
-export const registeredRoutes = new Elysia()
-        .use(authRoutes)
-        .use(downloadLinksRoute)
-        .use(rootRoute);
+export const registeredRoutes = new Elysia({name: 'registered-routes'})
+    .use(authRoutes)
+    .use(downloadLinksRoute)
+    .use(rootRoute);
