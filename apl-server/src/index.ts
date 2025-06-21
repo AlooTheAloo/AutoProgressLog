@@ -44,17 +44,17 @@ export const app = new Elysia()
     )
     .use(registeredRoutes)
     .use(togglWebhook)
-    // .ws("/ws", {
-    //     open(ws) {
-    //         sm.open(ws);
-    //     },
-    //     message(ws, message) {
-    //         sm.message(ws, message);
-    //     },
-    //     close(ws) {
-    //         sm.close(ws);
-    //     },
-    // })
+    .ws("/ws", {
+        open(ws) {
+            sm.open(ws);
+        },
+        message(ws, message) {
+            sm.message(ws, message);
+        },
+        close(ws) {
+            sm.close(ws);
+        },
+    })
     .listen(3000, (app) => {
         console.log(`APL Server is running on http://${app.hostname}:${app.port}/`);
     });
