@@ -1,10 +1,5 @@
 import { ElysiaWS } from "elysia/dist/ws";
-import {
-  addSocket,
-  togglTokenToTogglID,
-  removeSocket,
-  sockToID,
-} from "./auth";
+import { addSocket, togglTokenToTogglID, removeSocket, sockToID } from "./auth";
 import createWebhook from "../integrations/toggl/createWebhook";
 
 export class SocketManager {
@@ -47,7 +42,17 @@ export class SocketManager {
     }
 
     if (message.type === "ping") {
-      console.log("Ping !");
+      const id = await sockToID(ws);
+
+      // Close stale connection, force socket to reconnect
+      if (!id) {
+        console.log("Closing stale connection with " + ws.id);
+        ws.close(401);
+        return;
+      }
+
+      SocketManager.clients.set(id, ws);
+      console.log("Ping from " + id);
       ws.send(JSON.stringify({ type: "pong", payload: {} }));
       return;
     }
@@ -64,13 +69,22 @@ export class SocketManager {
 
   public send<T>(to: string, message: string, data: T) {
     console.log("Attempting to send message to " + to);
-    if (SocketManager.clients.has(to)) {
-      console.log("Snding message to " + to);
-      SocketManager.clients.get(to)?.send({
-        type: message,
-        payload: data,
-      });
+    const ws = SocketManager.clients.get(to);
+    console.log("The websocket is state " + ws?.readyState);
+
+    if (!ws) {
+      console.warn("No socket found for " + to);
+      return;
     }
+
+    if (ws.readyState == 3) {
+      console.warn("Socket for " + to + " is closed. Removing...");
+      SocketManager.clients.delete(to);
+      return;
+    }
+
+    console.log("Sending message to " + to);
+    ws.send(JSON.stringify({ type: message, payload: data }));
   }
 
   public addAuthListener(callback: (ws: ElysiaWS) => void) {

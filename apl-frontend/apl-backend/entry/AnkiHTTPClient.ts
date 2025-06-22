@@ -3,7 +3,7 @@ import { writeFileSync } from "fs";
 import { Chunk } from "./NormalSyncer";
 import { init, compress } from "@bokuweb/zstd-wasm";
 import path from "path";
-import { cleanAnkiDB } from "./DBOperations";
+import { checkIntegrity, cleanAnkiDB } from "./DBOperations";
 
 export interface Graves {
   cards: string[];
@@ -148,7 +148,11 @@ export default class AnkiHTTPClient {
     writeFileSync(filePath, obj);
 
     // Slims down ~98% of the database size
-    await cleanAnkiDB();
+    const integrity = await cleanAnkiDB();
+
+    if (!integrity) {
+      return false;
+    }
 
     return true;
   }

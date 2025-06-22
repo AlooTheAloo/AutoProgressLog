@@ -3,6 +3,7 @@ import { fileURLToPath } from "url";
 import { ankiPath } from "../Helpers/getConfig";
 import sqlite3 from "sqlite3";
 import fs from "fs";
+import dayjs, { Dayjs } from "dayjs";
 
 const CleanAnkiDB = `
     PRAGMA foreign_keys = OFF;
@@ -90,23 +91,51 @@ const ClearOldRevlog = `
 `;
 
 export async function cleanAnkiDB() {
-  await run(CleanAnkiDB);
+  return await run(CleanAnkiDB);
 }
 
 export async function clearOldRevlog() {
-  await run(ClearOldRevlog);
+  return await run(ClearOldRevlog);
 }
 
-function run(sql: string): Promise<void> {
+export async function checkIntegrity(): Promise<boolean> {
+  return new Promise<boolean>((res, rej) => {
+    const db = new sqlite3.Database(ankiPath, (err) => {
+      if (err) {
+        console.error("Could not open database", err);
+        return;
+      }
+
+      db.get(
+        "PRAGMA integrity_check;",
+        (err, row: { integrity_check: string }) => {
+          if (err) {
+            console.error("Error running integrity check", err);
+            res(false);
+          } else if (row.integrity_check === "ok") {
+            res(true);
+          } else {
+            console.error("Database is corrupt:", row.integrity_check);
+            res(false);
+          }
+
+          db.close();
+        }
+      );
+    });
+  });
+}
+
+function run(sql: string): Promise<boolean> {
   return new Promise((resolve, reject) => {
     const db = new sqlite3.Database(ankiPath, (openErr) => {
-      if (openErr) return reject(openErr);
+      if (openErr) return resolve(false);
 
       db.exec(sql, (execErr) => {
         db.close((closeErr) => {
-          if (execErr) return reject(execErr);
-          if (closeErr) return reject(closeErr);
-          resolve();
+          if (execErr) return resolve(false);
+          if (closeErr) return reject(false);
+          resolve(true);
         });
       });
     });

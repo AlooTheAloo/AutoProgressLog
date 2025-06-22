@@ -199,13 +199,9 @@ app.on("ready", async () => {
   if (CacheManager.exists) {
     try {
       // TODO : Add an API call to create the webhook
-
-      // Create the socket client, accessible through the singleton
-      console.log("Waiting for init...");
       await new SocketClient().init({
         token: getConfig()?.toggl.togglToken ?? "",
       });
-      console.log("Init done");
     } catch (e) {
       console.log("Failed to init socket client");
       console.log(e);
@@ -253,7 +249,7 @@ app.on("ready", async () => {
   }
 });
 
-(async () => {
+async () => {
   const cachedir = path.join(app.getPath("home"), ".cache", "puppeteer");
   const browsers = await getInstalledBrowsers({
     cacheDir: cachedir,
@@ -271,4 +267,4 @@ app.on("ready", async () => {
       unpack: true,
     });
   }
-});
+};

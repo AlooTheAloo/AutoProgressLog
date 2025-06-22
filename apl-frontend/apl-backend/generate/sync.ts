@@ -31,6 +31,7 @@ import NormalSyncer from "../entry/NormalSyncer";
 import AnkiHTTPClient from "../entry/AnkiHTTPClient";
 import Storage from "../entry/Storage";
 import { NotificationManager } from "../Helpers/notifications";
+import { clearOldRevlog } from "../entry/DBOperations";
 
 export interface AnkiSyncData {
   cardReview: number;
@@ -208,6 +209,9 @@ export async function syncAnki(isReport = false): Promise<AnkiSyncData | null> {
         "APL is unable to connect with your anki account. <br> <b>Potential cause of error : Never tested anki key.</b> ",
     });
     return null;
+  } else {
+    // Everything worked fine, slim out the Anki DB
+    clearOldRevlog();
   }
   return {
     cardReview: cardReview,

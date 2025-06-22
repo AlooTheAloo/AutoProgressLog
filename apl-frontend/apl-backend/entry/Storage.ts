@@ -79,6 +79,7 @@ export default class Storage {
 
   // Entry is an array of the form [id, nid, did, ord, mod, usn, type, queue, due, ivl, factor, reps, lapses, left, odue, odid, flags, data]
   async addOrUpdateCardIfNewer(entry: CardEntry, pendingUsn: number) {
+    console.log("Adding or updating card", entry[0]);
     return new Promise<void>((s, j) => {
       this.db
         .prepare(

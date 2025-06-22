@@ -6,6 +6,7 @@ import { getConfig } from "../../../../apl-backend/Helpers/getConfig";
 import { onConfigChange } from "../SettingsListeners";
 import { Options } from "../../../../apl-backend/types/options";
 import { SocketClient } from "../Socket/SocketClient";
+import { Socket } from "dgram";
 
 type miniEvent = {
   activity: string;
@@ -61,12 +62,13 @@ async function createListeners() {
   });
 
   SocketClient.instance.on("ActivityStart", async (event) => {
+    console.log("RECEIVED ACTIVITY START");
     const lastEntry = await GetLastEntry();
     const seconds =
       (lastEntry?.toggl?.totalSeconds ?? 0) +
       Math.abs(dayjs(event.start).diff(dayjs(), "seconds"));
 
-    if (!rpc?.isConnected) rpc?.login();
+    if (!rpc?.isConnected) await rpc?.login();
     await rpc!.user?.setActivity({
       details: `Immersing | ${(seconds / 3600).toFixed(2)} hours`,
       state: padToMinLength(event.activity, 2),
@@ -77,9 +79,15 @@ async function createListeners() {
     currentActivity = event;
   });
 
-  SocketClient.instance.on("ActivityStop", (event) => {
+  SocketClient.instance.on("ClearActivity", async (event) => {
+    if (!rpc?.isConnected) await rpc?.login();
+    currentActivity = null;
+    rpc?.user?.clearActivity();
+  });
+
+  SocketClient.instance.on("ActivityStop", async (event) => {
     if (event.id != currentActivity?.id) return;
-    if (!rpc?.isConnected) rpc?.login();
+    if (!rpc?.isConnected) await rpc?.login();
 
     currentActivity = null;
     rpc?.user?.clearActivity();

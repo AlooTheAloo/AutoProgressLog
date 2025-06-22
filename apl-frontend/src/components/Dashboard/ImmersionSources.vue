@@ -104,7 +104,7 @@ const colors = computed(() => {
 });
 
 let gradient = new NWayInterpol(
-  "var(--primary-color)",
+  "#8B61D0",
   "#73D562",
   "#D57AFF",
   "#F74E8F",

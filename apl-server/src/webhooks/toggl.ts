@@ -136,6 +136,8 @@ export function initTogglNotifications() {
         "ActivityStart",
         current_Activities.get(id)
       );
+    } else {
+      SocketManager.instance.send(id, "ClearActivity", {});
     }
   });
 }

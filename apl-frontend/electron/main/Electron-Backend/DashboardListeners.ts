@@ -29,6 +29,7 @@ import {
 import { readFile } from "fs";
 import { promises as fsPromises } from "fs";
 import sharp from "sharp";
+import { SocketClient } from "./Socket/SocketClient";
 
 export function dashboardListeners() {
   ipcMain.handle("isSyncing", async (event: any) => {
