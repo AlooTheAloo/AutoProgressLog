@@ -53,12 +53,14 @@ export class SocketClient {
         console.warn(`WebSocket closed: ${event.code} ${event.reason}`);
         this.stopHeartbeat();
         if (this.shouldReconnect && !this.isReconnecting) {
+          console.log("reconnecting");
           this.reconnect();
         }
       });
 
       this.socket.addEventListener("message", (event) => {
         try {
+          console.log("Message! " + event.data);
           const parsed = JSON.parse(event.data.toString());
           const { type, payload } = parsed;
           const listener = this.eventListeners[type as keyof EventMap];
@@ -117,17 +119,18 @@ export class SocketClient {
   }
 
   public disconnect(): void {
-    this.shouldReconnect = false;
+    // this.shouldReconnect = false;
     this.socket?.close();
   }
 
   private startHeartbeat() {
     this.stopHeartbeat();
     this.heartbeatInterval = setInterval(() => {
+      console.log("hearbeat");
       if (this.socket?.readyState === WebSocket.OPEN) {
         this.socket.send(JSON.stringify({ type: "ping", payload: {} }));
       }
-    }, 30000);
+    }, 5000);
   }
 
   private stopHeartbeat() {
@@ -141,4 +144,5 @@ export class SocketClient {
 type EventMap = {
   ActivityStart: { activity: string; start: string; id: string };
   ActivityStop: { id: string };
+  ClearActivity: {};
 };

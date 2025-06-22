@@ -65,12 +65,12 @@ async function sync() {
     console.log(maybe);
     if (!("error" in maybe)) {
       dto.value = maybe;
-      lastSyncTime.value = getLastSyncTime();
     }
   } catch (error) {
     console.error("Error syncing:", error);
   } finally {
     syncing.value = false;
+    lastSyncTime.value = getLastSyncTime();
   }
 }
 
@@ -146,8 +146,7 @@ const closeFirstDialog = () => {
         <img :src="Hey" class="rounded-lg w-full h-full" />
         <div
           class="absolute inset-0 flex items-center justify-center text-3xl font-bold gap-5"
-        >
-        </div>
+        ></div>
       </div>
       <div
         class="font-bold flex flex-col gap-4 py-6 px-5 bg-black rounded-b-[1rem]"
@@ -179,9 +178,18 @@ const closeFirstDialog = () => {
     <ProgressSpinner />
   </div>
   <div v-else class="flex flex-col w-full h-full overflow-auto">
-    <div class="flex flex-col flex-grow w-full h-full items-center">
+    <div
+      style="
+        display: flex;
+        flex-direction: column;
+        /* ensure scroll or clip occurs if overflow */
+        height: 100%;
+      "
+      class="flex flex-col flex-grow w-full h-full items-center my-5"
+    >
+      <div class="mt-auto"></div>
       <div
-        class="flex w-[45rem] 1720:w-[91rem] h-20 items-center my-5 justify-between gap-5"
+        class="flex w-[45rem] 1720:w-[91rem] h-20 items-center mb-5 justify-between gap-5"
       >
         <div>
           <img
@@ -274,9 +282,10 @@ const closeFirstDialog = () => {
         </div>
       </div>
 
-      <div class="flex w-full px-10 flex-grow 1720:mt-10">
+      <div class="flex w-full px-10 1720:mt-10">
         <DashboardBody :dto="dto" :syncing="generating_report" />
       </div>
+      <div class="mt-auto"></div>
     </div>
   </div>
 </template>

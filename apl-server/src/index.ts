@@ -1,10 +1,9 @@
 import {Elysia} from "elysia";
 import cors from "@elysiajs/cors";
 import swagger from "@elysiajs/swagger";
-import {downloadLinksRoute} from "./procedures/downloadLinks";
 import {initTogglNotifications, togglWebhook} from "./webhooks/toggl";
-import {rootRoute} from "./procedures/rootProcedure";
-import {SocketManager} from "./socket/socketManager";
+import {SocketManager} from "./sockets/manager";
+import {registeredRoutes} from "./routes";
 
 const sm = new SocketManager();
 export const app = new Elysia()
@@ -35,12 +34,15 @@ export const app = new Elysia()
                         name: "Webhooks",
                         description: "Webhook endpoints for external integrations",
                     },
+                    {
+                        name: "Auth",
+                        description: "Authentication endpoints",
+                    },
                 ],
             },
         })
     )
-    .use(rootRoute)
-    .use(downloadLinksRoute)
+    .use(registeredRoutes)
     .use(togglWebhook)
     .ws("/ws", {
         open(ws) {

@@ -7,32 +7,111 @@ import { __nullable__ } from "./__nullable__";
 export const UserPlain = t.Object(
   {
     id: t.Integer(),
-    createdAt: t.Date(),
     email: t.String(),
-    name: __nullable__(t.String()),
+    firstName: __nullable__(t.String()),
+    lastName: __nullable__(t.String()),
   },
   { additionalProperties: false },
 );
 
-export const UserRelations = t.Object({}, { additionalProperties: false });
+export const UserRelations = t.Object(
+  {
+    tokens: t.Array(
+      t.Object(
+        {
+          id: t.Integer(),
+          token: t.String(),
+          type: t.Union([t.Literal("EMAIL"), t.Literal("SESSION")], {
+            additionalProperties: false,
+          }),
+          valid: t.Boolean(),
+          expiration: __nullable__(t.Date()),
+          createdAt: t.Date(),
+          lastUsedAt: t.Date(),
+          deviceId: __nullable__(t.String()),
+          deviceName: __nullable__(t.String()),
+          userAgent: __nullable__(t.String()),
+          userId: t.Integer(),
+        },
+        { additionalProperties: false },
+      ),
+      { additionalProperties: false },
+    ),
+  },
+  { additionalProperties: false },
+);
 
 export const UserPlainInputCreate = t.Object(
-  { email: t.String(), name: t.Optional(__nullable__(t.String())) },
+  {
+    email: t.String(),
+    firstName: t.Optional(__nullable__(t.String())),
+    lastName: t.Optional(__nullable__(t.String())),
+  },
   { additionalProperties: false },
 );
 
 export const UserPlainInputUpdate = t.Object(
-  { email: t.Optional(t.String()), name: t.Optional(__nullable__(t.String())) },
+  {
+    email: t.Optional(t.String()),
+    firstName: t.Optional(__nullable__(t.String())),
+    lastName: t.Optional(__nullable__(t.String())),
+  },
   { additionalProperties: false },
 );
 
 export const UserRelationsInputCreate = t.Object(
-  {},
+  {
+    tokens: t.Optional(
+      t.Object(
+        {
+          connect: t.Array(
+            t.Object(
+              {
+                id: t.Integer({ additionalProperties: false }),
+              },
+              { additionalProperties: false },
+            ),
+            { additionalProperties: false },
+          ),
+        },
+        { additionalProperties: false },
+      ),
+    ),
+  },
   { additionalProperties: false },
 );
 
 export const UserRelationsInputUpdate = t.Partial(
-  t.Object({}, { additionalProperties: false }),
+  t.Object(
+    {
+      tokens: t.Partial(
+        t.Object(
+          {
+            connect: t.Array(
+              t.Object(
+                {
+                  id: t.Integer({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+            disconnect: t.Array(
+              t.Object(
+                {
+                  id: t.Integer({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+          },
+          { additionalProperties: false },
+        ),
+      ),
+    },
+    { additionalProperties: false },
+  ),
 );
 
 export const UserWhere = t.Partial(
@@ -44,9 +123,9 @@ export const UserWhere = t.Partial(
           NOT: t.Union([Self, t.Array(Self, { additionalProperties: false })]),
           OR: t.Array(Self, { additionalProperties: false }),
           id: t.Integer(),
-          createdAt: t.Date(),
           email: t.String(),
-          name: t.String(),
+          firstName: t.String(),
+          lastName: t.String(),
         },
         { additionalProperties: false },
       ),
@@ -87,9 +166,9 @@ export const UserWhereUnique = t.Recursive(
           t.Object(
             {
               id: t.Integer(),
-              createdAt: t.Date(),
               email: t.String(),
-              name: t.String(),
+              firstName: t.String(),
+              lastName: t.String(),
             },
             { additionalProperties: false },
           ),
@@ -104,9 +183,10 @@ export const UserSelect = t.Partial(
   t.Object(
     {
       id: t.Boolean(),
-      createdAt: t.Boolean(),
       email: t.Boolean(),
-      name: t.Boolean(),
+      firstName: t.Boolean(),
+      lastName: t.Boolean(),
+      tokens: t.Boolean(),
       _count: t.Boolean(),
     },
     { additionalProperties: false },
@@ -114,7 +194,10 @@ export const UserSelect = t.Partial(
 );
 
 export const UserInclude = t.Partial(
-  t.Object({ _count: t.Boolean() }, { additionalProperties: false }),
+  t.Object(
+    { tokens: t.Boolean(), _count: t.Boolean() },
+    { additionalProperties: false },
+  ),
 );
 
 export const UserOrderBy = t.Partial(
@@ -123,13 +206,13 @@ export const UserOrderBy = t.Partial(
       id: t.Union([t.Literal("asc"), t.Literal("desc")], {
         additionalProperties: false,
       }),
-      createdAt: t.Union([t.Literal("asc"), t.Literal("desc")], {
-        additionalProperties: false,
-      }),
       email: t.Union([t.Literal("asc"), t.Literal("desc")], {
         additionalProperties: false,
       }),
-      name: t.Union([t.Literal("asc"), t.Literal("desc")], {
+      firstName: t.Union([t.Literal("asc"), t.Literal("desc")], {
+        additionalProperties: false,
+      }),
+      lastName: t.Union([t.Literal("asc"), t.Literal("desc")], {
         additionalProperties: false,
       }),
     },

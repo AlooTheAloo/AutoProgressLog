@@ -1,5 +1,5 @@
 import Elysia, { t } from "elysia";
-import createWebhook from "../../util/toggl/createWebhook";
+import createWebhook from "../../integrations/toggl/createWebhook";
 
 const t_createWebhookBodySchema = t.Object({
   workspaceID: t.Number(),

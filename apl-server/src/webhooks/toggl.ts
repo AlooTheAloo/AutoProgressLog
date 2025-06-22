@@ -1,6 +1,6 @@
 import Elysia, { t } from "elysia";
-import { SocketManager } from "../socket/socketManager";
-import { sockToID } from "../socket/socketAuth";
+import { SocketManager } from "../sockets/manager";
+import { sockToID } from "../sockets/auth";
 
 const metadataPingSchema = t.Object({
   request_type: t.Literal("POST"),
@@ -136,6 +136,8 @@ export function initTogglNotifications() {
         "ActivityStart",
         current_Activities.get(id)
       );
+    } else {
+      SocketManager.instance.send(id, "ClearActivity", {});
     }
   });
 }

@@ -8,17 +8,38 @@ generator client {
 }
 
 generator prismabox {
-  provider= "prismabox"
-  output   = "./types"
-  typeboxImportVariableName = "t"
+  provider                    = "prismabox"
+  output                      = "./types"
+  typeboxImportVariableName   = "t"
   typeboxImportDependencyName = "elysia"
-  additionalProperties = false
-  inputModel = true
+  additionalProperties        = false
+  inputModel                  = true
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  email     String   @unique
-  name      String?
+  id        Int     @id @default(autoincrement())
+  email     String  @unique
+  firstName String?
+  lastName  String?
+  tokens    Token[]
+}
+
+model Token {
+  id         Int       @id @default(autoincrement())
+  token      String    @unique
+  type       TokenType
+  valid      Boolean   @default(true)
+  expiration DateTime?
+  createdAt  DateTime  @default(now())
+  lastUsedAt DateTime  @default(now())
+  deviceId   String?
+  deviceName String?
+  userAgent  String?
+  userId     Int
+  user       User      @relation(fields: [userId], references: [id])
+}
+
+enum TokenType {
+  EMAIL
+  SESSION
 }

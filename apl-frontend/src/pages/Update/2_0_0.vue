@@ -15,6 +15,7 @@ function NextPage() {
 
 onMounted(() => {
   window.ipcRenderer.on("open-url", (evt, data: string) => {
+    alert(data);
     console.log("Data is " + data);
   });
 });
@@ -61,19 +62,21 @@ onUnmounted(() => {
   <PlexusEffect />
   <div
     :style="{
-      'background-image': `linear-gradient(to bottom right, #add8e6, #d8b4fe)`,
+      'background-image': `linear-gradient(to bottom right, #add8ff, #d8b4fe)`,
     }"
     class="flex items-center justify-center w-screen h-screen"
   >
     <motion.div
-      :initial="{ opacity: 0, y: 20, filter: 'blur(10px)' }"
+      :initial="{ opacity: 0, filter: 'blur(10px)' }"
       :animate="{
         opacity: 1,
-        y: 0,
         filter: 'blur(0px)',
-        transition: { duration: 0.6 },
+        transition: { duration: 0.2 },
       }"
-      class="p-4 sm:p-12 flex flex-col justify-between w-full min-h-[30rem] max-w-[40rem] rounded-2xl bg-black"
+      :style="{
+        height: emailSent ? '40rem' : '27rem',
+      }"
+      class="p-4 sm:p-12 flex flex-col justify-between w-full max-w-[40rem] rounded-2xl bg-black transition-all duration-500"
     >
       <div class="flex flex-col items-start space-y-6 w-full h-full">
         <motion.div

@@ -137,8 +137,8 @@ function ankiTest(worked: boolean) {
               ></div>
               <div class="w-0 relative z-10">
                 <TabList
-                  pt:activeBar="my-class"
-                  pt:tabList="my-class-2"
+                  pt:activeBar="tablist-bar"
+                  pt:tabList="tablist"
                   class="w-0"
                 >
                   <Tab value="0">General</Tab>
@@ -234,12 +234,12 @@ function ankiTest(worked: boolean) {
 </template>
 
 <style>
-.my-class {
+.tablist-bar {
   height: 4px !important;
   border-radius: 1rem;
 }
 
-.my-class-2 {
+.tablist {
   background-color: transparent !important;
 }
 </style>
