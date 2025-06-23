@@ -15,4 +15,4 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Build the Docker image
-      run: docker build . --file apl-server/apl-prod.Dockerfile --tag apl-server:latest
+      run: docker build ./apl-server --file apl-server/apl-prod.Dockerfile --tag apl-server:latest
