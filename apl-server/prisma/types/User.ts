@@ -57,6 +57,7 @@ export const UserRelations = t.Object(
           reportNo: t.Integer(),
           score: t.Integer(),
           userId: t.Integer(),
+          syncDataId: t.Integer(),
         },
         { additionalProperties: false },
       ),
@@ -64,12 +65,7 @@ export const UserRelations = t.Object(
     ),
     syncData: t.Array(
       t.Object(
-        {
-          id: t.Integer(),
-          generationTime: t.Date(),
-          userId: t.Integer(),
-          reportId: __nullable__(t.Integer()),
-        },
+        { id: t.Integer(), generationTime: t.Date(), userId: t.Integer() },
         { additionalProperties: false },
       ),
       { additionalProperties: false },

@@ -22,6 +22,7 @@ export const StreakRelations = t.Object(
         reportNo: t.Integer(),
         score: t.Integer(),
         userId: t.Integer(),
+        syncDataId: t.Integer(),
       },
       { additionalProperties: false },
     ),

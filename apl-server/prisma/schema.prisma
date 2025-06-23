@@ -48,8 +48,7 @@ model SyncData {
   ankiData       AnkiData?
   userId         Int
   user           User      @relation(fields: [userId], references: [id])
-  report         Report?   @relation(fields: [reportId], references: [id])
-  reportId       Int?
+  report         Report?
 }
 
 model AnkiData {
@@ -72,13 +71,14 @@ model ImmersionActivity {
 }
 
 model Report {
-  id       Int        @id @default(autoincrement())
-  reportNo Int
-  score    Int
-  streak   Streak?
-  userId   Int
-  user     User       @relation(fields: [userId], references: [id])
-  SyncData SyncData[]
+  id         Int      @id @default(autoincrement())
+  reportNo   Int
+  score      Int
+  streak     Streak?
+  userId     Int
+  user       User     @relation(fields: [userId], references: [id])
+  syncData   SyncData @relation(fields: [syncDataId], references: [id])
+  syncDataId Int      @unique
 
   @@unique([reportNo, userId])
 }

@@ -5,12 +5,7 @@ import { __transformDate__ } from "./__transformDate__";
 import { __nullable__ } from "./__nullable__";
 
 export const SyncDataPlain = t.Object(
-  {
-    id: t.Integer(),
-    generationTime: t.Date(),
-    userId: t.Integer(),
-    reportId: __nullable__(t.Integer()),
-  },
+  { id: t.Integer(), generationTime: t.Date(), userId: t.Integer() },
   { additionalProperties: false },
 );
 
@@ -45,6 +40,7 @@ export const SyncDataRelations = t.Object(
           reportNo: t.Integer(),
           score: t.Integer(),
           userId: t.Integer(),
+          syncDataId: t.Integer(),
         },
         { additionalProperties: false },
       ),
@@ -164,7 +160,6 @@ export const SyncDataWhere = t.Partial(
           id: t.Integer(),
           generationTime: t.Date(),
           userId: t.Integer(),
-          reportId: t.Integer(),
         },
         { additionalProperties: false },
       ),
@@ -199,12 +194,7 @@ export const SyncDataWhereUnique = t.Recursive(
         ),
         t.Partial(
           t.Object(
-            {
-              id: t.Integer(),
-              generationTime: t.Date(),
-              userId: t.Integer(),
-              reportId: t.Integer(),
-            },
+            { id: t.Integer(), generationTime: t.Date(), userId: t.Integer() },
             { additionalProperties: false },
           ),
         ),
@@ -223,7 +213,6 @@ export const SyncDataSelect = t.Partial(
       userId: t.Boolean(),
       user: t.Boolean(),
       report: t.Boolean(),
-      reportId: t.Boolean(),
       _count: t.Boolean(),
     },
     { additionalProperties: false },
@@ -252,9 +241,6 @@ export const SyncDataOrderBy = t.Partial(
         additionalProperties: false,
       }),
       userId: t.Union([t.Literal("asc"), t.Literal("desc")], {
-        additionalProperties: false,
-      }),
-      reportId: t.Union([t.Literal("asc"), t.Literal("desc")], {
         additionalProperties: false,
       }),
     },
