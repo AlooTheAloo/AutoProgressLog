@@ -37,6 +37,38 @@ export const UserRelations = t.Object(
       ),
       { additionalProperties: false },
     ),
+    immersionActivities: t.Array(
+      t.Object(
+        {
+          id: t.Integer(),
+          time: t.Date(),
+          seconds: t.Integer(),
+          activityName: t.String(),
+          userId: t.Integer(),
+        },
+        { additionalProperties: false },
+      ),
+      { additionalProperties: false },
+    ),
+    reports: t.Array(
+      t.Object(
+        {
+          id: t.Integer(),
+          reportNo: t.Integer(),
+          score: t.Integer(),
+          userId: t.Integer(),
+        },
+        { additionalProperties: false },
+      ),
+      { additionalProperties: false },
+    ),
+    syncData: t.Array(
+      t.Object(
+        { id: t.Integer(), generationTime: t.Date(), userId: t.Integer() },
+        { additionalProperties: false },
+      ),
+      { additionalProperties: false },
+    ),
   },
   { additionalProperties: false },
 );
@@ -77,6 +109,54 @@ export const UserRelationsInputCreate = t.Object(
         { additionalProperties: false },
       ),
     ),
+    immersionActivities: t.Optional(
+      t.Object(
+        {
+          connect: t.Array(
+            t.Object(
+              {
+                id: t.Integer({ additionalProperties: false }),
+              },
+              { additionalProperties: false },
+            ),
+            { additionalProperties: false },
+          ),
+        },
+        { additionalProperties: false },
+      ),
+    ),
+    reports: t.Optional(
+      t.Object(
+        {
+          connect: t.Array(
+            t.Object(
+              {
+                id: t.Integer({ additionalProperties: false }),
+              },
+              { additionalProperties: false },
+            ),
+            { additionalProperties: false },
+          ),
+        },
+        { additionalProperties: false },
+      ),
+    ),
+    syncData: t.Optional(
+      t.Object(
+        {
+          connect: t.Array(
+            t.Object(
+              {
+                id: t.Integer({ additionalProperties: false }),
+              },
+              { additionalProperties: false },
+            ),
+            { additionalProperties: false },
+          ),
+        },
+        { additionalProperties: false },
+      ),
+    ),
   },
   { additionalProperties: false },
 );
@@ -85,6 +165,81 @@ export const UserRelationsInputUpdate = t.Partial(
   t.Object(
     {
       tokens: t.Partial(
+        t.Object(
+          {
+            connect: t.Array(
+              t.Object(
+                {
+                  id: t.Integer({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+            disconnect: t.Array(
+              t.Object(
+                {
+                  id: t.Integer({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+          },
+          { additionalProperties: false },
+        ),
+      ),
+      immersionActivities: t.Partial(
+        t.Object(
+          {
+            connect: t.Array(
+              t.Object(
+                {
+                  id: t.Integer({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+            disconnect: t.Array(
+              t.Object(
+                {
+                  id: t.Integer({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+          },
+          { additionalProperties: false },
+        ),
+      ),
+      reports: t.Partial(
+        t.Object(
+          {
+            connect: t.Array(
+              t.Object(
+                {
+                  id: t.Integer({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+            disconnect: t.Array(
+              t.Object(
+                {
+                  id: t.Integer({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+          },
+          { additionalProperties: false },
+        ),
+      ),
+      syncData: t.Partial(
         t.Object(
           {
             connect: t.Array(
@@ -187,6 +342,9 @@ export const UserSelect = t.Partial(
       firstName: t.Boolean(),
       lastName: t.Boolean(),
       tokens: t.Boolean(),
+      immersionActivities: t.Boolean(),
+      reports: t.Boolean(),
+      syncData: t.Boolean(),
       _count: t.Boolean(),
     },
     { additionalProperties: false },
@@ -195,7 +353,13 @@ export const UserSelect = t.Partial(
 
 export const UserInclude = t.Partial(
   t.Object(
-    { tokens: t.Boolean(), _count: t.Boolean() },
+    {
+      tokens: t.Boolean(),
+      immersionActivities: t.Boolean(),
+      reports: t.Boolean(),
+      syncData: t.Boolean(),
+      _count: t.Boolean(),
+    },
     { additionalProperties: false },
   ),
 );
