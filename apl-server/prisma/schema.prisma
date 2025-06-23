@@ -1,6 +1,6 @@
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = "postgresql://postgres:prisma@localhost:5432/postgres?schema=public"
 }
 
 generator client {
@@ -76,6 +76,7 @@ model Report {
   streak Streak?
   userId Int
   user User @relation(fields: [userId], references: [id])
+  @@unique([reportNo, userId])
 }
 
 model Streak {

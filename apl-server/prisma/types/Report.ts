@@ -137,12 +137,30 @@ export const ReportWhereUnique = t.Recursive(
     t.Intersect(
       [
         t.Partial(
-          t.Object({ id: t.Integer() }, { additionalProperties: false }),
+          t.Object(
+            {
+              id: t.Integer(),
+              reportNo_userId: t.Object(
+                { reportNo: t.Integer(), userId: t.Integer() },
+                { additionalProperties: false },
+              ),
+            },
+            { additionalProperties: false },
+          ),
           { additionalProperties: false },
         ),
-        t.Union([t.Object({ id: t.Integer() })], {
-          additionalProperties: false,
-        }),
+        t.Union(
+          [
+            t.Object({ id: t.Integer() }),
+            t.Object({
+              reportNo_userId: t.Object(
+                { reportNo: t.Integer(), userId: t.Integer() },
+                { additionalProperties: false },
+              ),
+            }),
+          ],
+          { additionalProperties: false },
+        ),
         t.Partial(
           t.Object({
             AND: t.Union([
