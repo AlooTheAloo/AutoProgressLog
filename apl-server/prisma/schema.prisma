@@ -17,11 +17,14 @@ generator prismabox {
 }
 
 model User {
-  id        Int     @id @default(autoincrement())
-  email     String  @unique
-  firstName String?
-  lastName  String?
-  tokens    Token[]
+  id                  Int                 @id @default(autoincrement())
+  email               String              @unique
+  firstName           String?
+  lastName            String?
+  tokens              Token[]
+  immersionActivities ImmersionActivity[]
+  reports             Report[]
+  syncData            SyncData[]
 }
 
 model Token {
@@ -37,6 +40,55 @@ model Token {
   userAgent  String?
   userId     Int
   user       User      @relation(fields: [userId], references: [id])
+}
+
+model SyncData {
+  id             Int       @id @default(autoincrement())
+  generationTime DateTime  @default(now())
+  ankiData       AnkiData?
+  userId         Int
+  user           User      @relation(fields: [userId], references: [id])
+  report         Report?
+}
+
+model AnkiData {
+  id                Int      @id @default(autoincrement())
+  totalCardsStudied Int
+  cardsStudied      Int
+  mature            Int
+  retention         Float
+  syncDataId        Int      @unique
+  syncData          SyncData @relation(fields: [syncDataId], references: [id])
+}
+
+model ImmersionActivity {
+  id           Int      @id @default(autoincrement())
+  time         DateTime
+  seconds      Int
+  activityName String
+  userId       Int
+  user         User     @relation(fields: [userId], references: [id])
+}
+
+model Report {
+  id         Int      @id @default(autoincrement())
+  reportNo   Int
+  score      Int
+  streak     Streak?
+  userId     Int
+  user       User     @relation(fields: [userId], references: [id])
+  syncData   SyncData @relation(fields: [syncDataId], references: [id])
+  syncDataId Int      @unique
+
+  @@unique([reportNo, userId])
+}
+
+model Streak {
+  id              Int    @id @default(autoincrement())
+  ankiStreak      Int
+  immersionStreak Int
+  reportId        Int    @unique
+  report          Report @relation(fields: [reportId], references: [id])
 }
 
 enum TokenType {
