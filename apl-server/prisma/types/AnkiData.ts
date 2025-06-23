@@ -19,7 +19,12 @@ export const AnkiDataPlain = t.Object(
 export const AnkiDataRelations = t.Object(
   {
     syncData: t.Object(
-      { id: t.Integer(), generationTime: t.Date(), userId: t.Integer() },
+      {
+        id: t.Integer(),
+        generationTime: t.Date(),
+        userId: t.Integer(),
+        reportId: __nullable__(t.Integer()),
+      },
       { additionalProperties: false },
     ),
   },

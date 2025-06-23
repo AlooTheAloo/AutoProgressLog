@@ -5,7 +5,12 @@ import { __transformDate__ } from "./__transformDate__";
 import { __nullable__ } from "./__nullable__";
 
 export const SyncDataPlain = t.Object(
-  { id: t.Integer(), generationTime: t.Date(), userId: t.Integer() },
+  {
+    id: t.Integer(),
+    generationTime: t.Date(),
+    userId: t.Integer(),
+    reportId: __nullable__(t.Integer()),
+  },
   { additionalProperties: false },
 );
 
@@ -32,6 +37,17 @@ export const SyncDataRelations = t.Object(
         lastName: __nullable__(t.String()),
       },
       { additionalProperties: false },
+    ),
+    report: __nullable__(
+      t.Object(
+        {
+          id: t.Integer(),
+          reportNo: t.Integer(),
+          score: t.Integer(),
+          userId: t.Integer(),
+        },
+        { additionalProperties: false },
+      ),
     ),
   },
   { additionalProperties: false },
@@ -73,6 +89,19 @@ export const SyncDataRelationsInputCreate = t.Object(
       },
       { additionalProperties: false },
     ),
+    report: t.Optional(
+      t.Object(
+        {
+          connect: t.Object(
+            {
+              id: t.Integer({ additionalProperties: false }),
+            },
+            { additionalProperties: false },
+          ),
+        },
+        { additionalProperties: false },
+      ),
+    ),
   },
   { additionalProperties: false },
 );
@@ -105,6 +134,20 @@ export const SyncDataRelationsInputUpdate = t.Partial(
         },
         { additionalProperties: false },
       ),
+      report: t.Partial(
+        t.Object(
+          {
+            connect: t.Object(
+              {
+                id: t.Integer({ additionalProperties: false }),
+              },
+              { additionalProperties: false },
+            ),
+            disconnect: t.Boolean(),
+          },
+          { additionalProperties: false },
+        ),
+      ),
     },
     { additionalProperties: false },
   ),
@@ -121,6 +164,7 @@ export const SyncDataWhere = t.Partial(
           id: t.Integer(),
           generationTime: t.Date(),
           userId: t.Integer(),
+          reportId: t.Integer(),
         },
         { additionalProperties: false },
       ),
@@ -155,7 +199,12 @@ export const SyncDataWhereUnique = t.Recursive(
         ),
         t.Partial(
           t.Object(
-            { id: t.Integer(), generationTime: t.Date(), userId: t.Integer() },
+            {
+              id: t.Integer(),
+              generationTime: t.Date(),
+              userId: t.Integer(),
+              reportId: t.Integer(),
+            },
             { additionalProperties: false },
           ),
         ),
@@ -173,6 +222,8 @@ export const SyncDataSelect = t.Partial(
       ankiData: t.Boolean(),
       userId: t.Boolean(),
       user: t.Boolean(),
+      report: t.Boolean(),
+      reportId: t.Boolean(),
       _count: t.Boolean(),
     },
     { additionalProperties: false },
@@ -181,7 +232,12 @@ export const SyncDataSelect = t.Partial(
 
 export const SyncDataInclude = t.Partial(
   t.Object(
-    { ankiData: t.Boolean(), user: t.Boolean(), _count: t.Boolean() },
+    {
+      ankiData: t.Boolean(),
+      user: t.Boolean(),
+      report: t.Boolean(),
+      _count: t.Boolean(),
+    },
     { additionalProperties: false },
   ),
 );
@@ -196,6 +252,9 @@ export const SyncDataOrderBy = t.Partial(
         additionalProperties: false,
       }),
       userId: t.Union([t.Literal("asc"), t.Literal("desc")], {
+        additionalProperties: false,
+      }),
+      reportId: t.Union([t.Literal("asc"), t.Literal("desc")], {
         additionalProperties: false,
       }),
     },

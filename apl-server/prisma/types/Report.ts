@@ -36,6 +36,18 @@ export const ReportRelations = t.Object(
       },
       { additionalProperties: false },
     ),
+    SyncData: t.Array(
+      t.Object(
+        {
+          id: t.Integer(),
+          generationTime: t.Date(),
+          userId: t.Integer(),
+          reportId: __nullable__(t.Integer()),
+        },
+        { additionalProperties: false },
+      ),
+      { additionalProperties: false },
+    ),
   },
   { additionalProperties: false },
 );
@@ -76,6 +88,22 @@ export const ReportRelationsInputCreate = t.Object(
       },
       { additionalProperties: false },
     ),
+    SyncData: t.Optional(
+      t.Object(
+        {
+          connect: t.Array(
+            t.Object(
+              {
+                id: t.Integer({ additionalProperties: false }),
+              },
+              { additionalProperties: false },
+            ),
+            { additionalProperties: false },
+          ),
+        },
+        { additionalProperties: false },
+      ),
+    ),
   },
   { additionalProperties: false },
 );
@@ -107,6 +135,31 @@ export const ReportRelationsInputUpdate = t.Partial(
           ),
         },
         { additionalProperties: false },
+      ),
+      SyncData: t.Partial(
+        t.Object(
+          {
+            connect: t.Array(
+              t.Object(
+                {
+                  id: t.Integer({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+            disconnect: t.Array(
+              t.Object(
+                {
+                  id: t.Integer({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+          },
+          { additionalProperties: false },
+        ),
       ),
     },
     { additionalProperties: false },
@@ -201,6 +254,7 @@ export const ReportSelect = t.Partial(
       streak: t.Boolean(),
       userId: t.Boolean(),
       user: t.Boolean(),
+      SyncData: t.Boolean(),
       _count: t.Boolean(),
     },
     { additionalProperties: false },
@@ -209,7 +263,12 @@ export const ReportSelect = t.Partial(
 
 export const ReportInclude = t.Partial(
   t.Object(
-    { streak: t.Boolean(), user: t.Boolean(), _count: t.Boolean() },
+    {
+      streak: t.Boolean(),
+      user: t.Boolean(),
+      SyncData: t.Boolean(),
+      _count: t.Boolean(),
+    },
     { additionalProperties: false },
   ),
 );
