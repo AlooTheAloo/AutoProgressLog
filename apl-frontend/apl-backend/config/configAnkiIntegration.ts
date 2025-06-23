@@ -35,11 +35,13 @@ export async function getDecksCards(): Promise<deck[]> {
           }
           const ret = await Promise.all(
             rowsTop.map(async (row) => {
-              return await new Promise<deck>((res, rej) => {
+              return await new Promise<deck | undefined>((res, rej) => {
                 prefsDB.all(
                   `SELECT name FROM decks WHERE id = ${row.did};`,
                   (err, rows: any) => {
-                    if (rows == undefined) return;
+                    if (rows == undefined || rows.length == 0)
+                      return res(undefined);
+
                     console.log("all rows" + JSON.stringify(rows));
 
                     console.log("err", err);
@@ -55,7 +57,7 @@ export async function getDecksCards(): Promise<deck[]> {
             })
           );
           prefsDB.close();
-          res(ret);
+          res(ret.filter((x) => x != undefined));
         }
       );
   });
