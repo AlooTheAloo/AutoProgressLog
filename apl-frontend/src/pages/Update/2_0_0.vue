@@ -12,7 +12,6 @@ import PlexusEffect from "../../components/Common/PlexusEffect.vue";
 function NextPage() {
   router.push("/setup/client-server-selection");
 }
-
 onMounted(() => {
   window.ipcRenderer.on("open-url", (evt, data: string) => {
     alert(data);
@@ -115,7 +114,7 @@ onUnmounted(() => {
           </div>
           <div class="w-full flex justify-end">
             <Button
-              @click="SendEmail"
+              @click="NextPage"
               :disabled="!isEmailValid || countdown > 0"
               class="w-[200px] p-3 !rounded-full transition-all"
             >

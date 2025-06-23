@@ -90,8 +90,8 @@ export async function createWindow() {
     if (process.env.NODE_ENV !== "development") {
       win?.show();
     } else {
-      win?.showInactive();
-      win?.blur();
+      // win?.showInactive();
+      // win?.blur();
     }
   });
   win.setMenuBarVisibility(false);
