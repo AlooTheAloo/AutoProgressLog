@@ -10,6 +10,8 @@ RUN npm install -g bun
 
 RUN bun install
 
+RUN bun run db:generate
+
 RUN bun build \
   --compile \
   --minify-whitespace \
