@@ -5,21 +5,20 @@ export const validateRoute = new Elysia({name: 'validate-token'}).post(
     '/validate',
     async ({body, set}) => {
         const {email, emailToken, deviceId, deviceName, userAgent} = body
+        try {
+            const dbToken = await exchangeEmailTokenForSession(email, emailToken, {
+                deviceId,
+                deviceName,
+                userAgent,
+            })
 
-        const dbToken = await exchangeEmailTokenForSession(email, emailToken, {
-            deviceId,
-            deviceName,
-            userAgent,
-        })
-
-        if (!dbToken) {
-            set.status = 401
-            return {error: 'Invalid or expired token'}
-        }
-
-        return {
-            token: dbToken.token,
-            createdAt: dbToken.createdAt,
+            return {
+                token: dbToken.token,
+                createdAt: dbToken.createdAt,
+            }
+        } catch (e: any) {
+            set.status = 400
+            throw new Error(e.message)
         }
     },
     {
