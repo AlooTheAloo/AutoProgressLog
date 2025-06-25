@@ -37,6 +37,8 @@ export async function exchangeEmailTokenForSession(
     const user = await prisma.user.findUniqueOrThrow({
         where: {email},
         include: {tokens: true}
+    }).catch(() =>{
+        throw new Error('The specified email is not associated with any account')
     })
 
     const dbToken = user.tokens.find(t => t.token === emailToken && t.type === "EMAIL" && (t.expiration && t.expiration > new Date()))

@@ -18,6 +18,7 @@
     "elysia": "latest",
     "elysia-rate-limit": "^4.4.0",
     "js-yaml": "^4.1.0",
+    "resend": "^4.6.0",
     "socket.io": "^4.8.1",
     "toggl-track": "^0.8.0",
     "toggl-webhook": "^1.0.2",

@@ -2,7 +2,7 @@
 
 echo "🚀 Booting container..."
 
-echo "📦 Running production migration..."
+echo "📦 Running migrations..."
 bun run db:generate
 bun run dev
 

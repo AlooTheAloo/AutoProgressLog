@@ -1,6 +1,7 @@
 import {Elysia, t} from "elysia";
 import {createEmailToken} from "../../services/auth/token";
 import prisma from "../../db/client";
+import {sendMagicLink} from "../../services/email/sendMagicLink";
 
 export const loginRoute = new Elysia({name: "login"}).post(
     '/login',
@@ -11,8 +12,8 @@ export const loginRoute = new Elysia({name: "login"}).post(
             user = await prisma.user.create({data: {email}})
             set.status = "Created"
         }
-        await createEmailToken(user.id)
-        //TODO: Send email with magic link
+        const token = await createEmailToken(user.id)
+        await sendMagicLink(email, token)
         return
     },
     {
