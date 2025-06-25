@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, shell } from "electron";
+import { app, BrowserWindow, dialog, ipcMain, shell } from "electron";
 import { fileURLToPath } from "node:url";
 import registerEvents from "./Electron-Backend/";
 import path from "node:path";
@@ -20,7 +20,7 @@ import { CacheManager } from "../../apl-backend/Helpers/cache";
 import checkHealth from "./Electron-App/HealthCheck";
 import { init } from "@bokuweb/zstd-wasm";
 import { SocketClient } from "./Electron-Backend/Socket/SocketClient";
-import { dialog } from "electron";
+
 import {
   Browser,
   detectBrowserPlatform,
@@ -28,6 +28,7 @@ import {
   install,
   resolveBuildId,
 } from "@puppeteer/browsers";
+import { initializeDeepLink } from "./Electron-Backend/DeepLink";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -158,17 +159,6 @@ app.on("second-instance", async (evt, cmd, wd) => {
     win?.focus();
     buildContextMenu();
   }
-
-  const text = cmd.pop();
-  if (text?.startsWith("apl://")) {
-    win?.webContents.send("open-url", text.slice(6));
-  }
-});
-
-app.on("open-url", (event, url) => {
-  if (url.startsWith("apl://")) {
-    win?.webContents.send("open-url", url.slice(6));
-  }
 });
 
 app.on("activate", () => {
@@ -231,25 +221,16 @@ app.on("ready", async () => {
 
   const isDev = process.env.NODE_ENV === "development";
 
-  // TODO : Make this into a setting
   if (!app.getLoginItemSettings().openAtLogin && !isDev) {
     app.setLoginItemSettings({
       openAtLogin: !isDev,
       args: ["was-opened-at-login"],
     });
   }
-
-  // Register the APL protocol
-  if (!isDev) {
-    if (process.argv.length >= 2) {
-      app.setAsDefaultProtocolClient("apl", process.execPath, [
-        path.resolve(process.argv[1]),
-      ]);
-    }
-  }
+  await initializeDeepLink();
 });
 
-async () => {
+(async () => {
   const cachedir = path.join(app.getPath("home"), ".cache", "puppeteer");
   const browsers = await getInstalledBrowsers({
     cacheDir: cachedir,
@@ -267,4 +248,4 @@ async () => {
       unpack: true,
     });
   }
-};
+})();

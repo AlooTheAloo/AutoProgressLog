@@ -1,4 +1,5 @@
 import { win } from "../../electron/main";
+import { buildContextMenu } from "../../electron/main/Electron-Backend/appBackend";
 import { CacheManager } from "../Helpers/cache";
 import upgrade_1_0_2 from "./Versions/1.0.2";
 import upgrade_2_0_0 from "./Versions/2.0.0";
@@ -7,8 +8,10 @@ export let upgrading = false;
 
 export async function upgrade_schema(version_current: string): Promise<void> {
   upgrading = true;
+  buildContextMenu();
   await launchUpgrade("2.0.0", upgrade_2_0_0);
   upgrading = false;
+  buildContextMenu();
   return;
 }
 

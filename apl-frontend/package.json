@@ -28,6 +28,7 @@
     "country-flag-icons": "^1.5.19",
     "d3-interpolate": "^3.0.1",
     "dayjs": "^1.11.13",
+    "electron-app-universal-protocol-client": "^2.1.1",
     "electron-updater": "^6.6.2",
     "esbuild": "0.25.0",
     "find-process": "^1.4.10",

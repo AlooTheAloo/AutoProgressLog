@@ -251,16 +251,16 @@ const closeFirstDialog = () => {
         <div
           class="flex flex-col items-end gap-2 w-fit flex-shrink-0 generateButton"
         >
-        <Button
-          severity="info"
-          @click="generateReport"
-          :disabled="disableActionButtons"
-          class="flex items-center !rounded-full px-6 py-3  h-[2.5rem]"
-        >
-          <i class="pi pi-plus-circle  text-white text-xl mr-2"></i>
-          
-          <span class="text-white font-bold text-lg">Generate Report</span>
-        </Button>
+          <Button
+            severity="info"
+            @click="generateReport"
+            :disabled="disableActionButtons"
+            class="flex items-center !rounded-full px-6 py-3 h-[2.5rem]"
+          >
+            <i class="pi pi-plus-circle text-white text-xl mr-2"></i>
+
+            <span class="text-white font-bold text-lg">Generate Report</span>
+          </Button>
           <div
             :class="`flex rounded-md bg-white h-8 text-black overflow-hidden z-10 ${
               disableActionButtons ? 'opacity-50' : ''

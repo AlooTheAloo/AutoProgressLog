@@ -23,6 +23,7 @@ import { CacheManager } from "../../../apl-backend/Helpers/cache";
 import { getAnkiCardReviewCount } from "../../../apl-backend/anki/db";
 import dayjs from "dayjs";
 import machineId from "node-machine-id";
+import os from "os";
 
 let account: TogglAccount | undefined;
 const DEFAULT_CONFIG: Options = {
@@ -85,16 +86,23 @@ export function getSetupAnki(): ankiOptions | undefined {
 }
 
 export function setupListeners() {
+  ipcMain.handle("Send-Email", async (e: any, email: string) => {
+    console.log("Sending email to " + email);
+    // TODO: Send email with magic link
+  });
+
   ipcMain.handle(
-    "Send-Email",
-    async (event: any, email: string, userAgent: string) => {
-      console.log("Sending email to " + email);
+    "approve-email-token",
+    async (e: any, email: string, token: string, userAgent: string) => {
+      console.log("Email " + email);
+      console.log("EmailToken " + token);
+      console.log("DeviceName is " + os.hostname().replace(/\.local$/, ""));
       console.log("Machine ID is " + machineId.machineIdSync());
       console.log("User agent is " + userAgent);
     }
   );
 
-  ipcMain.handle("anki-deck-select", async (event: any, arg: number[]) => {
+  ipcMain.handle("anki-deck-select", async (e: any, arg: number[]) => {
     if (config?.anki?.options == undefined) return;
     config.anki.options.trackedDecks = arg;
     if (arg.length == 0) {

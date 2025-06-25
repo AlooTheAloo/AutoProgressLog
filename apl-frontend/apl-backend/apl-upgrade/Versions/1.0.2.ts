@@ -88,12 +88,6 @@ const defaultProfilePicture =
   "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR4aJxpLDs-i-t-xiNj4uNHz1mhNpCJpR21DQ&s";
 
 export default async function upgrade_1_0_2() {
-  console.log("Checking");
-  console.log("version is " + CacheManager.get().version);
-  console.log(
-    "Compare is " + new SemVer(CacheManager.get().version).compare("1.0.2")
-  );
-
   if (new SemVer(CacheManager.get().version).compare("1.0.2") > -1) {
     return;
   }

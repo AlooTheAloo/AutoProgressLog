@@ -35,7 +35,10 @@ export default defineConfig(({ command }) => {
               rollupOptions: {
                 external: [
                   ...Object.keys("dependencies" in pkg ? pkg.dependencies : {}),
-                  "node-mac-permissions",
+                  "electron-app-universal-protocol-client",
+                  // maybe also the native bindings directly:
+                  "electron-app-universal-protocol-client/prebuilds/darwin-arm64/node.napi.uv1.armv8.node",
+                  "electron-app-universal-protocol-client/prebuilds/darwin-x64/node.napi.uv1.node",
                 ],
               },
             },
@@ -51,7 +54,10 @@ export default defineConfig(({ command }) => {
               rollupOptions: {
                 external: [
                   ...Object.keys("dependencies" in pkg ? pkg.dependencies : {}),
-                  "node-mac-permissions",
+                  "electron-app-universal-protocol-client",
+                  // maybe also the native bindings directly:
+                  "electron-app-universal-protocol-client/prebuilds/darwin-arm64/node.napi.uv1.armv8.node",
+                  "electron-app-universal-protocol-client/prebuilds/darwin-x64/node.napi.uv1.node",
                 ],
               },
             },

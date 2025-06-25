@@ -2,20 +2,47 @@
 import { useRouter } from "vue-router";
 import Button from "primevue/button";
 import { motion } from "motion-v";
-import { computed, onMounted, onUnmounted, ref } from "vue";
+import {
+  computed,
+  onMounted,
+  onUnmounted,
+  ref,
+  registerRuntimeCompiler,
+} from "vue";
 import ProgressSpinner from "primevue/progressspinner";
-const router = useRouter();
 import { InputText } from "primevue";
 import Logo from "../../assets/Logo.png";
 import PlexusEffect from "../../components/Common/PlexusEffect.vue";
+import z from "zod";
 
-function NextPage() {
-  router.push("/setup/client-server-selection");
-}
+const router = useRouter();
+
+const protocolSchema = z.object({
+  email: z.string().email(),
+  token: z.string(),
+});
+const emailSchema = z.string().email();
+
 onMounted(() => {
-  window.ipcRenderer.on("open-url", (evt, data: string) => {
-    alert(data);
-    console.log("Data is " + data);
+  window.ipcRenderer.on("open-url", async (evt, data: string) => {
+    console.log(data);
+    const url = new URL(data);
+    if (url.hostname !== "auth") return;
+    const parsed = Object.fromEntries(url.searchParams);
+    const result = protocolSchema.safeParse(parsed);
+    if (!result.success) {
+      alert("Invalid data received from url. Please try again.");
+      return;
+    }
+    const { email, token } = result.data;
+    const resp = await window.ipcRenderer.invoke(
+      "approve-email-token",
+      email,
+      token,
+      window.navigator.userAgent
+    );
+
+    alert(JSON.stringify({ email, token }));
   });
 });
 
@@ -24,11 +51,9 @@ const countdown = ref(0);
 let timerId: number | null = null;
 
 const isEmailValid = computed(() => {
-  const re = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g;
   console.log(email.value);
-  return re.test(String(email.value).toLowerCase());
+  return emailSchema.safeParse(email.value).success;
 });
-
 function startTimer() {
   countdown.value = 30;
   timerId = window.setInterval(() => {
@@ -45,11 +70,7 @@ const emailSent = ref(false);
 
 function SendEmail() {
   emailSent.value = true;
-  window.ipcRenderer.invoke(
-    "Send-Email",
-    email.value,
-    window.navigator.userAgent
-  );
+  window.ipcRenderer.invoke("Send-Email", email.value);
   startTimer();
 }
 
@@ -114,7 +135,7 @@ onUnmounted(() => {
           </div>
           <div class="w-full flex justify-end">
             <Button
-              @click="NextPage"
+              @click="SendEmail"
               :disabled="!isEmailValid || countdown > 0"
               class="w-[200px] p-3 !rounded-full transition-all"
             >

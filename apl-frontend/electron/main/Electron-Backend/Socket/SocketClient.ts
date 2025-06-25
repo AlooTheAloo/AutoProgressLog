@@ -19,8 +19,6 @@ export class SocketClient {
   }
 
   async init(authData: { token: string }): Promise<void> {
-    console.log("Initializing WebSocket client");
-
     this.authData = authData; // store for reconnect
 
     return new Promise<void>((resolve, reject) => {
@@ -60,12 +58,14 @@ export class SocketClient {
 
       this.socket.addEventListener("message", (event) => {
         try {
-          console.log("Message! " + event.data);
           const parsed = JSON.parse(event.data.toString());
           const { type, payload } = parsed;
           const listener = this.eventListeners[type as keyof EventMap];
           if (listener) {
             listener(payload);
+          }
+          if (type !== "pong") {
+            console.log("Message! " + event.data);
           }
         } catch (err) {
           console.error("Error parsing WebSocket message", err);
@@ -126,7 +126,6 @@ export class SocketClient {
   private startHeartbeat() {
     this.stopHeartbeat();
     this.heartbeatInterval = setInterval(() => {
-      console.log("hearbeat");
       if (this.socket?.readyState === WebSocket.OPEN) {
         this.socket.send(JSON.stringify({ type: "ping", payload: {} }));
       }

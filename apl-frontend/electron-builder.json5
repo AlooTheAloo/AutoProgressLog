@@ -21,9 +21,16 @@
       height: 540,
     },
   },
+  protocols: [
+    {
+      name: "APL Protocol",
+      schemes: ["apl"],
+    },
+  ],
   mac: {
     target: ["dmg"],
     artifactName: "${productName}_MacOS_${version}_Installer.${ext}",
+    category: "public.app-category.productivity",
     entitlements: "build/entitlements.mac.plist",
     entitlementsInherit: "build/entitlements.mac.plist",
     hardenedRuntime: true,
