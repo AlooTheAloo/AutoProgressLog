@@ -38,6 +38,10 @@ export const app = new Elysia()
                         name: "Auth",
                         description: "Authentication endpoints",
                     },
+                    {
+                        name: "User",
+                        description: "User-related endpoints",
+                    },
                 ],
             },
         })

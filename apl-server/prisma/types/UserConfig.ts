@@ -4,22 +4,32 @@ import { __transformDate__ } from "./__transformDate__";
 
 import { __nullable__ } from "./__nullable__";
 
-export const SyncDataPlain = t.Object(
-  { id: t.Integer(), generationTime: t.Date(), userId: t.Integer() },
+export const UserConfigPlain = t.Object(
+  {
+    id: t.Integer(),
+    togglToken: t.String(),
+    autoGenTime: __nullable__(t.Date()),
+    createdAt: t.Date(),
+    updatedAt: t.Date(),
+    userId: t.Integer(),
+  },
   { additionalProperties: false },
 );
 
-export const SyncDataRelations = t.Object(
+export const UserConfigRelations = t.Object(
   {
-    ankiData: __nullable__(
+    ankiConfig: __nullable__(
       t.Object(
         {
           id: t.Integer(),
-          totalCardsStudied: t.Integer(),
-          cardsStudied: t.Integer(),
-          mature: t.Integer(),
-          retention: t.Number(),
-          syncDataId: t.Integer(),
+          url: t.String(),
+          ankiToken: t.String(),
+          retentionMode: t.Union(
+            [t.Literal("ANKI_DEFAULT"), t.Literal("TRUE_RETENTION")],
+            { additionalProperties: false },
+          ),
+          trackedDecks: t.Array(t.Integer(), { additionalProperties: false }),
+          userConfigId: t.Integer(),
         },
         { additionalProperties: false },
       ),
@@ -33,35 +43,26 @@ export const SyncDataRelations = t.Object(
       },
       { additionalProperties: false },
     ),
-    report: __nullable__(
-      t.Object(
-        {
-          id: t.Integer(),
-          reportNo: t.Integer(),
-          score: t.Integer(),
-          userId: t.Integer(),
-          syncDataId: t.Integer(),
-        },
-        { additionalProperties: false },
-      ),
-    ),
   },
   { additionalProperties: false },
 );
 
-export const SyncDataPlainInputCreate = t.Object(
-  { generationTime: t.Optional(t.Date()) },
+export const UserConfigPlainInputCreate = t.Object(
+  { togglToken: t.String(), autoGenTime: t.Optional(__nullable__(t.Date())) },
   { additionalProperties: false },
 );
 
-export const SyncDataPlainInputUpdate = t.Object(
-  { generationTime: t.Optional(t.Date()) },
-  { additionalProperties: false },
-);
-
-export const SyncDataRelationsInputCreate = t.Object(
+export const UserConfigPlainInputUpdate = t.Object(
   {
-    ankiData: t.Optional(
+    togglToken: t.Optional(t.String()),
+    autoGenTime: t.Optional(__nullable__(t.Date())),
+  },
+  { additionalProperties: false },
+);
+
+export const UserConfigRelationsInputCreate = t.Object(
+  {
+    ankiConfig: t.Optional(
       t.Object(
         {
           connect: t.Object(
@@ -85,27 +86,14 @@ export const SyncDataRelationsInputCreate = t.Object(
       },
       { additionalProperties: false },
     ),
-    report: t.Optional(
-      t.Object(
-        {
-          connect: t.Object(
-            {
-              id: t.Integer({ additionalProperties: false }),
-            },
-            { additionalProperties: false },
-          ),
-        },
-        { additionalProperties: false },
-      ),
-    ),
   },
   { additionalProperties: false },
 );
 
-export const SyncDataRelationsInputUpdate = t.Partial(
+export const UserConfigRelationsInputUpdate = t.Partial(
   t.Object(
     {
-      ankiData: t.Partial(
+      ankiConfig: t.Partial(
         t.Object(
           {
             connect: t.Object(
@@ -130,26 +118,12 @@ export const SyncDataRelationsInputUpdate = t.Partial(
         },
         { additionalProperties: false },
       ),
-      report: t.Partial(
-        t.Object(
-          {
-            connect: t.Object(
-              {
-                id: t.Integer({ additionalProperties: false }),
-              },
-              { additionalProperties: false },
-            ),
-            disconnect: t.Boolean(),
-          },
-          { additionalProperties: false },
-        ),
-      ),
     },
     { additionalProperties: false },
   ),
 );
 
-export const SyncDataWhere = t.Partial(
+export const UserConfigWhere = t.Partial(
   t.Recursive(
     (Self) =>
       t.Object(
@@ -158,26 +132,33 @@ export const SyncDataWhere = t.Partial(
           NOT: t.Union([Self, t.Array(Self, { additionalProperties: false })]),
           OR: t.Array(Self, { additionalProperties: false }),
           id: t.Integer(),
-          generationTime: t.Date(),
+          togglToken: t.String(),
+          autoGenTime: t.Date(),
+          createdAt: t.Date(),
+          updatedAt: t.Date(),
           userId: t.Integer(),
         },
         { additionalProperties: false },
       ),
-    { $id: "SyncData" },
+    { $id: "UserConfig" },
   ),
 );
 
-export const SyncDataWhereUnique = t.Recursive(
+export const UserConfigWhereUnique = t.Recursive(
   (Self) =>
     t.Intersect(
       [
         t.Partial(
-          t.Object({ id: t.Integer() }, { additionalProperties: false }),
+          t.Object(
+            { id: t.Integer(), userId: t.Integer() },
+            { additionalProperties: false },
+          ),
           { additionalProperties: false },
         ),
-        t.Union([t.Object({ id: t.Integer() })], {
-          additionalProperties: false,
-        }),
+        t.Union(
+          [t.Object({ id: t.Integer() }), t.Object({ userId: t.Integer() })],
+          { additionalProperties: false },
+        ),
         t.Partial(
           t.Object({
             AND: t.Union([
@@ -194,50 +175,63 @@ export const SyncDataWhereUnique = t.Recursive(
         ),
         t.Partial(
           t.Object(
-            { id: t.Integer(), generationTime: t.Date(), userId: t.Integer() },
+            {
+              id: t.Integer(),
+              togglToken: t.String(),
+              autoGenTime: t.Date(),
+              createdAt: t.Date(),
+              updatedAt: t.Date(),
+              userId: t.Integer(),
+            },
             { additionalProperties: false },
           ),
         ),
       ],
       { additionalProperties: false },
     ),
-  { $id: "SyncData" },
+  { $id: "UserConfig" },
 );
 
-export const SyncDataSelect = t.Partial(
+export const UserConfigSelect = t.Partial(
   t.Object(
     {
       id: t.Boolean(),
-      generationTime: t.Boolean(),
-      ankiData: t.Boolean(),
+      togglToken: t.Boolean(),
+      ankiConfig: t.Boolean(),
+      autoGenTime: t.Boolean(),
+      createdAt: t.Boolean(),
+      updatedAt: t.Boolean(),
       userId: t.Boolean(),
       user: t.Boolean(),
-      report: t.Boolean(),
       _count: t.Boolean(),
     },
     { additionalProperties: false },
   ),
 );
 
-export const SyncDataInclude = t.Partial(
+export const UserConfigInclude = t.Partial(
   t.Object(
-    {
-      ankiData: t.Boolean(),
-      user: t.Boolean(),
-      report: t.Boolean(),
-      _count: t.Boolean(),
-    },
+    { ankiConfig: t.Boolean(), user: t.Boolean(), _count: t.Boolean() },
     { additionalProperties: false },
   ),
 );
 
-export const SyncDataOrderBy = t.Partial(
+export const UserConfigOrderBy = t.Partial(
   t.Object(
     {
       id: t.Union([t.Literal("asc"), t.Literal("desc")], {
         additionalProperties: false,
       }),
-      generationTime: t.Union([t.Literal("asc"), t.Literal("desc")], {
+      togglToken: t.Union([t.Literal("asc"), t.Literal("desc")], {
+        additionalProperties: false,
+      }),
+      autoGenTime: t.Union([t.Literal("asc"), t.Literal("desc")], {
+        additionalProperties: false,
+      }),
+      createdAt: t.Union([t.Literal("asc"), t.Literal("desc")], {
+        additionalProperties: false,
+      }),
+      updatedAt: t.Union([t.Literal("asc"), t.Literal("desc")], {
         additionalProperties: false,
       }),
       userId: t.Union([t.Literal("asc"), t.Literal("desc")], {
@@ -248,16 +242,16 @@ export const SyncDataOrderBy = t.Partial(
   ),
 );
 
-export const SyncData = t.Composite([SyncDataPlain, SyncDataRelations], {
+export const UserConfig = t.Composite([UserConfigPlain, UserConfigRelations], {
   additionalProperties: false,
 });
 
-export const SyncDataInputCreate = t.Composite(
-  [SyncDataPlainInputCreate, SyncDataRelationsInputCreate],
+export const UserConfigInputCreate = t.Composite(
+  [UserConfigPlainInputCreate, UserConfigRelationsInputCreate],
   { additionalProperties: false },
 );
 
-export const SyncDataInputUpdate = t.Composite(
-  [SyncDataPlainInputUpdate, SyncDataRelationsInputUpdate],
+export const UserConfigInputUpdate = t.Composite(
+  [UserConfigPlainInputUpdate, UserConfigRelationsInputUpdate],
   { additionalProperties: false },
 );

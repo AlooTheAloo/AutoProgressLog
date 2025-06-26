@@ -29,8 +29,8 @@ export const TokenRelations = t.Object(
       {
         id: t.Integer(),
         email: t.String(),
-        firstName: __nullable__(t.String()),
-        lastName: __nullable__(t.String()),
+        userName: __nullable__(t.String()),
+        profilePicture: __nullable__(t.String()),
       },
       { additionalProperties: false },
     ),

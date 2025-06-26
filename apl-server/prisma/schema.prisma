@@ -19,8 +19,9 @@ generator prismabox {
 model User {
   id                  Int                 @id @default(autoincrement())
   email               String              @unique
-  firstName           String?
-  lastName            String?
+  userName            String?
+  profilePicture      String?
+  config              UserConfig?
   tokens              Token[]
   immersionActivities ImmersionActivity[]
   reports             Report[]
@@ -91,7 +92,33 @@ model Streak {
   report          Report @relation(fields: [reportId], references: [id])
 }
 
+model UserConfig {
+  id          Int         @id @default(autoincrement())
+  togglToken  String
+  ankiConfig  AnkiConfig?
+  autoGenTime DateTime?   @db.Timetz(6)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  userId      Int         @unique
+  user        User        @relation(fields: [userId], references: [id])
+}
+
+model AnkiConfig {
+  id            Int               @id @default(autoincrement())
+  url           String            @default("https://sync.ankiweb.net/")
+  ankiToken     String
+  retentionMode AnkiRetentionMode
+  trackedDecks  Int[]
+  userConfigId  Int               @unique
+  userConfig    UserConfig        @relation(fields: [userConfigId], references: [id])
+}
+
 enum TokenType {
   EMAIL
   SESSION
+}
+
+enum AnkiRetentionMode {
+  ANKI_DEFAULT
+  TRUE_RETENTION
 }
