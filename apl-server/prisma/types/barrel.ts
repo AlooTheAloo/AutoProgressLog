@@ -1,4 +1,5 @@
 export * from "./TokenType";
+export * from "./AnkiRetentionMode";
 export * from "./User";
 export * from "./Token";
 export * from "./SyncData";
@@ -6,5 +7,7 @@ export * from "./AnkiData";
 export * from "./ImmersionActivity";
 export * from "./Report";
 export * from "./Streak";
+export * from "./UserConfig";
+export * from "./AnkiConfig";
 export * from "./__nullable__";
 export * from "./__transformDate__";

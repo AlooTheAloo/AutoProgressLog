@@ -8,14 +8,27 @@ export const UserPlain = t.Object(
   {
     id: t.Integer(),
     email: t.String(),
-    firstName: __nullable__(t.String()),
-    lastName: __nullable__(t.String()),
+    userName: __nullable__(t.String()),
+    profilePicture: __nullable__(t.String()),
   },
   { additionalProperties: false },
 );
 
 export const UserRelations = t.Object(
   {
+    config: __nullable__(
+      t.Object(
+        {
+          id: t.Integer(),
+          togglToken: t.String(),
+          autoGenTime: __nullable__(t.Date()),
+          createdAt: t.Date(),
+          updatedAt: t.Date(),
+          userId: t.Integer(),
+        },
+        { additionalProperties: false },
+      ),
+    ),
     tokens: t.Array(
       t.Object(
         {
@@ -77,8 +90,8 @@ export const UserRelations = t.Object(
 export const UserPlainInputCreate = t.Object(
   {
     email: t.String(),
-    firstName: t.Optional(__nullable__(t.String())),
-    lastName: t.Optional(__nullable__(t.String())),
+    userName: t.Optional(__nullable__(t.String())),
+    profilePicture: t.Optional(__nullable__(t.String())),
   },
   { additionalProperties: false },
 );
@@ -86,14 +99,27 @@ export const UserPlainInputCreate = t.Object(
 export const UserPlainInputUpdate = t.Object(
   {
     email: t.Optional(t.String()),
-    firstName: t.Optional(__nullable__(t.String())),
-    lastName: t.Optional(__nullable__(t.String())),
+    userName: t.Optional(__nullable__(t.String())),
+    profilePicture: t.Optional(__nullable__(t.String())),
   },
   { additionalProperties: false },
 );
 
 export const UserRelationsInputCreate = t.Object(
   {
+    config: t.Optional(
+      t.Object(
+        {
+          connect: t.Object(
+            {
+              id: t.Integer({ additionalProperties: false }),
+            },
+            { additionalProperties: false },
+          ),
+        },
+        { additionalProperties: false },
+      ),
+    ),
     tokens: t.Optional(
       t.Object(
         {
@@ -165,6 +191,20 @@ export const UserRelationsInputCreate = t.Object(
 export const UserRelationsInputUpdate = t.Partial(
   t.Object(
     {
+      config: t.Partial(
+        t.Object(
+          {
+            connect: t.Object(
+              {
+                id: t.Integer({ additionalProperties: false }),
+              },
+              { additionalProperties: false },
+            ),
+            disconnect: t.Boolean(),
+          },
+          { additionalProperties: false },
+        ),
+      ),
       tokens: t.Partial(
         t.Object(
           {
@@ -280,8 +320,8 @@ export const UserWhere = t.Partial(
           OR: t.Array(Self, { additionalProperties: false }),
           id: t.Integer(),
           email: t.String(),
-          firstName: t.String(),
-          lastName: t.String(),
+          userName: t.String(),
+          profilePicture: t.String(),
         },
         { additionalProperties: false },
       ),
@@ -323,8 +363,8 @@ export const UserWhereUnique = t.Recursive(
             {
               id: t.Integer(),
               email: t.String(),
-              firstName: t.String(),
-              lastName: t.String(),
+              userName: t.String(),
+              profilePicture: t.String(),
             },
             { additionalProperties: false },
           ),
@@ -340,8 +380,9 @@ export const UserSelect = t.Partial(
     {
       id: t.Boolean(),
       email: t.Boolean(),
-      firstName: t.Boolean(),
-      lastName: t.Boolean(),
+      userName: t.Boolean(),
+      profilePicture: t.Boolean(),
+      config: t.Boolean(),
       tokens: t.Boolean(),
       immersionActivities: t.Boolean(),
       reports: t.Boolean(),
@@ -355,6 +396,7 @@ export const UserSelect = t.Partial(
 export const UserInclude = t.Partial(
   t.Object(
     {
+      config: t.Boolean(),
       tokens: t.Boolean(),
       immersionActivities: t.Boolean(),
       reports: t.Boolean(),
@@ -374,10 +416,10 @@ export const UserOrderBy = t.Partial(
       email: t.Union([t.Literal("asc"), t.Literal("desc")], {
         additionalProperties: false,
       }),
-      firstName: t.Union([t.Literal("asc"), t.Literal("desc")], {
+      userName: t.Union([t.Literal("asc"), t.Literal("desc")], {
         additionalProperties: false,
       }),
-      lastName: t.Union([t.Literal("asc"), t.Literal("desc")], {
+      profilePicture: t.Union([t.Literal("asc"), t.Literal("desc")], {
         additionalProperties: false,
       }),
     },
