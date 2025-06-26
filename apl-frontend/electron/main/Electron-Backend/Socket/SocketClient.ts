@@ -1,6 +1,5 @@
 import WebSocket from "ws";
-
-const URL = "wss://apl.chromaserver.net/ws";
+import { SERVER_URL } from "../api/ApiManager";
 
 export class SocketClient {
   static instance: SocketClient; // Singleton
@@ -19,9 +18,11 @@ export class SocketClient {
   }
 
   async init(authData: { token: string }): Promise<void> {
+    const URL = `ws://${SERVER_URL}/ws`;
     this.authData = authData; // store for reconnect
 
     return new Promise<void>((resolve, reject) => {
+      console.log("Connecting to Socket with URL " + URL);
       this.socket = new WebSocket(URL, {});
 
       this.socket.addEventListener("open", () => {
@@ -34,7 +35,6 @@ export class SocketClient {
           }),
           (err) => {
             this.startHeartbeat();
-            console.log("Sent auth", err);
           }
         );
 

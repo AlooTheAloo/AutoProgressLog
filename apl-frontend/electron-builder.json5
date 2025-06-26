@@ -9,8 +9,14 @@
     "node_modules/puppeteer/.local-chromium/**/*",
     "**/node_modules/sharp/**/*",
     "**/node_modules/@img/**/*",
+    ".env.production",
   ],
-  files: ["dist*/**", "apl-backend/apl-visuals/visuals/**", "src/assets/**"],
+  files: [
+    "dist*/**",
+    "apl-backend/apl-visuals/visuals/**",
+    "src/assets/**",
+    ".env.production",
+  ],
   productName: "AutoProgressLog",
   directories: {
     output: "release/${version}",

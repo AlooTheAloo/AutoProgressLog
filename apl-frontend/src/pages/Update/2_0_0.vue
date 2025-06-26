@@ -25,7 +25,6 @@ const emailSchema = z.string().email();
 
 onMounted(() => {
   window.ipcRenderer.on("open-url", async (evt, data: string) => {
-    console.log(data);
     const url = new URL(data);
     if (url.hostname !== "auth") return;
     const parsed = Object.fromEntries(url.searchParams);
@@ -42,7 +41,9 @@ onMounted(() => {
       window.navigator.userAgent
     );
 
-    alert(JSON.stringify({ email, token }));
+    if (resp) {
+      // TODO : Continue logic
+    }
   });
 });
 

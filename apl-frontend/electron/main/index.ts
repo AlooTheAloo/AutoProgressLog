@@ -29,6 +29,25 @@ import {
   resolveBuildId,
 } from "@puppeteer/browsers";
 import { initializeDeepLink } from "./Electron-Backend/DeepLink";
+import { config as dotenvConfig } from "dotenv";
+import { initializeApiManager } from "./Electron-Backend/api/ApiManager";
+
+const isProd = app.isPackaged;
+
+// When packaged, use the correct path relative to the `.asar`
+const envPath = isProd
+  ? path.join(process.resourcesPath, "app.asar.unpacked", ".env.production") // or wherever you put it
+  : path.resolve(".env");
+
+console.log("[ENV] Loading:", envPath);
+if (fs.existsSync(envPath)) {
+  dotenvConfig({ path: envPath });
+  console.log("[ENV] SERVER_URL =", process.env.SERVER_URL);
+} else {
+  console.warn("[ENV] Missing:", envPath);
+}
+
+initializeApiManager();
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -219,8 +238,12 @@ app.on("ready", async () => {
     process.stderr.write(args.join(" ") + "\n");
   };
 
-  const isDev = process.env.NODE_ENV === "development";
+  console.log("App is ready");
+  console.log("Envppath is " + envPath);
+  console.log(process.env.SERVER_URL);
 
+  const isDev = process.env.NODE_ENV === "development";
+  console.log("isdev is " + isDev);
   if (!app.getLoginItemSettings().openAtLogin && !isDev) {
     app.setLoginItemSettings({
       openAtLogin: !isDev,

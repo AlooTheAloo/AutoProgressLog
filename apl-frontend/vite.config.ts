@@ -13,7 +13,11 @@ export default defineConfig(({ command }) => {
 
   return {
     optimizeDeps: {
-      exclude: ["node-mac-permissions", "@miniben90/x-win"],
+      exclude: [
+        "node-mac-permissions",
+        "@miniben90/x-win",
+        "electron-app-universal-protocol-client",
+      ],
     },
     plugins: [
       vue(),

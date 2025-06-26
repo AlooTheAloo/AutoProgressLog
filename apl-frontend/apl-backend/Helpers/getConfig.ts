@@ -29,6 +29,7 @@ export function updateConfig() {
 }
 
 export function getConfig(): Options | null {
+  return null;
   if (config == null) {
     if (!fs.existsSync(configPath)) {
       console.log("Unable to find config");

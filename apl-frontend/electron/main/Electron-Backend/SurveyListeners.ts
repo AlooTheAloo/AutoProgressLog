@@ -1,5 +1,6 @@
 import axios from "axios";
 import { ipcMain, ipcRenderer } from "electron";
+import { SERVER_URL } from "./api/ApiManager";
 
 interface surveyAnswer {
   track?: string;
@@ -38,12 +39,10 @@ export async function surveyListeners() {
   });
 }
 
-const backend_url = "https://apl.chromaserver.net/";
-
 function sendSurveyAnswer() {
   console.log("Sending survey answer" + JSON.stringify(surveyAnswer));
   try {
-    axios.post(`${backend_url}survey-answer/v1`, surveyAnswer);
+    axios.post(`${SERVER_URL}survey-answer/v1`, surveyAnswer);
   } catch (e) {
     console.log("Error sending survey answer");
   }

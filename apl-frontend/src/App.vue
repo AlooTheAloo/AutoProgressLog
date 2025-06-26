@@ -1,47 +1,43 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { RouterView, useRouter } from 'vue-router'
-import SideBarContainer from './components/Common/SideBarContainer.vue'
-import GlobalDialogRenderer from './util/DialogRenderer/GlobalDialogRenderer.vue'
-import LoadingScreen from './components/LoadingScreen.vue'
-import { appPath } from './pages/routes/appRoutes'
-import { ThemeManager } from './util/theme-manager'
+import { ref, onMounted } from "vue";
+import { RouterView, useRouter } from "vue-router";
+import SideBarContainer from "./components/Common/SideBarContainer.vue";
+import GlobalDialogRenderer from "./util/DialogRenderer/GlobalDialogRenderer.vue";
+import LoadingScreen from "./components/LoadingScreen.vue";
+import { appPath } from "./pages/routes/appRoutes";
+import { ThemeManager } from "./util/theme-manager";
 
-const router      = useRouter()
-const showSideBar = ref(false)
+const router = useRouter();
+const showSideBar = ref(false);
 
-const isLoading   = ref(true)
+const isLoading = ref(true);
 onMounted(() => {
-  ThemeManager.init()
+  ThemeManager.init();
   setTimeout(() => {
-    isLoading.value = false
-  }, 2000)
-})
+    isLoading.value = false;
+  }, 2000);
+});
 
 if (window.ipcRenderer) {
-  window.ipcRenderer.on('is-setup-complete', (_e, ok: boolean) => {
-    showSideBar.value = ok
-  })
+  window.ipcRenderer.on("is-setup-complete", (_e, ok: boolean) => {
+    showSideBar.value = ok;
+  });
 }
 </script>
 
 <template>
-  <Transition
-    name="fade"
-    mode="out-in"
-    appear
-  >
+  <Transition name="fade" mode="out-in" appear>
     <LoadingScreen v-if="isLoading" key="splash" />
 
-    <div v-else key="app" class="dark:bg-[#18181880] bg-[#fbfbfb] min-h-screen">
+    <div v-else key="app">
       <SideBarContainer
         v-if="showSideBar"
         :currentRoute="router.currentRoute.value.path as appPath"
       >
-        <RouterView/>
+        <RouterView />
       </SideBarContainer>
-      <RouterView v-else/>
-      <GlobalDialogRenderer/>
+      <RouterView v-else />
+      <GlobalDialogRenderer />
     </div>
   </Transition>
 </template>

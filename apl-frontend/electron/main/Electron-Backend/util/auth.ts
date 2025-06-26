@@ -1,42 +1,21 @@
-// import { systemPreferences } from "electron";
-// import keytar from "keytar";
+import { safeStorage } from "electron";
+import Store from "electron-store";
 
-// const SERVICE = "MyElectronApp"; // you can choose any unique service name
-// const ACCOUNT = "user-auth-token"; // name for this particular credential entry
+type StorageKey = "token";
 
-// /**
-//  * Store a token securely in the OS vault.
-//  * On macOS/Windows this will trigger the first biometric prompt
-//  * (Touch ID or Windows Hello), then respect the system’s lock policies.
-//  *
-//  * @param {string} token — The token (e.g. JWT) you want to save.
-//  * @returns {Promise<void>}
-//  */
-// export async function storeToken(token: string) {
-//   try {
-//     await keytar.setPassword(SERVICE, ACCOUNT, token);
-//     console.log("Token stored successfully");
-//   } catch (err) {
-//     console.error("Failed to store token:", err);
-//     throw err;
-//   }
-// }
+export class APLStorage {
+  static async set(key: StorageKey, value: string) {
+    const encrypted = safeStorage.encryptString(value);
+    // @ts-ignore
+    new Store({ name: "storage" }).set(key, encrypted.toString("base64"));
+  }
 
-// /**
-//  * Retrieve the previously stored token.
-//  * If the vault is locked (per OS policy), this will prompt the user again.
-//  *
-//  * @returns {Promise<string|null>} — The token string, or null if not found.
-//  */
-// export async function fetchToken() {
-//   try {
-//     const token = await keytar.getPassword(SERVICE, ACCOUNT);
-//     if (token === null) {
-//       console.warn("No token found in secure vault");
-//     }
-//     return token;
-//   } catch (err) {
-//     console.error("Failed to fetch token:", err);
-//     throw err;
-//   }
-// }
+  // Retrieve and decrypt the base64-encoded token
+  static async get(key: StorageKey) {
+    // @ts-ignore
+    const base64 = new Store({ name: "storage" }).get(key);
+    if (!base64) return null;
+    const encryptedBuffer = Buffer.from(base64, "base64");
+    return safeStorage.decryptString(encryptedBuffer);
+  }
+}

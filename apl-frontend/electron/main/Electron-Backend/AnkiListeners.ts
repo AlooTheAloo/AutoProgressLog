@@ -88,12 +88,11 @@ export function ankiListeners() {
 
   ipcMain.handle("anki-connect-start", async (event: any) => {
     try {
-      win?.webContents.send("anki-connect-message", "Authenticating");
-      if (login == undefined) return false;
-
-      const httpClient = new AnkiHTTPClient(login.url);
-      await httpClient.login(login?.username, login?.password);
-      return await connectFromClient(httpClient, login);
+      // win?.webContents.send("anki-connect-message", "Authenticating");
+      // if (login == undefined) return false;
+      // const httpClient = new AnkiHTTPClient(login.url);
+      // await httpClient.login(login?.username, login?.password);
+      // return await connectFromClient(httpClient, login);
     } catch (e) {
       console.log("Error connecting to Anki" + e);
       return false;

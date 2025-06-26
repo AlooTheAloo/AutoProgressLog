@@ -1,5 +1,4 @@
 import { app, dialog, ipcMain } from "electron";
-import { TogglAccount } from "../../../apl-backend/entry/FindAccounts";
 import { Tags, Toggl } from "toggl-track";
 import {
   ankiIntegration,
@@ -24,6 +23,15 @@ import { getAnkiCardReviewCount } from "../../../apl-backend/anki/db";
 import dayjs from "dayjs";
 import machineId from "node-machine-id";
 import os from "os";
+import { EdenClient } from "./api/ApiManager";
+import { APLStorage } from "./util/auth";
+
+interface TogglAccount {
+  id: string;
+  name: string;
+  api_token: string;
+  pfp_url: string;
+}
 
 let account: TogglAccount | undefined;
 const DEFAULT_CONFIG: Options = {
@@ -85,20 +93,44 @@ export function getSetupAnki(): ankiOptions | undefined {
   return config.anki;
 }
 
+type AuthType = "login" | "signup";
+
+const emailMap = new Map<string, AuthType>();
+
 export function setupListeners() {
   ipcMain.handle("Send-Email", async (e: any, email: string) => {
     console.log("Sending email to " + email);
-    // TODO: Send email with magic link
+    const { status } = await EdenClient.auth.login.post({
+      email,
+    });
+
+    if (status == 200) {
+      emailMap.set(email, "login");
+    }
+
+    if (status == 201) {
+      emailMap.set(email, "signup");
+    }
   });
 
   ipcMain.handle(
     "approve-email-token",
-    async (e: any, email: string, token: string, userAgent: string) => {
-      console.log("Email " + email);
-      console.log("EmailToken " + token);
-      console.log("DeviceName is " + os.hostname().replace(/\.local$/, ""));
-      console.log("Machine ID is " + machineId.machineIdSync());
-      console.log("User agent is " + userAgent);
+    async (e: any, email: string, emailToken: string, userAgent: string) => {
+      const retVal = await EdenClient.auth.validate.post({
+        email,
+        emailToken,
+        deviceName: os.hostname().replace(/\.local$/, ""),
+        deviceId: machineId.machineIdSync(),
+        userAgent,
+      });
+      if (retVal.data == null) return false;
+      if ("error" in retVal.data) {
+        return false;
+      } else {
+        const type = emailMap.get(email);
+        APLStorage.set("token", retVal.data.token);
+        return type;
+      }
     }
   );
 
@@ -210,6 +242,7 @@ export function setupListeners() {
   });
 
   ipcMain.handle("toggl-api-key-set", async (event: any, arg: any) => {
+    EdenClient.auth;
     account = undefined;
     const me = await new Toggl({
       auth: {
