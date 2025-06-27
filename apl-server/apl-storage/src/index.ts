@@ -1,20 +1,31 @@
 import {Elysia} from "elysia";
 import swagger from "@elysiajs/swagger";
 import {staticPlugin} from "@elysiajs/static";
-
+import {registeredRoutes} from "./routes";
 export const app = new Elysia()
     .use(
         swagger({
-            path: '/docs',
+            path: '/documentation',
             documentation: {
                 info: {
                     title: 'AutoProgressLog Static API',
                     description: 'API to serve static files for AutoProgressLog',
                     version: '1.0.0',
-                }
+                },
+                tags: [{
+                    name: 'Database',
+                    description: 'Interact with the user database'
+                }, {
+                    name: 'Pictures',
+                    description: 'Upload and manage user pictures'
+                }]
             }
         }))
-    .use(staticPlugin())
+    .use(staticPlugin({
+        assets: './public',
+        prefix: '/public',
+    }))
+    .use(registeredRoutes)
     .listen(2727, (app) => {
         console.log(
             `APL static server is running at ${app.hostname}:${app.port}`

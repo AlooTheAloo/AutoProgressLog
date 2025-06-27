@@ -42,6 +42,10 @@ export const app = new Elysia()
                         name: "User",
                         description: "User-related endpoints",
                     },
+                    {
+                        name: 'Storage',
+                        description: 'Endpoints to interact with the storage service',
+                    }
                 ],
             },
         })

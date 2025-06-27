@@ -31,6 +31,17 @@ services:
     env_file: .env.server
     networks: [chromanet_dev]
 
+  apl-storage:
+    build:
+      context: .
+      dockerfile: storage-dev.Dockerfile
+    ports:
+      - "8081:2727"
+    volumes:
+      - ./apl-storage/public:/app/apl-storage/public
+    networks: [chromanet_dev]
+    env_file: .env.server
+
   prisma-studio:
     image: oven/bun:latest
     working_dir: /app
