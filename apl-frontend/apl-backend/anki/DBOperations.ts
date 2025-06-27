@@ -1,9 +1,4 @@
-import path from "path";
-import { fileURLToPath } from "url";
-import { ankiPath } from "../Helpers/getConfig";
 import sqlite3 from "sqlite3";
-import fs from "fs";
-import dayjs, { Dayjs } from "dayjs";
 
 const CleanAnkiDB = `
     PRAGMA foreign_keys = OFF;
@@ -90,17 +85,17 @@ const ClearOldRevlog = `
     COMMIT;
 `;
 
-export async function cleanAnkiDB() {
-  return await run(CleanAnkiDB);
+export async function cleanAnkiDB(path: string) {
+  return await run(path, CleanAnkiDB);
 }
 
-export async function clearOldRevlog() {
-  return await run(ClearOldRevlog);
+export async function clearOldRevlog(path: string) {
+  return await run(path, ClearOldRevlog);
 }
 
-export async function checkIntegrity(): Promise<boolean> {
+export async function checkIntegrity(path: string): Promise<boolean> {
   return new Promise<boolean>((res, rej) => {
-    const db = new sqlite3.Database(ankiPath, (err) => {
+    const db = new sqlite3.Database(path, (err) => {
       if (err) {
         console.error("Could not open database", err);
         return;
@@ -126,9 +121,9 @@ export async function checkIntegrity(): Promise<boolean> {
   });
 }
 
-function run(sql: string): Promise<boolean> {
+function run(path: string, sql: string): Promise<boolean> {
   return new Promise((resolve, reject) => {
-    const db = new sqlite3.Database(ankiPath, (openErr) => {
+    const db = new sqlite3.Database(path, (openErr) => {
       if (openErr) return resolve(false);
 
       db.exec(sql, (execErr) => {

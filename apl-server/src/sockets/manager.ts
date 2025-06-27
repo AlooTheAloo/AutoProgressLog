@@ -27,7 +27,7 @@ export class SocketManager {
       const { token } = message.payload;
       const id = await togglTokenToTogglID(token);
 
-      console.log("Auth attempt for " + id);
+      console.log("Auth attempt for ", "Socket");
 
       if (!id) {
         ws.close(401);

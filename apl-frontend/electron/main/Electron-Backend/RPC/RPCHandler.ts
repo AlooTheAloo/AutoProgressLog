@@ -7,6 +7,7 @@ import { onConfigChange } from "../SettingsListeners";
 import { Options } from "../../../../apl-backend/types/options";
 import { SocketClient } from "../Socket/SocketClient";
 import { Socket } from "dgram";
+import { Logger } from "../../../../apl-backend/Helpers/Log";
 
 type miniEvent = {
   activity: string;
@@ -62,7 +63,7 @@ async function createListeners() {
   });
 
   SocketClient.instance.on("ActivityStart", async (event) => {
-    console.log("RECEIVED ACTIVITY START");
+    Logger.log("Start Activity", "Socket");
     const lastEntry = await GetLastEntry();
     const seconds =
       (lastEntry?.toggl?.totalSeconds ?? 0) +

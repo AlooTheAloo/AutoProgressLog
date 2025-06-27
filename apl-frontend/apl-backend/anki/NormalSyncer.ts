@@ -1,8 +1,7 @@
 import dayjs from "dayjs";
 import AnkiHTTPClient from "./AnkiHTTPClient";
 import Storage from "./Storage";
-import { fileURLToPath } from "url";
-import path from "path";
+import { Logger } from "../Helpers/Log";
 
 export interface Chunk {
   done: boolean;
@@ -24,7 +23,6 @@ export default class NormalSyncer {
   }
 
   public async start(): Promise<boolean> {
-    const start = dayjs();
     const pending_usn = await this.startAndProcessDeletions();
     if (!pending_usn) return false;
     const proceeded = await this.processChunksFromServer(pending_usn);
@@ -49,7 +47,7 @@ export default class NormalSyncer {
       while (true) {
         const chunk = await this.client.getChunk();
         if (chunk == undefined) {
-          console.log("chunk was undefined...");
+          Logger.log("Chunk was undefined...", "Anki");
           s(false);
           return;
         }

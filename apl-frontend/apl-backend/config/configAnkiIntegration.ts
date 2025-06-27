@@ -1,7 +1,8 @@
 import { ankiIntegration } from "../types/options";
 import sqlite3 from "sqlite3";
 import { ankiPath } from "../Helpers/getConfig";
-import AnkiHTTPClient from "../entry/AnkiHTTPClient";
+import AnkiHTTPClient from "../anki/AnkiHTTPClient";
+import { Logger } from "../Helpers/Log";
 
 export interface ankiLogin {
   username: string;
@@ -39,13 +40,13 @@ export async function getDecksCards(): Promise<deck[]> {
                 prefsDB.all(
                   `SELECT name FROM decks WHERE id = ${row.did};`,
                   (err, rows: any) => {
+                    if (err) {
+                      Logger.log(err?.message, "Anki");
+                    }
+
                     if (rows == undefined || rows.length == 0)
                       return res(undefined);
 
-                    console.log("all rows" + JSON.stringify(rows));
-
-                    console.log("err", err);
-                    console.log("rows len", rows.length);
                     res({
                       cardCount: row.cardCount,
                       name: rows[0].name,

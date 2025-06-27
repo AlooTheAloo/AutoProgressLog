@@ -2,7 +2,8 @@ import dayjs, { Dayjs } from "dayjs";
 import sqlite3, { Database } from "sqlite3";
 import { ankiPath, getConfig, syncDataPath } from "../Helpers/getConfig";
 import { RetentionMode } from "../types/options";
-import { getSetupAnki } from "../../electron/main/Electron-Backend/SetupConfigBuilder";
+import { getSetupAnki } from "../../../apl-frontend/electron/main/Electron-Backend/SetupConfigBuilder";
+import { Logger } from "../Helpers/Log";
 
 interface reviewsrow {
   reviews: number;
@@ -40,7 +41,7 @@ export async function getAnkiCardReviewCount(
       [startTime.valueOf(), endTime.valueOf()],
       (err, rows: reviewsrow[]) => {
         if (err) {
-          console.log(err);
+          Logger.log(err.message, "Anki");
           res(null);
         } else {
           // Process the results
@@ -62,7 +63,7 @@ export async function getLastUpdate() {
       `select MAX(id) AS "latest" FROM revlog`,
       (err, resp: { latest: number }[]) => {
         if (err) {
-          console.log(err);
+          Logger.log(err.message, "Anki");
           res(0);
         } else {
           const latest = resp[0].latest ?? 0;
@@ -80,7 +81,7 @@ export async function DeleteAnkiData() {
       `UPDATE syncdata SET cardsStudied=0, totalCardsStudied=0, mature=0, retention=0, lastAnkiUpdate=0`,
       async (err, rows: { id: number }[]) => {
         if (err) {
-          console.log(err);
+          Logger.log(err.message, "Anki");
         }
         return res();
       }
@@ -109,7 +110,7 @@ export async function getRetention(
         (err, allReviews: reviewsrow[]) => {
           if (err) {
             res(null);
-            console.log(err);
+            Logger.log(err.message, "Anki");
           } else {
             db.all(
               `SELECT COUNT(*) as "reviews" FROM revlog r ${JoinTrackedDecks(
@@ -136,7 +137,7 @@ export async function getRetention(
             from revlog ${JoinTrackedDecks()} AND revlog.id > ${aMonthAgo}`,
         (err, a: any[]) => {
           if (err) {
-            console.log(err);
+            Logger.log(err.message, "Anki");
             res(null);
             return;
           }
@@ -147,8 +148,8 @@ export async function getRetention(
             let ret = (passed / (passed + flunked)) * 100;
             if (Number.isNaN(ret)) ret = 0;
             res(ret);
-          } catch (err) {
-            console.log(err);
+          } catch (err: any) {
+            Logger.log(err, "Anki");
           }
         }
       );
@@ -169,7 +170,7 @@ export async function getMatureCards() {
       )} AND cards.ivl >= 21;`,
       (err, rows: maturerow[]) => {
         if (err) {
-          console.log(err);
+          Logger.log(err.message, "Anki");
           res(null);
         } else {
           // Process the results
@@ -184,7 +185,7 @@ export async function getMatureCards() {
 function open() {
   return new sqlite3.Database(ankiPath, (err) => {
     if (err) {
-      console.log(err);
+      Logger.log(err.message, "Anki");
     }
   });
 }

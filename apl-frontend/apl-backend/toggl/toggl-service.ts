@@ -6,9 +6,12 @@ import { compareActivities } from "../Helpers/activityHelper";
 import { Toggl } from "toggl-track";
 import { getConfig } from "../Helpers/getConfig";
 import { activity } from "../types/activity";
-import { onConfigChange } from "../../electron/main/Electron-Backend/SettingsListeners";
+import { onConfigChange } from "../../../apl-frontend/electron/main/Electron-Backend/SettingsListeners";
 import { Options } from "../types/options";
 import { EventAction, TogglWebhookClient } from "toggl-webhook";
+import { Logger } from "../Helpers/Log";
+
+// TODO : All of this needs to be moved to the server
 
 const ignore = (tags: string[]) =>
   ["aplignore", "ignore", "autoprogresslogignore"].some((x) =>
@@ -48,7 +51,7 @@ export async function getTimeEntries(
     );
 
     // TODO : Telemetry maybe
-    console.log("Fetch took " + dayjs().diff(start, "ms") + " ms");
+    Logger.log("Fetch took " + dayjs().diff(start, "ms") + " ms", "Toggl");
     const entriesAfterLastGen = entries.filter((x) => {
       const formattedTags = x.tags.map((x) => (x as string).toLowerCase());
       return (
@@ -81,7 +84,7 @@ export async function getTimeEntries(
 
     return { entriesAfterLastGen, allEvents };
   } catch (e) {
-    console.log("error fetching entries", e);
+    Logger.log("Error fetching entries", "Toggl");
     return null;
   }
 }
@@ -93,7 +96,6 @@ onConfigChange.on(
       if (newConfig.toggl.togglToken == "") {
         toggl = undefined;
       } else {
-        console.log("creating new toggl");
         toggl = new Toggl({
           auth: {
             token: newConfig.toggl.togglToken,

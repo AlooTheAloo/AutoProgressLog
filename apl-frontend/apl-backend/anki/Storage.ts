@@ -1,8 +1,6 @@
 import { Graves } from "./AnkiHTTPClient";
 import sqlite3, { Database } from "sqlite3";
 import { CardEntry, Chunk, RevlogEntry } from "./NormalSyncer";
-import { fileURLToPath } from "url";
-import path from "path";
 
 export default class Storage {
   private db: Database;
@@ -39,7 +37,6 @@ export default class Storage {
   }
 
   public remove_card(cid: string) {
-    console.log("removing card " + cid);
     const stmt = this.db.prepare("delete from cards where id = ?");
     stmt.run(cid);
     stmt.finalize();
@@ -79,7 +76,6 @@ export default class Storage {
 
   // Entry is an array of the form [id, nid, did, ord, mod, usn, type, queue, due, ivl, factor, reps, lapses, left, odue, odid, flags, data]
   async addOrUpdateCardIfNewer(entry: CardEntry, pendingUsn: number) {
-    console.log("Adding or updating card", entry[0]);
     return new Promise<void>((s, j) => {
       this.db
         .prepare(
@@ -112,10 +108,4 @@ export default class Storage {
   async setUsn(usn: number): Promise<void> {
     this.db.prepare("UPDATE col SET usn = ?").run(usn);
   }
-}
-
-enum GraveKind {
-  Note,
-  Deck,
-  Card,
 }

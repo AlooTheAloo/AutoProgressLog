@@ -18,40 +18,38 @@ import {
   getDecksCards,
 } from "../../../apl-backend/config/configAnkiIntegration";
 import { onConfigChange } from "./SettingsListeners";
-import AnkiHTTPClient from "../../../apl-backend/entry/AnkiHTTPClient";
 import { ankiPath } from "../../../apl-backend/Helpers/getConfig";
+import AnkiHTTPClient from "../../../apl-backend/anki/AnkiHTTPClient";
+import { Logger } from "../../../apl-backend/Helpers/Log";
 
 export function ankiListeners() {
   ipcMain.handle("test-anki-connection", async (event: any, arg: ankiLogin) => {
-    win?.webContents.send("anki-connect-message", "Authenticating");
+    win?.webContents.send("anki-connect-message", "Testing anki connection");
 
-    const httpClient = new AnkiHTTPClient("", arg.url);
-    const loginInfo = await httpClient.login(arg.username, arg.password);
-    console.log("Info is " + loginInfo);
-    win?.webContents.send("anki-connect-message", "Downloading Anki Database");
-    return loadDB(httpClient);
+    // TODO : Make API Call here
+    // TODO : Ship this to the server
+    // const httpClient = new AnkiHTTPClient("", arg.url);
+    // const loginInfo = await httpClient.login(arg.username, arg.password);
+    // win?.webContents.send("anki-connect-message", "Downloading Anki Database");
+    // return loadDB(httpClient);
   });
 
   ipcMain.handle(
     "test-anki-connection-key",
     async (event: any, key: string, url: string) => {
-      win?.webContents.send("anki-connect-message", "Authenticating");
-      const httpClient = new AnkiHTTPClient(key, url);
-      return loadDB(httpClient);
+      // TODO : Make API Call here (and ship to server)
+      // win?.webContents.send("anki-connect-message", "Authenticating");
+      // const httpClient = new AnkiHTTPClient(key, url);
+      // return loadDB(httpClient);
     }
   );
 
   const loadDB = async (client: AnkiHTTPClient) => {
     const worked = await client.downloadInitialDatabase(ankiPath);
-    console.log("worked is " + worked);
     if (!worked) {
       return { worked: false, decks: [], key: "" };
     } else {
-      console.log("clearly because it worked we're here");
-      win?.webContents.send("anki-connect-message", "Reading decks");
       const decks = await getDecksCards();
-      console.log("and my decks are " + decks);
-      console.log("decks is " + decks);
       return { worked: true, decks: decks, key: client.key };
     }
   };
@@ -94,11 +92,12 @@ export function ankiListeners() {
       // await httpClient.login(login?.username, login?.password);
       // return await connectFromClient(httpClient, login);
     } catch (e) {
-      console.log("Error connecting to Anki" + e);
+      Logger.log("Error connecting to Anki" + e, "Anki");
       return false;
     }
   });
 
+  // Ship this to server too
   async function connectFromClient(client: AnkiHTTPClient, login: ankiLogin) {
     if (login == undefined) return false;
     if (!client.isLoggedIn()) return false;

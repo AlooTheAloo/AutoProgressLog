@@ -12,6 +12,7 @@ import { Layout } from "../apl-visuals/src/types/report-data.js";
 import { app } from "electron";
 import playwright, { Page } from "playwright";
 import { Browser, getInstalledBrowsers } from "@puppeteer/browsers";
+import { Logger } from "./Log.js";
 
 declare global {
   interface Window {
@@ -61,30 +62,33 @@ export async function buildImage(
     executablePath: execpath,
   });
 
-  console.log(11.2);
   const page = await browser.newPage();
-  console.log(11.3);
 
   // 1) Log browser console messages:
   page.on("console", (msg) => {
-    console.log(`⮞ console.${msg.type()}: ${msg.text()}`);
+    Logger.log(`${msg.type()}: ${msg.text()}`, "Playwright");
   });
 
   // 2) Log unhandled exceptions in the page context:
   page.on("pageerror", (error) => {
-    console.error("⮞ pageerror:", error);
+    Logger.log(`${error}`, "Playwright");
   });
 
   // 3) Log any failed network requests:
   page.on("requestfailed", (request) => {
-    console.warn(
-      `⮞ requestfailed: ${request.url()} — ${request.failure()?.errorText}`
+    Logger.log(
+      `Request failed : ${request.url()} — ${request.failure()?.errorText}`,
+      "Playwright"
     );
   });
 
   // 4) (Optional) Log all network requests/responses
-  page.on("request", (r) => console.log("⮞ request:", r.method(), r.url()));
-  page.on("response", (r) => console.log("⮞ response:", r.status(), r.url()));
+  page.on("request", (r) =>
+    Logger.log(`Request: ${r.method()} ${r.url()}`, "Playwright")
+  );
+  page.on("response", (r) =>
+    Logger.log(`Response: ${r.status()} ${r.url()})`, "Playwright")
+  );
 
   await page.addInitScript(
     ([data, layout]) => {
@@ -94,14 +98,10 @@ export async function buildImage(
     [reportData, reportLayout]
   );
 
-  console.log(11.4);
-
   await page.setViewportSize({
     width: Math.round((2000 * options.outputQuality) / 2),
     height, // ← use the same `height` you’ll pass to tryScreenshot
   });
-
-  console.log(11.5);
 
   const isDev = process.env.NODE_ENV === "development";
 
@@ -124,24 +124,17 @@ export async function buildImage(
         "index.html"
       );
 
-  console.log(`file:${visualsPath}`);
   await page.goto(`file:${visualsPath}`, { waitUntil: "networkidle" });
-  console.log(11.7);
 
   await tryScreenshot(
     page,
     outputPath as any,
     { width: 1586, height, x: 0, y: 0 },
     extensionToType(options.outputFile.extension),
-    3, // maxRetries
-    30_000 // timeoutMs (30 s — Puppeteer default is 30 s anyway)
+    3,
+    30_000
   );
-
-  console.log(11.8);
-
   await browser.close();
-  console.log(11.9);
-
   return outputPath;
 }
 
@@ -229,13 +222,10 @@ export function buildJSON(
     .slice(0, MOVING_AVERAGE_SIZE)
     .map((x) => x.seconds);
   const oldAverage = arithmeticWeightedMean(lastnElements);
-  console.log("LastnElements are " + JSON.stringify(lastnElements));
   const newnElements = [
     builderDTO.timeToAdd,
     ...lastnElements.slice(0, MOVING_AVERAGE_SIZE - 1),
   ];
-  console.log("NewnElements are " + JSON.stringify(newnElements));
-
   const newAverage = arithmeticWeightedMean(newnElements);
 
   const ImmersionScore = builderDTO.timeToAdd;

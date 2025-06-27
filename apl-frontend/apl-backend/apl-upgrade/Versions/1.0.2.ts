@@ -1,5 +1,5 @@
 import { SemVer } from "semver";
-import { win } from "../../../electron/main";
+import { win } from "../../../../apl-frontend/electron/main";
 import { DEFAULT_ANKI_URL } from "../../entry/AnkiHTTPClient";
 import { CacheManager } from "../../Helpers/cache";
 import { getConfig } from "../../Helpers/getConfig";

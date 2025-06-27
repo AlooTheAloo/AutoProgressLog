@@ -52,16 +52,10 @@ export class ThemeManager {
   /** Set user preference: light / dark / system */
   static setTheme(theme: Theme) {
     this._theme = theme;
-    console.log("setting theme to", theme);
-    localStorage.setItem("theme", theme);
-
     if (theme === "system") {
-      // immediately apply whatever the OS is currently
       const sys = this.mediaQuery.matches ? "dark" : "light";
-      console.log("system is", sys);
       this.applyResolvedTheme(sys, "system");
     } else {
-      console.log("applying the resolved theme", theme);
       this.applyResolvedTheme(theme, theme);
     }
   }
@@ -78,10 +72,8 @@ export class ThemeManager {
 
   /** Notify all listeners and toggle <html> class */
   private static applyResolvedTheme(resolved: "light" | "dark", raw: Theme) {
-    console.log("Applying theme:", resolved);
     document.documentElement.classList.toggle("dark", resolved === "dark");
     for (const cb of this._listeners) cb(resolved, raw);
-    console.log("Applied theme:", this._theme, "→", resolved);
   }
 
   /** Subscribe to changes in the *resolved* (light/dark) theme. */

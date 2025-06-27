@@ -67,8 +67,12 @@ onMounted(() => {
       window.navigator.userAgent
     );
 
-    if (resp) {
+    if (!resp) {
+      alert("Invalid email or token");
+    } else if (resp == "login") {
       router.push("/setup/auth-success");
+    } else if (resp == "signup") {
+      router.push("/app/dashboard");
     }
   });
 });

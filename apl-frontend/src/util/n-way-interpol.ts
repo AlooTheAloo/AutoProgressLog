@@ -7,7 +7,6 @@ export class NWayInterpol {
    * @param colors an array of CSS-color strings, e.g. ["red", "#0f0", "blue"]
    */
   constructor(...colors: string[]) {
-    console.log(colors);
     if (colors.length < 2) {
       throw new Error("Need at least two colors");
     }

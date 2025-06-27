@@ -8,23 +8,14 @@ import {
   ServerOptions,
 } from "../../../apl-backend/types/options";
 import { existsSync, writeFileSync } from "fs";
-import {
-  configPath,
-  getConfig,
-  syncDataPath,
-} from "../../../apl-backend/Helpers/getConfig";
-import sqlite3 from "sqlite3";
-import { CreateDB } from "../../../apl-backend/Helpers/DataBase/CreateDB";
+import { configPath } from "../../../apl-backend/Helpers/getConfig";
 import { win } from "..";
-import { buildContextMenu } from "./appBackend";
 import path from "path";
-import { CacheManager } from "../../../apl-backend/Helpers/cache";
-import { getAnkiCardReviewCount } from "../../../apl-backend/anki/db";
-import dayjs from "dayjs";
 import machineId from "node-machine-id";
 import os from "os";
 import { EdenClient } from "./api/ApiManager";
 import { APLStorage } from "./util/auth";
+import { Logger } from "../../../apl-backend/Helpers/Log";
 
 interface TogglAccount {
   id: string;
@@ -93,24 +84,12 @@ export function getSetupAnki(): ankiOptions | undefined {
   return config.anki;
 }
 
-type AuthType = "login" | "signup";
-
-const emailMap = new Map<string, AuthType>();
-
 export function setupListeners() {
   ipcMain.handle("Send-Email", async (e: any, email: string) => {
-    console.log("Sending email to " + email);
+    Logger.log("Sending email to " + email, "API");
     const { status } = await EdenClient.auth.login.post({
       email,
     });
-
-    if (status == 200) {
-      emailMap.set(email, "login");
-    }
-
-    if (status == 201) {
-      emailMap.set(email, "signup");
-    }
   });
 
   ipcMain.handle(
@@ -127,9 +106,17 @@ export function setupListeners() {
       if ("error" in retVal.data) {
         return false;
       } else {
-        const type = emailMap.get(email);
         APLStorage.set("token", retVal.data.token);
-        return type;
+
+        const config = await EdenClient.user.config.get({
+          headers: {
+            authorization: `Bearer ${retVal.data.token}`,
+          },
+        });
+        if (config.error || config.status != 200) {
+          return false;
+        }
+        return config.data == null ? "signup" : "login";
       }
     }
   );
@@ -152,31 +139,32 @@ export function setupListeners() {
   ipcMain.handle("SaveConfig", async (event: any, arg: any) => {
     if (existsSync(configPath)) return;
     writeFileSync(configPath, JSON.stringify(config));
-    await new Promise<void>((res, rej) => {
-      let db = new sqlite3.Database(
-        syncDataPath,
-        sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE,
-        async (err) => {
-          let cards = 0;
-          if (config.anki?.enabled) {
-            cards =
-              (await getAnkiCardReviewCount(
-                dayjs(0),
-                dayjs().startOf("day")
-              )) ?? 0;
-          }
-          const time = await CreateDB(db, {
-            cards: cards,
-          });
-          if (time == undefined) return;
+    // await new Promise<void>((res, rej) => {
+    //   let db = new sqlite3.Database(
+    //     syncDataPath,
+    //     sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE,
+    //     async (err) => {
+    //       let cards = 0;
+    //       if (config.anki?.enabled) {
+    //         cards =
+    //           (await getAnkiCardReviewCount(
+    //             dayjs(0),
+    //             dayjs().startOf("day")
+    //           )) ?? 0;
+    //       }
+    //       const time = await CreateDB(db, {
+    //         cards: cards,
+    //       });
+    //       if (time == undefined) return;
 
-          CacheManager.init(time, cards);
-          res();
-        }
-      );
-    });
-    await buildContextMenu();
-    console.log("Done!!");
+    //       CacheManager.init(time, cards);
+    //       res();
+    //     }
+    //   );
+    // });
+    // await buildContextMenu();
+
+    // TODO : Make API Call here
     return;
   });
 
@@ -201,7 +189,6 @@ export function setupListeners() {
 
   ipcMain.handle("OpenFileDialog", (evt, openAt) => {
     if (win == undefined) return;
-    console.log("Opening file dialog");
     return dialog.showOpenDialogSync(win, {
       properties: [
         "openFile",
@@ -242,7 +229,6 @@ export function setupListeners() {
   });
 
   ipcMain.handle("toggl-api-key-set", async (event: any, arg: any) => {
-    EdenClient.auth;
     account = undefined;
     const me = await new Toggl({
       auth: {

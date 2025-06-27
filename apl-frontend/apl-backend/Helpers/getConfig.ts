@@ -28,11 +28,11 @@ export function updateConfig() {
   config = JSON.parse(fs.readFileSync(configPath).toString());
 }
 
+// TODO: Replace this with API Call
 export function getConfig(): Options | null {
   return null;
   if (config == null) {
     if (!fs.existsSync(configPath)) {
-      console.log("Unable to find config");
       return null;
     }
 

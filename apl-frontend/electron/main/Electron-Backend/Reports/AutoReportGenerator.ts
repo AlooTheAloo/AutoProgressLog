@@ -29,7 +29,6 @@ export async function createAutoReport() {
 }
 
 async function createJob() {
-  console.log("Creating job");
   const config = getConfig();
   if (config == undefined) return;
 
@@ -46,7 +45,6 @@ async function createJob() {
   }
 
   id = powerSaveBlocker.start("prevent-app-suspension");
-  console.log("id is " + id);
   currentJob = nodeScheduler.scheduleJob(
     `0 ${config.general.autogen.options?.generationTime.minutes} ${config.general.autogen.options?.generationTime.hours} * * *`,
     async () => {

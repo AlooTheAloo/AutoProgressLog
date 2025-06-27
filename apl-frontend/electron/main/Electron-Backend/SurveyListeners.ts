@@ -1,6 +1,7 @@
 import axios from "axios";
 import { ipcMain, ipcRenderer } from "electron";
 import { SERVER_URL } from "./api/ApiManager";
+import { Logger } from "../../../apl-backend/Helpers/Log";
 
 interface surveyAnswer {
   track?: string;
@@ -40,10 +41,10 @@ export async function surveyListeners() {
 }
 
 function sendSurveyAnswer() {
-  console.log("Sending survey answer" + JSON.stringify(surveyAnswer));
+  Logger.log("Sending survey answer" + JSON.stringify(surveyAnswer), "API");
   try {
     axios.post(`${SERVER_URL}survey-answer/v1`, surveyAnswer);
   } catch (e) {
-    console.log("Error sending survey answer");
+    Logger.log("Error sending survey answer", "API");
   }
 }
