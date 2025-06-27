@@ -15,6 +15,7 @@ const evt_props = {
 /**
  * Initializes or enables the APL webhook. Consumes 2 tokens.
  * @param workspaceID The workspace ID to use. If -1, uses the default workspace and consumes 1 extra token.
+ * @param togglToken
  */
 export default async function createWebhook(
   workspaceID = -1,
@@ -42,7 +43,7 @@ export default async function createWebhook(
 
   const wh = ls.find((x) => x.description == wh_name);
   if (wh != undefined) {
-    client.updateSubscription({
+    await client.updateSubscription({
       subscription_id: wh.subscription_id,
       workspace_id: wh.workspace_id,
       url_callback: wh_link,
