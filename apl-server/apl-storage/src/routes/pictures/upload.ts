@@ -48,13 +48,14 @@ export const uploadRoute = new Elysia({name: 'upload-route'})
 
         // Extract file from body
         const file = body.file as File;
-
-        // Convert file contents to Uint8Array buffer
         const buffer = new Uint8Array(await file.arrayBuffer());
 
-        // Construct the directory and file paths
+        const ext = path.extname(file.name).toLowerCase(); // e.g., ".jpeg"
+        const safeExt = ['.png', '.jpg', '.jpeg', '.webp'].includes(ext) ? ext : '.png'; // fallback
+
         const dirPath = path.resolve('./public', 'pictures');
-        const filePath = path.join(dirPath, `${userId}.png`);
+        const filePath = path.join(dirPath, `${userId}${safeExt}`);
+
 
         // Create the directory if it doesn't exist
         await mkdir(dirPath, {recursive: true});
