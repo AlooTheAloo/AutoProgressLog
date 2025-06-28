@@ -27,7 +27,7 @@ import {existsSync, createReadStream} from 'fs';
  * ```
  * ./public/pictures/{userId}.png
  * ```
- * Where `{userId}` is the UUID received from the URL.
+ * Where `{userId}` is the id of the user.
  *
  * ---
  *
@@ -66,7 +66,7 @@ export const fetchRoute = new Elysia({name: 'fetch-picture'}).get(
     },
     {
         params: t.Object({
-            userId: t.String({format: 'uuid'})  // userId should be a valid UUID
+            userId: t.Integer()
         }),
         detail: {
             tags: ['Pictures'],

@@ -22,7 +22,7 @@ import {existsSync} from 'fs';
  * ---
  *
  * ### 📥 Expected input
- * - `userId` as a path parameter (UUID format)
+ * - `userId` as a number
  *
  * ---
  *
@@ -52,7 +52,7 @@ export const deleteRoute = new Elysia({name: 'delete-picture'}).delete(
     },
     {
         params: t.Object({
-            userId: t.String({format: 'uuid'}),
+            userId: t.Integer(),
         }),
         response: t.Union([
             t.Object({

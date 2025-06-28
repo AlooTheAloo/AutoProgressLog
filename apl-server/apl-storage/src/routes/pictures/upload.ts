@@ -24,7 +24,7 @@ import path from "path";
  * ```
  * ./public/pictures/{userId}.png
  * ```
- * Where `userId` is the UUID passed in the URL.
+ * Where `userId` is the id passed in the URL parameter.
  *
  * ---
  *
@@ -39,7 +39,7 @@ import path from "path";
  *
  * ### ✅ Behavior
  * 1. Ensures `public/pictures` exists (creates it if necessary)
- * 2. Writes file contents as a PNG using the user’s UUID as filename
+ * 2. Writes file contents as a PNG using the user’s id as filename
  * 3. Responds with a success message
  */
 export const uploadRoute = new Elysia({ name: "upload-picture" }).post(
@@ -73,7 +73,7 @@ export const uploadRoute = new Elysia({ name: "upload-picture" }).post(
       file: t.File(),
     }),
     params: t.Object({
-      userId: t.String({ format: "uuid" }),
+      userId: t.Integer(),
     }),
     response: t.Object({
       message: t.String(),
