@@ -124,9 +124,8 @@ export async function CreateDTO() {
       : undefined,
     immersionDTO: {
       totalImmersion: lastEntry?.toggl?.totalSeconds ?? 0,
-      immersionSinceLastReport: await GetImmersionTimeSince(
-        dayjs(lastReport.generationTime)
-      ),
+      immersionSinceLastReport:
+        (lastEntry?.toggl?.totalSeconds ?? 0) - lastReport.totalSeconds,
       monthlyImmersion: thisMonth,
       monthlyImmersionLastMonth: lastMonth,
       immersionSources: await GetImmersionSourcesSince(
