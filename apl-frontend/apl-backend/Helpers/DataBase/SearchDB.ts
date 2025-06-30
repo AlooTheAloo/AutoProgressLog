@@ -2,7 +2,7 @@ import sqlite3 from "sqlite3";
 import { syncDataPath } from "../getConfig";
 import { ImmersionActivity, SyncData, SyncType } from "../../types/sync";
 import dayjs from "dayjs";
-import { ImmersionSource } from "../../../electron/main/Electron-Backend/types/Dashboard";
+import { ImmersionSource } from "../../../../apl-frontend/electron/main/Electron-Backend/types/Dashboard";
 import { entry } from "../../types/entry";
 
 interface flatSyncData {

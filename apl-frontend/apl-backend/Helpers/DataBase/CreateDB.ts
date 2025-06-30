@@ -1,6 +1,7 @@
 import dayjs from "dayjs";
 import sqlite3 from "sqlite3";
 import { getTimeEntries } from "../../toggl/toggl-service";
+import { Logger } from "../Log";
 
 export async function CreateDB(
   db: sqlite3.Database,
@@ -30,7 +31,7 @@ export async function CreateDB(
       )
     `,
     () => {
-      console.log('Table "syncData" created');
+      Logger.log("Table 'syncData' created", "DB");
       db.run(
         `INSERT INTO syncData (id, generationTime, totalSeconds, totalCardsStudied, cardsStudied, mature, retention, type, lastAnkiUpdate) VALUES (
               $id, $generationTime, $totalSeconds, $totalCardsStudied, $cardsStudied, $mature, $retention, $type, $lastAnkiUpdate)`,

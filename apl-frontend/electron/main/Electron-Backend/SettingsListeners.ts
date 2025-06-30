@@ -13,6 +13,7 @@ import { app } from "electron";
 import path from "node:path";
 import { cpSync, rmSync } from "node:fs";
 import { setConfig } from "../../../apl-backend/config/configManager";
+import { Logger } from "../../../apl-backend/Helpers/Log";
 
 export const onConfigChange = new EventEmitter();
 
@@ -37,7 +38,7 @@ export function settingsListeners() {
   );
 
   ipcMain.handle("reset-settings", async () => {
-    console.log("reset settings handled in the electron process");
+    Logger.log("Reset settings handled in the electron process", "Settings");
     rmSync(path.resolve(configPath, "../"), {
       recursive: true,
       force: true,

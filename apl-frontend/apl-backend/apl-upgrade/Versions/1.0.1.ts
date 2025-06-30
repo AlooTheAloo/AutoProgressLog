@@ -1,10 +1,10 @@
 import { SemVer } from "semver";
-import { win } from "../../../electron/main";
-import { DEFAULT_ANKI_URL } from "../../entry/AnkiHTTPClient";
+import { win } from "../../../../apl-frontend/electron/main";
 import { CacheManager } from "../../Helpers/cache";
 import { getConfig } from "../../Helpers/getConfig";
 import { Options } from "../../types/options";
 import { setConfig } from "../../config/configManager";
+import { DEFAULT_ANKI_URL } from "../../anki/AnkiHTTPClient";
 
 interface previous_config {
   general: {

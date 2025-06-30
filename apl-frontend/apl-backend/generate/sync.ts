@@ -23,15 +23,16 @@ import {
 } from "../anki/db";
 import dayjs from "dayjs";
 import { sumTime } from "../Helpers/entryHelper";
-import { CreateDTO } from "../../electron/main/Electron-Backend/DashboardListeners";
+import { CreateDTO } from "../../../apl-frontend/electron/main/Electron-Backend/DashboardListeners";
 import { SyncData } from "../types/sync";
 import { CacheManager } from "../Helpers/cache";
-import { win } from "../../electron/main";
-import NormalSyncer from "../entry/NormalSyncer";
-import AnkiHTTPClient from "../entry/AnkiHTTPClient";
-import Storage from "../entry/Storage";
+import { win } from "../../../apl-frontend/electron/main";
 import { NotificationManager } from "../Helpers/notifications";
-import { clearOldRevlog } from "../entry/DBOperations";
+import NormalSyncer from "../anki/NormalSyncer";
+import Storage from "../anki/Storage";
+import AnkiHTTPClient from "../anki/AnkiHTTPClient";
+import { clearOldRevlog } from "../anki/DBOperations";
+import { Logger } from "../Helpers/Log";
 
 export interface AnkiSyncData {
   cardReview: number;
@@ -85,17 +86,18 @@ export async function runSync(props: syncProps = DEFAULT) {
         await syncAnki(props.isReport)
           .then(res)
           .catch((e) => {
-            console.log("Anki sync failed" + e);
+            Logger.log("Anki sync failed" + e, "Anki");
             rej();
           });
-        console.log(
-          "Finished syncing anki in ",
-          dayjs().diff(start, "ms") + " ms"
+
+        Logger.log(
+          `Finished syncing anki in ${dayjs().diff(start, "ms")} ms`,
+          "Anki"
         );
       }),
     ]);
   } catch (e) {
-    console.log("Sync failed" + e);
+    Logger.log("Sync failed" + e, "Anki");
     return false;
   }
 
@@ -211,7 +213,7 @@ export async function syncAnki(isReport = false): Promise<AnkiSyncData | null> {
     return null;
   } else {
     // Everything worked fine, slim out the Anki DB
-    clearOldRevlog();
+    clearOldRevlog(ankiPath);
   }
   return {
     cardReview: cardReview,
@@ -254,7 +256,7 @@ export async function VerifyPreviousActivities(
 
     // return the async modify call (so Promise.all will wait on it)
     return ModifyActivityByID(entry.id, entry).then(() =>
-      console.log(`Modified ${entry.id}`)
+      Logger.log(`Modified ${entry.id}`, "Toggl")
     );
   });
 

@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import { win } from "../../../electron/main";
+import { win } from "../../../../apl-frontend/electron/main";
 import nodeScheduler from "node-schedule";
 import { NotificationManager } from "../notifications";
 
@@ -14,7 +14,6 @@ export async function checkInternet() {
     await fetch("https://google.com");
     return true;
   } catch (e) {
-    console.log("Error is " + e);
     return false;
   }
 }

@@ -35,6 +35,12 @@ export function buildMenu(app: App) {
         }, // About menu item
         { type: "separator" },
         {
+          label: "Check for Updates",
+          click: () => {
+            ipcMain.emit("check-for-update");
+          },
+        },
+        {
           label: "Settings",
           accelerator: "CmdOrCtrl+,",
           enabled: getConfig() != null,

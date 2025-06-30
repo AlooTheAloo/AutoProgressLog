@@ -43,7 +43,6 @@ function SelectServer() {
           alt="APL Logo"
           class="w-16 h-16 sm:w-20 sm:h-20 block"
         />
-        <BackButton route="/setup/index" />
         <h1
           class="text-xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-semibold text-white leading-tight"
         >

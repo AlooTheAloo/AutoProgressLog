@@ -24,6 +24,10 @@ export const setupRoutes = [
     component: () => import("../Setup/Auth/Setup-Auth.vue"),
   },
   {
+    path: "/setup/auth-success",
+    component: () => import("../Setup/Auth/Auth-Success.vue"),
+  },
+  {
     path: "/setup/client-server-selection",
     component: () => import("../Setup/Other/Setup-client-server-selection.vue"),
   },

@@ -31,3 +31,4 @@ yarn.lock
 bun.lockb
 
 apl-frontend/apl-backend/apl-visuals/visuals/assets/*
+.env

@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, shell } from "electron";
+import { app, BrowserWindow, dialog, ipcMain, shell } from "electron";
 import { fileURLToPath } from "node:url";
 import registerEvents from "./Electron-Backend/";
 import path from "node:path";
@@ -20,7 +20,7 @@ import { CacheManager } from "../../apl-backend/Helpers/cache";
 import checkHealth from "./Electron-App/HealthCheck";
 import { init } from "@bokuweb/zstd-wasm";
 import { SocketClient } from "./Electron-Backend/Socket/SocketClient";
-import { dialog } from "electron";
+
 import {
   Browser,
   detectBrowserPlatform,
@@ -28,6 +28,27 @@ import {
   install,
   resolveBuildId,
 } from "@puppeteer/browsers";
+import { initializeDeepLink } from "./Electron-Backend/DeepLink";
+import { config as dotenvConfig } from "dotenv";
+import { initializeApiManager } from "./Electron-Backend/api/ApiManager";
+import { Logger } from "../../apl-backend/Helpers/Log";
+
+const isProd = app.isPackaged;
+
+// When packaged, use the correct path relative to the `.asar`
+const envPath = isProd
+  ? path.join(process.resourcesPath, "app.asar.unpacked", ".env.production")
+  : path.resolve(".env");
+
+Logger.log(`Loading ${envPath}`, "ENV");
+if (fs.existsSync(envPath)) {
+  dotenvConfig({ path: envPath });
+  Logger.log(`SERVER_URL = ${process.env.SERVER_URL}`, "ENV");
+} else {
+  Logger.log(`Missing .env file at ${envPath}`, "ENV");
+}
+
+initializeApiManager();
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -61,7 +82,7 @@ if (process.platform === "win32") app.setAppUserModelId(app.getName());
 
 if (!VITE_DEV_SERVER_URL) {
   if (!app.requestSingleInstanceLock()) {
-    console.log("dead");
+    Logger.log("App already running");
     app.quit();
     process.exit(0);
   }
@@ -71,7 +92,6 @@ export let win: BrowserWindow | null = null;
 const preload = path.join(__dirname, "../preload/index.mjs");
 export const indexHtml = path.join(RENDERER_DIST, "index.html");
 export async function createWindow() {
-  console.log("creating window");
   win = new BrowserWindow({
     show: true,
     minHeight: 600,
@@ -90,8 +110,8 @@ export async function createWindow() {
     if (process.env.NODE_ENV !== "development") {
       win?.show();
     } else {
-      win?.showInactive();
-      win?.blur();
+      // win?.showInactive();
+      // win?.blur();
     }
   });
   win.setMenuBarVisibility(false);
@@ -99,7 +119,6 @@ export async function createWindow() {
     // #298
     win.loadURL(VITE_DEV_SERVER_URL);
     // Open devTool if the app is not packaged
-    console.log("opening devt");
     win.webContents.openDevTools();
   } else {
     win.loadFile(indexHtml);
@@ -122,13 +141,14 @@ export async function createWindow() {
 app
   .whenReady()
   .then(async () => {
+    Logger.log("2");
+
     await createWindow();
     if (
       app.getLoginItemSettings().wasOpenedAtLogin ||
       process.argv.includes("was-opened-at-login")
     ) {
       win?.destroy();
-      console.log("App opened at login but window not created");
       return;
     }
   })
@@ -158,17 +178,6 @@ app.on("second-instance", async (evt, cmd, wd) => {
     win?.focus();
     buildContextMenu();
   }
-
-  const text = cmd.pop();
-  if (text?.startsWith("apl://")) {
-    win?.webContents.send("open-url", text.slice(6));
-  }
-});
-
-app.on("open-url", (event, url) => {
-  if (url.startsWith("apl://")) {
-    win?.webContents.send("open-url", url.slice(6));
-  }
 });
 
 app.on("activate", () => {
@@ -181,7 +190,7 @@ app.on("activate", () => {
       app.getLoginItemSettings().wasOpenedAtLogin ||
       process.argv.includes("was-opened-at-login")
     ) {
-      console.log("App opened at login but window not created");
+      Logger.log("App opened at login but window not created");
       win?.destroy();
       return;
     }
@@ -203,8 +212,8 @@ app.on("ready", async () => {
         token: getConfig()?.toggl.togglToken ?? "",
       });
     } catch (e) {
-      console.log("Failed to init socket client");
-      console.log(e);
+      Logger.log("Failed to init socket client", "Socket");
+      Logger.log(e, "Socket");
     }
   }
 
@@ -228,28 +237,17 @@ app.on("ready", async () => {
     );
     process.stderr.write(args.join(" ") + "\n");
   };
-
   const isDev = process.env.NODE_ENV === "development";
-
-  // TODO : Make this into a setting
   if (!app.getLoginItemSettings().openAtLogin && !isDev) {
     app.setLoginItemSettings({
       openAtLogin: !isDev,
       args: ["was-opened-at-login"],
     });
   }
-
-  // Register the APL protocol
-  if (!isDev) {
-    if (process.argv.length >= 2) {
-      app.setAsDefaultProtocolClient("apl", process.execPath, [
-        path.resolve(process.argv[1]),
-      ]);
-    }
-  }
+  await initializeDeepLink();
 });
 
-async () => {
+(async () => {
   const cachedir = path.join(app.getPath("home"), ".cache", "puppeteer");
   const browsers = await getInstalledBrowsers({
     cacheDir: cachedir,
@@ -267,4 +265,4 @@ async () => {
       unpack: true,
     });
   }
-};
+})();

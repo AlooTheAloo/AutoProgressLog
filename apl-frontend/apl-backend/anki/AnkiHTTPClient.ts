@@ -4,6 +4,8 @@ import { Chunk } from "./NormalSyncer";
 import { init, compress } from "@bokuweb/zstd-wasm";
 import path from "path";
 import { checkIntegrity, cleanAnkiDB } from "./DBOperations";
+import { Logger } from "../Helpers/Log";
+import { ankiPath } from "../Helpers/getConfig";
 
 export interface Graves {
   cards: string[];
@@ -82,7 +84,7 @@ export default class AnkiHTTPClient {
     });
 
     if (response.status != 200) {
-      console.log("Response was not 200, it was " + response.status);
+      Logger.log("Response was not 200, it was " + response.status, "Anki");
       return undefined;
     }
     const blob = await response.blob();
@@ -148,7 +150,7 @@ export default class AnkiHTTPClient {
     writeFileSync(filePath, obj);
 
     // Slims down ~98% of the database size
-    const integrity = await cleanAnkiDB();
+    const integrity = await cleanAnkiDB(ankiPath);
 
     if (!integrity) {
       return false;

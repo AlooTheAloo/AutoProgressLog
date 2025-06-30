@@ -1,6 +1,6 @@
 import WebSocket from "ws";
-
-const URL = "wss://apl.chromaserver.net/ws";
+import { SERVER_URL } from "../api/ApiManager";
+import { Logger } from "../../../../apl-backend/Helpers/Log";
 
 export class SocketClient {
   static instance: SocketClient; // Singleton
@@ -11,7 +11,6 @@ export class SocketClient {
   private authData?: { token: string }; // store last authData for reconnect
   private reconnectDelay = 3000; // ms
   private isReconnecting = false;
-  private shouldReconnect = true;
   private heartbeatInterval?: NodeJS.Timeout;
 
   constructor() {
@@ -19,16 +18,15 @@ export class SocketClient {
   }
 
   async init(authData: { token: string }): Promise<void> {
-    console.log("Initializing WebSocket client");
-
+    const URL = `ws://${SERVER_URL}/ws`;
     this.authData = authData; // store for reconnect
 
     return new Promise<void>((resolve, reject) => {
+      Logger.log("Connecting to Socket with URL " + URL, "Socket");
       this.socket = new WebSocket(URL, {});
 
       this.socket.addEventListener("open", () => {
-        console.log("Connected to WebSocket, sending auth");
-
+        Logger.log("Connected to WebSocket, sending auth", "Socket");
         this.socket?.send(
           JSON.stringify({
             type: "auth",
@@ -36,7 +34,6 @@ export class SocketClient {
           }),
           (err) => {
             this.startHeartbeat();
-            console.log("Sent auth", err);
           }
         );
 
@@ -45,30 +42,32 @@ export class SocketClient {
       });
 
       this.socket.addEventListener("error", (err) => {
-        console.log("WebSocket error", (err as any).message);
+        Logger.log("WebSocket error : " + (err as any).message, "Socket");
         reject(err);
       });
 
       this.socket.addEventListener("close", (event) => {
-        console.warn(`WebSocket closed: ${event.code} ${event.reason}`);
+        Logger.log(`WebSocket closed: ${event.code} ${event.reason}`, "Socket");
         this.stopHeartbeat();
-        if (this.shouldReconnect && !this.isReconnecting) {
-          console.log("reconnecting");
+        if (!this.isReconnecting) {
+          Logger.log("Reconnecting to socket", "Socket");
           this.reconnect();
         }
       });
 
       this.socket.addEventListener("message", (event) => {
         try {
-          console.log("Message! " + event.data);
           const parsed = JSON.parse(event.data.toString());
           const { type, payload } = parsed;
           const listener = this.eventListeners[type as keyof EventMap];
           if (listener) {
             listener(payload);
           }
+          if (type !== "pong") {
+            Logger.log("Message! " + event.data, "Socket");
+          }
         } catch (err) {
-          console.error("Error parsing WebSocket message", err);
+          Logger.log("Error parsing WebSocket message", "Socket");
         }
       });
     });
@@ -76,16 +75,19 @@ export class SocketClient {
 
   private reconnect() {
     if (!this.authData) {
-      console.warn("No auth data stored. Cannot reconnect.");
+      Logger.log("No auth data stored. Cannot reconnect.", "Socket");
       return;
     }
 
     this.isReconnecting = true;
 
-    console.log(`Reconnecting in ${this.reconnectDelay / 1000}s...`);
+    Logger.log(
+      "Reconnecting to socket in " + this.reconnectDelay / 1000 + "s",
+      "Socket"
+    );
     setTimeout(() => {
       if (this.authData == undefined) return;
-      console.log("Attempting to reconnect...");
+      Logger.log("Reconnecting to socket after delay", "Socket");
       this.init(this.authData).catch((err) => {
         console.error("Reconnect failed", err);
         // Will retry again after delay
@@ -114,19 +116,17 @@ export class SocketClient {
         })
       );
     } else {
-      console.warn("WebSocket is not open. Cannot send message.");
+      Logger.log("WebSocket is not open. Cannot send message.", "Socket");
     }
   }
 
   public disconnect(): void {
-    // this.shouldReconnect = false;
     this.socket?.close();
   }
 
   private startHeartbeat() {
     this.stopHeartbeat();
     this.heartbeatInterval = setInterval(() => {
-      console.log("hearbeat");
       if (this.socket?.readyState === WebSocket.OPEN) {
         this.socket.send(JSON.stringify({ type: "ping", payload: {} }));
       }

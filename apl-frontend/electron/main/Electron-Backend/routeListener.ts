@@ -7,7 +7,7 @@ export function routeListeners() {
   ipcMain.handle("PageSelect", (event, args) => {
     if (getConfig() === null) {
       win?.webContents.send("is-setup-complete", false);
-      return "/setup/index";
+      return "/setup/auth-success";
     } else {
       const ver = CacheManager.verifyVersion();
       if (!ver) {

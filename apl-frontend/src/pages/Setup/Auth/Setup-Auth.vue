@@ -10,6 +10,7 @@ import ProgressSpinner from "primevue/progressspinner";
 import Logo from "../../../assets/Logo.png";
 import { ThemeManager } from "../../../util/theme-manager";
 import { motion } from "motion-v";
+import { z } from "zod";
 
 const router = useRouter();
 const { height } = useWindowSize();
@@ -36,19 +37,44 @@ function startTimer() {
   }, 1000);
 }
 
-function NextPage() {
-  router.push("/setup/anki-home");
-}
-
 function SendEmail() {
   if (!isEmailValid.value) return;
   emailSent.value = true;
-  // TODO: Send email
+  window.ipcRenderer.invoke("Send-Email", email.value);
   startTimer();
 }
 
+const protocolSchema = z.object({
+  email: z.string().email(),
+  token: z.string(),
+});
+
 onMounted(() => {
-  ThemeManager.setTheme("dark");
+  window.ipcRenderer.on("open-url", async (evt, data: string) => {
+    const url = new URL(data);
+    if (url.hostname !== "auth") return;
+    const parsed = Object.fromEntries(url.searchParams);
+    const result = protocolSchema.safeParse(parsed);
+    if (!result.success) {
+      alert("Invalid data received from url. Please try again.");
+      return;
+    }
+    const { email, token } = result.data;
+    const resp = await window.ipcRenderer.invoke(
+      "approve-email-token",
+      email,
+      token,
+      window.navigator.userAgent
+    );
+
+    if (!resp) {
+      alert("Invalid email or token");
+    } else if (resp == "login") {
+      router.push("/setup/auth-success");
+    } else if (resp == "signup") {
+      router.push("/app/dashboard");
+    }
+  });
 });
 onUnmounted(() => {
   if (timerId) clearInterval(timerId);

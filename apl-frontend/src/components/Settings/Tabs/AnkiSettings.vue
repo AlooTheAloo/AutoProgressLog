@@ -19,6 +19,7 @@ import AccordionHeader from "primevue/accordionheader";
 import AccordionContent from "primevue/accordioncontent";
 import Password from "primevue/password";
 import ProgressSpinner from "primevue/progressspinner";
+import AnkiIcon from "../../../assets/ank.png";
 
 interface algorithm {
   key: string;
@@ -278,20 +279,34 @@ function updateAnki(value: boolean) {
     </div>
   </Dialog>
 
-  <div class="flex flex-col w-full gap-6 pt-6 flex-grow" v-if="config != undefined">
+  <div class="flex flex-col w-full gap-4 pt-6 flex-grow" v-if="config != undefined">
     <div class="flex items-center h-12 gap-3">
       <h1 class="text-2xl font-bold dark:text-white text-black">
         Connection settings
       </h1>
-      <Button
-        class="w-fit h-10"
-        v-on:click="easyAnkiVisible = true"
-        :loading="testing_connection"
-      >
-        Easy Anki setup
-      </Button>
     </div>
+<div class="flex items-center gap-4 mb-2">
+  <!-- match the same label styling/width used elsewhere -->
+  <label class="text-white font-semibold w-48">
+    Anki Setup
+  </label>
 
+  <Button
+    class="w-[250px] p-3 ml-[5.5rem]  !rounded-full font-bold flex items-center"
+    @click="easyAnkiVisible = true"
+    :loading="testing_connection"
+  >
+    <img
+      :src="AnkiIcon"
+      alt="Anki"
+      class="w-7 h-7 mr-2 flex-shrink-0"
+    />
+    Easy Anki setup
+  </Button>
+</div>
+
+
+      
     <SettingsToggle
       :value="config.anki.enabled"
       label="Synchronize Anki"
@@ -299,6 +314,7 @@ function updateAnki(value: boolean) {
       @update:value="updateAnki"
       :disabled="testing_connection"
     />
+  
 
     <SettingsField
       :value="props.config?.anki.ankiIntegration?.key"
@@ -310,26 +326,30 @@ function updateAnki(value: boolean) {
     >
     </SettingsField>
 
-    <SettingsField
-      :value="props.config?.anki.ankiIntegration?.url"
-      label="Anki Backend URL"
-      help-text="If you are using a self-hosted Anki backend, you can enter the URL here. Do not include the trailing slash."
-      :disabled="testing_connection"
-    >
-    </SettingsField>
+<SettingsField
+  :value="props.config?.anki.ankiIntegration?.url"
+  label="Anki Backend URL"
+  help-text="If you are using a self-hosted Anki backend, you can enter the URL here. Do not include the trailing slash."
+  :disabled="testing_connection"
+/>
+
+<div class="mt-2 ml-[18.5rem]">
+  <Button
+    class="w-[250px] p-3 !rounded-full font-bold"
+    @click="testKey"
+    :loading="testing_connection"
+    :disabled="!props.config?.anki.ankiIntegration?.key"
+  >
+    Test Anki connection
+  </Button>
+</div>
+
+
 
     <div class="flex items-center h-12 gap-3">
       <h1 class="text-2xl font-bold dark:text-white text-black">
         Synchronization settings
       </h1>
-      <Button
-        class="w-fit h-10"
-        v-on:click="testKey"
-        :loading="testing_connection"
-        :disabled="props.config?.anki.ankiIntegration == null"
-      >
-        Test key
-      </Button>
     </div>
     <div class="flex flex-col w-full gap-5 flex-grow">
       <SettingsRadioSet
