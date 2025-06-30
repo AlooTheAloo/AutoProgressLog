@@ -24,7 +24,7 @@ import { CreateAndTrimDatabase, getDBPath } from "../../services/db";
  * ```
  * ./public/ankidb/{userId}.collection.anki2
  * ```
- * Where `userId` is the UUID passed in the URL.
+ * Where `userId` is the user ID passed in the URL.
  *
  * ---
  *
@@ -64,7 +64,7 @@ export const uploadRoute = new Elysia({ name: "upload-database" }).post(
       file: t.File(),
     }),
     params: t.Object({
-      userId: t.String({ format: "uuid" }),
+      userId: t.Integer(),
     }),
     response: t.Union([
       t.Object({

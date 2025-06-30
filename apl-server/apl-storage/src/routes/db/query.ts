@@ -66,7 +66,7 @@ export const queryRoute = new Elysia({
   },
   {
     body: t.Object({
-      userId: t.String({ format: "uuid" }), // userId should be a valid UUID
+      userId: t.Integer(),
       query: t.String(), // valid sql query
       queryParams: t.Optional(t.Array(t.Any())), // params are array of any type
     }),

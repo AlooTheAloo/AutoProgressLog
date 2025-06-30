@@ -53,7 +53,7 @@ export const deleteRoute = new Elysia({ name: "delete-database" }).delete(
   },
   {
     params: t.Object({
-      userId: t.String({ format: "uuid" }),
+      userId: t.Integer(),
     }),
     response: t.Union([
       t.Object({

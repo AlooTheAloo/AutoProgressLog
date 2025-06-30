@@ -1,14 +1,14 @@
 import { Elysia, t } from "elysia";
 import path from "path";
 import { existsSync } from "fs";
-import { CleanRevlog } from "../../services/db";
+import { CleanRevlog, StoreDeletedCards } from "../../services/db";
 
 /**
  * @module cleanRoute (apl-storage)
  *
  * ## 🧹 Clean Old Revlogs
  *
- * This route deletes old entries from the `revlog` table of a user’s Anki database.
+ * This route deletes old entries from the `revlog` table of a user’s Anki database and stores the deleted card counts in the `deleted_revs_stats` table.
  */
 export const cleanRoute = new Elysia({ name: "clean-revlog" }).post(
   "/clean/:userId",
@@ -26,7 +26,8 @@ export const cleanRoute = new Elysia({ name: "clean-revlog" }).post(
     }
 
     try {
-      await CleanRevlog(filePath);
+      const cleaned = await CleanRevlog(filePath);
+      await StoreDeletedCards(userId, cleaned);
       set.status = 200;
       return { message: "Old revlog entries cleaned successfully" };
     } catch (e: any) {
@@ -36,7 +37,7 @@ export const cleanRoute = new Elysia({ name: "clean-revlog" }).post(
   },
   {
     params: t.Object({
-      userId: t.String({ format: "uuid" }),
+      userId: t.Integer(),
     }),
     response: t.Union([
       t.Object({ message: t.String() }),

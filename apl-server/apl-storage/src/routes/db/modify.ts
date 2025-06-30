@@ -55,19 +55,19 @@ export const modifyRoute = new Elysia({
       return { error: "Database not found" };
     }
 
-    let lastID: number;
+    let lastID: number | bigint;
     try {
       lastID = await executeModification(filePath, query, queryParams);
+      set.status = 201;
+      return { message: "Modification successful", lastID: lastID };
     } catch (e: any) {
       set.status = 400;
       return { error: e.message };
     }
-    set.status = 201;
-    return { message: "Modification successful", lastID: lastID };
   },
   {
     body: t.Object({
-      userId: t.String({ format: "uuid" }), // userId should be a valid UUID
+      userId: t.Integer(), // userId should be a valid UUID
       query: t.String(), // valid sql query
       queryParams: t.Optional(t.Array(t.Any())), // params are array of any type
     }),

@@ -1,43 +1,29 @@
-import sqlite3 from "sqlite3";
+import Database from "bun:sqlite";
 import fs from "fs/promises";
 import path from "path";
-import { tmpdir } from "os";
+import { existsSync } from "fs";
 
-export async function executeQuery(
+export function executeQuery(
   filePath: string,
   query: string,
   params: any[] = []
 ) {
-  return new Promise<any[]>((resolve, reject) => {
-    sqlite3.verbose();
-    const db = new sqlite3.Database(filePath, (err) => {
-      if (err) return reject(err);
-      db.all(query, params, (err, rows: any[]) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(rows);
-        }
-        db.close();
-      });
-    });
-  });
+  const db = new Database(filePath, { readonly: true });
+  const result = db.prepare(query).all(...params);
+  db.close();
+  return result;
 }
 
-export async function executeModification(
-  filepath: string,
+export function executeModification(
+  filePath: string,
   sql: string,
   params: any[] = []
 ) {
-  return new Promise<number>((resolve, reject) => {
-    const db = new sqlite3.Database(filepath, (err) => {
-      if (err) return reject(err);
-      db.run(sql, params, function (this, err) {
-        if (err) return reject(err);
-        resolve(this.lastID);
-      });
-    });
-  });
+  const db = new Database(filePath);
+  const stmt = db.prepare(sql);
+  const info = stmt.run(...params);
+  db.close();
+  return info.lastInsertRowid;
 }
 
 export async function CreateAndTrimDatabase(
@@ -45,141 +31,202 @@ export async function CreateAndTrimDatabase(
   file: File
 ) {
   const tempFilePath = `${destinationPath}.tmp`;
-
-  // Step 1: Write uploaded file to a temporary path
   const buffer = new Uint8Array(await file.arrayBuffer());
   await fs.mkdir(path.dirname(tempFilePath), { recursive: true });
-  console.log("created dir", path.dirname(tempFilePath));
   await fs.writeFile(tempFilePath, buffer);
 
-  // Step 2: Run cleanup SQL
-  await new Promise<void>((resolve, reject) => {
-    const db = new sqlite3.Database(tempFilePath, (err) => {
-      if (err)
-        return reject(new Error(`Failed to open SQLite DB: ${err.message}`));
-    });
+  const db = new Database(tempFilePath);
+  db.exec(sql_CleanAnkiDB);
+  db.close();
 
-    db.run(CleanAnkiDB, (err) => {
-      if (err)
-        return reject(new Error(`Failed to clean SQLite DB: ${err.message}`));
-      db.close((err) => {
-        if (err)
-          return reject(new Error(`Failed to close SQLite DB: ${err.message}`));
-        resolve();
-      });
-    });
-  });
-
-  // Step 3: Move the cleaned file to the final destination
   await fs.mkdir(path.dirname(destinationPath), { recursive: true });
   await fs.rename(tempFilePath, destinationPath);
 }
 
-/**
- * Deletes old revlog entries (older than ~50 days) from the given SQLite DB.
- * @param dbPath Absolute path to the .anki2 file
- */
-export async function CleanRevlog(dbPath: string): Promise<void> {
-  await new Promise<void>((resolve, reject) => {
-    const db = new sqlite3.Database(dbPath, (err) => {
-      if (err) return reject(new Error(`Failed to open DB: ${err.message}`));
-    });
+type CleanRevlogResult = {
+  deckId: number;
+  reviewCount: number;
+};
 
-    db.exec(ClearOldRevlog, (err) => {
-      if (err)
-        return reject(new Error(`Failed to clean revlog: ${err.message}`));
-      db.close((err) => {
-        if (err) return reject(new Error(`Failed to close DB: ${err.message}`));
-        resolve();
-      });
-    });
-  });
+export function CleanRevlog(dbPath: string): CleanRevlogResult[] {
+  const db = new Database(dbPath);
+  const results: CleanRevlogResult[] = db
+    .prepare<CleanRevlogResult, []>(sql_CountOldRevlogByDeck)
+    .all();
+  db.exec(sql_ClearOldRevlog);
+  db.close();
+  return results;
 }
 
-export const getDBPath = (userId: string) =>
+export function StoreDeletedCards(
+  userID: number,
+  cleanedRevlog: CleanRevlogResult[]
+) {
+  const db = new Database(indexDBPath);
+  const insertOrUpdateStmt = db.prepare(sql_StoreDeletedCards);
+
+  const insertMany = db.transaction((data: CleanRevlogResult[]) => {
+    for (const result of data) {
+      insertOrUpdateStmt.run(userID, result.deckId, result.reviewCount);
+    }
+  });
+
+  insertMany(cleanedRevlog);
+  db.close();
+}
+
+export async function CountRevlog(
+  userId: number
+): Promise<Map<number, number>> {
+  const indexDB = new Database(indexDBPath);
+  const userDB = new Database(getDBPath(userId));
+  try {
+    let revlogMap = new Map<number, number>();
+
+    const recentRes = await userDB
+      .prepare<{ did: number; reviewCount: number }, []>(
+        `SELECT cards.did AS did, COUNT(*) AS reviewCount
+        FROM revlog
+        JOIN cards ON revlog.cid = cards.id
+        GROUP BY cards.did;`
+      )
+      .all();
+
+    if (!recentRes) throw new Error("Internal SQLite error in recent revlogs");
+
+    console.log(recentRes);
+
+    recentRes.forEach((deck) => {
+      revlogMap.set(deck.did, deck.reviewCount);
+    });
+
+    // Check deleted
+    const deletedRes = await indexDB
+      .prepare<{ did: number; reviewCount: number }, [number]>(
+        `SELECT deck_id AS did, deleted_revs AS reviewCount
+        FROM deleted_revs_stats
+        WHERE user_id = ?;`
+      )
+      .all(userId);
+
+    if (!deletedRes)
+      throw new Error("Internal SQLite error in deleted revlogs");
+
+    deletedRes.forEach((deck) => {
+      const currentValue = revlogMap.get(deck.did) ?? 0;
+      revlogMap.set(deck.did, currentValue + deck.reviewCount);
+    });
+
+    return revlogMap;
+  } catch (e: any) {
+    console.log(e);
+    throw new Error(e);
+  } finally {
+    indexDB.close();
+    userDB.close();
+  }
+}
+
+export const getDBPath = (userId: number) =>
   path.resolve("./public/ankidb", `${userId}.collection.anki2`);
 
-const CleanAnkiDB = `
-    PRAGMA foreign_keys = OFF;
-    PRAGMA wal_checkpoint(FULL);
-    PRAGMA journal_mode=DELETE;
+const indexDBPath = path.resolve("./public/ankidb", `index.db`);
 
-    DROP TABLE IF EXISTS android_metadata;
-    DROP TABLE IF EXISTS config;
-    DROP TABLE IF EXISTS notetypes;
-    DROP TABLE IF EXISTS tags;
-    DROP TABLE IF EXISTS deck_config;
-    DROP TABLE IF EXISTS fields;
-    DROP TABLE IF EXISTS notes;
-    DROP TABLE IF EXISTS templates;
-    DROP TABLE IF EXISTS graves;
+export function CreateIndexDB() {
+  if (existsSync(indexDBPath)) return;
+  const db = new Database(indexDBPath);
+  db.exec(sql_CreateIndexDB);
+  db.close();
+}
 
-    -- ── cards ──────────────────────────────────────────────────────────────────────
-    CREATE TABLE cards_new (
+const sql_StoreDeletedCards = `
+  INSERT INTO deleted_revs_stats (user_id, deck_id, deleted_revs)
+  VALUES (?, ?, ?)
+  ON CONFLICT(user_id, deck_id) DO UPDATE SET
+    deleted_revs = deleted_revs + excluded.deleted_revs
+`;
+
+const sql_CreateIndexDB = `
+  CREATE TABLE IF NOT EXISTS deleted_revs_stats (
+    user_id TEXT NOT NULL,
+    deck_id INTEGER NOT NULL,
+    deleted_revs INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY (user_id, deck_id)
+  );
+`;
+
+const sql_CleanAnkiDB = `
+  PRAGMA foreign_keys = OFF;
+  PRAGMA wal_checkpoint(FULL);
+  PRAGMA journal_mode=DELETE;
+
+  DROP TABLE IF EXISTS android_metadata;
+  DROP TABLE IF EXISTS config;
+  DROP TABLE IF EXISTS notetypes;
+  DROP TABLE IF EXISTS tags;
+  DROP TABLE IF EXISTS deck_config;
+  DROP TABLE IF EXISTS fields;
+  DROP TABLE IF EXISTS notes;
+  DROP TABLE IF EXISTS templates;
+  DROP TABLE IF EXISTS graves;
+
+  CREATE TABLE cards_new (
     id    INTEGER PRIMARY KEY,
     did   INTEGER NOT NULL,
     usn   INTEGER NOT NULL,
     ivl   INTEGER NOT NULL
-    );
+  );
+  INSERT INTO cards_new (id, did, usn, ivl)
+  SELECT id, did, usn, ivl FROM cards;
+  DROP INDEX IF EXISTS idx_decks_name;
+  DROP TABLE cards;
+  ALTER TABLE cards_new RENAME TO cards;
 
-
-
-    INSERT INTO cards_new (id, did, usn, ivl)
-    SELECT id, did, usn, ivl FROM cards;
-
-    DROP INDEX IF EXISTS idx_decks_name;
-
-    DROP TABLE cards;
-    ALTER TABLE cards_new RENAME TO cards;
-
-    -- ── col ────────────────────────────────────────────────────────────────────────
-    CREATE TABLE col_new (
+  CREATE TABLE col_new (
     id      INTEGER PRIMARY KEY,
-    crt     INTEGER       NOT NULL,
-    mod     INTEGER       NOT NULL,
-    scm     INTEGER       NOT NULL,
-    ver     INTEGER       NOT NULL,
-    dty     INTEGER       NOT NULL,
-    usn     INTEGER       NOT NULL,
-    ls      INTEGER       NOT NULL,
-    conf    TEXT    COLLATE NOCASE,
-    models  TEXT    COLLATE NOCASE,
-    decks   TEXT    COLLATE NOCASE,
-    dconf   TEXT    COLLATE NOCASE,
-    tags    TEXT    COLLATE NOCASE
-    );
-    INSERT INTO col_new SELECT * FROM col;
-    DROP TABLE col;
-    ALTER TABLE col_new RENAME TO col;
+    crt     INTEGER NOT NULL,
+    mod     INTEGER NOT NULL,
+    scm     INTEGER NOT NULL,
+    ver     INTEGER NOT NULL,
+    dty     INTEGER NOT NULL,
+    usn     INTEGER NOT NULL,
+    ls      INTEGER NOT NULL,
+    conf    TEXT COLLATE NOCASE,
+    models  TEXT COLLATE NOCASE,
+    decks   TEXT COLLATE NOCASE,
+    dconf   TEXT COLLATE NOCASE,
+    tags    TEXT COLLATE NOCASE
+  );
+  INSERT INTO col_new SELECT * FROM col;
+  DROP TABLE col;
+  ALTER TABLE col_new RENAME TO col;
 
-    -- ── decks ─────────────────────────────────────────────────────────────────────
-    CREATE TABLE decks_new (
-    id          INTEGER  PRIMARY KEY,
-    name        TEXT     COLLATE NOCASE,
-    mtime_secs  INTEGER  NOT NULL,
-    usn         INTEGER  NOT NULL,
-    common      BLOB     NOT NULL,
-    kind        BLOB     NOT NULL
-    );
-    INSERT INTO decks_new SELECT * FROM decks;
-    DROP TABLE decks;
-    ALTER TABLE decks_new RENAME TO decks;
+  CREATE TABLE decks_new (
+    id          INTEGER PRIMARY KEY,
+    name        TEXT COLLATE NOCASE,
+    mtime_secs  INTEGER NOT NULL,
+    usn         INTEGER NOT NULL,
+    common      BLOB NOT NULL,
+    kind        BLOB NOT NULL
+  );
+  INSERT INTO decks_new SELECT * FROM decks;
+  DROP TABLE decks;
+  ALTER TABLE decks_new RENAME TO decks;
+  DROP INDEX IF EXISTS ix_revlog_usn;
+  DROP INDEX IF EXISTS ix_revlog_cid;
 
-
-    DROP INDEX ix_revlog_usn;
-    DROP INDEX ix_revlog_cid;
-
-    -- Rerun this section on every sync
-    DELETE FROM revlog
-    WHERE id < (strftime('%s','now') - 50 * 86400) * 1000;
-    PRAGMA foreign_keys = ON;
-
-    VACUUM;
+  VACUUM;
 `;
 
-const ClearOldRevlog = `
-    BEGIN TRANSACTION;
-    DELETE FROM revlog
-    WHERE id < (strftime('%s','now') - 50 * 86400) * 1000;
-    COMMIT;
+const sql_ClearOldRevlog = `
+  DELETE FROM revlog
+  WHERE id < (strftime('%s','now') - 50 * 86400) * 1000;
+`;
+
+const sql_CountOldRevlogByDeck = `
+  SELECT cards.did AS deckId, COUNT(*) AS reviewCount
+  FROM revlog
+  JOIN cards ON revlog.cid = cards.id
+  WHERE revlog.id < (strftime('%s','now') - 50 * 86400) * 1000
+  GROUP BY cards.did;
 `;
