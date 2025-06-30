@@ -63,6 +63,7 @@ function openLink() {
     </div>
     <div class="w-96 flex">
       <Button
+      class="w-[250px] !rounded-full font-bold"
         mode="basic"
         @click="updateValue"
         chooseLabel="Browse"

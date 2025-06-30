@@ -63,7 +63,8 @@ function resetSettings() {
       </div>
     </div>
     <div class="w-96 flex">
-      <Button severity="danger" @click="resetDialogVisible = true" :auto="true">
+      <Button
+      class="w-[250px] !rounded-full font-bold " severity="danger" @click="resetDialogVisible = true" :auto="true">
         Reset app data
       </Button>
     </div>

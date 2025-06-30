@@ -69,6 +69,10 @@ function startTimer() {
 
 const emailSent = ref(false);
 
+function NextPage() {
+  router.push("/setup/complete");
+}
+
 function SendEmail() {
   emailSent.value = true;
   window.ipcRenderer.invoke("Send-Email", email.value);
@@ -136,7 +140,7 @@ onUnmounted(() => {
           </div>
           <div class="w-full flex justify-end">
             <Button
-              @click="SendEmail"
+              @click="NextPage"
               :disabled="!isEmailValid || countdown > 0"
               class="w-[200px] p-3 !rounded-full transition-all"
             >
