@@ -8,6 +8,7 @@ import electronUpdater from "electron-updater";
 import {
   buildContextMenu,
   createAppBackend,
+  FocusApp,
 } from "./Electron-Backend/appBackend";
 import { createAutoReport } from "./Electron-Backend/Reports/AutoReportGenerator";
 import { createAutoRPC } from "./Electron-Backend/RPC/RPCHandler";
@@ -153,14 +154,7 @@ app.on("window-all-closed", () => {
 app.on("second-instance", async (evt, cmd, wd) => {
   if (VITE_DEV_SERVER_URL) return;
   if (win) {
-    if (process.platform == "darwin") {
-      app.dock?.show();
-    } else if (process.platform == "win32" && !win?.isDestroyed) {
-      win?.setSkipTaskbar(false);
-    }
-    if (win?.isDestroyed()) await createWindow();
-    if (win?.isMinimized()) win.restore();
-    win?.focus();
+    FocusApp();
     buildContextMenu();
   }
 });

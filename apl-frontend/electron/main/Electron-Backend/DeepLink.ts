@@ -1,5 +1,7 @@
 import { electronAppUniversalProtocolClient } from "electron-app-universal-protocol-client";
-import { win } from "..";
+import { createWindow, win } from "..";
+import { app } from "electron";
+import { FocusApp } from "./appBackend";
 
 export async function initializeDeepLink() {
   const isDev = process.env.NODE_ENV === "development";
@@ -12,6 +14,7 @@ export async function initializeDeepLink() {
   }
   electronAppUniversalProtocolClient.on("request", async (requestUrl) => {
     if (requestUrl.startsWith("apl://")) {
+      await FocusApp();
       win?.webContents.send("open-url", requestUrl);
     }
   });
