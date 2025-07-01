@@ -4,7 +4,7 @@ import registerEvents from "./Electron-Backend/";
 import path from "node:path";
 import os from "node:os";
 import { buildMenu } from "./Electron-App/MenuBuilder";
-import electronUpdater, { type AppUpdater } from "electron-updater";
+import electronUpdater from "electron-updater";
 import {
   buildContextMenu,
   createAppBackend,
@@ -18,7 +18,6 @@ import {
 import fs from "fs";
 import { CacheManager } from "../../apl-backend/Helpers/cache";
 import checkHealth from "./Electron-App/HealthCheck";
-import { init } from "@bokuweb/zstd-wasm";
 import { SocketClient } from "./Electron-Backend/Socket/SocketClient";
 
 import {
@@ -32,6 +31,7 @@ import { initializeDeepLink } from "./Electron-Backend/DeepLink";
 import { config as dotenvConfig } from "dotenv";
 import { initializeApiManager } from "./Electron-Backend/api/ApiManager";
 import { Logger } from "../../apl-backend/Helpers/Log";
+import { init } from "@bokuweb/zstd-wasm";
 
 const isProd = app.isPackaged;
 
@@ -48,27 +48,16 @@ if (fs.existsSync(envPath)) {
   Logger.log(`Missing .env file at ${envPath}`, "ENV");
 }
 
-initializeApiManager();
-
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+initializeApiManager();
 registerEvents();
 
-// The built directory structure
-//
-// ├─┬ dist-electron
-// │ ├─┬ main
-// │ │ └── index.js    > Electron-Main
-// │ └─┬ preload
-// │   └── index.mjs   > Preload-Scripts
-// ├─┬ dist
-// │ └── index.html    > Electron-Renderer
-//
 process.env.APP_ROOT = path.join(__dirname, "../..");
 
 export const MAIN_DIST = path.join(process.env.APP_ROOT, "dist-electron");
 export const RENDERER_DIST = path.join(process.env.APP_ROOT, "dist");
-export const VITE_DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL;
+export const VITE_DEV_SERVER_URL = process.env.ELECTRON_RENDERER_URL;
 
 process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL
   ? path.join(process.env.APP_ROOT, "public")
@@ -80,16 +69,14 @@ if (os.release().startsWith("6.1")) app.disableHardwareAcceleration();
 // Set application name for Windows 10+ notifications
 if (process.platform === "win32") app.setAppUserModelId(app.getName());
 
-if (!VITE_DEV_SERVER_URL) {
-  if (!app.requestSingleInstanceLock()) {
-    Logger.log("App already running");
-    app.quit();
-    process.exit(0);
-  }
+if (!app.requestSingleInstanceLock()) {
+  Logger.log("App already running");
+  app.quit();
+  process.exit(0);
 }
 
 export let win: BrowserWindow | null = null;
-const preload = path.join(__dirname, "../preload/index.mjs");
+const preload = path.join(__dirname, "../preload/index.js");
 export const indexHtml = path.join(RENDERER_DIST, "index.html");
 export async function createWindow() {
   win = new BrowserWindow({
@@ -141,8 +128,6 @@ export async function createWindow() {
 app
   .whenReady()
   .then(async () => {
-    Logger.log("2");
-
     await createWindow();
     if (
       app.getLoginItemSettings().wasOpenedAtLogin ||
@@ -206,6 +191,7 @@ app.on("ready", async () => {
   await init();
 
   if (CacheManager.exists) {
+    console.log("Exists !!!");
     try {
       // TODO : Add an API call to create the webhook
       await new SocketClient().init({

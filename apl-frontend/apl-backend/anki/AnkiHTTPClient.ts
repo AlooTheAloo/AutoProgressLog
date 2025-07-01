@@ -1,9 +1,8 @@
 import * as fzstd from "fzstd";
 import { writeFileSync } from "fs";
 import { Chunk } from "./NormalSyncer";
-import { init, compress } from "@bokuweb/zstd-wasm";
-import path from "path";
-import { checkIntegrity, cleanAnkiDB } from "./DBOperations";
+import { compress } from "@bokuweb/zstd-wasm";
+import { cleanAnkiDB } from "./DBOperations";
 import { Logger } from "../Helpers/Log";
 import { ankiPath } from "../Helpers/getConfig";
 
