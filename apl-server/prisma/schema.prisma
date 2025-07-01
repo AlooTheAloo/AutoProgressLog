@@ -40,7 +40,9 @@ model Token {
   deviceName String?
   userAgent  String?
   userId     Int
-  user       User      @relation(fields: [userId], references: [id])
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token, userId])
 }
 
 model SyncData {
@@ -48,8 +50,10 @@ model SyncData {
   generationTime DateTime  @default(now())
   ankiData       AnkiData?
   userId         Int
-  user           User      @relation(fields: [userId], references: [id])
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   report         Report?
+
+  @@index([userId])
 }
 
 model AnkiData {
@@ -59,7 +63,9 @@ model AnkiData {
   mature            Int
   retention         Float
   syncDataId        Int      @unique
-  syncData          SyncData @relation(fields: [syncDataId], references: [id])
+  syncData          SyncData @relation(fields: [syncDataId], references: [id], onDelete: Cascade)
+
+  @@index([syncDataId])
 }
 
 model ImmersionActivity {
@@ -68,7 +74,9 @@ model ImmersionActivity {
   seconds      Int
   activityName String
   userId       Int
-  user         User     @relation(fields: [userId], references: [id])
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model Report {
@@ -77,11 +85,13 @@ model Report {
   score      Int
   streak     Streak?
   userId     Int
-  user       User     @relation(fields: [userId], references: [id])
-  syncData   SyncData @relation(fields: [syncDataId], references: [id])
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  syncData   SyncData @relation(fields: [syncDataId], references: [id], onDelete: Cascade)
   syncDataId Int      @unique
 
   @@unique([reportNo, userId])
+  @@index([userId])
+  @@index([syncDataId])
 }
 
 model Streak {
@@ -89,7 +99,9 @@ model Streak {
   ankiStreak      Int
   immersionStreak Int
   reportId        Int    @unique
-  report          Report @relation(fields: [reportId], references: [id])
+  report          Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  @@index([reportId])
 }
 
 model UserConfig {
@@ -100,7 +112,9 @@ model UserConfig {
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
   userId      Int         @unique
-  user        User        @relation(fields: [userId], references: [id])
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model AnkiConfig {
@@ -110,7 +124,9 @@ model AnkiConfig {
   retentionMode AnkiRetentionMode
   trackedDecks  Int[]
   userConfigId  Int               @unique
-  userConfig    UserConfig        @relation(fields: [userConfigId], references: [id])
+  userConfig    UserConfig        @relation(fields: [userConfigId], references: [id], onDelete: Cascade)
+
+  @@index([userConfigId])
 }
 
 enum TokenType {

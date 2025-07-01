@@ -18,12 +18,6 @@ import ToastService from "primevue/toastservice";
 import ConfirmationService from "primevue/confirmationservice";
 import VueWriter from "vue-writer";
 import VueApexCharts from "vue3-apexcharts";
-import {APLServer} from "../../apl-server/src";
-import {treaty} from "@elysiajs/eden";
-
-//@ts-ignore
-const client = treaty<APLServer>("localhost:3000")
-
 
 const router = createRouter({
   history: createMemoryHistory(),

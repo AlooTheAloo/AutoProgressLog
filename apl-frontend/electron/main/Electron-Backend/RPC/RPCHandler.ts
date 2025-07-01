@@ -48,6 +48,7 @@ export function createAutoRPC() {
 async function killListeners() {
   SocketClient.instance.off("ActivityStart");
   SocketClient.instance.off("ActivityStop");
+  SocketClient.instance.off("ClearActivity");
 }
 
 async function createListeners() {

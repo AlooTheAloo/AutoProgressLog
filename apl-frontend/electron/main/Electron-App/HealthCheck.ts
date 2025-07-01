@@ -99,6 +99,7 @@ export const optionsSchema = z.object({
 export type Options = z.infer<typeof optionsSchema>;
 
 export default async function checkHealth(rawInput: unknown) {
+  if (rawInput == undefined) return true;
   const result = optionsSchema.safeParse(rawInput);
   if (!result.success) {
     console.error(result.error.format());

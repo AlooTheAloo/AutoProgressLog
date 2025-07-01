@@ -17,5 +17,16 @@ services:
     env_file: .env.server
     networks: [chromanet]
 
+  apl-storage:
+    build:
+      context: .
+      dockerfile: storage-prod.Dockerfile
+    volumes:
+      - ./apl-storage/public:/app/apl-storage/public
+    expose:
+      - "2727"
+    env_file: .env.server
+    networks: [chromanet]
+
 networks:
   chromanet:

@@ -56,7 +56,9 @@ onMounted(() => {
 
 <style scoped>
 .fade-up-enter-active {
-  transition: opacity 1s ease, transform 0.6s ease;
+  transition:
+    opacity 1s ease,
+    transform 0.6s ease;
 }
 .fade-up-enter-from {
   opacity: 0;
