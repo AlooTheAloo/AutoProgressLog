@@ -68,7 +68,6 @@ export const app = new Elysia()
   .listen(3000, async (app) => {
     console.log(`APL Server is running on http://${app.hostname}:${app.port}/`);
     AnkiStorage.init(Bun.env.STORAGE_URL ?? "");
-    const a = await AnkiStorage.getAnkiCardReviewCount(123);
   });
 
 // TODO : Move this somewhere else
