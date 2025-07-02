@@ -79,7 +79,9 @@ export async function CountRevlog(
   userId: number
 ): Promise<Map<number, number>> {
   const indexDB = new Database(indexDBPath);
+
   const userDB = new Database(getDBPath(userId));
+
   try {
     let revlogMap = new Map<number, number>();
 
@@ -117,6 +119,8 @@ export async function CountRevlog(
       revlogMap.set(deck.did, currentValue + deck.reviewCount);
     });
 
+    console.log(revlogMap);
+
     return revlogMap;
   } catch (e: any) {
     console.log(e);
@@ -132,8 +136,10 @@ export const getDBPath = (userId: number) =>
 
 const indexDBPath = path.resolve("./public/ankidb", `index.db`);
 
-export function CreateIndexDB() {
+export async function CreateIndexDB() {
   if (existsSync(indexDBPath)) return;
+  await fs.mkdir(path.dirname(indexDBPath), { recursive: true });
+  await fs.writeFile(indexDBPath, "");
   const db = new Database(indexDBPath);
   db.exec(sql_CreateIndexDB);
   db.close();

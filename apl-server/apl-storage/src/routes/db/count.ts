@@ -10,7 +10,7 @@ import { CountRevlog } from "../../services/db";
  * ## Pass in the userId to get the count of reviews in all their decks
  */
 export const countRoute = new Elysia({ name: "count-reviews" }).get(
-  "/deleted_reviews/:userId",
+  "/count_reviews/:userId",
   async ({ params, set }) => {
     const { userId } = params;
 

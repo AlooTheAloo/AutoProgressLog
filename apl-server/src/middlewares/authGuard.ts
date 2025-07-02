@@ -1,5 +1,5 @@
-import {Elysia, t} from 'elysia';
-import prisma from '../db/client';
+import { Elysia, t } from "elysia";
+import prisma from "../db/client";
 
 /**
  * ## 🧾 Auth Header Schema
@@ -11,9 +11,9 @@ import prisma from '../db/client';
  * This is used inside the `authGuard` to validate incoming requests.
  */
 export const authHeaders = t.Object({
-    authorization: t.String({
-        pattern: '^Bearer (.+)$',
-    }),
+  authorization: t.String({
+    pattern: "^Bearer (.+)$",
+  }),
 });
 
 /**
@@ -42,6 +42,7 @@ export const authHeaders = t.Object({
  *
  * Wrap routes using:
  * ```ts
+ *
  * new Elysia().use(authGuard).get('/secure', ({ user }) => ...)
  * ```
  *
@@ -52,50 +53,52 @@ export const authHeaders = t.Object({
  * Authorization: Bearer abc.def.ghi
  * ```
  */
-export const authGuard = new Elysia({name: 'auth-guard'})
+export const authGuard = new Elysia({ name: "auth-guard" })
 
-    // Apply the header schema to all guarded routes
-    .guard({
-        headers: authHeaders,
-    })
+  // Apply the header schema to all guarded routes
+  .guard({
+    headers: authHeaders,
+  })
 
-    // Resolve runs BEFORE route handlers. It checks the token and exposes `user` & `sessionToken`
-    .resolve({as: 'scoped'}, async ({headers, set}) => {
-        // 🧱 Step 1: Extract the token from the "Authorization" header
-        const tokenValue = headers.authorization?.split(' ')[1];
+  // Resolve runs BEFORE route handlers. It checks the token and exposes `user` & `sessionToken`
+  .resolve({ as: "scoped" }, async ({ headers, set }) => {
+    // 🧱 Step 1: Extract the token from the "Authorization" header
+    const tokenValue = headers.authorization?.split(" ")[1];
 
-        // 🧱 Step 2: Look up the token in the DB
-        const token = await prisma.token.findUniqueOrThrow({
-            where: {token: tokenValue},
-            include: {user: true},
-        }).catch(() => {
-            // 🚫 Token not found
-            set.status = 401;
-            throw new Error('Invalid or missing session token');
-        });
+    // 🧱 Step 2: Look up the token in the DB
+    const token = await prisma.token
+      .findUniqueOrThrow({
+        where: { token: tokenValue },
+        include: { user: true },
+      })
+      .catch(() => {
+        // 🚫 Token not found
+        set.status = 401;
+        throw new Error("Invalid or missing session token");
+      });
 
-        const now = new Date();
+    const now = new Date();
 
-        // 🧱 Step 3: Validate token properties
-        if (
-            !token ||
-            !token.valid ||                     // Must be still marked as valid
-            token.type !== 'SESSION' ||         // Only allow session-type tokens
-            (token.expiration && token.expiration < now) // Reject if expired
-        ) {
-            set.status = 401;
-            throw new Error('Invalid or expired session token');
-        }
+    // 🧱 Step 3: Validate token properties
+    if (
+      !token ||
+      !token.valid || // Must be still marked as valid
+      token.type !== "SESSION" || // Only allow session-type tokens
+      (token.expiration && token.expiration < now) // Reject if expired
+    ) {
+      set.status = 401;
+      throw new Error("Invalid or expired session token");
+    }
 
-        // 🧱 Step 4: Update lastUsedAt (for audit/session tracking)
-        await prisma.token.update({
-            where: {id: token.id},
-            data: {lastUsedAt: now},
-        });
-
-        // ✅ Step 5: Inject the user + token into the route context
-        return {
-            user: token.user,
-            sessionToken: tokenValue,
-        };
+    // 🧱 Step 4: Update lastUsedAt (for audit/session tracking)
+    await prisma.token.update({
+      where: { id: token.id },
+      data: { lastUsedAt: now },
     });
+
+    // ✅ Step 5: Inject the user + token into the route context
+    return {
+      user: token.user,
+      sessionToken: tokenValue,
+    };
+  });

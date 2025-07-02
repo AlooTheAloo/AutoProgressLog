@@ -185,7 +185,6 @@ app.on("ready", async () => {
   await init();
 
   if (CacheManager.exists) {
-    console.log("Exists !!!");
     try {
       // TODO : Add an API call to create the webhook
       await new SocketClient().init({
