@@ -4,6 +4,7 @@ import { useRouter } from "vue-router";
 import SetupBackground from "../../../components/Setup/SetupBackground.vue";
 import Button from "primevue/button";
 import BackButton from "../../../components/Common/BackButton.vue";
+import PlexusEffect from "../../../components/Common/PlexusEffect.vue";
 import { onMounted, ref } from "vue";
 import ProgressSpinner from "primevue/progressspinner";
 import { TogglAccount } from "../../../../types/TogglAccount";
@@ -25,11 +26,27 @@ function NextPage() {
 </script>
 
 <template>
-  <SetupBackground></SetupBackground>
-  <div class="flex w-screen">
-  <div class="p-4 sm:p-12
-             flex flex-col justify-between
-             w-full max-w-[60rem] bg-black min-h-screen">
+  <SetupBackground/>
+  <div
+    :style="{ backgroundImage: `linear-gradient(to bottom right, #add8ff, #d8b4fe)` }"
+    class="relative flex items-center justify-start h-screen pl-12"
+  >
+    <PlexusEffect class="absolute inset-0 z-0" />
+
+    <!-- Card -->
+    <div
+      class="
+        relative z-10
+        bg-black rounded-3xl p-12
+
+        /* 1) column flex that spans full height */
+        flex flex-col justify-between items-start
+        h-[90vh] max-h-[946px]  /* your height rules */
+
+        /* 2) width clamped between min & max */
+        w-full max-w-[899px] min-w-[600px]
+      "
+    >
   <div class="flex flex-col items-start space-y-6 w-full">
         <img
           :src="Logo"
@@ -69,10 +86,10 @@ function NextPage() {
       </div>
     </motion.div>
   </div>
-      <div class="flex justify-end">
+      <div class="w-full flex justify-end">
         <Button
           @click="NextPage"
-          class="w-[300px] p-3 !rounded-full"
+          class="w-[300px] p-3 rounded-full"
           >
           <span class="text-xl font-bold text-black">Continue</span>
         </Button>

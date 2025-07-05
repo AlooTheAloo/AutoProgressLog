@@ -12,7 +12,7 @@ import clockify from "../../assets/AppLogos/Clockify-logo.png";
 import mokuro from "../../assets/AppLogos/Mokuro-logo.png";
 import ttsu from "../../assets/AppLogos/Ttsu-logo.png";
 import { motion } from 'motion-v';
-
+import PlexusEffect from "../../components/Common/PlexusEffect.vue";
 const selectedApps = defineModel<{ label: string; value: any }[] | undefined>(
   "language",
 );
@@ -52,10 +52,25 @@ function NextPage() {
 
 <template>
   <SetupBackground/>
+  <div
+    :style="{ backgroundImage: `linear-gradient(to bottom right, #add8ff, #d8b4fe)` }"
+    class="relative flex items-center justify-start h-screen pl-12"
+  >
+    <PlexusEffect class="absolute inset-0 z-0" />
 
-  <div class="flex w-screen">
+    <!-- Card -->
     <div
-      class="p-4 sm:p-12 flex flex-col justify-between h-screen w-full max-w-[60rem] bg-black"
+      class="
+        relative z-10
+        bg-black rounded-3xl p-12
+
+        /* 1) column flex that spans full height */
+        flex flex-col justify-between items-start
+        h-[90vh] max-h-[946px]  /* your height rules */
+
+        /* 2) width clamped between min & max */
+        w-full max-w-[899px] min-w-[600px]
+      "
     >
       <div class="flex w-full items-center justify-between mb-6">
         <img :src="Logo" alt="APL Logo" class="w-16 h-16 sm:w-20 sm:h-20"/>
@@ -82,7 +97,7 @@ function NextPage() {
           v-model="selectedApps"
           :options="appList"
           multiple
-          :scroll-height="height > 800 ? '700px' : height / 2 + 'px'"
+          :scroll-height="height > 800 ? '400px' : height / 2 + 'px'"
           class="w-full p-2 bg-[#18181B] rounded-lg"
         >
           <template #option="{ option }">
@@ -95,11 +110,11 @@ function NextPage() {
           </template>
         </Listbox>
       </motion.div>
-      <div class="flex justify-end">
+      <div class="w-full flex justify-end">
         <Button
           :label="buttonLabel"
           @click="NextPage"
-          class="w-[300px] p-3 !rounded-full"
+          class="w-[300px] p-3 rounded-full"
         />
       </div>
     </div>

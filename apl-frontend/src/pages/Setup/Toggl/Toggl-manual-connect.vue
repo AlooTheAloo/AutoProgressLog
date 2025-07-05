@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-
+import PlexusEffect from "../../../components/Common/PlexusEffect.vue";
 import Logo from "../../../assets/Logo.png"
 import SetupBackground from "../../../components/Setup/SetupBackground.vue"
 import Button from "primevue/button"
@@ -34,11 +34,23 @@ async function NextPage() {
 
 <template>
   <SetupBackground/>
-  <div class="flex w-screen">
+  <div
+    :style="{ backgroundImage: `linear-gradient(to bottom right, #add8ff, #d8b4fe)` }"
+    class="relative flex items-center justify-start h-screen pl-12"
+  >
+    <PlexusEffect class="absolute inset-0 z-0" />
     <div
-      class="p-4 sm:p-12
-             flex flex-col justify-between
-             w-full max-w-[60rem] bg-black min-h-screen"
+      class="
+        relative z-10
+        bg-black rounded-3xl p-12
+
+        /* 1) column flex that spans full height */
+        flex flex-col justify-between items-start
+        h-[90vh] max-h-[946px]  /* your height rules */
+
+        /* 2) width clamped between min & max */
+        w-full max-w-[899px] min-w-[600px]
+      "
     >
     <div class="flex flex-col items-start space-y-6 w-full">
         <img
@@ -71,7 +83,7 @@ async function NextPage() {
         <div class="my-3">
           <Button
             @click="OpenTogglTrackPage"
-            class="w-[300px] p-3 !rounded-full
+            class="w-[300px] p-3 rounded-full
                    !bg-[#731768] !text-white
                    hover:!bg-[#5a1058] flex items-center
                    !border-none focus:outline-none"
@@ -96,11 +108,11 @@ async function NextPage() {
         </div>
       </motion.div>
     </div>
-      <div class="flex justify-end">
+      <div class="w-full flex justify-end">
         <Button
           @click="NextPage"
           :disabled="!apiKey"
-          class="w-[300px] p-3 !rounded-full"
+          class="w-[300px] p-3 rounded-full"
           :class="!apiKey ? 'opacity-50 cursor-not-allowed' : 'opacity-100'"
           >
           <span class="text-xl font-bold text-black">Continue</span>

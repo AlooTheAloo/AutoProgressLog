@@ -2,6 +2,7 @@
 import { useRouter } from "vue-router";
 import { useWindowSize } from "@vueuse/core";
 import SetupBackground from "../../../components/Setup/SetupBackground.vue";
+import PlexusEffect from "../../../components/Common/PlexusEffect.vue";
 import Button from "primevue/button";
 import Logo from "../../../assets/Logo.png";
 import { motion } from "motion-v";
@@ -19,10 +20,15 @@ onMounted(() => {
 });
 </script>
 <template>
-  <SetupBackground />
-  <div class="flex">
+  <div
+    :style="{
+      'background-image': `linear-gradient(to bottom right, #add8ff, #d8b4fe)`,
+    }"
+    class="flex items-center justify-start h-screen pl-12"
+  >
+    <PlexusEffect class="absolute inset-0 z-0" />
     <div
-      class="p-12 w-full max-w-[60rem] bg-black min-h-screen flex flex-col justify-center"
+      class="relative z-10 bg-black rounded-3xl p-12 flex flex-col items-center justify-center w-full max-w-[899px] min-w-[600px] h-[90vh] max-h-[946px]"
     >
       <motion.div
         :initial="{ opacity: 0, y: 20, filter: 'blur(10px)' }"
@@ -45,7 +51,7 @@ onMounted(() => {
         </h1>
         <Button
           @click="NextPage"
-          class="w-[300px] p-3 !rounded-full self-start"
+          class="w-[300px] p-3 rounded-full self-start"
         >
           <span class="text-xl font-bold text-black">Get started!</span>
         </Button>

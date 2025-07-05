@@ -4,6 +4,7 @@ import { useRouter } from "vue-router";
 import { useWindowSize } from "@vueuse/core";
 import SetupBackground from "../../../components/Setup/SetupBackground.vue";
 import BackButton from "../../../components/Common/BackButton.vue";
+import PlexusEffect from "../../../components/Common/PlexusEffect.vue";
 import InputText from "primevue/inputtext";
 import Button from "primevue/button";
 import ProgressSpinner from "primevue/progressspinner";
@@ -42,6 +43,10 @@ function SendEmail() {
   emailSent.value = true;
   window.ipcRenderer.invoke("Send-Email", email.value);
   startTimer();
+}
+
+function NextPage() {
+  router.push("/setup/auth-success");
 }
 
 const protocolSchema = z.object({
@@ -83,13 +88,32 @@ onUnmounted(() => {
 
 <template>
   <SetupBackground />
-  <div class="flex w-screen">
+  <div
+    :style="{ backgroundImage: `linear-gradient(to bottom right, #add8ff, #d8b4fe)` }"
+    class="relative flex items-center justify-start h-screen pl-12"
+  >
+    <PlexusEffect class="absolute inset-0 z-0" />
+
+    <!-- Card -->
     <div
-      class="p-4 sm:p-12 flex flex-col justify-between w-full max-w-[60rem] bg-black min-h-screen"
+      class="
+        relative z-10
+        bg-black rounded-3xl p-12
+
+        /* 1) column flex that spans full height */
+        flex flex-col justify-between items-start
+        h-[90vh] max-h-[946px]  /* your height rules */
+
+        /* 2) width clamped between min & max */
+        w-full max-w-[899px] min-w-[600px]
+      "
     >
-      <div class="space-y-6">
+      <!-- Top block: logo + back button + intro -->
+      <div class="space-y-6 w-full">
         <img :src="Logo" alt="APL Logo" class="w-16 h-16 sm:w-20 sm:h-20" />
+
         <BackButton route="/setup/index" />
+
         <motion.div
           :initial="{ opacity: 0, y: 20, filter: 'blur(10px)' }"
           :animate="{
@@ -98,20 +122,18 @@ onUnmounted(() => {
             filter: 'blur(0px)',
             transition: { duration: 1 },
           }"
-          class="flex flex-col items-start space-y-2"
+          class="flex flex-col items-start space-y-4 w-full"
         >
           <h1
             class="text-xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-semibold text-white leading-tight"
           >
             Let's start with your email.
           </h1>
-
           <p class="text-xs sm:text-sm lg:text-base text-[#C0C0C0]">
             Please provide a valid email address. We’ll send you a link so you
             can either create an account or log in.
           </p>
-
-          <div class="flex flex-col gap-1 w-full">
+          <div class="w-full">
             <InputText
               v-model="email"
               placeholder="john.doe@example.com"
@@ -127,18 +149,20 @@ onUnmounted(() => {
                 filter: 'blur(0px)',
                 transition: { duration: 1 },
               }"
-              class="text-green-400 text-sm font-medium"
+              class="text-green-400 text-sm font-medium mt-1"
             >
               ✅ Check your inbox.
             </motion.p>
           </div>
         </motion.div>
       </div>
-      <div class="flex justify-end">
+
+      <!-- Bottom block: send button -->
+      <div class="w-full flex justify-end">
         <Button
-          @click="SendEmail"
+          @click="NextPage"
           :disabled="!isEmailValid || countdown > 0"
-          class="w-[300px] p-3 !rounded-full flex items-center justify-center transition-all duration-200"
+          class="w-[300px] p-3 rounded-full flex items-center justify-center transition-all duration-200"
         >
           <div class="inline-flex items-center space-x-2 whitespace-nowrap">
             <ProgressSpinner
@@ -153,6 +177,9 @@ onUnmounted(() => {
         </Button>
       </div>
     </div>
+
+    <!-- filler so card stays left -->
     <div class="flex-grow"></div>
   </div>
 </template>
+
