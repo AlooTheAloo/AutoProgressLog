@@ -4,6 +4,7 @@ import { useRoute, useRouter } from "vue-router";
 import Button from "primevue/button";
 import SetupBackground from "../../../components/Setup/SetupBackground.vue";
 import AccountDisplay from "../../../components/Common/AccountDisplay.vue";
+import PlexusEffect from "../../../components/Common/PlexusEffect.vue";
 import BackButton from "../../../components/Common/BackButton.vue";
 import AnkiLogo from "../../../assets/AnkiLogo.png";
 import ProgressSpinner from "primevue/progressspinner";
@@ -49,12 +50,17 @@ function SelectProfile() {
 
 <template>
   <SetupBackground />
-
-  <div class="flex w-screen">
+  <div
+    :style="{
+      'background-image': `linear-gradient(to bottom right, #add8ff, #d8b4fe)`,
+    }"
+    class="flex items-center justify-start h-screen pl-12"
+  >
+    <PlexusEffect class="absolute inset-0 z-0" />
     <div
-      class="p-4 sm:p-12 flex flex-col h-screen w-full max-w-[60rem] bg-black"
+      class="relative z-10 bg-black rounded-3xl p-12 flex flex-col items-center justify-center w-full max-w-[899px] min-w-[600px] h-[90vh] max-h-[946px]"
     >
-      <div class="space-y-6">
+      <div class="space-y-6 w-full">
         <div class="flex w-full items-center justify-between">
           <img :src="Logo" class="w-16 h-16 sm:w-20 sm:h-20" alt="APL logo" />
           <AccountDisplay />

@@ -5,6 +5,7 @@ import SetupBackground from "../../../components/Setup/SetupBackground.vue";
 import Button from "primevue/button";
 import { onMounted, ref } from "vue";
 import { motion } from "motion-v";
+import PlexusEffect from "../../../components/Common/PlexusEffect.vue";
 
 const router = useRouter();
 const savingDone = ref<boolean>(false);
@@ -24,9 +25,15 @@ onMounted(() => {
 
 <template>
   <SetupBackground />
-  <div class="flex">
+  <div
+    :style="{
+      'background-image': `linear-gradient(to bottom right, #add8ff, #d8b4fe)`,
+    }"
+    class="flex items-center justify-start h-screen pl-12"
+  >
+    <PlexusEffect class="absolute inset-0 z-0" />
     <div
-      class="p-12 w-full max-w-[60rem] bg-black min-h-screen flex flex-col justify-center"
+      class="relative z-10 bg-black rounded-3xl p-12 flex flex-col items-start justify-center w-full max-w-[899px] min-w-[600px] h-[90vh] max-h-[946px]"
     >
       <motion.div
         :initial="{ opacity: 0, y: 20, filter: 'blur(10px)' }"
@@ -50,7 +57,7 @@ onMounted(() => {
         <Button
           :disabled="!savingDone"
           @click="NextPage"
-          class="w-[300px] p-3 !rounded-full self-start"
+          class="w-[300px] p-3 rounded-full self-start"
         >
           <span class="text-xl font-bold text-black">Go to dashboard</span>
         </Button>

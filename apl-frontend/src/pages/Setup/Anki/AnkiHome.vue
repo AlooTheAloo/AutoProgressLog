@@ -4,6 +4,7 @@ import Button from "primevue/button";
 import SetupBackground from "../../../components/Setup/SetupBackground.vue";
 import AccountDisplay from "../../../components/Common/AccountDisplay.vue";
 import BackButton from "../../../components/Common/BackButton.vue";
+import PlexusEffect from "../../../components/Common/PlexusEffect.vue";
 import InputText from "primevue/inputtext";
 import Password from "primevue/password";
 import { ankiLogin } from "../../../../apl-backend/config/configAnkiIntegration";
@@ -22,23 +23,23 @@ const password = ref<string>("");
 const url = ref<string>(DEFAULT_URL);
 
 const canContinue = computed(() => {
-  return email.value.trim() !== '' && password.value.trim() !== ''
-})
+  return email.value.trim() !== "" && password.value.trim() !== "";
+});
 
 const router = useRouter();
 function NextPage() {
   if (!canContinue.value) {
-    return
+    return;
   }
 
   const login: ankiLogin = {
     username: email.value,
     password: password.value,
     url: url.value,
-  }
-  console.log(login)
-  window.ipcRenderer.invoke("anki-credentials", login)
-  router.push("/setup/anki-connect")
+  };
+  console.log(login);
+  window.ipcRenderer.invoke("anki-credentials", login);
+  router.push("/setup/anki-connect");
 }
 
 function SkipAnki() {
@@ -61,10 +62,17 @@ onMounted(() => {
 
 <template>
   <SetupBackground />
+  <div
+    :style="{
+      backgroundImage: `linear-gradient(to bottom right, #add8ff, #d8b4fe)`,
+    }"
+    class="relative flex items-center justify-start h-screen pl-12"
+  >
+    <PlexusEffect class="absolute inset-0 z-0" />
 
-  <div class="flex w-screen">
+    <!-- Card -->
     <div
-      class="p-4 sm:p-12 flex flex-col justify-between w-full max-w-[60rem] bg-black min-h-screen"
+      class="relative z-10 bg-black rounded-3xl p-12 flex flex-col justify-between items-start h-[90vh] max-h-[946px] w-full max-w-[899px] min-w-[600px]"
     >
       <div class="space-y-6 w-full">
         <div class="flex w-full items-center justify-between">
@@ -154,11 +162,11 @@ onMounted(() => {
           style="font-size: 12px; padding: 0"
           @click="SkipAnki"
         />
-          <Button
+        <Button
           @click="NextPage"
           :disabled="!canContinue"
           :class="canContinue ? 'opacity-100' : 'opacity-50 cursor-not-allowed'"
-          class="w-[300px] p-3 !rounded-full"
+          class="w-[300px] p-3 rounded-full"
         >
           <span class="text-xl font-bold text-black">Continue</span>
         </Button>
