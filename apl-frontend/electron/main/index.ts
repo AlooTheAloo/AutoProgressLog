@@ -184,7 +184,7 @@ app.on("ready", async () => {
   // ZFSTD
   await init();
 
-  if (CacheManager.exists) {
+  if (getConfig() !== null) {
     try {
       // TODO : Add an API call to create the webhook
       await new SocketClient().init({

@@ -2,14 +2,14 @@ import { Elysia, t } from "elysia";
 import { createEmailToken } from "../../../services/auth/token";
 import prisma from "../../../db/client";
 import { sendMagicLink } from "../../../services/email/sendMagicLink";
-import { authGuard } from "../../../middlewares/authGuard";
+import { authGuard, authHeaders } from "../../../middlewares/authGuard";
 import { RateLimiterFactory } from "../../../middlewares/rateLimiter";
 import AnkiStorage from "../../../services/anki/AnkiStorage";
 
 /**
- * ## POST /ankiData/:userId
+ * ## GET /all
  *
- * This endpoint handles fetching the user's Anki data.
+ * This endpoint handles fetching ALL the user's Anki data.
  * It will:
  * - ✅ Find the total cards studied
  * - ✅ Find the retention rate according to the user's settings
@@ -18,31 +18,12 @@ import AnkiStorage from "../../../services/anki/AnkiStorage";
  * ---
  *
  * ### 🔓 Protected Access
- * The body must contain a valid token.
- *
- * ---
- *
- * ### 🧠 Step-by-step logic:
- * 1. Accepts a `POST` request with `{ email }` in the body
- * 2. Checks if a user already exists with that email
- *    - If not, creates a new user record
- *    - If yes, just proceeds
- * 3. Generates a secure token linked to the user's ID
- * 4. Sends an email containing a magic link (login URL with token)
- * 5. Responds with empty 204 (no content), or 201 if user was just created
- *
- * ---
- *
- * ### ⚠️ Security Considerations
+ * This endpoint is protected by the Auth Guard and a Rate Limiter.
  *
  * ---
  *
  * ### 📦 Request Format:
- * ```json
- * {
- *   "email": "youssef@youssef.dev"
- * }
- * ```
+ * `${URL}/storage/anki/all/727`
  *
  * ---
  *
@@ -53,40 +34,45 @@ import AnkiStorage from "../../../services/anki/AnkiStorage";
  *
  * const api = eden<typeof APLServer>('https://api.autoprogresslog.com');
  *
- * await api.auth.login({ email: 'youssef@youssef.dev' });
- * // User receives a magic link in their inbox
+ * await api.storage.anki.all.get({
+ *   headers: {
+ *     authorization: `Bearer ${token}`,
+ *   },
+ * });
  * ```
+ *
+ * ### 🔄 Response:
+ * - ✅ `200 OK` on success
+ * - ❌ `401 Unauthorized` if the token is not valid or not owned
  */
-export const loginRoute = new Elysia({ name: "login" })
+export const allRoute = new Elysia({ name: "anki_all" })
   .use(authGuard)
   .use(RateLimiterFactory.for("default"))
-  .post(
-    "/all/:userId",
-    async ({ params, set }) => {
-      const userId = params.userId;
-      const [matureCards, retention, totalCards] = await Promise.all([
+  .get(
+    "/all",
+    async ({ user, set }) => {
+      const userId = user.id;
+      const [matureCards, retention, reviews] = await Promise.all([
         AnkiStorage.getMatureCards(userId),
         AnkiStorage.getRetention(userId),
         AnkiStorage.getAnkiCardReviewCount(userId),
       ]);
 
-      if (matureCards == null || retention == null || totalCards == null) {
+      if (matureCards == null || retention == null || reviews == null) {
         set.status = 500;
         return { error: "Anki data not found" };
       }
 
       set.status = 200;
-      return { matureCards, retention, totalCards };
+      return { matureCards, retention, reviews };
     },
     {
-      params: t.Object({
-        userId: t.Integer(),
-      }),
+      headers: authHeaders,
       response: t.Union([
         t.Object({
           matureCards: t.Integer(),
           retention: t.Number(),
-          totalCards: t.Object({
+          reviews: t.Object({
             count: t.Array(t.Object({ count: t.Integer(), did: t.Integer() })),
             totalCount: t.Integer(),
           }),
@@ -94,10 +80,10 @@ export const loginRoute = new Elysia({ name: "login" })
         t.Object({ error: t.String() }),
       ]),
       detail: {
-        summary: "Login",
-        tags: ["Auth"],
+        summary: "Get all a user's anki data",
+        tags: ["Storage"],
         description:
-          "Starts the passwordless login process by sending a magic link to the user's email address.",
+          "Get all anki data linked to a user. This includes the total cards studied, the retention rate, and the mature cards count.",
       },
     }
   );

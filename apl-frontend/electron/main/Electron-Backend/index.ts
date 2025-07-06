@@ -7,6 +7,7 @@ import { routeListeners } from "./routeListener";
 import { settingsListeners } from "./SettingsListeners";
 import { setupListeners } from "./SetupConfigBuilder";
 import { surveyListeners } from "./SurveyListeners";
+import { APLStorage } from "./util/auth";
 
 export default function registerEvents() {
   globalListeners();

@@ -78,6 +78,7 @@ export const authGuard = new Elysia({ name: "auth-guard" })
       });
 
     const now = new Date();
+    console.log(token);
 
     // 🧱 Step 3: Validate token properties
     if (

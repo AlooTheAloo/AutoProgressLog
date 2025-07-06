@@ -1,6 +1,5 @@
 import { treaty } from "@elysiajs/eden";
 import type { APLServer } from "../../../../../apl-server/src"; // Wow it just works
-import { Logger } from "../../../../apl-backend/Helpers/Log";
 
 export let SERVER_URL: string | undefined = "";
 

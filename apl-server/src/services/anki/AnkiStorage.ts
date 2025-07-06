@@ -100,7 +100,7 @@ export default class AnkiStorage {
    */
   public static async getRetention(userID: number) {
     const settings = await AnkiStorage.getUserAnkiSettings(userID);
-    if (!settings) return null;
+    if (!settings) return undefined;
 
     const daysAgo =
       settings.retentionMode === "TRUE_RETENTION"

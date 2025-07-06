@@ -3,7 +3,6 @@ import { runGeneration } from "../../../apl-backend/generate/generate";
 import {
   getConfig,
   getSyncProps,
-  syncDataPath,
 } from "../../../apl-backend/Helpers/getConfig";
 import {
   isSyncing,
