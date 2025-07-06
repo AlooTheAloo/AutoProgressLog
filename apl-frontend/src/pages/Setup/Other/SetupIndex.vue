@@ -49,10 +49,7 @@ onMounted(() => {
           The immersion tracking app that
           <span class="text-[#0FB4EC]">just works.</span>
         </h1>
-        <Button
-          @click="NextPage"
-          class="w-[300px] p-3 rounded-full self-start"
-        >
+        <Button @click="NextPage" class="w-[300px] p-3 rounded-full self-start">
           <span class="text-xl font-bold text-black">Get started!</span>
         </Button>
       </motion.div>

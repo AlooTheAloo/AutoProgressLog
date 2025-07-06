@@ -23,23 +23,23 @@ const password = ref<string>("");
 const url = ref<string>(DEFAULT_URL);
 
 const canContinue = computed(() => {
-  return email.value.trim() !== '' && password.value.trim() !== ''
-})
+  return email.value.trim() !== "" && password.value.trim() !== "";
+});
 
 const router = useRouter();
 function NextPage() {
   if (!canContinue.value) {
-    return
+    return;
   }
 
   const login: ankiLogin = {
     username: email.value,
     password: password.value,
     url: url.value,
-  }
-  console.log(login)
-  window.ipcRenderer.invoke("anki-credentials", login)
-  router.push("/setup/anki-connect")
+  };
+  console.log(login);
+  window.ipcRenderer.invoke("anki-credentials", login);
+  router.push("/setup/anki-connect");
 }
 
 function SkipAnki() {
@@ -63,24 +63,16 @@ onMounted(() => {
 <template>
   <SetupBackground />
   <div
-    :style="{ backgroundImage: `linear-gradient(to bottom right, #add8ff, #d8b4fe)` }"
+    :style="{
+      backgroundImage: `linear-gradient(to bottom right, #add8ff, #d8b4fe)`,
+    }"
     class="relative flex items-center justify-start h-screen pl-12"
   >
     <PlexusEffect class="absolute inset-0 z-0" />
 
     <!-- Card -->
     <div
-      class="
-        relative z-10
-        bg-black rounded-3xl p-12
-
-        /* 1) column flex that spans full height */
-        flex flex-col justify-between items-start
-        h-[90vh] max-h-[946px]  /* your height rules */
-
-        /* 2) width clamped between min & max */
-        w-full max-w-[899px] min-w-[600px]
-      "
+      class="relative z-10 bg-black rounded-3xl p-12 flex flex-col justify-between items-start h-[90vh] max-h-[946px] w-full max-w-[899px] min-w-[600px]"
     >
       <div class="space-y-6 w-full">
         <div class="flex w-full items-center justify-between">
@@ -170,7 +162,7 @@ onMounted(() => {
           style="font-size: 12px; padding: 0"
           @click="SkipAnki"
         />
-          <Button
+        <Button
           @click="NextPage"
           :disabled="!canContinue"
           :class="canContinue ? 'opacity-100' : 'opacity-50 cursor-not-allowed'"
