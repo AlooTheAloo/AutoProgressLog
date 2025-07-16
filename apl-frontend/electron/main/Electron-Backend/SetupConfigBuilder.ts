@@ -16,6 +16,7 @@ import os from "os";
 import { EdenClient } from "./api/ApiManager";
 import { APLStorage } from "./util/auth";
 import { Logger } from "../../../apl-backend/Helpers/Log";
+import { HttpStatusCode } from "axios";
 
 interface TogglAccount {
   id: string;
@@ -228,21 +229,23 @@ export function setupListeners() {
     }
   });
 
-  ipcMain.handle("toggl-api-key-set", async (event: any, arg: any) => {
+  ipcMain.handle("toggl-api-key-verify", async (event: any, arg: any) => {
+    const token = await APLStorage.get("token");
     account = undefined;
-    const me = await new Toggl({
-      auth: {
-        token: arg,
-      },
-    }).me.get();
-
     config.toggl = {
       togglToken: arg,
     };
-    config.account = {
-      userName: me.fullname,
-      profilePicture: me.image_url,
-    };
+    const verification = await EdenClient["verify-provider"].toggl.post(
+      {
+        togglToken: arg,
+      },
+      {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return verification.status == HttpStatusCode.Ok;
   });
 
   ipcMain.handle("set-server-options", (event: any, arg: ServerOptions) => {

@@ -30,8 +30,15 @@ async function NextPage() {
   if (!apiKey.value.trim()) {
     return;
   }
-  await window.ipcRenderer.invoke("toggl-api-key-set", apiKey.value);
-  router.push("/setup/toggl-success");
+  await window.ipcRenderer
+    .invoke("toggl-api-key-verify", apiKey.value)
+    .then((worked) => {
+      if (worked) {
+        router.push("/setup/toggl-success");
+      } else {
+        router.push("/setup/toggl-failure");
+      }
+    });
 }
 </script>
 

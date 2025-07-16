@@ -72,7 +72,7 @@ onMounted(() => {
 
     <!-- Card -->
     <div
-      class="relative z-10 bg-black rounded-3xl p-12 flex flex-col justify-between items-start h-[90vh] max-h-[946px] w-full max-w-[899px] min-w-[600px]"
+      class="relative z-10 overflow-y-auto bg-black rounded-3xl p-12 flex flex-col justify-between items-start h-[90vh] max-h-[946px] w-full max-w-[899px] min-w-[600px]"
     >
       <div class="space-y-6 w-full">
         <div class="flex w-full items-center justify-between">

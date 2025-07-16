@@ -15,9 +15,6 @@ const router = useRouter();
 
 onMounted(async () => {
   togglAccount.value = await window.ipcRenderer.invoke("toggl-account-get");
-  if (togglAccount.value === undefined) {
-    router.push("/setup/toggl-failure");
-  }
 });
 
 function NextPage() {
@@ -39,17 +36,21 @@ function NextPage() {
     <div
       class="relative z-10 bg-black rounded-3xl p-12 flex flex-col justify-between items-start h-[90vh] max-h-[946px] w-full max-w-[899px] min-w-[600px]"
     >
-      <div class="flex flex-col items-start space-y-6 w-full">
+      <div class="flex flex-col items-start w-full flex-grow">
         <img
           :src="Logo"
           alt="APL Logo"
           class="w-16 h-16 sm:w-20 sm:h-20 block"
         />
-        <ProgressSpinner
+
+        <div
           v-if="togglAccount === undefined"
-          class="flex-grow w-full h-full"
-        ></ProgressSpinner>
+          class="flex justify-center items-center w-full flex-grow"
+        >
+          <ProgressSpinner class="flex-grow w-full h-full"></ProgressSpinner>
+        </div>
         <motion.div
+          v-else
           :initial="{ opacity: 0, y: 20, filter: 'blur(10px)' }"
           :animate="{
             opacity: 1,
@@ -57,7 +58,7 @@ function NextPage() {
             filter: 'blur(0px)',
             transition: { duration: 0.6 },
           }"
-          class="flex flex-col items-start space-y-6"
+          class="flex flex-col items-start space-y-6 mt-6"
         >
           <BackButton route="/setup/toggl-manual-connect" />
           <h1

@@ -152,7 +152,7 @@ onUnmounted(() => {
       <!-- Bottom block: send button -->
       <div class="w-full flex justify-end">
         <Button
-          @click="NextPage"
+          @click="SendEmail"
           :disabled="!isEmailValid || countdown > 0"
           class="w-[300px] p-3 rounded-full flex items-center justify-center transition-all duration-200"
         >
