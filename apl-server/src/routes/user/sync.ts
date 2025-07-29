@@ -81,14 +81,14 @@ export const syncRoute = new Elysia({name: 'sync-route'})
                 data: {
                     userId,
                     totalImmersionTime: totalImmersion._sum.seconds ?? 0,
-                    ankiData: {
+                    ankiData: ankiToken || url ? {
                         create: {
                             totalCardsStudied: await AnkiStorage.getAnkiCardReviewCount(userId).then(r => r.totalCount ?? 0),
                             cardsStudied: await AnkiStorage.getAnkiCardReviewCount(userId).then(r => Math.abs((r.totalCount ?? 0) - (latestSync?.ankiData?.totalCardsStudied ?? 0))),
                             mature: await AnkiStorage.getMatureCards(userId) ?? 0,
                             retention: await AnkiStorage.getRetention(userId) ?? 0,
                         }
-                    }
+                    } : undefined
                 },
                 include: {ankiData: true}
             });
@@ -185,15 +185,23 @@ export const syncRoute = new Elysia({name: 'sync-route'})
                 immersionDTO,
                 ankiDTO,
                 nextReport,
-            };
+            } as Static<typeof DashboardDTOSchema>;
         },
         {
             headers: authHeaders,
-            response: DashboardDTOSchema,
+            response: {
+                200: DashboardDTOSchema,
+                404: t.Object({
+                    message: t.String(),
+                    code: t.Literal('ConfigNotFound')
+                }),
+                500: t.Null()
+            },
             detail: {
                 summary: 'Sync user data (immersion + Anki)',
                 tags: ['User'],
-                description: 'Synchronizes immersion and Anki data, returning up-to-date metrics for dashboard rendering.'
+                description: 'Synchronizes immersion and Anki data, returning up-to-date metrics for dashboard rendering.',
             }
+
         }
     );
