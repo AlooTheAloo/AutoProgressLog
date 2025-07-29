@@ -25,6 +25,7 @@ export const AnkiConfigRelations = t.Object(
       {
         id: t.Integer(),
         togglToken: t.String(),
+        togglUserId: t.String(),
         autoGenTime: __nullable__(t.Date()),
         createdAt: t.Date(),
         updatedAt: t.Date(),

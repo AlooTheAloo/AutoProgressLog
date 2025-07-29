@@ -5,7 +5,12 @@ import { __transformDate__ } from "./__transformDate__";
 import { __nullable__ } from "./__nullable__";
 
 export const SyncDataPlain = t.Object(
-  { id: t.Integer(), generationTime: t.Date(), userId: t.Integer() },
+  {
+    id: t.Integer(),
+    generationTime: t.Date(),
+    userId: t.Integer(),
+    totalImmersionTime: t.Integer(),
+  },
   { additionalProperties: false },
 );
 
@@ -50,12 +55,15 @@ export const SyncDataRelations = t.Object(
 );
 
 export const SyncDataPlainInputCreate = t.Object(
-  { generationTime: t.Optional(t.Date()) },
+  { generationTime: t.Optional(t.Date()), totalImmersionTime: t.Integer() },
   { additionalProperties: false },
 );
 
 export const SyncDataPlainInputUpdate = t.Object(
-  { generationTime: t.Optional(t.Date()) },
+  {
+    generationTime: t.Optional(t.Date()),
+    totalImmersionTime: t.Optional(t.Integer()),
+  },
   { additionalProperties: false },
 );
 
@@ -160,6 +168,7 @@ export const SyncDataWhere = t.Partial(
           id: t.Integer(),
           generationTime: t.Date(),
           userId: t.Integer(),
+          totalImmersionTime: t.Integer(),
         },
         { additionalProperties: false },
       ),
@@ -194,7 +203,12 @@ export const SyncDataWhereUnique = t.Recursive(
         ),
         t.Partial(
           t.Object(
-            { id: t.Integer(), generationTime: t.Date(), userId: t.Integer() },
+            {
+              id: t.Integer(),
+              generationTime: t.Date(),
+              userId: t.Integer(),
+              totalImmersionTime: t.Integer(),
+            },
             { additionalProperties: false },
           ),
         ),
@@ -213,6 +227,7 @@ export const SyncDataSelect = t.Partial(
       userId: t.Boolean(),
       user: t.Boolean(),
       report: t.Boolean(),
+      totalImmersionTime: t.Boolean(),
       _count: t.Boolean(),
     },
     { additionalProperties: false },
@@ -241,6 +256,9 @@ export const SyncDataOrderBy = t.Partial(
         additionalProperties: false,
       }),
       userId: t.Union([t.Literal("asc"), t.Literal("desc")], {
+        additionalProperties: false,
+      }),
+      totalImmersionTime: t.Union([t.Literal("asc"), t.Literal("desc")], {
         additionalProperties: false,
       }),
     },

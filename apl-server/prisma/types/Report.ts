@@ -38,7 +38,12 @@ export const ReportRelations = t.Object(
       { additionalProperties: false },
     ),
     syncData: t.Object(
-      { id: t.Integer(), generationTime: t.Date(), userId: t.Integer() },
+      {
+        id: t.Integer(),
+        generationTime: t.Date(),
+        userId: t.Integer(),
+        totalImmersionTime: t.Integer(),
+      },
       { additionalProperties: false },
     ),
   },

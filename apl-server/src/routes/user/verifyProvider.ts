@@ -22,7 +22,12 @@ export const verifyProviderRoutes = new Elysia({name: 'verify-provider-routes'})
                     }),
                 }),
                 headers: authHeaders,
-                response: t.Void()
+                response: t.Void(),
+                detail: {
+                    summary: 'Verify Toggl Token for specified user',
+                    tags: ['User'],
+                    description: 'This endpoint verifies the provided Toggl token by fetching the user details.',
+                },
             }
         )
 );

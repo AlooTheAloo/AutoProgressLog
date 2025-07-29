@@ -21,6 +21,7 @@ export const UserRelations = t.Object(
         {
           id: t.Integer(),
           togglToken: t.String(),
+          togglUserId: t.String(),
           autoGenTime: __nullable__(t.Date()),
           createdAt: t.Date(),
           updatedAt: t.Date(),
@@ -54,7 +55,7 @@ export const UserRelations = t.Object(
       t.Object(
         {
           id: t.Integer(),
-          time: t.Date(),
+          createdAt: t.Date(),
           seconds: t.Integer(),
           activityName: t.String(),
           userId: t.Integer(),
@@ -78,7 +79,12 @@ export const UserRelations = t.Object(
     ),
     syncData: t.Array(
       t.Object(
-        { id: t.Integer(), generationTime: t.Date(), userId: t.Integer() },
+        {
+          id: t.Integer(),
+          generationTime: t.Date(),
+          userId: t.Integer(),
+          totalImmersionTime: t.Integer(),
+        },
         { additionalProperties: false },
       ),
       { additionalProperties: false },

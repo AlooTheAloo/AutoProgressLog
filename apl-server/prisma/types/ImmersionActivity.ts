@@ -7,7 +7,7 @@ import { __nullable__ } from "./__nullable__";
 export const ImmersionActivityPlain = t.Object(
   {
     id: t.Integer(),
-    time: t.Date(),
+    createdAt: t.Date(),
     seconds: t.Integer(),
     activityName: t.String(),
     userId: t.Integer(),
@@ -31,13 +31,13 @@ export const ImmersionActivityRelations = t.Object(
 );
 
 export const ImmersionActivityPlainInputCreate = t.Object(
-  { time: t.Date(), seconds: t.Integer(), activityName: t.String() },
+  { createdAt: t.Date(), seconds: t.Integer(), activityName: t.String() },
   { additionalProperties: false },
 );
 
 export const ImmersionActivityPlainInputUpdate = t.Object(
   {
-    time: t.Optional(t.Date()),
+    createdAt: t.Optional(t.Date()),
     seconds: t.Optional(t.Integer()),
     activityName: t.Optional(t.String()),
   },
@@ -89,7 +89,7 @@ export const ImmersionActivityWhere = t.Partial(
           NOT: t.Union([Self, t.Array(Self, { additionalProperties: false })]),
           OR: t.Array(Self, { additionalProperties: false }),
           id: t.Integer(),
-          time: t.Date(),
+          createdAt: t.Date(),
           seconds: t.Integer(),
           activityName: t.String(),
           userId: t.Integer(),
@@ -129,7 +129,7 @@ export const ImmersionActivityWhereUnique = t.Recursive(
           t.Object(
             {
               id: t.Integer(),
-              time: t.Date(),
+              createdAt: t.Date(),
               seconds: t.Integer(),
               activityName: t.String(),
               userId: t.Integer(),
@@ -147,7 +147,7 @@ export const ImmersionActivitySelect = t.Partial(
   t.Object(
     {
       id: t.Boolean(),
-      time: t.Boolean(),
+      createdAt: t.Boolean(),
       seconds: t.Boolean(),
       activityName: t.Boolean(),
       userId: t.Boolean(),
@@ -171,7 +171,7 @@ export const ImmersionActivityOrderBy = t.Partial(
       id: t.Union([t.Literal("asc"), t.Literal("desc")], {
         additionalProperties: false,
       }),
-      time: t.Union([t.Literal("asc"), t.Literal("desc")], {
+      createdAt: t.Union([t.Literal("asc"), t.Literal("desc")], {
         additionalProperties: false,
       }),
       seconds: t.Union([t.Literal("asc"), t.Literal("desc")], {

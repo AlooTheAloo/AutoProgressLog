@@ -11,5 +11,4 @@ export const registeredRoutes = new Elysia({ name: "registered-routes" })
   .use(userRoutes)
   .use(storageRoutes)
   .use(downloadLinksRoute)
-  .use(rootRoute)
-  .use(verifyProviderRoutes);
+  .use(rootRoute);

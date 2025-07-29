@@ -46,12 +46,13 @@ model Token {
 }
 
 model SyncData {
-  id             Int       @id @default(autoincrement())
-  generationTime DateTime  @default(now())
-  ankiData       AnkiData?
-  userId         Int
-  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  report         Report?
+  id                 Int       @id @default(autoincrement())
+  generationTime     DateTime  @default(now())
+  ankiData           AnkiData?
+  userId             Int
+  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  report             Report?
+  totalImmersionTime Int
 
   @@index([userId])
 }
@@ -70,7 +71,7 @@ model AnkiData {
 
 model ImmersionActivity {
   id           Int      @id @default(autoincrement())
-  time         DateTime
+  createdAt    DateTime
   seconds      Int
   activityName String
   userId       Int
@@ -107,6 +108,7 @@ model Streak {
 model UserConfig {
   id          Int         @id @default(autoincrement())
   togglToken  String
+  togglUserId String
   ankiConfig  AnkiConfig?
   autoGenTime DateTime?   @db.Timetz(6)
   createdAt   DateTime    @default(now())

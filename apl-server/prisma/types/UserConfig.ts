@@ -8,6 +8,7 @@ export const UserConfigPlain = t.Object(
   {
     id: t.Integer(),
     togglToken: t.String(),
+    togglUserId: t.String(),
     autoGenTime: __nullable__(t.Date()),
     createdAt: t.Date(),
     updatedAt: t.Date(),
@@ -133,6 +134,7 @@ export const UserConfigWhere = t.Partial(
           OR: t.Array(Self, { additionalProperties: false }),
           id: t.Integer(),
           togglToken: t.String(),
+          togglUserId: t.String(),
           autoGenTime: t.Date(),
           createdAt: t.Date(),
           updatedAt: t.Date(),
@@ -178,6 +180,7 @@ export const UserConfigWhereUnique = t.Recursive(
             {
               id: t.Integer(),
               togglToken: t.String(),
+              togglUserId: t.String(),
               autoGenTime: t.Date(),
               createdAt: t.Date(),
               updatedAt: t.Date(),
@@ -197,6 +200,7 @@ export const UserConfigSelect = t.Partial(
     {
       id: t.Boolean(),
       togglToken: t.Boolean(),
+      togglUserId: t.Boolean(),
       ankiConfig: t.Boolean(),
       autoGenTime: t.Boolean(),
       createdAt: t.Boolean(),
@@ -223,6 +227,9 @@ export const UserConfigOrderBy = t.Partial(
         additionalProperties: false,
       }),
       togglToken: t.Union([t.Literal("asc"), t.Literal("desc")], {
+        additionalProperties: false,
+      }),
+      togglUserId: t.Union([t.Literal("asc"), t.Literal("desc")], {
         additionalProperties: false,
       }),
       autoGenTime: t.Union([t.Literal("asc"), t.Literal("desc")], {

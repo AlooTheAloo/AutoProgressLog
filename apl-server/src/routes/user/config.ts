@@ -1,8 +1,8 @@
-import { Elysia, t } from "elysia";
+import {Elysia, t} from "elysia";
 import client from "../../db/client";
-import { authGuard, authHeaders } from "../../middlewares/authGuard";
-import { __nullable__ } from "../../../prisma/types/__nullable__";
-import { UserConfigPlain } from "../../../prisma/types/UserConfig";
+import {authGuard, authHeaders} from "../../middlewares/authGuard";
+import {__nullable__} from "../../../prisma/types/__nullable__";
+import {UserConfigPlain} from "../../../prisma/types/UserConfig";
 
 // Define what part of the config we expose publicly
 const PublicUserConfig = t.Omit(UserConfigPlain, ['id', 'userId']);
@@ -26,7 +26,7 @@ const PublicUserConfig = t.Omit(UserConfigPlain, ['id', 'userId']);
  *
  * All endpoints are protected by `authGuard`, meaning the authenticated `user` is injected automatically.
  */
-export const configRoutes = new Elysia({ name: 'config-routes' }).use(authGuard)
+export const configRoutes = new Elysia({name: 'config-routes'}).use(authGuard)
 
     /**
      * ## GET /config
@@ -48,11 +48,12 @@ export const configRoutes = new Elysia({ name: 'config-routes' }).use(authGuard)
      * console.log(config?.autoGenTime);
      * ```
      */
-    .get('/config', async ({ user }) => {
+    .get('/config', async ({user}) => {
         return client.userConfig.findUnique({
-            where: { userId: user.id },
+            where: {userId: user.id},
             select: {
                 togglToken: true,
+                togglUserId: true,
                 autoGenTime: true,
                 createdAt: true,
                 updatedAt: true,
@@ -90,9 +91,9 @@ export const configRoutes = new Elysia({ name: 'config-routes' }).use(authGuard)
      * });
      * ```
      */
-    .patch('/config', async ({ body, user }) => {
+    .patch('/config', async ({body, user}) => {
         return client.userConfig.update({
-            where: { userId: user.id },
+            where: {userId: user.id},
             data: {
                 togglToken: body.togglToken,
                 autoGenTime: body.autoGenTime,
@@ -100,6 +101,7 @@ export const configRoutes = new Elysia({ name: 'config-routes' }).use(authGuard)
             select: {
                 togglToken: true,
                 autoGenTime: true,
+                togglUserId: true,
                 createdAt: true,
                 updatedAt: true,
             },
@@ -143,16 +145,18 @@ export const configRoutes = new Elysia({ name: 'config-routes' }).use(authGuard)
      * });
      * ```
      */
-    .post('/config', async ({ body, user }) => {
+    .post('/config', async ({body, user}) => {
         return client.userConfig.create({
             data: {
                 togglToken: body.togglToken,
                 autoGenTime: body.autoGenTime,
+                togglUserId: body.togglUserId,
                 userId: user.id,
             },
             select: {
                 togglToken: true,
                 autoGenTime: true,
+                togglUserId: true,
                 createdAt: true,
                 updatedAt: true,
             },
