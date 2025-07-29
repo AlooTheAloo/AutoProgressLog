@@ -3,9 +3,11 @@ import client from "../../db/client";
 import {authGuard, authHeaders} from "../../middlewares/authGuard";
 import {__nullable__} from "../../../prisma/types/__nullable__";
 import {UserConfigPlain} from "../../../prisma/types/UserConfig";
+import {AnkiConfigPlain} from "../../../prisma/types/AnkiConfig";
 
 // Define what part of the config we expose publicly
 const PublicUserConfig = t.Omit(UserConfigPlain, ['id', 'userId']);
+const PublicAnkiConfig = t.Omit(AnkiConfigPlain, ['id', 'userConfigId']);
 
 /**
  * ## /config Routes (Grouped under configRoutes)
@@ -169,5 +171,158 @@ export const configRoutes = new Elysia({name: 'config-routes'}).use(authGuard)
             summary: 'Create user configuration',
             tags: ['User'],
             description: 'Creates a new configuration record for the authenticated user.',
+        },
+    })
+    /**
+     * ## GET /config/anki
+     *
+     * Get the Anki configuration for the authenticated user.
+     *
+     * ---
+     *
+     * ### 🧠 What it does:
+     * - Retrieves the user's Anki configuration using their `user.id`
+     * - Returns only the safe fields (no ID)
+     *
+     * ---
+     *
+     * ### 🧪 Example usage (Eden):
+     * ```ts
+     * const ankiConfig = await api.user.config.anki.get();
+     * console.log(ankiConfig?.url);
+     * ```
+     */
+    .get('/config/anki', async ({user}) => {
+        const associatedConfig = await client.userConfig.findUnique({
+            where: {userId: user.id},
+        })
+        return client.ankiConfig.findUnique({
+            where: {userConfigId: associatedConfig?.id},
+            select: {
+                url: true,
+                ankiToken: true,
+                retentionMode: true,
+                trackedDecks: true,
+            }
+        });
+    }, {
+        headers: authHeaders,
+        response: __nullable__(PublicAnkiConfig),
+        detail: {
+            summary: 'Get Anki configuration',
+            tags: ['User'],
+            description: 'Returns the Anki configuration for the authenticated user.',
+        },
+    })
+    /**
+     * ## PATCH /config/anki
+     *
+     * Update the Anki configuration for the authenticated user.
+     *
+     * ---
+     *
+     * ### 🧠 What it does:
+     * - Accepts a partial Anki config (`url`, `ankiToken`, `retentionMode`, `trackedDecks`)
+     * - Updates the user's Anki configuration record using their `user.id`
+     * - Returns the updated record
+     *
+     * ---
+     *
+     * ### 🧪 Example usage (Eden):
+     * ```ts
+     * const updatedAnkiConfig = await api.user.config.anki.patch({
+     *   url: 'http://localhost:8765',
+     *   ankiToken: 'my-anki-token',
+     *   retentionMode: 'ANKI_DEFAULT',
+     *   trackedDecks: [1, 2, 3]
+     * });
+     * ```
+     */
+    .patch('/config/anki', async ({body, user}) => {
+        const associatedConfig = await client.userConfig.findUnique({
+            where: {userId: user.id},
+        })
+        return client.ankiConfig.update({
+            where: {userConfigId: associatedConfig?.id},
+            data: {
+                url: body.url,
+                ankiToken: body.ankiToken,
+                retentionMode: body.retentionMode,
+                trackedDecks: body.trackedDecks,
+            },
+            select: {
+                url: true,
+                ankiToken: true,
+                retentionMode: true,
+                trackedDecks: true,
+            }
+        });
+    }, {
+        headers: authHeaders,
+        body: t.Omit(AnkiConfigPlain, ['id', 'userConfigId']),
+        response: PublicAnkiConfig,
+        detail: {
+            summary: 'Update Anki configuration',
+            tags: ['User'],
+            description: 'Allows the authenticated user to update their Anki configuration settings.',
+        },
+    })
+
+    /**
+     * ## POST /config/anki
+     *
+     * Create an Anki configuration for the authenticated user.
+     *
+     * ---
+     *
+     * ### 🧠 What it does:
+     * - Creates a new `ankiConfig` row for the logged-in user
+     * - Uses their `user.id` as the foreign key
+     * - Returns the created configuration fields
+     *
+     * ---
+     *
+     * ### 🧪 Example usage (Eden):
+     * ```ts
+     * const ankiConfig = await api.user.config.anki.post({
+     *  url: 'http://localhost:8765',
+     *  ankiToken: 'my-anki-token',
+     *  retentionMode: 'ANKI_DEFAULT',
+     *  trackedDecks: [1, 2, 3]
+     *  });
+     *  console.log(ankiConfig);
+     *  ```
+     *
+     */
+    .post('/config/anki', async ({body, user}) => {
+        const associatedConfig = await client.userConfig.findUnique({
+            where: {userId: user.id},
+        })
+        if (!associatedConfig) {
+            throw new Error('User configuration not found. Please create a user config first.');
+        }
+        return client.ankiConfig.create({
+            data: {
+                url: body.url,
+                ankiToken: body.ankiToken,
+                retentionMode: body.retentionMode,
+                trackedDecks: body.trackedDecks,
+                userConfigId: associatedConfig?.id,
+            },
+            select: {
+                url: true,
+                ankiToken: true,
+                retentionMode: true,
+                trackedDecks: true,
+            }
+        });
+    }, {
+        headers: authHeaders,
+        body: t.Omit(AnkiConfigPlain, ['id', 'userConfigId']),
+        response: PublicAnkiConfig,
+        detail: {
+            summary: 'Create Anki configuration',
+            tags: ['User'],
+            description: 'Creates a new Anki configuration record for the authenticated user.',
         },
     });

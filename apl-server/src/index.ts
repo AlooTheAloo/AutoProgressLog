@@ -4,7 +4,6 @@ import swagger from "@elysiajs/swagger";
 import {initTogglNotifications, togglWebhook} from "./webhooks/toggl";
 import {SocketManager} from "./sockets/manager";
 import {registeredRoutes} from "./routes";
-import {executeFetch} from "./services/storage/anki";
 import AnkiStorage from "./services/anki/AnkiStorage";
 
 const sm = new SocketManager();
