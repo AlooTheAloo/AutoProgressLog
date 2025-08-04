@@ -8,7 +8,6 @@ import { getConfig } from "../Helpers/getConfig";
 import { activity } from "../types/activity";
 import { onConfigChange } from "../../../apl-frontend/electron/main/Electron-Backend/SettingsListeners";
 import { Options } from "../types/options";
-import { EventAction, TogglWebhookClient } from "toggl-webhook";
 import { Logger } from "../Helpers/Log";
 
 // TODO : All of this needs to be moved to the server

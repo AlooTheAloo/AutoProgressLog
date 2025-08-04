@@ -235,6 +235,9 @@ export function setupListeners() {
     config.toggl = {
       togglToken: arg,
     };
+    console.log(token);
+    console.log(arg);
+
     const verification = await EdenClient["verify-provider"].toggl.post(
       {
         togglToken: arg,
@@ -245,6 +248,7 @@ export function setupListeners() {
         },
       }
     );
+    console.log("Verification", verification);
     return verification.status == HttpStatusCode.Ok;
   });
 

@@ -26,6 +26,10 @@ export function ankiListeners() {
   ipcMain.handle("test-anki-connection", async (event: any, arg: ankiLogin) => {
     win?.webContents.send("anki-connect-message", "Testing anki connection");
 
+    const httpClient = new AnkiHTTPClient("", arg.url);
+    const loginInfo = await httpClient.login(arg.username, arg.password);
+    return loadDB(httpClient);
+
     // TODO : Make API Call here
     // TODO : Ship this to the server
     // const httpClient = new AnkiHTTPClient("", arg.url);

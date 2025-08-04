@@ -59,7 +59,7 @@ function Confirm() {
           }"
           class="flex flex-col items-start space-y-6"
         >
-          <BackButton route="/setup/index" />
+          <BackButton route="/setup/auth-success" />
           <h1
             class="text-xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-semibold text-white leading-tight"
           >
