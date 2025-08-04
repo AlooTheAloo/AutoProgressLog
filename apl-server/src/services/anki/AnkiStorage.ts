@@ -87,6 +87,23 @@ export default class AnkiStorage {
         };
     }
 
+    static async uploadAnkiDB(userId: number, db: Uint8Array) {
+        const response = await fetch(
+            `${AnkiStorage.storage_url}/ankidb/upload/${userId}`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+                body: db,
+            }
+        );
+        if (!response.ok) {
+            throw new Error(`Failed to upload Anki DB: ${response.statusText}`);
+        }
+        return response.json();
+    }
+
     /**
      * Remove all Anki data associated with the user.
      */
