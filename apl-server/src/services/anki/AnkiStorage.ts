@@ -93,14 +93,31 @@ export default class AnkiStorage {
     };
   }
 
-  /**
-   * Remove all Anki data associated with the user.
-   */
-  public static async DeleteAnkiData(userID: number) {
-    await paa.ankiData.deleteMany({
-      where: { syncData: { userId: userID } },
-    });
-  }
+    static async uploadAnkiDB(userId: number, db: Uint8Array) {
+        const response = await fetch(
+            `${AnkiStorage.storage_url}/ankidb/upload/${userId}`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+                body: db,
+            }
+        );
+        if (!response.ok) {
+            throw new Error(`Failed to upload Anki DB: ${response.statusText}`);
+        }
+        return response.json();
+    }
+
+    /**
+     * Remove all Anki data associated with the user.
+     */
+    public static async DeleteAnkiData(userID: number) {
+        await prisma.ankiData.deleteMany({
+            where: {syncData: {userId: userID}},
+        });
+    }
 
   /**
    * Calculate retention percentage for a user.

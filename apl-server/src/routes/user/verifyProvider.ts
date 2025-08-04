@@ -34,15 +34,15 @@ export const verifyProviderRoutes = new Elysia({name: 'verify-provider-routes'})
             }
         )
         .post('/anki', async ({body, set, user}) => {
-                const {username, password} = body;
-                const response = await new AnkiHTTPClient().login(username, password);
+                const {username, password, ankiUrl} = body;
+                const response = await new AnkiHTTPClient("", ankiUrl).login(username, password);
                 if (!response) {
                     set.status = 401; // Unauthorized
                     return {error: 'Invalid Anki credentials'};
                 }
                 set.status = 200; // OK
-             //TODO: Download the Anki DB in apl-storage
-             //TODO: getDeckCards and return the decks
+                await AnkiStorage.uploadAnkiDB(user.id, (await new AnkiHTTPClient(response, ankiUrl).downloadInitialDatabase())!);
+                //TODO: getDeckCards and return the decks
             },
             {
                 body: t.Object({
@@ -54,6 +54,10 @@ export const verifyProviderRoutes = new Elysia({name: 'verify-provider-routes'})
                         example: 'securepassword123',
                         description: 'Your Anki password',
                     }),
+                    ankiUrl: t.Optional(t.String({
+                        example: 'http://localhost:8765',
+                        description: 'The URL of your AnkiConnect server',
+                    }))
                 }),
                 headers: authHeaders,
                 detail: {
