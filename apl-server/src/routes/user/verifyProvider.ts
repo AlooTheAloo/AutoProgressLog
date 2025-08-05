@@ -2,8 +2,7 @@ import {Elysia, t} from "elysia"
 import {authHeaders, authGuard} from "../../middlewares/authGuard";
 import {Toggl} from "toggl-track";
 import AnkiHTTPClient from "../../services/anki/AnkiHTTPClient";
-import AnkiStorage from "../../services/anki/AnkiStorage";
-import NormalSyncer from "../../services/anki/NormalSyncer";
+import AnkiStorage, {DeckTypeSchema} from "../../services/anki/AnkiStorage";
 
 export const verifyProviderRoutes = new Elysia({name: 'verify-provider-routes'}).use(authGuard).group('/verify-provider',
     app => app
@@ -40,9 +39,14 @@ export const verifyProviderRoutes = new Elysia({name: 'verify-provider-routes'})
                     set.status = 401; // Unauthorized
                     return {error: 'Invalid Anki credentials'};
                 }
-                set.status = 200; // OK
                 await AnkiStorage.uploadAnkiDB(user.id, (await new AnkiHTTPClient(response, ankiUrl).downloadInitialDatabase())!);
-                //TODO: getDeckCards and return the decks
+                try {
+                    set.status = 200;
+                    return AnkiStorage.getDecksCards(user.id);
+                } catch (e: any) {
+                    set.status = 500;
+                    return {error: e.message};
+                }
             },
             {
                 body: t.Object({
@@ -60,6 +64,15 @@ export const verifyProviderRoutes = new Elysia({name: 'verify-provider-routes'})
                     }))
                 }),
                 headers: authHeaders,
+                response: {
+                    200: t.Array(DeckTypeSchema),
+                    401: t.Object({
+                        error: t.String(),
+                    }),
+                    500: t.Object({
+                        error: t.String(),
+                    }),
+                },
                 detail: {
                     summary: 'Verify Anki credentials for specified user',
                     tags: ['User'],

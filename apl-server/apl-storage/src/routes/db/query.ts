@@ -1,6 +1,5 @@
 import { Elysia, t } from "elysia";
-import path from "path";
-import { existsSync, createReadStream } from "fs";
+import { existsSync } from "fs";
 import { executeQuery, getDBPath } from "../../services/db";
 
 /**
