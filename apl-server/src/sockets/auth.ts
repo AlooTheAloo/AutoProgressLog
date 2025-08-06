@@ -1,22 +1,35 @@
 import { ElysiaWS } from "elysia/dist/ws";
 import Toggl from "toggl-track";
+import client from "../db/client";
 
 /**
- * Converts a Toggl Token to a toggl user ID. Consumes 1 token.
+ * Converts a auth token to a toggl user ID.
  * @param token The token to use.
- * @returns The user ID or false if the token is invalid.
+ * @returns The user ID and token or null if the token is invalid.
  */
-export async function togglTokenToTogglID(token: string) {
+export async function tokenToTogglData(token: string) {
   try {
-    const tog = new Toggl({
-      auth: {
-        token: token,
+    const user = client.user.findFirst({
+      where: {
+        tokens: {
+          some: {
+            token,
+            type: "SESSION",
+          },
+        },
+      },
+      include: {
+        config: true,
       },
     });
-    const me = await tog.me.get();
-    return (me.id as number).toString();
+    return user.config({
+      select: {
+        togglToken: true,
+        togglUserId: true,
+      },
+    });
   } catch (e) {
-    return false;
+    return null;
   }
 }
 

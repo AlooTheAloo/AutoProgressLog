@@ -1,5 +1,5 @@
 import { ElysiaWS } from "elysia/dist/ws";
-import { addSocket, togglTokenToTogglID, removeSocket, sockToID } from "./auth";
+import { addSocket, removeSocket, sockToID, tokenToTogglData } from "./auth";
 import createWebhook from "../integrations/toggl/createWebhook";
 
 export class SocketManager {
@@ -25,17 +25,17 @@ export class SocketManager {
   public async message(ws: ElysiaWS, message: any) {
     if (message.type === "auth") {
       const { token } = message.payload;
-      const id = await togglTokenToTogglID(token);
+      const data = await tokenToTogglData(token);
 
       console.log("Auth attempt for ", "Socket");
 
-      if (!id) {
+      if (!data) {
         ws.close(401);
       } else {
-        console.log("Authenticated " + id);
-        createWebhook(-1, token); // TODO: move this to client when auth system is complete
-        addSocket(id, ws);
-        SocketManager.clients.set(id, ws);
+        console.log("Authenticated " + data.togglUserId);
+        createWebhook(-1, data.togglToken);
+        addSocket(data.togglUserId, ws);
+        SocketManager.clients.set(data.togglUserId, ws);
         this.authListeners.forEach((x) => x(ws));
       }
       return;

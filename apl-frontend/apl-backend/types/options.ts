@@ -1,20 +1,9 @@
 export interface Options {
   general: {
-    autogen: ConditionalOption<ServerOptions>;
     discordIntegration: boolean;
-  };
-  account: {
-    userName: string;
-    profilePicture: string;
   };
   appearance: {
     glow: boolean;
-  };
-  toggl: {
-    togglToken: string;
-  };
-  anki: ConditionalOption<AnkiOptions> & {
-    ankiIntegration?: ankiIntegration;
   };
   outputOptions: OutputOptions;
 }

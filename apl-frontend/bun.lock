@@ -11,6 +11,7 @@
         "@primevue/themes": "^4.3.5",
         "@puppeteer/browsers": "^2.10.5",
         "@types/electron-json-storage": "^4.5.4",
+        "@types/vue-writer": "^1.2.0",
         "@vueuse/core": "^13.4.0",
         "@xhayper/discord-rpc": "^1.2.2",
         "ajv": "^8.17.1",
@@ -408,6 +409,8 @@
     "@types/responselike": ["@types/responselike@1.0.3", "", { "dependencies": { "@types/node": "*" } }, "sha512-H/+L+UkTV33uf49PH5pCAUBVPNj2nDBXTN+qS1dOwyyg24l3CcicicCA7ca+HMvJBZcFgl5r8e+RR6elsb4Lyw=="],
 
     "@types/verror": ["@types/verror@1.10.11", "", {}, "sha512-RlDm9K7+o5stv0Co8i8ZRGxDbrTxhJtgjqjFyVh/tXQyl/rYtTKlnTvZ88oSTeYREWurwx20Js4kTuKCsFkUtg=="],
+
+    "@types/vue-writer": ["@types/vue-writer@1.2.0", "", { "dependencies": { "vue": "^3.0.5" } }, "sha512-wZFLQBme71QB914WAAc65MrvXM5g1yzrfVE3OH71gtknUNlxWqFfot9PrDLu0elXU09ynz/NU72g5v+aYpxCSw=="],
 
     "@types/web-bluetooth": ["@types/web-bluetooth@0.0.21", "", {}, "sha512-oIQLCGWtcFZy2JW77j9k8nHzAOpqMHLQejDA48XXMWH6tjCQHz5RCFz1bzsmROyL6PUm+LLnUiI4BCn221inxA=="],
 

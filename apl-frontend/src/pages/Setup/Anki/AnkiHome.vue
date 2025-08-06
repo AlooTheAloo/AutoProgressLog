@@ -7,7 +7,6 @@ import BackButton from "../../../components/Common/BackButton.vue";
 import PlexusEffect from "../../../components/Common/PlexusEffect.vue";
 import InputText from "primevue/inputtext";
 import Password from "primevue/password";
-import { ankiLogin } from "../../../../apl-backend/config/configAnkiIntegration";
 import { ref, computed, onMounted } from "vue";
 import AccordionPanel from "primevue/accordionpanel";
 import Accordion from "primevue/accordion";
@@ -15,6 +14,7 @@ import AccordionHeader from "primevue/accordionheader";
 import AccordionContent from "primevue/accordioncontent";
 import Logo from "../../../assets/Logo.png";
 import { motion } from "motion-v";
+import { AnkiLogin } from "../../../../electron/main/Electron-Backend/SetupConfigBuilder";
 
 const DEFAULT_URL = "https://sync.ankiweb.net";
 
@@ -32,7 +32,7 @@ function NextPage() {
     return;
   }
 
-  const login: ankiLogin = {
+  const login: AnkiLogin = {
     username: email.value,
     password: password.value,
     url: url.value,
@@ -50,7 +50,7 @@ function SkipAnki() {
 onMounted(() => {
   window.ipcRenderer
     .invoke("get-anki-credentials")
-    .then((credentials: ankiLogin) => {
+    .then((credentials: AnkiLogin) => {
       if (credentials.username && credentials.password) {
         email.value = credentials.username;
         password.value = credentials.password;

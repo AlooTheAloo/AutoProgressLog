@@ -28,6 +28,7 @@
     "@primevue/themes": "^4.3.5",
     "@puppeteer/browsers": "^2.10.5",
     "@types/electron-json-storage": "^4.5.4",
+    "@types/vue-writer": "^1.2.0",
     "@vueuse/core": "^13.4.0",
     "@xhayper/discord-rpc": "^1.2.2",
     "ajv": "^8.17.1",

@@ -33,6 +33,7 @@ import { config as dotenvConfig } from "dotenv";
 import { initializeApiManager } from "./Electron-Backend/api/ApiManager";
 import { Logger } from "../../apl-backend/Helpers/Log";
 import { init } from "@bokuweb/zstd-wasm";
+import { APLStorage } from "./Electron-Backend/util/auth";
 
 const isProd = app.isPackaged;
 
@@ -188,7 +189,7 @@ app.on("ready", async () => {
     try {
       // TODO : Add an API call to create the webhook
       await new SocketClient().init({
-        token: getConfig()?.toggl.togglToken ?? "",
+        token: (await APLStorage.get("token")) as string,
       });
     } catch (e) {
       Logger.log("Failed to init socket client", "Socket");

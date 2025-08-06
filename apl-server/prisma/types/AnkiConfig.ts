@@ -11,12 +11,12 @@ export const AnkiConfigPlain = t.Object(
     ankiToken: t.String(),
     retentionMode: t.Union(
       [t.Literal("ANKI_DEFAULT"), t.Literal("TRUE_RETENTION")],
-      { additionalProperties: false },
+      { additionalProperties: false }
     ),
-    trackedDecks: t.Array(t.Integer(), { additionalProperties: false }),
+    trackedDecks: t.Array(t.BigInt(), { additionalProperties: false }),
     userConfigId: t.Integer(),
   },
-  { additionalProperties: false },
+  { additionalProperties: false }
 );
 
 export const AnkiConfigRelations = t.Object(
@@ -31,10 +31,10 @@ export const AnkiConfigRelations = t.Object(
         updatedAt: t.Date(),
         userId: t.Integer(),
       },
-      { additionalProperties: false },
+      { additionalProperties: false }
     ),
   },
-  { additionalProperties: false },
+  { additionalProperties: false }
 );
 
 export const AnkiConfigPlainInputCreate = t.Object(
@@ -43,11 +43,11 @@ export const AnkiConfigPlainInputCreate = t.Object(
     ankiToken: t.String(),
     retentionMode: t.Union(
       [t.Literal("ANKI_DEFAULT"), t.Literal("TRUE_RETENTION")],
-      { additionalProperties: false },
+      { additionalProperties: false }
     ),
-    trackedDecks: t.Array(t.Integer(), { additionalProperties: false }),
+    trackedDecks: t.Array(t.BigInt(), { additionalProperties: false }),
   },
-  { additionalProperties: false },
+  { additionalProperties: false }
 );
 
 export const AnkiConfigPlainInputUpdate = t.Object(
@@ -57,13 +57,13 @@ export const AnkiConfigPlainInputUpdate = t.Object(
     retentionMode: t.Optional(
       t.Union([t.Literal("ANKI_DEFAULT"), t.Literal("TRUE_RETENTION")], {
         additionalProperties: false,
-      }),
+      })
     ),
     trackedDecks: t.Optional(
-      t.Array(t.Integer(), { additionalProperties: false }),
+      t.Array(t.BigInt(), { additionalProperties: false })
     ),
   },
-  { additionalProperties: false },
+  { additionalProperties: false }
 );
 
 export const AnkiConfigRelationsInputCreate = t.Object(
@@ -74,13 +74,13 @@ export const AnkiConfigRelationsInputCreate = t.Object(
           {
             id: t.Integer({ additionalProperties: false }),
           },
-          { additionalProperties: false },
+          { additionalProperties: false }
         ),
       },
-      { additionalProperties: false },
+      { additionalProperties: false }
     ),
   },
-  { additionalProperties: false },
+  { additionalProperties: false }
 );
 
 export const AnkiConfigRelationsInputUpdate = t.Partial(
@@ -92,14 +92,14 @@ export const AnkiConfigRelationsInputUpdate = t.Partial(
             {
               id: t.Integer({ additionalProperties: false }),
             },
-            { additionalProperties: false },
+            { additionalProperties: false }
           ),
         },
-        { additionalProperties: false },
+        { additionalProperties: false }
       ),
     },
-    { additionalProperties: false },
-  ),
+    { additionalProperties: false }
+  )
 );
 
 export const AnkiConfigWhere = t.Partial(
@@ -115,15 +115,15 @@ export const AnkiConfigWhere = t.Partial(
           ankiToken: t.String(),
           retentionMode: t.Union(
             [t.Literal("ANKI_DEFAULT"), t.Literal("TRUE_RETENTION")],
-            { additionalProperties: false },
+            { additionalProperties: false }
           ),
-          trackedDecks: t.Array(t.Integer(), { additionalProperties: false }),
+          trackedDecks: t.Array(t.BigInt(), { additionalProperties: false }),
           userConfigId: t.Integer(),
         },
-        { additionalProperties: false },
+        { additionalProperties: false }
       ),
-    { $id: "AnkiConfig" },
-  ),
+    { $id: "AnkiConfig" }
+  )
 );
 
 export const AnkiConfigWhereUnique = t.Recursive(
@@ -133,16 +133,16 @@ export const AnkiConfigWhereUnique = t.Recursive(
         t.Partial(
           t.Object(
             { id: t.Integer(), userConfigId: t.Integer() },
-            { additionalProperties: false },
+            { additionalProperties: false }
           ),
-          { additionalProperties: false },
+          { additionalProperties: false }
         ),
         t.Union(
           [
             t.Object({ id: t.Integer() }),
             t.Object({ userConfigId: t.Integer() }),
           ],
-          { additionalProperties: false },
+          { additionalProperties: false }
         ),
         t.Partial(
           t.Object({
@@ -156,7 +156,7 @@ export const AnkiConfigWhereUnique = t.Recursive(
             ]),
             OR: t.Array(Self, { additionalProperties: false }),
           }),
-          { additionalProperties: false },
+          { additionalProperties: false }
         ),
         t.Partial(
           t.Object(
@@ -166,20 +166,20 @@ export const AnkiConfigWhereUnique = t.Recursive(
               ankiToken: t.String(),
               retentionMode: t.Union(
                 [t.Literal("ANKI_DEFAULT"), t.Literal("TRUE_RETENTION")],
-                { additionalProperties: false },
+                { additionalProperties: false }
               ),
-              trackedDecks: t.Array(t.Integer(), {
+              trackedDecks: t.Array(t.BigInt(), {
                 additionalProperties: false,
               }),
               userConfigId: t.Integer(),
             },
-            { additionalProperties: false },
-          ),
+            { additionalProperties: false }
+          )
         ),
       ],
-      { additionalProperties: false },
+      { additionalProperties: false }
     ),
-  { $id: "AnkiConfig" },
+  { $id: "AnkiConfig" }
 );
 
 export const AnkiConfigSelect = t.Partial(
@@ -194,8 +194,8 @@ export const AnkiConfigSelect = t.Partial(
       userConfig: t.Boolean(),
       _count: t.Boolean(),
     },
-    { additionalProperties: false },
-  ),
+    { additionalProperties: false }
+  )
 );
 
 export const AnkiConfigInclude = t.Partial(
@@ -205,8 +205,8 @@ export const AnkiConfigInclude = t.Partial(
       userConfig: t.Boolean(),
       _count: t.Boolean(),
     },
-    { additionalProperties: false },
-  ),
+    { additionalProperties: false }
+  )
 );
 
 export const AnkiConfigOrderBy = t.Partial(
@@ -228,8 +228,8 @@ export const AnkiConfigOrderBy = t.Partial(
         additionalProperties: false,
       }),
     },
-    { additionalProperties: false },
-  ),
+    { additionalProperties: false }
+  )
 );
 
 export const AnkiConfig = t.Composite([AnkiConfigPlain, AnkiConfigRelations], {
@@ -238,10 +238,10 @@ export const AnkiConfig = t.Composite([AnkiConfigPlain, AnkiConfigRelations], {
 
 export const AnkiConfigInputCreate = t.Composite(
   [AnkiConfigPlainInputCreate, AnkiConfigRelationsInputCreate],
-  { additionalProperties: false },
+  { additionalProperties: false }
 );
 
 export const AnkiConfigInputUpdate = t.Composite(
   [AnkiConfigPlainInputUpdate, AnkiConfigRelationsInputUpdate],
-  { additionalProperties: false },
+  { additionalProperties: false }
 );

@@ -35,11 +35,7 @@ onMounted(async () => {
 function NextPage() {
   const ids = selectedDecks.value.map((d) => d.id);
   window.ipcRenderer.invoke("anki-deck-select", ids).then(() => {
-    if (ids.length == 0) {
-      router.push("/setup/pick-filename");
-    } else {
-      router.push("/setup/anki-reading");
-    }
+    router.push("/setup/pick-filename");
   });
 }
 </script>

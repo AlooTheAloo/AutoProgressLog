@@ -68,10 +68,6 @@ export const setupRoutes = [
     component: () => import("../Setup/Anki/AnkiDeckSelect.vue"),
   },
   {
-    path: "/setup/anki-reading",
-    component: () => import("../Setup/Anki/AnkiReading.vue"),
-  },
-  {
     path: "/setup/pick-filename",
     component: () => import("../Setup/Other/Pick-Filename.vue"),
   },
