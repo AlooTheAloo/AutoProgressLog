@@ -5,6 +5,7 @@ import {initTogglNotifications, togglWebhook} from "./webhooks/toggl";
 import {SocketManager} from "./sockets/manager";
 import {registeredRoutes} from "./routes";
 import AnkiStorage from "./services/anki/AnkiStorage";
+import {init as zstdinit} from "@bokuweb/zstd-wasm";
 
 const sm = new SocketManager();
 export const app = new Elysia()
@@ -68,6 +69,8 @@ export const app = new Elysia()
         console.log(`APL Server is running on http://${app.hostname}:${app.port}/`);
         AnkiStorage.init(Bun.env.STORAGE_URL ?? "");
         initTogglNotifications();
+        console.log("Initializing ZSTD...");
+        await zstdinit();
     });
 
 export type APLServer = typeof app;

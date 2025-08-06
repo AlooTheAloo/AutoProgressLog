@@ -109,19 +109,19 @@ export default class AnkiStorage {
         };
     }
 
-    static async uploadAnkiDB(userId: number, db: Uint8Array) {
+    static async requestAnkiDBDownload(userId: number, ankiToken: string, ankiUrl: string) {
         const response = await fetch(
-            `${AnkiStorage.storage_url}/ankidb/upload/${userId}`,
+            `${AnkiStorage.storage_url}/ankidb/download/${userId}`,
             {
                 method: "POST",
                 headers: {
-                    "Content-Type": "multipart/form-data",
+                    "Content-Type": "application/json",
                 },
-                body: db,
+                body: JSON.stringify({ankiToken, ankiUrl}),
             }
         );
         if (!response.ok) {
-            throw new Error(`Failed to upload Anki DB: ${response.statusText}`);
+            throw new Error(`Failed to request Anki DB download: ${response.statusText}`);
         }
         return response.json();
     }

@@ -1,5 +1,4 @@
 import * as fzstd from "fzstd";
-import {Chunk} from "./NormalSyncer";
 import {compress} from "@bokuweb/zstd-wasm";
 
 export interface Graves {
@@ -8,10 +7,21 @@ export interface Graves {
     decks: string[];
 }
 
-    export const DEFAULT_ANKI_URL = "https://sync.ankiweb.net";
+interface Chunk {
+    done: boolean;
+    revlog: RevlogEntry[];
+    cards: CardEntry[];
+    notes: NoteEntry[];
+}
+
+type RevlogEntry = number[];
+type CardEntry = string[];
+type NoteEntry = string[];
+
+export const DEFAULT_ANKI_URL = "https://sync.ankiweb.net";
 let anki_url = DEFAULT_ANKI_URL;
-// Direct copy of the original rust AnkiHTTPClient
-export default class AnkiHTTPClient {
+
+export default class StorageHTTPClient {
     public key: string = "";
     public simpleRandom = crypto.randomUUID();
 
@@ -80,6 +90,7 @@ export default class AnkiHTTPClient {
 
         if (response.status != 200) {
             console.log("Response was not 200, it was " + response.status, "Anki");
+            console.log(response);
             return undefined;
         }
         const blob = await response.blob();
@@ -123,12 +134,10 @@ export default class AnkiHTTPClient {
                 "/sync/hostKey",
                 {u: username, p: password}
             );
-            console.log("Response from Anki login:", response, "Anki");
             if (response == undefined) return undefined;
             this.key = response.key;
             return response.key;
         } catch (e) {
-            console.error("Anki login failed:", e, "Anki");
             return undefined;
         }
     }

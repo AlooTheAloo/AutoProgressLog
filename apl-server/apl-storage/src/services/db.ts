@@ -28,10 +28,9 @@ export function executeModification(
 
 export async function CreateAndTrimDatabase(
   destinationPath: string,
-  file: File
+  buffer: Uint8Array<ArrayBufferLike>
 ) {
   const tempFilePath = `${destinationPath}.tmp`;
-  const buffer = new Uint8Array(await file.arrayBuffer());
   await fs.mkdir(path.dirname(tempFilePath), { recursive: true });
   await fs.writeFile(tempFilePath, buffer);
 

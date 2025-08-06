@@ -1,7 +1,7 @@
 import {Elysia, t} from "elysia"
 import {authHeaders, authGuard} from "../../middlewares/authGuard";
 import {Toggl} from "toggl-track";
-import AnkiHTTPClient from "../../services/anki/AnkiHTTPClient";
+import AnkiHTTPClient, {DEFAULT_ANKI_URL} from "../../services/anki/AnkiHTTPClient";
 import AnkiStorage, {DeckTypeSchema} from "../../services/anki/AnkiStorage";
 
 export const verifyProviderRoutes = new Elysia({name: 'verify-provider-routes'}).use(authGuard).group('/verify-provider',
@@ -34,12 +34,19 @@ export const verifyProviderRoutes = new Elysia({name: 'verify-provider-routes'})
         )
         .post('/anki', async ({body, set, user}) => {
                 const {username, password, ankiUrl} = body;
-                const response = await new AnkiHTTPClient("", ankiUrl).login(username, password);
+                const response = await new AnkiHTTPClient("", ankiUrl ?? DEFAULT_ANKI_URL).login(username, password);
                 if (!response) {
                     set.status = 401; // Unauthorized
                     return {error: 'Invalid Anki credentials'};
                 }
-                await AnkiStorage.uploadAnkiDB(user.id, (await new AnkiHTTPClient(response, ankiUrl).downloadInitialDatabase())!);
+
+                try {
+                    await AnkiStorage.requestAnkiDBDownload(user.id, response, ankiUrl ?? DEFAULT_ANKI_URL);
+                } catch (e: any) {
+                    set.status = 500;
+                    return {error: e.message};
+                }
+
                 try {
                     set.status = 200;
                     return AnkiStorage.getDecksCards(user.id);

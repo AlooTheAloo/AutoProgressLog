@@ -1,6 +1,6 @@
 import Elysia from "elysia";
 import { queryRoute } from "./query";
-import { uploadRoute } from "./upload";
+import { downloadRoute } from "./download";
 import { deleteRoute } from "./delete";
 import { modifyRoute } from "./modify";
 import { cleanRoute } from "./clean";
@@ -12,7 +12,7 @@ export const databaseRoutes = new Elysia({ name: "anki-database-route" }).group(
     app
       .use(queryRoute)
       .use(modifyRoute)
-      .use(uploadRoute)
+      .use(downloadRoute)
       .use(deleteRoute)
       .use(cleanRoute)
       .use(countRoute)

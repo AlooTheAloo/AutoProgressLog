@@ -55,7 +55,7 @@ export const fetchRoute = new Elysia({ name: 'fetch-route' }).get(
     },
     {
         params: t.Object({
-            userId: t.String({ format: "uuid" }),
+            userId: t.Integer(),
         }),
         detail: {
             tags: ['Storage'],
