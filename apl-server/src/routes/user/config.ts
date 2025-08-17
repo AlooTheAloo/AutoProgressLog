@@ -7,9 +7,7 @@ import { AnkiConfigPlain } from "../../../prisma/types/AnkiConfig";
 
 // Define what part of the config we expose publicly
 const PublicUserConfig = t.Omit(UserConfigPlain, ["id", "userId"]);
-const PublicAnkiConfig = t.Omit(AnkiConfigPlain, ["id", "userConfigId"]);
-
-const BodyAnkiConfig = t.Intersect([
+const PublicAnkiConfig = t.Intersect([
   t.Omit(AnkiConfigPlain, ["id", "userConfigId", "trackedDecks"] as const),
   t.Object({
     trackedDecks: t.Array(t.Integer(), { additionalProperties: false }),
@@ -278,7 +276,7 @@ export const configRoutes = new Elysia({ name: "config-routes" })
           url: body.url,
           ankiToken: body.ankiToken,
           retentionMode: body.retentionMode,
-          trackedDecks: body.trackedDecks.map((x) => BigInt(x)),
+          trackedDecks: body.trackedDecks,
         },
         select: {
           url: true,
@@ -290,7 +288,7 @@ export const configRoutes = new Elysia({ name: "config-routes" })
     },
     {
       headers: authHeaders,
-      body: BodyAnkiConfig,
+      body: PublicAnkiConfig,
       response: PublicAnkiConfig,
       detail: {
         summary: "Update Anki configuration",
@@ -343,7 +341,7 @@ export const configRoutes = new Elysia({ name: "config-routes" })
           url: body.url,
           ankiToken: body.ankiToken,
           retentionMode: body.retentionMode,
-          trackedDecks: body.trackedDecks.map((x) => BigInt(x)),
+          trackedDecks: body.trackedDecks,
           userConfigId: associatedConfig?.id,
         },
         select: {
@@ -356,7 +354,7 @@ export const configRoutes = new Elysia({ name: "config-routes" })
     },
     {
       headers: authHeaders,
-      body: BodyAnkiConfig,
+      body: PublicAnkiConfig,
       response: PublicAnkiConfig,
       detail: {
         summary: "Create Anki configuration",
