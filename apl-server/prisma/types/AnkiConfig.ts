@@ -13,7 +13,7 @@ export const AnkiConfigPlain = t.Object(
       [t.Literal("ANKI_DEFAULT"), t.Literal("TRUE_RETENTION")],
       { additionalProperties: false },
     ),
-    trackedDecks: t.Array(t.Integer(), { additionalProperties: false }),
+    trackedDecks: t.Array(t.String(), { additionalProperties: false }),
     userConfigId: t.Integer(),
   },
   { additionalProperties: false },
@@ -45,7 +45,7 @@ export const AnkiConfigPlainInputCreate = t.Object(
       [t.Literal("ANKI_DEFAULT"), t.Literal("TRUE_RETENTION")],
       { additionalProperties: false },
     ),
-    trackedDecks: t.Array(t.Integer(), { additionalProperties: false }),
+    trackedDecks: t.Array(t.String(), { additionalProperties: false }),
   },
   { additionalProperties: false },
 );
@@ -60,7 +60,7 @@ export const AnkiConfigPlainInputUpdate = t.Object(
       }),
     ),
     trackedDecks: t.Optional(
-      t.Array(t.Integer(), { additionalProperties: false }),
+      t.Array(t.String(), { additionalProperties: false }),
     ),
   },
   { additionalProperties: false },
@@ -117,7 +117,7 @@ export const AnkiConfigWhere = t.Partial(
             [t.Literal("ANKI_DEFAULT"), t.Literal("TRUE_RETENTION")],
             { additionalProperties: false },
           ),
-          trackedDecks: t.Array(t.Integer(), { additionalProperties: false }),
+          trackedDecks: t.Array(t.String(), { additionalProperties: false }),
           userConfigId: t.Integer(),
         },
         { additionalProperties: false },
@@ -168,7 +168,7 @@ export const AnkiConfigWhereUnique = t.Recursive(
                 [t.Literal("ANKI_DEFAULT"), t.Literal("TRUE_RETENTION")],
                 { additionalProperties: false },
               ),
-              trackedDecks: t.Array(t.Integer(), {
+              trackedDecks: t.Array(t.String(), {
                 additionalProperties: false,
               }),
               userConfigId: t.Integer(),

@@ -124,7 +124,7 @@ model AnkiConfig {
   url           String            @default("https://sync.ankiweb.net/")
   ankiToken     String
   retentionMode AnkiRetentionMode
-  trackedDecks  BigInt[]
+  trackedDecks  String[]
   userConfigId  Int               @unique
   userConfig    UserConfig        @relation(fields: [userConfigId], references: [id], onDelete: Cascade)
 

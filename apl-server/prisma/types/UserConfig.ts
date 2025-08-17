@@ -29,7 +29,7 @@ export const UserConfigRelations = t.Object(
             [t.Literal("ANKI_DEFAULT"), t.Literal("TRUE_RETENTION")],
             { additionalProperties: false },
           ),
-          trackedDecks: t.Array(t.Integer(), { additionalProperties: false }),
+          trackedDecks: t.Array(t.String(), { additionalProperties: false }),
           userConfigId: t.Integer(),
         },
         { additionalProperties: false },
