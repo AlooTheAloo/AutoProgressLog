@@ -35,6 +35,7 @@ const screen = useWindowSize();
 
 onMounted(() => {
   window.ipcRenderer.invoke("GetConfig").then((data: Options) => {
+    console.log("GetConfig", data);
     config.value = data;
     originalConfig.value = data;
   });
@@ -152,6 +153,7 @@ function ankiTest(worked: boolean) {
               </div>
             </div>
             <div
+              v-if="config != undefined"
               class="overflow-y-auto"
               ref="settingsParent"
               :style="{
@@ -177,6 +179,8 @@ function ankiTest(worked: boolean) {
                     @update:config="setConfig"
                   />
                 </TabPanel>
+                <!-- 
+                
                 <TabPanel value="3">
                   <AnkiSettings
                     :config="config"
@@ -193,7 +197,7 @@ function ankiTest(worked: boolean) {
                     :config="config"
                     @update:config="setConfig"
                   />
-                </TabPanel>
+                </TabPanel> -->
               </TabPanels>
             </div>
           </Tabs>

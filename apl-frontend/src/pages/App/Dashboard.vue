@@ -1,27 +1,17 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref, watch, computed } from "vue";
-import { useRouter } from "vue-router";
+import { onMounted, ref, computed } from "vue";
 import Button from "primevue/button";
-import SideBarContainer from "../../components/Common/SideBarContainer.vue";
-import { appPath } from "../routes/appRoutes";
 import ProgressSpinner from "primevue/progressspinner";
 import dayjs from "dayjs";
 import DashboardBody from "../../components/Dashboard/DashboardBody.vue";
-import { useMagicKeys } from "@vueuse/core";
 import { Maybe } from "../../../types/Maybe";
 import Skeleton from "primevue/skeleton";
 import Dialog from "primevue/dialog";
-import GrainyColor from "../../assets/GrainyColor.png";
 import Report from "../../assets/Report.png";
 
-import Logo from "../../assets/Logo.png";
 import Hey from "../../assets/Hey !.gif";
 import { Options } from "../../../apl-backend/types/options";
 import { DashboardDTO } from "../../../electron/main/Electron-Backend/types/Dashboard";
-
-const TIME_SYNC_INTERVAL = 60 * 1000;
-const THIRTY_MINUTES = 30 * 60 * 1000;
-const router = useRouter();
 
 const generating_report = ref<boolean>(false);
 const syncing = ref<boolean>(false);
@@ -34,24 +24,16 @@ const disableActionButtons = computed(
   () => generating_report.value || syncing.value
 );
 
-onUnmounted(() => {
-  intervals.forEach((x) => clearInterval(x));
-  intervals.length = 0;
-  dto.value = undefined;
-});
-
 async function generateReport() {
   try {
     generating_report.value = true;
-    const maybe: Maybe<DashboardDTO> = await window.ipcRenderer.invoke(
-      "GenerateReport"
-    );
+    const maybe: Maybe<DashboardDTO> =
+      await window.ipcRenderer.invoke("GenerateReport");
     if (!("error" in maybe)) {
       dto.value = maybe;
     }
   } catch (error) {
     console.error("Error generating report:", error);
-    // TODO : Handle error (e.g., show error message to user)
   } finally {
     generating_report.value = false;
   }
@@ -60,10 +42,9 @@ async function generateReport() {
 async function sync() {
   syncing.value = true;
   try {
-    const maybe: Maybe<DashboardDTO> = await window.ipcRenderer.invoke("Sync");
-
-    console.log(maybe);
-    if (!("error" in maybe)) {
+    const maybe: DashboardDTO | undefined =
+      await window.ipcRenderer.invoke("Sync");
+    if (maybe) {
       dto.value = maybe;
     }
   } catch (error) {
@@ -74,14 +55,14 @@ async function sync() {
   }
 }
 
-window.ipcRenderer.on("SetSync", (evt, newSync: boolean) => {
-  generating_report.value = newSync;
-});
+function prout() {
+  console.log("prout");
+  console.log("generating_report.value", generating_report.value);
+  console.log("syncing.value", syncing.value);
+  console.log("disableActionButtons", disableActionButtons);
+}
 
-onUnmounted(() => {
-  intervals.forEach((x) => clearInterval(x));
-  intervals.length = 0;
-});
+window.ipcRenderer.on("SetSync", (evt, newSync: boolean) => {});
 
 onMounted(async () => {
   window.ipcRenderer.invoke("GetConfig").then((data: Options) => {
@@ -90,39 +71,26 @@ onMounted(async () => {
 
   try {
     syncing.value = true;
-    const data: DashboardDTO = await window.ipcRenderer.invoke(
-      "Get-Dashboard-DTO"
-    );
+    const data: DashboardDTO =
+      await window.ipcRenderer.invoke("Get-Dashboard-DTO");
     console.log(data);
     dto.value = data;
-
-    if (data.syncCount == 1) {
-      firstDialog.value = true;
-    }
 
     await sync();
     const s = await window.ipcRenderer.invoke("isSyncing");
     generating_report.value = s;
+    console.log("generating_report.value", generating_report.value);
   } catch (error) {
     console.error("Error fetching dashboard data:", error);
   }
-
-  intervals.push(
-    setInterval(() => {
-      sync();
-    }, THIRTY_MINUTES)
-  );
-
-  intervals.push(
-    setInterval(() => {
-      lastSyncTime.value = getLastSyncTime();
-    }, TIME_SYNC_INTERVAL)
-  );
 });
 
-const intervals: Timer[] = [];
+window.ipcRenderer.on("ShowWelcomeMessage", () => {
+  firstDialog.value = true;
+});
 
 const getLastSyncTime = () => {
+  console.log("Lastsynctime : " + dto.value?.lastSyncTime);
   if (!dto.value?.lastSyncTime) return "";
   return dayjs.duration(-dayjs().diff(dto.value.lastSyncTime)).humanize(true);
 };
@@ -193,27 +161,22 @@ const closeFirstDialog = () => {
       >
         <div>
           <img
-            v-if="dto.profile_picture.isUrl"
-            :src="dto.profile_picture.buffer"
+            :src="dto.profile_picture"
             class="w-16 h-16 rounded-full dark:bg-black bg-white border-2 dark:border-[#e0e0e0] border-[#3d3e42]"
           />
-          <div v-else>
-            <img
-              :src="'data:image/png;base64,' + dto.profile_picture.buffer"
-              class="w-16 h-16 rounded-full dark:bg-black bg-white border-2 dark:border-[#e0e0e0] border-[#3d3e42]"
-            />
-          </div>
         </div>
         <div class="flex flex-col w-0 flex-grow text-black dark:text-white">
           <h1
             class="flex items-center gap-2 bg-gradient-to-r text-lg 1720:text-2xl font-bold"
           >
-            <span class="">Welcome back,</span>
+            <span class="whitespace-nowrap">Welcome back,</span>
 
             <div v-if="dto.userName == undefined">
               <Skeleton width="10rem" height="2rem" />
             </div>
-            <div class="flex-grow truncate" v-else>{{ dto.userName }} !</div>
+            <div v-else class="flex-grow truncate">
+              {{ dto.userName }}
+            </div>
           </h1>
           <div class="flex items-center syncNowButton">
             <div
@@ -265,7 +228,7 @@ const closeFirstDialog = () => {
             :class="`flex rounded-md bg-white h-8 text-black overflow-hidden z-10 ${
               disableActionButtons ? 'opacity-50' : ''
             }`"
-            v-if="config?.general.autogen.enabled"
+            v-if="true"
           >
             <div class="bg-[var(--primary-color)] p-2">
               <img :src="Report" class="w-full h-full" />
@@ -275,7 +238,7 @@ const closeFirstDialog = () => {
             >
               <div>
                 New generated report
-                {{ dayjs(dto.nextReport).fromNow() }}
+                {{ dayjs(dto?.nextReport).fromNow() }}
               </div>
             </div>
           </div>

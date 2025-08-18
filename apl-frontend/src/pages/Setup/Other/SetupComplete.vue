@@ -3,7 +3,7 @@ import Logo from "../../../assets/Logo.png";
 import { useRoute, useRouter } from "vue-router";
 import SetupBackground from "../../../components/Setup/SetupBackground.vue";
 import Button from "primevue/button";
-import { onMounted, ref } from "vue";
+import { onBeforeMount, onMounted, ref } from "vue";
 import { motion } from "motion-v";
 import PlexusEffect from "../../../components/Common/PlexusEffect.vue";
 
@@ -11,14 +11,18 @@ const router = useRouter();
 const savingDone = ref<boolean>(false);
 
 function NextPage() {
-  window.ipcRenderer.invoke("SetupComplete").then(() => {
-    router.push("/app/dashboard");
-  });
+  router.push("/app/dashboard");
+  window.ipcRenderer.invoke("SetupComplete").then(() => {});
 }
 
-onMounted(() => {
-  window.ipcRenderer.invoke("SaveConfig").then(() => {
-    savingDone.value = true;
+onBeforeMount(() => {
+  if (savingDone.value) return;
+  window.ipcRenderer.invoke("SaveConfig").then((worked) => {
+    if (worked) {
+      savingDone.value = true;
+    } else {
+      alert("Failed to save config.");
+    }
   });
 });
 </script>

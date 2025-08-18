@@ -46,56 +46,66 @@ import client from "../../../db/client";
  * Note: Eden automatically serializes `FormData` in supported routes.
  */
 
-export const uploadRoute = new Elysia({ name: 'upload-route' })
-    .use(authGuard)
-    .post('/upload',
-        async ({ user, body, set }) => {
-            const form = new FormData();
-            form.append('file', body.file);
+export const uploadRoute = new Elysia({ name: "upload-route" })
+  .use(authGuard)
+  .post(
+    "/upload",
+    async ({ user, body, set }) => {
+      console.log(body.file);
+      const form = new FormData();
+      form.append("file", body.file);
 
-            const res = await fetch(`http://apl-storage:2727/pictures/upload/${user.id}`, {
-                method: 'POST',
-                body: form,
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
-
-            if (!res.ok) {
-                set.status = res.status;
-                return { error: 'Failed to upload picture' };
-            }
-
-            // Update the user's profilePicture field in the DB
-            client.user.update({
-                where: { id: user.id },
-                data: { profilePicture: `/storage/pictures/fetch/${user.id}` },
-            }).catch(err => {
-                console.error('Failed to update user picture URL:', err);
-            });
-
-            return res.json();
-        },
+      const res = await fetch(
+        `http://apl-storage:2727/pictures/upload/${user.id}`,
         {
-            body: t.Object({
-                file: t.File(),
-            }),
-            headers: authHeaders,
-            response: {
-                200: t.Object({
-                    description: t.String(), // You could rename to 'message' if more accurate
-                }),
-                400: t.Object({
-                    description: t.String(),
-                }),
-                500: t.Object({
-                    description: t.String(),
-                }),
-            },
-            detail: {
-                tags: ['Storage'],
-                summary: 'Upload a picture',
-                description: 'Uploads a picture to the storage service and updates the user\'s profile picture URL in the database.',
-            },
+          method: "POST",
+          body: form,
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
         }
-    );
+      );
+
+      if (!res.ok) {
+        console.log("not ok");
+        console.log(res.statusText);
+        set.status = res.status;
+        return { error: "Failed to upload picture" };
+      }
+
+      // Update the user's profilePicture field in the DB
+      client.user
+        .update({
+          where: { id: user.id },
+          data: { profilePicture: `/storage/pictures/fetch/${user.id}` },
+        })
+        .catch((err) => {
+          console.error("Failed to update user picture URL:", err);
+        });
+      console.log(res.json());
+      return res.json();
+    },
+    {
+      body: t.Object({
+        file: t.File(),
+      }),
+      headers: authHeaders,
+      response: {
+        200: t.Object({
+          description: t.String(), // You could rename to 'message' if more accurate
+        }),
+        400: t.Object({
+          description: t.String(),
+        }),
+        500: t.Object({
+          description: t.String(),
+        }),
+      },
+      detail: {
+        tags: ["Storage"],
+        summary: "Upload a picture",
+        description:
+          "Uploads a picture to the storage service and updates the user's profile picture URL in the database.",
+      },
+    }
+  );

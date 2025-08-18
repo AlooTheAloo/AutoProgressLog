@@ -1,7 +1,7 @@
 import { ipcMain } from "electron";
 import { win } from "..";
 import { Options } from "../../../apl-backend/types/options";
-import { AnkiLogin, deck, setAnkiIntegration } from "./SetupConfigBuilder";
+import { AnkiLogin, deck } from "./SetupConfigBuilder";
 import { onConfigChange } from "./SettingsListeners";
 import { Logger } from "../../../apl-backend/Helpers/Log";
 import { EdenClient } from "./api/ApiManager";

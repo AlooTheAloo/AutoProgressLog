@@ -8,6 +8,7 @@ import Calendar from "../../assets/Icons/calendar.png";
 
 import AppSmallWidget from "./AppSmallWidget.vue";
 import { computed } from "vue";
+//@ts-ignore
 import pluralize from "pluralize";
 import ImmersionSources from "./ImmersionSources.vue";
 import Skeleton from "primevue/skeleton";
@@ -124,7 +125,8 @@ const bottomText = computed(() => {
               units="%"
               :value="{
                 current: dto.ankiDTO.retentionRate.toFixed(2),
-                delta: dto.ankiDTO.retentionRateDelta.toString(),
+                delta:
+                  dto.ankiDTO.retentionRateDelta.toFixed(2).toString() + '%',
               }"
               :image="Brain"
               :direction="dto.ankiDTO.retentionRateDelta"

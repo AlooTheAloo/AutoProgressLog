@@ -1,6 +1,3 @@
-import dayjs from "dayjs";
-import { win } from "../../../../apl-frontend/electron/main";
-import nodeScheduler from "node-schedule";
 import { NotificationManager } from "../notifications";
 
 let hasInternet = false;

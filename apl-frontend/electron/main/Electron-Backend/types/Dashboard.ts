@@ -2,19 +2,12 @@ import dayjs from "dayjs";
 
 export type DashboardDTO = {
   userName: string;
-  profile_picture: ProfilePicture;
+  profile_picture: string;
   lastSyncTime: string;
   lastReportTime: string;
   immersionDTO: ImmersionDTO;
   ankiDTO?: AnkiDTO;
-  monthlyScore: number;
-  syncCount: number;
   nextReport: number | null;
-};
-
-export type ProfilePicture = {
-  buffer: string;
-  isUrl: boolean;
 };
 
 export type AnkiDTO = {

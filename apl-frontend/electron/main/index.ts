@@ -10,7 +10,6 @@ import {
   createAppBackend,
   FocusApp,
 } from "./Electron-Backend/appBackend";
-import { createAutoReport } from "./Electron-Backend/Reports/AutoReportGenerator";
 import { createAutoRPC } from "./Electron-Backend/RPC/RPCHandler";
 import {
   getConfig,
@@ -46,6 +45,9 @@ Logger.log(`Loading ${envPath}`, "ENV");
 if (fs.existsSync(envPath)) {
   dotenvConfig({ path: envPath });
   Logger.log(`SERVER_URL = ${process.env.SERVER_URL}`, "ENV");
+  (async () => {
+    Logger.log("AUTHORIZATION = " + (await APLStorage.get("token")), "ENV");
+  })();
 } else {
   Logger.log(`Missing .env file at ${envPath}`, "ENV");
 }
@@ -198,7 +200,6 @@ app.on("ready", async () => {
   }
 
   buildMenu(app);
-  createAutoReport();
   createAutoRPC();
   electronUpdater.autoUpdater.forceDevUpdateConfig = true;
   electronUpdater.autoUpdater.autoDownload = false;

@@ -52,7 +52,6 @@ export class SocketManager {
       }
 
       SocketManager.clients.set(id, ws);
-      console.log("Ping from " + id);
       ws.send(JSON.stringify({ type: "pong", payload: {} }));
       return;
     }

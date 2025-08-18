@@ -7,7 +7,7 @@ import {
   buildLayout,
   buildNewCache,
 } from "../Helpers/buildMessage.js";
-import { getConfig, getSyncProps } from "../Helpers/getConfig.js";
+import { getConfig } from "../Helpers/getConfig.js";
 import path from "path";
 import { fileURLToPath } from "url";
 import { CacheManager } from "../Helpers/cache.js";

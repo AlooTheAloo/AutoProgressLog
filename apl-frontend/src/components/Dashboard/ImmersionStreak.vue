@@ -128,6 +128,8 @@ const options = computed<ApexOptions>(() => {
   };
 });
 
+const SECONDS_IN_HOUR = 3600;
+
 const props = defineProps<{
   streak: number[];
 }>();
@@ -135,7 +137,7 @@ const props = defineProps<{
 const series = computed(() => {
   return [
     {
-      data: props.streak,
+      data: props.streak.map((x) => x / SECONDS_IN_HOUR),
     },
   ];
 });

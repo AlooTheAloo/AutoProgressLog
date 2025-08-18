@@ -32,7 +32,7 @@ function SelectServer() {
   >
     <PlexusEffect class="absolute inset-0 z-0" />
     <div
-      class="relative z-10 bg-black rounded-3xl p-12 /* 1) column flex that spans full height */ flex flex-col justify-between items-start h-[90vh] max-h-[946px] /* your height rules */ /* 2) width clamped between min & max */ w-full max-w-[899px] min-w-[600px]"
+      class="relative z-10 bg-black rounded-3xl p-12 flex flex-col justify-between items-start h-[90vh] max-h-[946px] /* your height rules */ /* 2) width clamped between min & max */ w-full max-w-[899px] min-w-[600px]"
     >
       <motion.div
         :initial="{ opacity: 0, y: 20, filter: 'blur(10px)' }"

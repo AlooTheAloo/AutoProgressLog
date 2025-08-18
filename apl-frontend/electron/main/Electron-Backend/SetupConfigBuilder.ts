@@ -1,12 +1,4 @@
 import { app, dialog, ipcMain } from "electron";
-import { Tags, Toggl } from "toggl-track";
-import {
-  ankiIntegration,
-  ankiOptions,
-  Options,
-  RetentionMode,
-  ServerOptions,
-} from "../../../apl-backend/types/options";
 import { existsSync, writeFileSync } from "fs";
 import { configPath } from "../../../apl-backend/Helpers/getConfig";
 import { win } from "..";
@@ -19,6 +11,8 @@ import { Logger } from "../../../apl-backend/Helpers/Log";
 import { HttpStatusCode } from "axios";
 import dayjs from "dayjs";
 import { loadDB } from "./AnkiListeners";
+import { SocketClient } from "./Socket/SocketClient";
+import { Options } from "../../../apl-backend/types/options";
 
 export interface AnkiLogin {
   username: string;
@@ -51,25 +45,41 @@ let ankiConfig: Partial<AnkiConfig> = {};
 let togglAccount: TogglAccount | undefined;
 
 const DEFAULT_CONFIG: Options = {
-  general: {
-    discordIntegration: false,
-  },
-  appearance: {
-    glow: true,
-  },
-  outputOptions: {
-    outputFile: {
-      path: "",
-      name: "",
-      extension: ".png",
+  serverOptions: {
+    userOptions: {
+      autoGenTime: null,
+      togglToken: "",
+      togglUserId: "",
     },
-    outputQuality: 5,
+    ankiOptions: {
+      enabled: true,
+      options: {
+        url: "",
+        ankiToken: "",
+        retentionMode: "ANKI_DEFAULT",
+        trackedDecks: [],
+      },
+    },
+  },
+  localOptions: {
+    general: {
+      discordIntegration: false,
+    },
+    appearance: {
+      glow: true,
+    },
+    outputOptions: {
+      outputFile: {
+        path: "",
+        name: "",
+        extension: ".png",
+      },
+      outputQuality: 5,
+    },
   },
 };
 
 const config: Partial<Options> = DEFAULT_CONFIG;
-
-export function setAnkiIntegration(anki: ankiIntegration | false) {}
 
 export function setupListeners() {
   ipcMain.handle("Send-Email", async (e: any, email: string) => {
@@ -102,7 +112,16 @@ export function setupListeners() {
         if (config.error || config.status != 200) {
           return false;
         }
-        return config.data == null ? "signup" : "login";
+        console.log("Config is ", config.data);
+        console.log(config.response.headers.get("content-length"));
+
+        const isLogin = config.response.headers.get("content-length") != "0";
+        if (isLogin) {
+          APLStorage.set("token", retVal.data.token);
+          APLStorage.set("setupComplete", true);
+          win?.webContents.send("is-setup-complete", true);
+          return "login";
+        } else return "signup";
       }
     }
   );
@@ -112,11 +131,15 @@ export function setupListeners() {
     ankiConfig.trackedDecks = arg;
   });
 
-  ipcMain.handle("SetupComplete", (event: any, arg: any) => {
+  ipcMain.handle("SetupComplete", async (event: any, arg: any) => {
+    await new SocketClient().init({
+      token: (await APLStorage.get("token")) as string,
+    });
     win?.webContents.send("is-setup-complete", true);
   });
 
   ipcMain.handle("SaveConfig", async (event: any, arg: any) => {
+    console.log("Save config is called");
     if (togglAccount == undefined) return;
     const resp = await EdenClient.user.config.post(
       {
@@ -143,7 +166,7 @@ export function setupListeners() {
           url: ankiConfig.url,
           ankiToken: ankiConfig.ankiToken,
           retentionMode: "TRUE_RETENTION",
-          trackedDecks: ankiConfig.trackedDecks,
+          trackedDecks: ankiConfig.trackedDecks.map((x) => x.toString()),
         },
         {
           headers: {
@@ -151,15 +174,23 @@ export function setupListeners() {
           },
         }
       );
+      console.log("Tracked decks is ", ankiConfig.trackedDecks);
       console.log("resp is ", JSON.stringify(respAnki));
+
       if (respAnki.status != 200) return false;
+      APLStorage.set("localConfig", config.localOptions);
+    }
+    if (resp.status == 200) {
+      console.log("setup complete !!!");
+      APLStorage.set("setupComplete", true);
     }
 
     return resp.status == 200;
   });
 
   ipcMain.handle("SetOutputFile", (event: any, arg: any) => {
-    config.outputOptions = {
+    if (config.localOptions == undefined) return;
+    config.localOptions.outputOptions = {
       outputFile: arg,
       outputQuality: 3,
     };
@@ -225,7 +256,8 @@ export function setupListeners() {
   });
 
   ipcMain.handle("SkipAnki", async (event: any, arg: any) => {
-    setAnkiIntegration(false);
+    if (config.serverOptions == undefined) return;
+    config.serverOptions.ankiOptions.enabled = false;
   });
 
   ipcMain.handle("anki-credentials", async (avt: any, data: AnkiLogin) => {

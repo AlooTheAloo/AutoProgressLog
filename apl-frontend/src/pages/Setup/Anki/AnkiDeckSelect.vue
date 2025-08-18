@@ -8,7 +8,6 @@ import AccountDisplay from "../../../components/Common/AccountDisplay.vue";
 import PlexusEffect from "../../../components/Common/PlexusEffect.vue";
 import BackButton from "../../../components/Common/BackButton.vue";
 import Logo from "../../../assets/Logo.png";
-import AnkiLogo from "../../../assets/AnkiLogo.png";
 
 import Listbox from "primevue/listbox";
 import ProgressSpinner from "primevue/progressspinner";

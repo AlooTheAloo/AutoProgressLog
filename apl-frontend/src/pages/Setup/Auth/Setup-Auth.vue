@@ -9,12 +9,10 @@ import InputText from "primevue/inputtext";
 import Button from "primevue/button";
 import ProgressSpinner from "primevue/progressspinner";
 import Logo from "../../../assets/Logo.png";
-import { ThemeManager } from "../../../util/theme-manager";
 import { motion } from "motion-v";
 import { z } from "zod";
 
 const router = useRouter();
-const { height } = useWindowSize();
 
 const email = ref("");
 const isEmailValid = computed(() => {
@@ -45,10 +43,6 @@ function SendEmail() {
   startTimer();
 }
 
-function NextPage() {
-  router.push("/setup/auth-success");
-}
-
 const protocolSchema = z.object({
   email: z.string().email(),
   token: z.string(),
@@ -56,6 +50,7 @@ const protocolSchema = z.object({
 
 onMounted(() => {
   window.ipcRenderer.on("open-url", async (evt, data: string) => {
+    console.log("Prout 1");
     const url = new URL(data);
     if (url.hostname !== "auth") return;
     const parsed = Object.fromEntries(url.searchParams);
@@ -74,9 +69,9 @@ onMounted(() => {
 
     if (!resp) {
       alert("Invalid email or token");
-    } else if (resp == "login") {
-      router.push("/setup/auth-success");
     } else if (resp == "signup") {
+      router.push("/setup/auth-success");
+    } else if (resp == "login") {
       router.push("/app/dashboard");
     }
   });

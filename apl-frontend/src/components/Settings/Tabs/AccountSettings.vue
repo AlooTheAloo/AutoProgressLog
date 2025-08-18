@@ -19,7 +19,7 @@ const emit = defineEmits<{
 <template>
   <div class="flex flex-col w-full gap-6 pt-6" v-if="config != undefined">
     <SettingsField
-      :value="config?.account?.userName"
+      :value="config.serverOptions.userOptions.togglUserId"
       label="Username"
       placeholder="Enter your username"
       @update:value="
@@ -33,12 +33,7 @@ const emit = defineEmits<{
     <SettingsFileUpload
       label="Profile picture"
       help-text="Changes the profile picture in the app. This will automatically be uploaded and applied."
-      @update:pfp="
-        $emit('update:config', {
-          ...config,
-          account: { ...config.account, profilePicture: $event },
-        })
-      "
+      @update:pfp=""
     />
   </div>
 </template>

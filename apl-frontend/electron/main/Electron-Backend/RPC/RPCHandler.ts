@@ -25,11 +25,12 @@ export function createAutoRPC() {
   onConfigChange.on(
     "config-change",
     async (oldConfig: Options, newConfig: Options) => {
+      console.log("config-change", oldConfig, newConfig);
       if (
-        oldConfig.general.discordIntegration !=
-        newConfig.general.discordIntegration
+        oldConfig.localOptions.general.discordIntegration !=
+        newConfig.localOptions.general.discordIntegration
       ) {
-        if (newConfig.general.discordIntegration) {
+        if (newConfig.localOptions.general.discordIntegration) {
           await createListeners();
         } else {
           killListeners();
@@ -52,8 +53,9 @@ async function killListeners() {
 }
 
 async function createListeners() {
-  const config = getConfig();
-  if (config == undefined || !config.general.discordIntegration) return;
+  const config = await getConfig();
+  if (config == undefined || !config.localOptions.general.discordIntegration)
+    return;
 
   rpc = new RPC.Client({
     clientId: clientId,

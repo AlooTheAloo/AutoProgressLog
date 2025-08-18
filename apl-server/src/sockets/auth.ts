@@ -9,25 +9,23 @@ import client from "../db/client";
  */
 export async function tokenToTogglData(token: string) {
   try {
-    const user = client.user.findFirst({
+    const user = await client.user.findFirst({
       where: {
         tokens: {
-          some: {
-            token,
-            type: "SESSION",
+          some: { token, type: "SESSION" },
+        },
+      },
+      select: {
+        config: {
+          select: {
+            togglToken: true,
+            togglUserId: true,
           },
         },
       },
-      include: {
-        config: true,
-      },
     });
-    return user.config({
-      select: {
-        togglToken: true,
-        togglUserId: true,
-      },
-    });
+
+    return user?.config ?? null;
   } catch (e) {
     return null;
   }
