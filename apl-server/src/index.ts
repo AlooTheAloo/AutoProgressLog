@@ -6,6 +6,7 @@ import {SocketManager} from "./sockets/manager";
 import {registeredRoutes} from "./routes";
 import AnkiStorage from "./services/anki/AnkiStorage";
 import {init as zstdinit} from "@bokuweb/zstd-wasm";
+import {startTunnel} from "./services/ngrok/dev-tunnel";
 
 const sm = new SocketManager();
 export const app = new Elysia()
@@ -71,6 +72,9 @@ export const app = new Elysia()
         initTogglNotifications();
         console.log("Initializing ZSTD...");
         await zstdinit();
+        console.log("ZSTD initialized successfully.");
+        console.log("Starting Ngrok tunnel...");
+        await startTunnel();
     });
 
 export type APLServer = typeof app;
