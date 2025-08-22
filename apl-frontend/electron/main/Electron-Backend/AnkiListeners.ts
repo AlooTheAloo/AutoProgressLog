@@ -18,10 +18,18 @@ export function ankiListeners() {
   ipcMain.handle(
     "test-anki-connection-key",
     async (event: any, key: string, url: string) => {
-      // TODO : Make API Call here (and ship to server)
-      // win?.webContents.send("anki-connect-message", "Authenticating");
-      // const httpClient = new AnkiHTTPClient(key, url);
-      // return loadDB(httpClient);
+      const resp = await EdenClient.user["verify-provider"].anki.post(
+        {
+          ankiToken: key,
+          ankiUrl: url,
+        },
+        {
+          headers: {
+            authorization: `Bearer ${await APLStorage.get("token")}`,
+          },
+        }
+      );
+      return { worked: resp.status == 200, decks: resp.data?.cards ?? [], key };
     }
   );
 
@@ -38,6 +46,11 @@ export function ankiListeners() {
 }
 
 export const loadDB = async (login: AnkiLogin) => {
+  const no = {
+    worked: false,
+    decks: [],
+    key: "",
+  };
   const token = await APLStorage.get("token");
   if (
     login?.password == undefined ||
@@ -45,10 +58,10 @@ export const loadDB = async (login: AnkiLogin) => {
     login?.url == undefined
   ) {
     console.log("Login is undefined");
-    return false;
+    return no;
   }
   try {
-    const response = await EdenClient.user["verify-provider"].anki.post(
+    const response = await EdenClient.user["verify-provider"].anki.auth.post(
       {
         username: login?.username,
         password: login?.password,
@@ -62,12 +75,16 @@ export const loadDB = async (login: AnkiLogin) => {
     );
     Logger.log("Response from Anki login:", "Anki");
     if (response.status == 200) {
-      if (response.data == null) return false;
+      if (response.data == null) return no;
       decksCards = response.data.cards;
-      return response.data.key;
-    } else return false;
+      return {
+        worked: true,
+        decks: response.data.cards,
+        key: response.data.key,
+      };
+    } else return no;
   } catch (e) {
     Logger.log("Error connecting to Anki" + e, "Anki");
-    return false;
+    return no;
   }
 };

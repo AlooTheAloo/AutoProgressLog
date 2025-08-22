@@ -187,7 +187,7 @@ app.on("ready", async () => {
   // ZFSTD
   await init();
 
-  if (getConfig() !== null) {
+  if (await APLStorage.get("setupComplete")) {
     try {
       // TODO : Add an API call to create the webhook
       await new SocketClient().init({

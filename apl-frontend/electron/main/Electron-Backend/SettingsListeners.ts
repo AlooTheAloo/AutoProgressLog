@@ -40,7 +40,39 @@ export function settingsListeners() {
     updateConfig();
     const conf: Options = JSON.parse(arg);
     await setServerConfigAndInvalidate(async () => {
+      APLStorage.set("localConfig", conf.localOptions);
       await EdenClient.user.config.patch(conf.serverOptions.userOptions, auth);
+      await EdenClient.user.me.patch(conf.serverOptions.userProfile, auth);
+
+      const currentAnkiSettings = await EdenClient.user.config.anki.get(auth);
+      if (
+        currentAnkiSettings.status == 200 &&
+        !conf.serverOptions.ankiOptions.enabled
+      ) {
+        await EdenClient.user.config.anki.delete(null, auth);
+      }
+
+      if (conf.serverOptions.ankiOptions.enabled)
+        try {
+          let resp;
+          if (currentAnkiSettings.status == 404) {
+            resp = await EdenClient.user.config.anki.post(
+              conf.serverOptions.ankiOptions.options,
+              auth
+            );
+          } else {
+            resp = await EdenClient.user.config.anki.patch(
+              conf.serverOptions.ankiOptions.options,
+              auth
+            );
+          }
+
+          resp.status == 200
+            ? console.log("Patched successfully")
+            : console.log("Failed to patch" + resp.status);
+        } catch (e) {
+          console.log("Anki config patch failed : " + e);
+        }
     });
     onConfigChange.emit("config-change", oldConfig, JSON.parse(arg));
     return await getConfig();
@@ -65,36 +97,30 @@ export function settingsListeners() {
 
   ipcMain.handle("Upload-Profile-Picture", async () => {
     if (!win) return;
-    const image = await dialog.showOpenDialogSync(win, {
-      properties: [
-        "openFile",
-        "showHiddenFiles",
-        "dontAddToRecent",
-        "createDirectory",
-      ],
-      filters: [
-        {
-          name: "Image",
-          extensions: ["png", "jpg", "jpeg", "webp"],
-        },
-      ],
+    const imagePaths = dialog.showOpenDialogSync(win, {
+      properties: ["openFile"],
+      filters: [{ name: "Image", extensions: ["png", "jpg", "jpeg", "webp"] }],
     });
-    if (image == undefined) return null;
-    const form = new FormData();
+    if (!imagePaths || imagePaths.length === 0) return null;
 
-    EdenClient.storage.pictures.upload
-      .post(
-        {
-          file: new File([readFileSync(image[0])], "profilePicture.png"),
+    const imagePath = imagePaths[0];
+    const buffer = readFileSync(imagePath);
+    const file = new File([buffer], path.basename(imagePath), {
+      type: "image/" + path.extname(imagePath).replace(".", ""),
+    });
+
+    // Call Eden treaty route
+    const res = await EdenClient.storage.pictures.upload.post(
+      {
+        file: file as any,
+      },
+      {
+        headers: {
+          authorization: `Bearer ${await APLStorage.get("token")}`,
         },
-        {
-          headers: {
-            authorization: `Bearer ${await APLStorage.get("token")}`,
-          },
-        }
-      )
-      .then((x) => {
-        console.log("Uploaded", JSON.stringify(x));
-      });
+      }
+    );
+    console.log("Uploaded", JSON.stringify(res));
+    return res.data;
   });
 }

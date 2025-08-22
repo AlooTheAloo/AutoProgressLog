@@ -1,4 +1,5 @@
 import { Elysia, t } from "elysia";
+import { rmSync } from "fs";
 import { mkdir, writeFile } from "fs/promises";
 import path from "path";
 
@@ -52,12 +53,10 @@ export const uploadRoute = new Elysia({ name: "upload-picture" }).post(
     const buffer = new Uint8Array(await file.arrayBuffer());
 
     const ext = path.extname(file.name).toLowerCase(); // e.g., ".jpeg"
-    const safeExt = [".png", ".jpg", ".jpeg", ".webp"].includes(ext)
-      ? ext
-      : ".png"; // fallback
 
     const dirPath = path.resolve("./public", "pictures");
-    const filePath = path.join(dirPath, `${userId}${safeExt}`);
+
+    const filePath = path.join(dirPath, `${userId}`);
 
     // Create the directory if it doesn't exist
     await mkdir(dirPath, { recursive: true });

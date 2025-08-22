@@ -1,4 +1,7 @@
-import { EdenClient } from "../../electron/main/Electron-Backend/api/ApiManager";
+import {
+  EdenClient,
+  SERVER_URL,
+} from "../../electron/main/Electron-Backend/api/ApiManager";
 import { APLStorage } from "../../electron/main/Electron-Backend/util/auth";
 import { NotificationManager } from "../Helpers/notifications";
 
@@ -19,10 +22,11 @@ export async function runSync() {
         authorization: `Bearer ${await APLStorage.get("token")}`,
       },
     });
-    console.log("caca is ", JSON.stringify(fetchedDTO));
     if (fetchedDTO.data == null) return null;
     if (fetchedDTO.data.profile_picture == "")
       fetchedDTO.data.profile_picture = DEFAULT_PFP;
+    else
+      fetchedDTO.data.profile_picture = `http://${SERVER_URL}${fetchedDTO.data.profile_picture}`;
 
     console.log("Returning : " + JSON.stringify(fetchedDTO.data));
     await APLStorage.set("Cached_DTO", fetchedDTO.data);

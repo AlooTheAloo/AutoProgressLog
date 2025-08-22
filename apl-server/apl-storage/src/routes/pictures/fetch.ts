@@ -1,6 +1,6 @@
-import {Elysia, t} from 'elysia';
-import path from 'path';
-import {existsSync, createReadStream} from 'fs';
+import { Elysia, t } from "elysia";
+import path from "path";
+import { existsSync, createReadStream } from "fs";
 
 /**
  * @module fetchRoute (apl-storage)
@@ -43,39 +43,34 @@ import {existsSync, createReadStream} from 'fs';
  * - If the file exists: returns it as a stream (image/png)
  * - If not: returns a 404 with an error message
  */
-export const fetchRoute = new Elysia({name: 'fetch-picture'}).get(
-    '/fetch/:userId',
-    ({params, set}) => {
-        const {userId} = params;
+export const fetchRoute = new Elysia({ name: "fetch-picture" }).get(
+  "/fetch/:userId",
+  ({ params, set }) => {
+    const { userId } = params;
 
-        const knownExtensions = ['.png', '.jpg', '.jpeg', '.webp'];
+    const filePath = path.resolve("./public/pictures", `${userId}`);
 
-        const filePath = knownExtensions
-            .map(ext => path.resolve('./public/pictures', `${userId}${ext}`))
-            .find(existsSync);
-
-        if (!filePath) {
-            set.status = 404;
-            return {error: 'Picture not found'};
-        }
-
-        set.status = 200;
-        set.headers['Content-Type'] = 'image/*'
-        return createReadStream(filePath);
-
-    },
-    {
-        params: t.Object({
-            userId: t.Integer()
-        }),
-        detail: {
-            tags: ['Pictures'],
-            summary: 'Fetch a user picture',
-            description: 'Returns the user profile picture as a PNG stream.',
-            responses: {
-                200: {description: 'Picture stream returned (image/png)'},
-                404: {description: 'Picture not found on disk'}
-            }
-        }
+    if (!filePath) {
+      set.status = 404;
+      return { error: "Picture not found" };
     }
+
+    set.status = 200;
+    set.headers["Content-Type"] = "image/*";
+    return createReadStream(filePath);
+  },
+  {
+    params: t.Object({
+      userId: t.Integer(),
+    }),
+    detail: {
+      tags: ["Pictures"],
+      summary: "Fetch a user picture",
+      description: "Returns the user profile picture as a PNG stream.",
+      responses: {
+        200: { description: "Picture stream returned (image/png)" },
+        404: { description: "Picture not found on disk" },
+      },
+    },
+  }
 );

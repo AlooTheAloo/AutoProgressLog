@@ -2,6 +2,7 @@ import {
   APLLocalOptions,
   APLServerOptions,
   Options,
+  UserProfile,
 } from "../types/options.js";
 import fs from "fs";
 import path from "path";
@@ -42,7 +43,7 @@ const DEFAULT_LOCAL_CONFIG: APLLocalOptions = {
       name: "index",
       extension: ".jpg",
     },
-    outputQuality: 100,
+    outputQuality: 3,
   },
 };
 
@@ -87,19 +88,25 @@ async function fetchServerOptions(): Promise<APLServerOptions | null> {
     },
   };
 
-  const [userConfig, ankiConfig] = await Promise.all([
+  const [userConfig, ankiConfig, userProfile] = await Promise.all([
     EdenClient.user.config.get(auth),
     EdenClient.user.config.anki.get(auth),
+    EdenClient.user.me.get(auth),
   ]);
 
-  if (userConfig.data == null) return null;
+  console.log(ankiConfig.status);
+  console.log("ankiconf is : " + JSON.stringify(ankiConfig.data));
 
+  if (userConfig.data == null) return null;
+  if (userProfile.data == null) return null;
+  if (userProfile.data == null) return null;
   const serverOptions: APLServerOptions = {
     userOptions: userConfig.data,
     ankiOptions:
-      ankiConfig.data == null
+      ankiConfig.status == 404 || ankiConfig.data == null
         ? { enabled: false }
         : { enabled: true, options: ankiConfig.data },
+    userProfile: userProfile.data,
   };
 
   return serverOptions;
@@ -133,6 +140,7 @@ export async function getConfig(
     serverConfigCache != null &&
     now - serverConfigCache.fetchedAt < ttlMs;
 
+  console.log("cacheValid is " + cacheValid);
   if (cacheValid && serverConfigCache != null) {
     return {
       localOptions: localConfig,
@@ -150,10 +158,11 @@ export async function getConfig(
       // fall through to refetch
     }
   }
-
   // Do the fetch (deduped)
   inFlight = (async () => {
+    console.log("fetching server options");
     const fresh = await fetchServerOptions();
+    console.log("fresh is " + JSON.stringify(fresh));
     if (fresh == null)
       return Promise.reject(new Error("No user config on server"));
     else {

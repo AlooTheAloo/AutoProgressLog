@@ -25,7 +25,7 @@ export function createAutoRPC() {
   onConfigChange.on(
     "config-change",
     async (oldConfig: Options, newConfig: Options) => {
-      console.log("config-change", oldConfig, newConfig);
+      console.log("config-change", oldConfig, JSON.stringify(newConfig));
       if (
         oldConfig.localOptions.general.discordIntegration !=
         newConfig.localOptions.general.discordIntegration

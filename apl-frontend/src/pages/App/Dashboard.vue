@@ -55,13 +55,6 @@ async function sync() {
   }
 }
 
-function prout() {
-  console.log("prout");
-  console.log("generating_report.value", generating_report.value);
-  console.log("syncing.value", syncing.value);
-  console.log("disableActionButtons", disableActionButtons);
-}
-
 window.ipcRenderer.on("SetSync", (evt, newSync: boolean) => {});
 
 onMounted(async () => {
@@ -161,7 +154,7 @@ const closeFirstDialog = () => {
       >
         <div>
           <img
-            :src="dto.profile_picture"
+            :src="`${dto.profile_picture}?v=${dayjs().valueOf()}`"
             class="w-16 h-16 rounded-full dark:bg-black bg-white border-2 dark:border-[#e0e0e0] border-[#3d3e42]"
           />
         </div>

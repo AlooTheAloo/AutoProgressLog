@@ -230,6 +230,7 @@ let series /* Literally a calculus reference */ = computed(() => {
 
       <!-- List Section -->
       <ul
+        style=""
         class="min-w-[21.5rem] 1720:flex hidden divide-black/60 dark:divide-white/60 w-fit mr-4 divide-y divide-dashed dark:text-white text-black flex-col justify-center"
       >
         <li

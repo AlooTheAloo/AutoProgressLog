@@ -157,7 +157,7 @@ onMounted(() => {
 
       <div class="flex justify-between w-full">
         <Button
-          label="I don’t use Anki"
+          label="I don't use Anki"
           link
           style="font-size: 12px; padding: 0"
           @click="SkipAnki"

@@ -1,7 +1,7 @@
-import {Elysia, t} from "elysia";
-import {createEmailToken} from "../../services/auth/token";
+import { Elysia, t } from "elysia";
+import { createEmailToken } from "../../services/auth/token";
 import prisma from "../../db/client";
-import {sendMagicLink} from "../../services/email/sendMagicLink";
+import { sendMagicLink } from "../../services/email/sendMagicLink";
 
 /**
  * ## POST /login
@@ -56,41 +56,42 @@ import {sendMagicLink} from "../../services/email/sendMagicLink";
  * // User receives a magic link in their inbox
  * ```
  */
-export const loginRoute = new Elysia({name: "login"}).post(
-    '/login',
-    async ({body, set}) => {
-        const {email} = body;
+export const loginRoute = new Elysia({ name: "login" }).post(
+  "/login",
+  async ({ body, set }) => {
+    const { email } = body;
 
-        // Check if a user exists with this email
-        let user = await prisma.user.findUnique({where: {email}});
+    // Check if a user exists with this email
+    let user = await prisma.user.findUnique({ where: { email } });
 
-        // If user doesn't exist, create them
-        if (!user) {
-            user = await prisma.user.create({data: {email}});
-            set.status = "Created"; // sets HTTP 201 Created
-        }
-
-        // Generate email-based login token
-        const token = await createEmailToken(user.id);
-
-        // Send the magic login link to the email
-        await sendMagicLink(email, token);
-
-        // Response: nothing, just success
-        return;
-    },
-    {
-        body: t.Object({
-            email: t.String({
-                format: 'email',
-                example: 'youssef@youssef.dev',
-            }),
-        }),
-        response: t.Void(),
-        detail: {
-            summary: 'Login',
-            tags: ['Auth'],
-            description: 'Starts the passwordless login process by sending a magic link to the user\'s email address.',
-        }
+    // If user doesn't exist, create them
+    if (!user) {
+      user = await prisma.user.create({ data: { email } });
+      set.status = "Created"; // sets HTTP 201 Created
     }
+
+    // Generate email-based login token
+    const token = await createEmailToken(user.id);
+
+    // Send the magic login link to the email
+    await sendMagicLink(email, token);
+
+    // Response: nothing, just success
+    return;
+  },
+  {
+    body: t.Object({
+      email: t.String({
+        format: "email",
+        example: "youssef@youssef.dev",
+      }),
+    }),
+    response: t.Void(),
+    detail: {
+      summary: "Login",
+      tags: ["Auth"],
+      description:
+        "Starts the passwordless login process by sending a magic link to the user's email address.",
+    },
+  }
 );

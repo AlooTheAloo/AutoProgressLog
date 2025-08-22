@@ -1,26 +1,282 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Login to AutoProgressLog</title>
     <style>
-        {{STYLE}}
-    </style>
-</head>
-<body>
-<h2>🔐 Login to AutoProgressLog</h2>
-<p>Click the button below to log in:</p>
-<p>
-    <a href="{{MAGIC_LINK}}" style="
-        background-color: #4f46e5;
+      /* Reset-ish */
+      * {
+        box-sizing: border-box;
+      }
+
+      /* Layout */
+      .wrap {
+        height: 100%;
+
+        min-height: 100%;
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+        margin: 0;
+        background: #0f1115;
+        color: #e6e8ee;
+        font:
+          16px/1.5 system-ui,
+          -apple-system,
+          Segoe UI,
+          Roboto,
+          Ubuntu,
+          Cantarell,
+          Noto Sans,
+          Helvetica,
+          Arial,
+          "Apple Color Emoji",
+          "Segoe UI Emoji";
+      }
+
+      .appbar {
+        background: linear-gradient(180deg, #0d111a 0%, #0a0d14 100%);
+        border-bottom: 1px solid #1f2633;
+        padding: 14px 18px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .logo {
+        width: 25px;
+        height: 25px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .brand-name {
+        font-weight: 600;
+        letter-spacing: 0.2px;
+        color: #e6e8ee;
+      }
+
+      .loginToText {
+        font-size: clamp(24px, 3.6vw, 40px);
         color: white;
-        padding: 12px 24px;
-        text-decoration: none;
-        border-radius: 6px;
+      }
+
+      .hero {
+        position: relative;
+        padding: clamp(28px, 6vw, 56px) 18px;
+        background:
+          radial-gradient(
+            1200px 400px at 85% 10%,
+            rgba(42, 160, 255, 0.22),
+            transparent 60%
+          ),
+          radial-gradient(
+            800px 300px at 95% 0%,
+            rgba(12, 123, 230, 0.22),
+            transparent 60%
+          ),
+          linear-gradient(180deg, #0a0e16 0%, #0b1019 100%);
+        border-bottom: 1px solid #162033;
+      }
+
+      .card {
+        max-width: 720px;
+        margin: 0 auto;
+        background: linear-gradient(180deg, #151922 0%, #0f141d 100%);
+        border: 1px solid #1e2635;
+        border-radius: 16px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+        padding: clamp(20px, 4vw, 36px);
+        text-align: center;
+      }
+
+      .icon-circle {
+        width: 64px;
+        height: 64px;
+        margin: 6px auto 18px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        background: radial-gradient(
+          100% 100% at 30% 20%,
+          #3fb1ff 0%,
+          #1a8ef3 40%,
+          #0f6ec7 100%
+        );
+        box-shadow:
+          inset 0 0 0 6px rgba(255, 255, 255, 0.05),
+          0 8px 28px rgba(22, 122, 240, 0.35);
+      }
+      .icon-circle span {
+        display: block;
+        width: 26px;
+        height: 26px;
+        background: #fff;
+        -webkit-mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="%23000" viewBox="0 0 24 24"><path d="M12 4l1.41 1.41L8.83 10H20v2H8.83l4.58 4.59L12 18l-8-8 8-8z"/></svg>')
+          center/contain no-repeat;
+        mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="%23000" viewBox="0 0 24 24"><path d="M12 4l1.41 1.41L8.83 10H20v2H8.83l4.58 4.59L12 18l-8-8 8-8z"/></svg>')
+          center/contain no-repeat;
+      }
+
+      h1 {
+        margin: 4px 0 0;
+        font-size: clamp(24px, 3.6vw, 40px);
+        line-height: 1.2;
+        font-weight: 800;
+        letter-spacing: 0.2px;
+      }
+      .subtitle {
+        margin: 10px auto 22px;
+        max-width: 46ch;
+        color: #a9afbf;
+      }
+
+      .cta {
+        appearance: none;
+        border: none;
+        cursor: pointer;
         display: inline-block;
-      ">Login to App</a>
-</p>
-<p>If the button doesn't work, copy this link:</p>
-<p><code>{{MAGIC_LINK}}</code></p>
-<hr/>
-<p>This link is valid for 15 minutes and will open the AutoProgressLog app.</p>
-</body>
+        padding: 14px 22px;
+        font-weight: 700;
+        border-radius: 12px;
+        background: linear-gradient(180deg, #2aa0ff 0%, #09497c 100%);
+        color: #06121f;
+        outline: none;
+        transition:
+          transform 0.08s ease,
+          filter 0.2s ease;
+        box-shadow: 0 8px 24px rgba(33, 139, 255, 0.35);
+        text-decoration: none;
+      }
+      .cta:focus-visible {
+        outline: 2px solid #76c2ff;
+        outline-offset: 3px;
+      }
+      .cta:hover {
+        filter: brightness(1.06);
+        transform: translateY(-1px);
+      }
+      .cta:active {
+        transform: translateY(0);
+      }
+
+      .fine {
+        margin: 16px auto 6px;
+        color: #a9afbf;
+        max-width: 60ch;
+        font-size: 0.95rem;
+      }
+
+      .alt {
+        margin-top: 18px;
+        font-weight: 600;
+      }
+
+      .codewrap {
+        margin-top: 10px;
+        background: #121826;
+        border: 1px solid #202a3d;
+        border-radius: 12px;
+        padding: 10px 12px;
+        /* Important: long link handling */
+        overflow: hidden; /* keeps the pill shape nice vertically */
+      }
+      .inline-scroll {
+        display: block;
+        width: 100%;
+        scrollbar-width: thin;
+      }
+      .inline-scroll::-webkit-scrollbar {
+        height: 10px;
+      }
+      .inline-scroll::-webkit-scrollbar-thumb {
+        background: #273248;
+        border-radius: 8px;
+      }
+      .kbd {
+        font-family:
+          ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono",
+          monospace;
+        font-size: 0.95rem;
+        color: #b9c3d9;
+        user-select: all;
+      }
+
+      .footer {
+        text-align: center;
+        color: #9aa3b8;
+        font-size: 0.95rem;
+        padding: 16px 18px 40px;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .cta {
+          transition: none;
+        }
+        .icon-circle {
+          box-shadow: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <!-- App bar -->
+      <header class="appbar" role="banner">
+        <div class="logo" aria-hidden="true">
+          <svg
+            width="32"
+            height="32"
+            viewBox="0 0 32 32"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <rect width="31.5067" height="31.5067" rx="3.52875" fill="white" />
+            <path
+              d="M4.25074 20.2534H2.54938L5.64706 11.4545H7.61479L10.7168 20.2534H9.01541L6.6653 13.2589H6.59655L4.25074 20.2534ZM4.30659 16.8034H8.94666V18.0838H4.30659V16.8034ZM11.8757 20.2534V11.4545H15.1753C15.8513 11.4545 16.4184 11.5805 16.8767 11.8325C17.3378 12.0846 17.6858 12.4312 17.9207 12.8723C18.1584 13.3105 18.2773 13.8089 18.2773 14.3674C18.2773 14.9317 18.1584 15.4329 17.9207 15.8711C17.683 16.3094 17.3321 16.6545 16.8681 16.9066C16.4041 17.1557 15.8327 17.2803 15.1538 17.2803H12.967V15.9699H14.939C15.3343 15.9699 15.6579 15.9012 15.91 15.7637C16.162 15.6262 16.3482 15.4372 16.4685 15.1966C16.5917 14.956 16.6533 14.6796 16.6533 14.3674C16.6533 14.0552 16.5917 13.7802 16.4685 13.5425C16.3482 13.3048 16.1606 13.12 15.9057 12.9883C15.6536 12.8536 15.3286 12.7863 14.9304 12.7863H13.4697V20.2534H11.8757ZM19.6618 20.2534V11.4545H21.2557V18.9172H25.1311V20.2534H19.6618Z"
+              fill="black"
+            />
+            <path
+              d="M27.4038 20.3479C27.1432 20.3479 26.9198 20.2563 26.7336 20.073C26.5474 19.8897 26.4558 19.6662 26.4586 19.4027C26.4558 19.145 26.5474 18.9244 26.7336 18.7411C26.9198 18.5578 27.1432 18.4661 27.4038 18.4661C27.6559 18.4661 27.875 18.5578 28.0612 18.7411C28.2502 18.9244 28.3462 19.145 28.349 19.4027C28.3462 19.5775 28.3003 19.7364 28.2116 19.8796C28.1256 20.0228 28.0111 20.1374 27.8678 20.2233C27.7275 20.3064 27.5728 20.3479 27.4038 20.3479Z"
+              fill="#24CAFF"
+            />
+          </svg>
+        </div>
+        <div class="brand-name">AutoProgressLog</div>
+      </header>
+
+      <!-- Main / hero -->
+      <main class="hero">
+        <section class="card" aria-labelledby="title">
+          <div class="icon-circle" aria-hidden="true"><span></span></div>
+
+          <h1 id="title" class="loginToText">Login to<br />AutoProgressLog</h1>
+
+          <p class="subtitle">
+            You requested to sign in to your account. Click the button below to
+            continue:
+          </p>
+
+          <a class="cta" href="{{MAGIC_LINK}}" rel>Approve sign-in</a>
+
+          <p class="fine">
+            This link will expire in 15 minutes for your security.<br />If you
+            didn’t request this, you can safely ignore this email.
+          </p>
+
+          <p class="alt">If the button doesn’t work, copy this link:</p>
+          <div class="codewrap" role="region" aria-label="One-time sign-in URL">
+            <span class="inline-scroll">
+              <span class="kbd">{{MAGIC_LINK}}</span>
+            </span>
+          </div>
+        </section>
+      </main>
+
+      <!-- Footer -->
+      <footer class="footer">— The APL team</footer>
+    </div>
+  </body>
 </html>

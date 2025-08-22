@@ -25,6 +25,12 @@ export type APLServerOptions = {
     retentionMode: RetentionMode;
     trackedDecks: string[];
   }>;
+  userProfile: UserProfile;
+};
+
+export type UserProfile = {
+  userName: string | null;
+  email: string;
 };
 
 export type ConditionalOption<T> =

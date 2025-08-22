@@ -32,6 +32,7 @@ export default class AnkiHTTPClient {
   }
 
   private async fetchWithRedirect(path: string, options: RequestInit = {}) {
+    console.log("Pinging endpoint at " + anki_url + path);
     const response = await fetch(anki_url + path, {
       ...options,
       redirect: "manual",

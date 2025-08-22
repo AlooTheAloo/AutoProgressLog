@@ -14,11 +14,12 @@ import { useToast } from "primevue/usetoast";
 import Toast from "primevue/toast";
 import GeneralSettings from "../../components/Settings/Tabs/GeneralSettings.vue";
 import AccountSettings from "../../components/Settings/Tabs/AccountSettings.vue";
+import { useElementBounding, useWindowSize } from "@vueuse/core";
+import AppearanceSettings from "../../components/Settings/Tabs/AppearanceSettings.vue";
+import { ProgressSpinner, Skeleton } from "primevue";
 import AnkiSettings from "../../components/Settings/Tabs/AnkiSettings.vue";
 import TimeSettings from "../../components/Settings/Tabs/TimeSettings.vue";
 import ReportsSettings from "../../components/Settings/Tabs/ReportsSettings.vue";
-import { useElementBounding, useWindowSize } from "@vueuse/core";
-import AppearanceSettings from "../../components/Settings/Tabs/AppearanceSettings.vue";
 
 const router = useRouter();
 
@@ -45,12 +46,24 @@ function save() {
   window.ipcRenderer
     .invoke("SetConfig", JSON.stringify(config.value))
     .then((data: Options) => {
+      console.log("new config dropped in : " + JSON.stringify(data));
+
       config.value = data;
       originalConfig.value = data;
       toast.add({
         severity: "success",
         summary: "Changes saved!",
         detail: "The changes were saved successfully.",
+        life: 5000,
+      });
+    })
+    .catch((e) => {
+      console.error("Failed to save config:", e);
+      toast.add({
+        severity: "error",
+        summary: "Failed to save changes!",
+        detail:
+          "Failed to save changes. Make sure all fields are valid and try again.",
         life: 5000,
       });
     });
@@ -61,6 +74,7 @@ function reset() {
 
 function setConfig(newconfig: Options) {
   config.value = newconfig;
+  console.log("new config dropped in : " + JSON.stringify(newconfig));
 }
 
 function createWarning(warningProps: WarningProps | undefined) {
@@ -179,8 +193,6 @@ function ankiTest(worked: boolean) {
                     @update:config="setConfig"
                   />
                 </TabPanel>
-                <!-- 
-                
                 <TabPanel value="3">
                   <AnkiSettings
                     :config="config"
@@ -197,8 +209,21 @@ function ankiTest(worked: boolean) {
                     :config="config"
                     @update:config="setConfig"
                   />
-                </TabPanel> -->
+                </TabPanel>
               </TabPanels>
+            </div>
+            <div
+              v-else
+              :style="{
+                height: screen.height.value - 200 + 'px',
+              }"
+              class="flex flex-col w-full gap-6 pt-6"
+            >
+              <Skeleton
+                v-for="index in 10"
+                :key="index"
+                style="height: 48px"
+              ></Skeleton>
             </div>
           </Tabs>
         </div>

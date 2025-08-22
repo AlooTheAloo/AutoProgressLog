@@ -19,13 +19,37 @@ const emit = defineEmits<{
 <template>
   <div class="flex flex-col w-full gap-6 pt-6" v-if="config != undefined">
     <SettingsField
-      :value="config.serverOptions.userOptions.togglUserId"
+      :value="config.serverOptions.userProfile.userName ?? undefined"
       label="Username"
       placeholder="Enter your username"
       @update:value="
         $emit('update:config', {
           ...config,
-          account: { ...config.account, userName: $event },
+          serverOptions: {
+            ...config.serverOptions,
+            userProfile: {
+              ...config.serverOptions.userProfile,
+              userName: $event,
+            },
+          },
+        })
+      "
+    />
+
+    <SettingsField
+      :value="config.serverOptions.userProfile.email"
+      label="Email"
+      placeholder="Enter your email"
+      @update:value="
+        $emit('update:config', {
+          ...config,
+          serverOptions: {
+            ...config.serverOptions,
+            userProfile: {
+              ...config.serverOptions.userProfile,
+              email: $event,
+            },
+          },
         })
       "
     />

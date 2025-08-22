@@ -14,7 +14,7 @@ export async function getLastUpdate() {}
 export async function DeleteAnkiData() {}
 
 export async function getRetention(
-  retentionMode: RetentionMode = "true_retention"
+  retentionMode: RetentionMode = "TRUE_RETENTION"
 ) {}
 
 export async function getMatureCards() {}

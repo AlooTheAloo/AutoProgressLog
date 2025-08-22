@@ -51,20 +51,18 @@ export const uploadRoute = new Elysia({ name: "upload-route" })
   .post(
     "/upload",
     async ({ user, body, set }) => {
-      console.log(body.file);
       const form = new FormData();
+      console.log("USer id is " + user.id);
       form.append("file", body.file);
-
+      console.log("Form data is ", form);
       const res = await fetch(
         `http://apl-storage:2727/pictures/upload/${user.id}`,
         {
           method: "POST",
           body: form,
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
         }
       );
+      console.log("meow : " + res);
 
       if (!res.ok) {
         console.log("not ok");
@@ -72,7 +70,10 @@ export const uploadRoute = new Elysia({ name: "upload-route" })
         set.status = res.status;
         return { error: "Failed to upload picture" };
       }
-
+      console.log("Its ok !@!!");
+      console.log(res.statusText);
+      console.log("");
+      console.log("res is ", res);
       // Update the user's profilePicture field in the DB
       client.user
         .update({
@@ -82,8 +83,9 @@ export const uploadRoute = new Elysia({ name: "upload-route" })
         .catch((err) => {
           console.error("Failed to update user picture URL:", err);
         });
-      console.log(res.json());
-      return res.json();
+      const json = await res.json();
+      console.log(json);
+      return json;
     },
     {
       body: t.Object({
@@ -92,7 +94,7 @@ export const uploadRoute = new Elysia({ name: "upload-route" })
       headers: authHeaders,
       response: {
         200: t.Object({
-          description: t.String(), // You could rename to 'message' if more accurate
+          message: t.String(), // You could rename to 'message' if more accurate
         }),
         400: t.Object({
           description: t.String(),

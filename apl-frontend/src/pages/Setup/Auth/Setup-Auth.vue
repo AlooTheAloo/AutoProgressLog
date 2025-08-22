@@ -50,7 +50,6 @@ const protocolSchema = z.object({
 
 onMounted(() => {
   window.ipcRenderer.on("open-url", async (evt, data: string) => {
-    console.log("Prout 1");
     const url = new URL(data);
     if (url.hostname !== "auth") return;
     const parsed = Object.fromEntries(url.searchParams);
@@ -76,8 +75,10 @@ onMounted(() => {
     }
   });
 });
+
 onUnmounted(() => {
   if (timerId) clearInterval(timerId);
+  window.ipcRenderer.removeAllListeners("open-url");
 });
 </script>
 

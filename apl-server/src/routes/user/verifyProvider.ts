@@ -49,7 +49,7 @@ export const verifyProviderRoutes = new Elysia({
         }
       )
       .post(
-        "/anki",
+        "/anki/auth",
         async ({ body, set, user }) => {
           const { username, password, ankiUrl } = body;
           const response = await new AnkiHTTPClient(
@@ -105,6 +105,64 @@ export const verifyProviderRoutes = new Elysia({
             200: t.Object({
               cards: t.Array(DeckTypeSchema),
               key: t.String(),
+            }),
+            401: t.Object({
+              error: t.String(),
+            }),
+            500: t.Object({
+              error: t.String(),
+            }),
+          },
+          detail: {
+            summary: "Verify Anki credentials for specified user",
+            tags: ["User"],
+            description:
+              "This endpoint verifies the provided Anki credentials by attempting to log in.",
+          },
+        }
+      )
+      .post(
+        "/anki",
+        async ({ body, set, user }) => {
+          const { ankiToken, ankiUrl } = body;
+          try {
+            await AnkiStorage.requestAnkiDBDownload(
+              user.id,
+              ankiToken,
+              ankiUrl ?? DEFAULT_ANKI_URL
+            );
+          } catch (e: any) {
+            set.status = 500;
+            return { error: e.message };
+          }
+
+          try {
+            set.status = 200;
+            return {
+              cards: await AnkiStorage.getDecksCards(user.id),
+            };
+          } catch (e: any) {
+            set.status = 500;
+            return { error: e.message };
+          }
+        },
+        {
+          body: t.Object({
+            ankiToken: t.String({
+              example: "your-anki-token",
+              description: "Your Anki token for authentication",
+            }),
+            ankiUrl: t.Optional(
+              t.String({
+                example: "http://localhost:8765",
+                description: "The URL of your AnkiConnect server",
+              })
+            ),
+          }),
+          headers: authHeaders,
+          response: {
+            200: t.Object({
+              cards: t.Array(DeckTypeSchema),
             }),
             401: t.Object({
               error: t.String(),

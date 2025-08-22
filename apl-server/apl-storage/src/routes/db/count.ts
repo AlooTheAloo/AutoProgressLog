@@ -11,8 +11,10 @@ import { CountRevlog } from "../../services/db";
  */
 export const countRoute = new Elysia({ name: "count-reviews" }).get(
   "/count_reviews/:userId",
-  async ({ params, set }) => {
+  async ({ params, set, query }) => {
     const { userId } = params;
+    const { deckIDs } = query;
+    console.log("Here!!");
 
     const filePath = path.resolve(
       "./public/ankidb",
@@ -31,14 +33,20 @@ export const countRoute = new Elysia({ name: "count-reviews" }).get(
         did: number;
       }[] = [];
 
+      console.log("deck ids : ", deckIDs);
       // Convert map to array
       count.forEach((v, k) => {
-        revs.push({
-          count: v,
-          did: k,
-        });
+        if (deckIDs.includes(k.toString())) {
+          console.log("includes : ", k);
+
+          revs.push({
+            count: v,
+            did: k,
+          });
+        }
       });
 
+      console.log("revs : ", revs);
       return {
         count: revs,
         totalCount: revs.map((x) => x.count).reduce((p, c) => p + c), // Sum up all decks
@@ -51,6 +59,9 @@ export const countRoute = new Elysia({ name: "count-reviews" }).get(
   {
     params: t.Object({
       userId: t.Numeric(),
+    }),
+    query: t.Object({
+      deckIDs: t.Array(t.String()),
     }),
     response: t.Union([
       t.Object({

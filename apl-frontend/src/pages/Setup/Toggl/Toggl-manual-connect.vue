@@ -70,7 +70,7 @@ async function NextPage() {
           }"
           class="flex flex-col items-start space-y-6"
         >
-          <BackButton route="/setup/client-server-selection" />
+          <BackButton route="/setup/index" />
           <h1
             class="text-xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-semibold text-white leading-tight"
           >

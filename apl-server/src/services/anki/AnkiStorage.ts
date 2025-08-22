@@ -96,13 +96,23 @@ export default class AnkiStorage {
    * Fetch total and per-deck review counts from remote DB.
    */
   static async getAnkiCardReviewCount(userID: number) {
-    const response = await fetch(
-      `${AnkiStorage.storage_url}/ankidb/count_reviews/${userID}`,
-      {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-      }
+    const settings = await AnkiStorage.getUserAnkiSettings(userID);
+
+    console.log("trackeddecks : ", settings?.trackedDecks);
+
+    const url = new URL(
+      `${AnkiStorage.storage_url}/ankidb/count_reviews/${userID}`
     );
+    for (const id of settings?.trackedDecks ?? []) {
+      url.searchParams.append("deckIDs", String(id));
+    }
+
+    const response = await fetch(url.toString(), {
+      method: "GET",
+    });
+
+    console.log("Got the response from the server:", response);
+
     return (await response.json()) as {
       count: { did: number; count: number }[];
       totalCount: number;
@@ -114,6 +124,9 @@ export default class AnkiStorage {
     ankiToken: string,
     ankiUrl: string
   ) {
+    console.log("Requesting Anki DB download for userId " + userId);
+    console.log("ankiToken is " + ankiToken);
+    console.log("ankiUrl is " + ankiUrl);
     const response = await fetch(
       `${AnkiStorage.storage_url}/ankidb/download/${userId}`,
       {

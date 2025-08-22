@@ -1,6 +1,9 @@
 import { app, dialog, ipcMain } from "electron";
 import { existsSync, writeFileSync } from "fs";
-import { configPath } from "../../../apl-backend/Helpers/getConfig";
+import {
+  configPath,
+  invalidateConfigCache,
+} from "../../../apl-backend/Helpers/getConfig";
 import { win } from "..";
 import path from "path";
 import machineId from "node-machine-id";
@@ -41,7 +44,7 @@ interface AnkiConfig {
 }
 
 let ankiLogin: AnkiLogin | undefined;
-let ankiConfig: Partial<AnkiConfig> = {};
+let ankiConfig: Partial<AnkiConfig> | null = null;
 let togglAccount: TogglAccount | undefined;
 
 const DEFAULT_CONFIG: Options = {
@@ -60,6 +63,10 @@ const DEFAULT_CONFIG: Options = {
         trackedDecks: [],
       },
     },
+    userProfile: {
+      email: "",
+      userName: "",
+    },
   },
   localOptions: {
     general: {
@@ -70,8 +77,8 @@ const DEFAULT_CONFIG: Options = {
     },
     outputOptions: {
       outputFile: {
-        path: "",
-        name: "",
+        path: app.getPath("desktop"),
+        name: "Progress Report",
         extension: ".png",
       },
       outputQuality: 5,
@@ -80,7 +87,7 @@ const DEFAULT_CONFIG: Options = {
 };
 
 const config: Partial<Options> = DEFAULT_CONFIG;
-
+let savedConfig = false;
 export function setupListeners() {
   ipcMain.handle("Send-Email", async (e: any, email: string) => {
     Logger.log("Sending email to " + email, "API");
@@ -153,7 +160,10 @@ export function setupListeners() {
         },
       }
     );
-    if (ankiConfig != undefined) {
+
+    console.log("And ankiconfig is " + JSON.stringify(ankiConfig));
+    console.log("resp " + JSON.stringify(resp));
+    if (ankiConfig != null) {
       if (
         ankiConfig.url == undefined ||
         ankiConfig.trackedDecks == undefined ||
@@ -178,12 +188,15 @@ export function setupListeners() {
       console.log("resp is ", JSON.stringify(respAnki));
 
       if (respAnki.status != 200) return false;
-      APLStorage.set("localConfig", config.localOptions);
     }
+    APLStorage.set("localConfig", config.localOptions);
+
     if (resp.status == 200) {
       console.log("setup complete !!!");
       APLStorage.set("setupComplete", true);
     }
+
+    invalidateConfigCache();
 
     return resp.status == 200;
   });
@@ -258,6 +271,7 @@ export function setupListeners() {
   ipcMain.handle("SkipAnki", async (event: any, arg: any) => {
     if (config.serverOptions == undefined) return;
     config.serverOptions.ankiOptions.enabled = false;
+    config.serverOptions.ankiOptions.options = undefined;
   });
 
   ipcMain.handle("anki-credentials", async (avt: any, data: AnkiLogin) => {
@@ -271,11 +285,13 @@ export function setupListeners() {
   ipcMain.handle("anki-connect-start", async () => {
     win?.webContents.send("anki-connect-message", "Testing anki connection");
     if (ankiLogin == undefined) return false;
-    const key = await loadDB(ankiLogin);
-    if (key == false) return false;
+    const resp = await loadDB(ankiLogin);
+    if (resp.worked == false) return false;
     else {
-      ankiConfig.url = ankiLogin.url;
-      ankiConfig.ankiToken = key;
+      ankiConfig = {
+        url: ankiLogin.url,
+        ankiToken: resp.key,
+      };
       return true;
     }
   });

@@ -31,6 +31,9 @@ export default class StorageHTTPClient {
     );
     if (url != DEFAULT_ANKI_URL) anki_url = url;
     this.key = key;
+
+    console.log("anki_url is " + anki_url);
+    console.log("key is " + this.key);
   }
 
   isLoggedIn = () => this.key != "";
@@ -46,7 +49,8 @@ export default class StorageHTTPClient {
 
   private async fetchWithRedirect(path: string, options: RequestInit = {}) {
     console.log("Pinging endpoint at " + anki_url + path);
-
+    console.log("anki_url is " + anki_url);
+    console.log("key is " + this.key);
     const response = await fetch(anki_url + path, {
       ...options,
       redirect: "manual",
