@@ -94,7 +94,6 @@ export const syncRoute = new Elysia({ name: "sync-route" }).use(authGuard).post(
       where: { userId },
       _sum: { seconds: true },
     });
-    console.log("Total immersion aggregation result:", totalImmersion);
     console.log(
       "Total immersion time for user:",
       userId,

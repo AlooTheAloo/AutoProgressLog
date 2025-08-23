@@ -10,6 +10,15 @@ import {startTunnel} from "./services/ngrok/dev-tunnel";
 
 const sm = new SocketManager();
 export const app = new Elysia()
+    .onStart(async () => {
+        AnkiStorage.init(Bun.env.STORAGE_URL ?? "");
+        initTogglNotifications();
+        console.log("Initializing ZSTD...");
+        await zstdinit();
+        console.log("ZSTD initialized successfully.");
+        console.log("Starting Ngrok tunnel...");
+        await startTunnel();
+    })
     .use(
         cors({
             origin: ["http://localhost:*", "https://www.aplapp.dev"],
@@ -66,15 +75,8 @@ export const app = new Elysia()
             sm.close(ws);
         },
     })
-    .listen(3000, async (app) => {
+    .listen(3000, (app) => {
         console.log(`APL Server is running on http://${app.hostname}:${app.port}/`);
-        AnkiStorage.init(Bun.env.STORAGE_URL ?? "");
-        initTogglNotifications();
-        console.log("Initializing ZSTD...");
-        await zstdinit();
-        console.log("ZSTD initialized successfully.");
-        console.log("Starting Ngrok tunnel...");
-        await startTunnel();
-    });
+    })
 
 export type APLServer = typeof app;
