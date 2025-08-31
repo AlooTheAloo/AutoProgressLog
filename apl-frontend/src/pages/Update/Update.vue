@@ -20,7 +20,12 @@ const message = ref("Preparing");
 
 const router = useRouter();
 
+window.ipcRenderer.on("update-complete", (evt, data: string) => {
+  router.push("/app/dashboard");
+});
+
 window.ipcRenderer.on("2_0_0_upgrade", (evt, data: string) => {
+  console.log("Moving");
   router.push("/update/2_0_0");
 });
 
@@ -43,13 +48,14 @@ onMounted(() => {
     <motion.div
       class="absolute inset-0 flex flex-col items-center justify-center space-y-4"
       :initial="{ opacity: 0, y: 20, filter: 'blur(10px)' }"
-      :animate="{ opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 0.6 } }"
+      :animate="{
+        opacity: 1,
+        y: 0,
+        filter: 'blur(0px)',
+        transition: { duration: 0.6 },
+      }"
     >
-      <img
-        :src="Logo"
-        alt="APL Logo"
-        class="w-12 h-12 sm:w-16 sm:h-16"
-      />
+      <img :src="Logo" alt="APL Logo" class="w-12 h-12 sm:w-16 sm:h-16" />
       <div class="flex text-3xl text-white">
         <VueWriter
           :array="shuffle(update_names)"
@@ -60,8 +66,7 @@ onMounted(() => {
         >
           <p class="inline mr-1">Downloading new</p>
         </VueWriter>
-        <span
-          class="inline -ml-1 underscore font-extrabold text-[#89bdff]"
+        <span class="inline -ml-1 underscore font-extrabold text-[#89bdff]"
           >_</span
         >
       </div>
@@ -75,4 +80,3 @@ onMounted(() => {
     </motion.div>
   </div>
 </template>
-

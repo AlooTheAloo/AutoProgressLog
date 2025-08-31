@@ -6,7 +6,8 @@ type StorageKey =
   | "setupComplete"
   | "Cached_DTO"
   | "localConfig"
-  | "serverConfig";
+  | "serverConfig"
+  | "version";
 
 export class APLStorage {
   static async set(key: StorageKey, value: unknown) {

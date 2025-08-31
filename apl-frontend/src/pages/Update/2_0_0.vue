@@ -79,6 +79,12 @@ function SendEmail() {
   startTimer();
 }
 
+function caca() {
+  window.ipcRenderer.invoke("update-2_0_0_done").then(() => {
+    router.push("/update-app");
+  });
+}
+
 onUnmounted(() => {
   if (timerId !== null) clearInterval(timerId);
 });
@@ -138,6 +144,9 @@ onUnmounted(() => {
               v-model="email"
             />
           </div>
+          <Button @click="caca" class="w-[200px] p-3 !rounded-full">
+            caca
+          </Button>
           <div class="w-full flex justify-end">
             <Button
               @click="NextPage"
@@ -173,7 +182,8 @@ onUnmounted(() => {
           <p class="text-center w-full">
             An email has been sent to
             <span class="inline text-blue-200"> {{ email }} </span>. Please
-            check your inbox for a link to continue.
+            check your inbox for a link to continue. This may take up to 30
+            minutes (blame google and microsoft lol)
           </p>
         </motion.div>
       </div>

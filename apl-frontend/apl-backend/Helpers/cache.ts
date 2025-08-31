@@ -22,6 +22,8 @@ export class CacheManager {
   };
 
   static verifyVersion = () => {
+    console.log("appversion is " + appVersion);
+    console.log("cache version is " + this.SemVer().version);
     return this.SemVer().compare(appVersion) == 0;
   };
 

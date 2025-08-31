@@ -16,7 +16,6 @@ import {
   getFileInAPLData,
 } from "../../apl-backend/Helpers/getConfig";
 import fs from "fs";
-import { CacheManager } from "../../apl-backend/Helpers/cache";
 import checkHealth from "./Electron-App/HealthCheck";
 import { SocketClient } from "./Electron-Backend/Socket/SocketClient";
 
@@ -33,6 +32,7 @@ import { initializeApiManager } from "./Electron-Backend/api/ApiManager";
 import { Logger } from "../../apl-backend/Helpers/Log";
 import { init } from "@bokuweb/zstd-wasm";
 import { APLStorage } from "./Electron-Backend/util/auth";
+import { VersionManager } from "../../apl-backend/Helpers/VersionManager";
 
 const isProd = app.isPackaged;
 
@@ -180,8 +180,12 @@ app.on("activate", () => {
 });
 
 app.on("ready", async () => {
-  if (CacheManager.verifyVersion()) {
+  if (await VersionManager.verifyVersion()) {
     await checkHealth(getConfig());
+  }
+
+  if (!VersionManager.exists() && (await APLStorage.get("setupComplete"))) {
+    await VersionManager.init();
   }
 
   // ZFSTD

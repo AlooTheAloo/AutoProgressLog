@@ -2,7 +2,6 @@
 import { useRouter } from "vue-router";
 import Logo from "../../assets/Logo.png";
 import LogoDark from "../../assets/Logo-Dark.png";
-import Tooltip from "primevue/tooltip";
 import { appPath as AppPath } from "../../pages/routes/appRoutes";
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import Dialog from "primevue/dialog";
@@ -13,6 +12,7 @@ import {
   Statistics,
   Settings,
   Help,
+  Tools,
 } from "../../assets/Icons/Sidebar/Icons";
 import UserDialog from "../../../types/UserDialog";
 import { UpdateInfo } from "electron-updater";
@@ -44,6 +44,11 @@ const routes: route[] = [
     path: "/app/reports",
     image: Reports,
     name: "Reports",
+  },
+  {
+    path: "/app/utilities",
+    image: Tools,
+    name: "Utilities",
   },
   {
     image: Competitions,
@@ -87,6 +92,7 @@ const handleClick = (path: string | undefined) => {
 
 const props = defineProps<{
   currentRoute: AppPath;
+  showSidebar: boolean;
 }>();
 
 const updateInfo = ref<UpdateInfo | null>(null);
@@ -227,6 +233,7 @@ const toastValue = ref<UserDialog>();
         'w-20': !sidebarState,
         'w-48': sidebarState,
       }"
+      v-if="props.showSidebar"
     >
       <motion.div
         layoutRoot

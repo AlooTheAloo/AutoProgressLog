@@ -16,13 +16,16 @@ onMounted(() => {
   setTimeout(() => {
     isLoading.value = false;
   }, 2000);
+  if (window.ipcRenderer) {
+    window.ipcRenderer.on("is-setup-complete", (_e, ok: boolean) => {
+      showSideBar.value = ok;
+    });
+    window.ipcRenderer.on("set-sidebar-state", (_e, value) => {
+      showSideBar.value = value;
+      console.log("showSideBar is " + value);
+    });
+  }
 });
-
-if (window.ipcRenderer) {
-  window.ipcRenderer.on("is-setup-complete", (_e, ok: boolean) => {
-    showSideBar.value = ok;
-  });
-}
 </script>
 
 <template>
@@ -31,12 +34,11 @@ if (window.ipcRenderer) {
 
     <div v-else key="app">
       <SideBarContainer
-        v-if="showSideBar"
+        :showSidebar="showSideBar"
         :currentRoute="router.currentRoute.value.path as appPath"
       >
         <RouterView />
       </SideBarContainer>
-      <RouterView v-else />
       <GlobalDialogRenderer />
     </div>
   </Transition>

@@ -1,4 +1,4 @@
-import { ipcMain } from "electron";
+import { app, ipcMain } from "electron";
 import { win } from "..";
 import { Options } from "../../../apl-backend/types/options";
 import { AnkiLogin, deck } from "./SetupConfigBuilder";
@@ -6,10 +6,22 @@ import { onConfigChange } from "./SettingsListeners";
 import { Logger } from "../../../apl-backend/Helpers/Log";
 import { EdenClient } from "./api/ApiManager";
 import { APLStorage } from "./util/auth";
+import { existsSync } from "fs";
 
 let decksCards: deck[] = [];
 
 export function ankiListeners() {
+  ipcMain.handle("GetMagicAnkiFilePath", () => {
+    let filepath = "";
+    if (process.platform === "win32") {
+      filepath = "";
+    } else if (process.platform === "darwin") {
+      filepath = `${app.getPath("appData")}/Anki2/User 1/collection.anki2`;
+    } else filepath = "/";
+
+    return existsSync(filepath) ? filepath : "";
+  });
+
   ipcMain.handle("test-anki-connection", async (event: any, arg: AnkiLogin) => {
     win?.webContents.send("anki-connect-message", "Testing anki connection");
     return loadDB(arg);

@@ -12,6 +12,7 @@
         "@puppeteer/browsers": "^2.10.5",
         "@types/electron-json-storage": "^4.5.4",
         "@types/pluralize": "^0.0.33",
+        "@types/semver": "^7.7.0",
         "@types/vue-writer": "^1.2.0",
         "@vueuse/core": "^13.4.0",
         "@xhayper/discord-rpc": "^1.2.2",
@@ -39,6 +40,7 @@
         "primeicons": "^7.0.0",
         "primevue": "^4.3.5",
         "round-to": "^6.0.0",
+        "semver": "^7.7.2",
         "sharp": "^0.34.2",
         "sqlite3": "^5.1.7",
         "toggl-track": "^0.8.0",
@@ -411,6 +413,8 @@
     "@types/pluralize": ["@types/pluralize@0.0.33", "", {}, "sha512-JOqsl+ZoCpP4e8TDke9W79FDcSgPAR0l6pixx2JHkhnRjvShyYiAYw2LVsnA7K08Y6DeOnaU6ujmENO4os/cYg=="],
 
     "@types/responselike": ["@types/responselike@1.0.3", "", { "dependencies": { "@types/node": "*" } }, "sha512-H/+L+UkTV33uf49PH5pCAUBVPNj2nDBXTN+qS1dOwyyg24l3CcicicCA7ca+HMvJBZcFgl5r8e+RR6elsb4Lyw=="],
+
+    "@types/semver": ["@types/semver@7.7.0", "", {}, "sha512-k107IF4+Xr7UHjwDc7Cfd6PRQfbdkiRabXGRjo07b4WyPahFBZCZ1sE+BNxYIJPPg73UkfOsVOLwqVc/6ETrIA=="],
 
     "@types/verror": ["@types/verror@1.10.11", "", {}, "sha512-RlDm9K7+o5stv0Co8i8ZRGxDbrTxhJtgjqjFyVh/tXQyl/rYtTKlnTvZ88oSTeYREWurwx20Js4kTuKCsFkUtg=="],
 

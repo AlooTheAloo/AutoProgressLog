@@ -10,8 +10,7 @@ import { win } from "..";
 import semver from "semver";
 import { version as v1 } from "../../../package.json";
 import { upgrade_schema } from "../../../apl-backend/apl-upgrade";
-import { CacheManager } from "../../../apl-backend/Helpers/cache";
-import { version } from "../../../package.json";
+import { VersionManager } from "../../../apl-backend/Helpers/VersionManager";
 
 const APP_URL = "https://github.com/AlooTheAloo/AutoProgressLog/";
 
@@ -29,7 +28,8 @@ export function globalListeners() {
   });
 
   ipcMain.handle("Update-App-Schema", async (event, args) => {
-    await upgrade_schema(CacheManager.SemVer().version);
+    console.log("Update schema is called");
+    await upgrade_schema((await VersionManager.SemVer()).toString());
     win?.webContents.send("router-push", "/app/dashboard");
     win?.webContents.send("is-setup-complete", true);
   });
@@ -45,11 +45,11 @@ export function globalListeners() {
   });
 
   ipcMain.handle("check-for-update", async (event, args) => {
-    if (!CacheManager.exists) return;
+    if (!(await VersionManager.exists())) return;
     const result = await electronUpdater.autoUpdater.checkForUpdates();
     const f = getFileInAPLData("skip.txt");
     const skipped = existsSync(f)
-      ? readFileSync(f).toString() ?? "0.0.0"
+      ? (readFileSync(f).toString() ?? "0.0.0")
       : "0.0.0";
 
     if (

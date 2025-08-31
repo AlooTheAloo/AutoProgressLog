@@ -1,17 +1,19 @@
 import { win } from "../../../apl-frontend/electron/main";
 import { buildContextMenu } from "../../../apl-frontend/electron/main/Electron-Backend/appBackend";
-import { CacheManager } from "../Helpers/cache";
 import { Logger } from "../Helpers/Log";
-import upgrade_1_0_2 from "./Versions/1.0.2";
+import { VersionManager } from "../Helpers/VersionManager";
 import upgrade_2_0_0 from "./Versions/2.0.0";
 
 export let upgrading = false;
 
 export async function upgrade_schema(version_current: string): Promise<void> {
   upgrading = true;
+  win?.webContents.send("set-sidebar-state", false);
   buildContextMenu();
   await launchUpgrade("2.0.0", upgrade_2_0_0);
   upgrading = false;
+  win?.webContents.send("set-sidebar-state", true);
+  win?.webContents.send("update-complete");
   buildContextMenu();
   return;
 }
@@ -26,5 +28,5 @@ export async function launchUpgrade(
   );
   await upgradeFunc();
   Logger.log("Upgraded to " + version_target, "Upgrade");
-  CacheManager.setVersion(version_target);
+  VersionManager.setVersion(version_target);
 }

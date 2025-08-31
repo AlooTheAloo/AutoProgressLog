@@ -29,6 +29,7 @@ export const ankiPath = getFileInAPLData("anki.db");
 export const configPath = getFileInAPLData("config.json");
 export const syncDataPath = getFileInAPLData("syncData.db");
 export const cache_location = getFileInAPLData("cache.json");
+export const version_location = getFileInAPLData("version.json");
 
 const DEFAULT_LOCAL_CONFIG: APLLocalOptions = {
   general: {
@@ -47,8 +48,12 @@ const DEFAULT_LOCAL_CONFIG: APLLocalOptions = {
   },
 };
 
-export function updateConfig() {
-  config = JSON.parse(fs.readFileSync(configPath).toString());
+export async function updateConfig() {
+  const localOptions = await APLStorage.get<APLLocalOptions>("localConfig");
+  const serverOptions = await APLStorage.get<APLServerOptions>("serverConfig");
+  if (localOptions && serverOptions) {
+    config = { localOptions, serverOptions };
+  }
 }
 // --- In-memory cache ---
 let serverConfigCache: { data: APLServerOptions; fetchedAt: number } | null =

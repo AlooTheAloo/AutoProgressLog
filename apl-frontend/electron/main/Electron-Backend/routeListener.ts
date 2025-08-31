@@ -1,13 +1,12 @@
 import { ipcMain } from "electron";
-import { getConfig } from "../../../apl-backend/Helpers/getConfig";
-import { CacheManager } from "../../../apl-backend/Helpers/cache";
 import { win } from "..";
 import { APLStorage } from "./util/auth";
+import { VersionManager } from "../../../apl-backend/Helpers/VersionManager";
 
 export function routeListeners() {
   ipcMain.handle("PageSelect", async (event, args) => {
     if ((await APLStorage.get("setupComplete")) === true) {
-      const ver = CacheManager.verifyVersion();
+      const ver = await VersionManager.verifyVersion();
       if (!ver) {
         return "/update-app";
       }
