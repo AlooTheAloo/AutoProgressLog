@@ -1,7 +1,9 @@
 import { Component } from "vue";
-import GeneratingReports from "../components/Help/GeneratingReports.vue";
-import DashboardPageHelp from "../components/Help/DashboardPageHelp.vue";
-import { Overview, Reports, Settings } from "../assets/Icons/Sidebar/Icons";
+import ReportsHelp from "../components/Help/ReportsHelp.vue";
+import Report from "../../src/assets/Icons/Sidebar/Reports.svg";
+import Settings from "../../src/assets/Icons/Sidebar/Settings.svg";
+import AnkiHelp from "../components/Help/AnkiHelp.vue";
+
 
 export interface HelpPage {
   title: string;
@@ -12,24 +14,17 @@ export interface HelpPage {
 
 const helpPages: HelpPage[] = [
   {
-    title: "Dashboard",
-    description:
-      "The Dashboard is where you can view your progress and generate reports.",
-    component: DashboardPageHelp,
-    icon: Overview,
-  },
-  {
     title: "Reports",
     description:
-      "The Reports page is where you can view your generated reports.",
-    component: GeneratingReports,
-    icon: Reports,
+      "Learn about how to generate reports and how to use them to learn more efficiently.",
+    component: ReportsHelp,
+    icon: Report,
   },
   {
-    title: "Settings",
+    title: "Anki",
     description:
-      "The Settings page is where you can configure your application.",
-    component: GeneratingReports,
+      "Learn how to connect your Anki account to APL and how to use it to track your progress.",
+    component: AnkiHelp,
     icon: Settings,
   },
 ];

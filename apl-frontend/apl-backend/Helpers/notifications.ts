@@ -1,5 +1,5 @@
 import { powerMonitor } from "electron";
-import { win } from "../../electron/main";
+import { win } from "../../../apl-frontend/electron/main";
 
 export class NotificationManager {
   static isTurnedOn = true;

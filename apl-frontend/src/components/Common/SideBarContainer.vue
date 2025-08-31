@@ -2,7 +2,7 @@
 import { useRouter } from "vue-router";
 import Logo from "../../assets/Logo.png";
 import LogoDark from "../../assets/Logo-Dark.png";
-
+import Tooltip from "primevue/tooltip";
 import { appPath as AppPath } from "../../pages/routes/appRoutes";
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import Dialog from "primevue/dialog";
@@ -95,10 +95,10 @@ const glow = ref<boolean>(false);
 onMounted(() => {
   window.ipcRenderer.invoke("GetConfig").then((data: Options) => {
     console.log(data);
-    glow.value = data.appearance.glow;
+    glow.value = data.localOptions.appearance.glow;
   });
   window.ipcRenderer.on("config-change", (e, args: Options) => {
-    glow.value = args.appearance.glow;
+    glow.value = args.localOptions.appearance.glow;
   });
 
   window.ipcRenderer.on("ShowDialog", (evt, args: UserDialog) => {
@@ -153,7 +153,7 @@ const toastValue = ref<UserDialog>();
         </div>
 
         <div
-          class="markdown-body whitespace-normal"
+          class="markdown-body whitespace-normal text-black dark:text-white py-4"
           v-html="toastValue?.content"
         ></div>
 
@@ -181,7 +181,7 @@ const toastValue = ref<UserDialog>();
     :modal="true"
     :dismissableMask="true"
   >
-    <div v-html="dialog?.content"></div>
+    <div v-html="dialog?.content" class="text-black dark:text-white"></div>
     <div class="flex gap-2">
       <Button
         v-if="dialog?.yes"
@@ -201,19 +201,19 @@ const toastValue = ref<UserDialog>();
   </Dialog>
   <!-- glow -->
   <div
-    class="h-screen w-screen absolute overflow-hidden pointer-events-none z-10"
+    class="h-screen w-screen absolute overflow-hidden pointer-events-none"
     v-if="glow"
   >
     <div class="flex absolute w-full h-full justify-end">
       <div
         style="filter: blur(150px)"
-        class="glow glow-delay w-[30rem] h-[30rem] absolute rounded-full bg-[#24CAFF] -z-30 -mt-52 -mr-52"
+        class="glow glow-delay w-[30rem] h-[30rem] absolute rounded-full bg-[var(--primary-color)] -mt-52 -mr-52"
       />
     </div>
     <!-- <div class="w-24 xl:w-72 transition-all duration-250 h-full">
           <div
             style="filter: blur(75px)"
-            class="glow w-96 h-96 rounded-full bg-[#24CAFF] z-0 -ml-64 -mt-64"
+            class="glow w-96 h-96 rounded-full bg-[var(--primary-color)] z-0 -ml-64 -mt-64"
           ></div>
         </div> -->
   </div>
@@ -279,8 +279,10 @@ const toastValue = ref<UserDialog>();
           :style="{
             cursor: route.path != null ? 'pointer' : 'default',
             opacity: route.path == null ? 0.5 : 1,
-            backgroundColor: route.path == props.currentRoute ? '#1295BF' : '',
+            backgroundColor:
+              route.path == props.currentRoute ? 'var(--primary-color)' : '',
           }"
+          v-tooltip.right="route.path == null ? 'Coming soon!' : undefined"
           :key="route.path"
           class="rounded-[5px] px-4 py-1 flex items-center gap-2 w-full transition-all duration-200"
           v-on:click="(e) => handleClick(route.path)"
@@ -294,7 +296,7 @@ const toastValue = ref<UserDialog>();
           <AnimatePresence>
             <motion.div
               v-if="sidebarState"
-              key="caca"
+              key="routeName"
               class="font-bold text-black dark:text-white text-md"
               :initial="{
                 opacity: 0,
@@ -329,7 +331,8 @@ const toastValue = ref<UserDialog>();
           :style="{
             cursor: route.path != null ? 'pointer' : 'default',
             opacity: route.path == null ? 0.5 : 1,
-            backgroundColor: route.path == props.currentRoute ? '#1295BF' : '',
+            backgroundColor:
+              route.path == props.currentRoute ? 'var(--primary-color)' : '',
           }"
           :key="route.path"
           class="rounded-[5px] px-4 py-1 flex items-center gap-2 w-full transition-all duration-200"
@@ -340,7 +343,7 @@ const toastValue = ref<UserDialog>();
           <AnimatePresence>
             <motion.div
               v-if="sidebarState"
-              key="caca"
+              key="bottomRouteNames"
               class="font-bold dark:text-white text-black text-md"
               :initial="{
                 opacity: 0,

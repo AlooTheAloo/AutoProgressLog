@@ -1,26 +1,17 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref, watch, computed } from "vue";
-import { useRouter } from "vue-router";
+import { onMounted, ref, computed } from "vue";
 import Button from "primevue/button";
-import SideBarContainer from "../../components/Common/SideBarContainer.vue";
-import { appPath } from "../routes/appRoutes";
 import ProgressSpinner from "primevue/progressspinner";
 import dayjs from "dayjs";
 import DashboardBody from "../../components/Dashboard/DashboardBody.vue";
-import { useMagicKeys } from "@vueuse/core";
 import { Maybe } from "../../../types/Maybe";
 import Skeleton from "primevue/skeleton";
 import Dialog from "primevue/dialog";
-import GrainyColor from "../../assets/GrainyColor.png";
 import Report from "../../assets/Report.png";
 
-import Logo from "../../assets/Logo.png";
+import Hey from "../../assets/Hey !.gif";
 import { Options } from "../../../apl-backend/types/options";
 import { DashboardDTO } from "../../../electron/main/Electron-Backend/types/Dashboard";
-
-const TIME_SYNC_INTERVAL = 60 * 1000;
-const THIRTY_MINUTES = 30 * 60 * 1000;
-const router = useRouter();
 
 const generating_report = ref<boolean>(false);
 const syncing = ref<boolean>(false);
@@ -33,24 +24,16 @@ const disableActionButtons = computed(
   () => generating_report.value || syncing.value
 );
 
-onUnmounted(() => {
-  intervals.forEach((x) => clearInterval(x));
-  intervals.length = 0;
-  dto.value = undefined;
-});
-
 async function generateReport() {
   try {
     generating_report.value = true;
-    const maybe: Maybe<DashboardDTO> = await window.ipcRenderer.invoke(
-      "GenerateReport"
-    );
+    const maybe: Maybe<DashboardDTO> =
+      await window.ipcRenderer.invoke("GenerateReport");
     if (!("error" in maybe)) {
       dto.value = maybe;
     }
   } catch (error) {
     console.error("Error generating report:", error);
-    // TODO : Handle error (e.g., show error message to user)
   } finally {
     generating_report.value = false;
   }
@@ -59,28 +42,20 @@ async function generateReport() {
 async function sync() {
   syncing.value = true;
   try {
-    const maybe: Maybe<DashboardDTO> = await window.ipcRenderer.invoke("Sync");
-
-    console.log(maybe);
-    if (!("error" in maybe)) {
+    const maybe: DashboardDTO | undefined =
+      await window.ipcRenderer.invoke("Sync");
+    if (maybe) {
       dto.value = maybe;
-      lastSyncTime.value = getLastSyncTime();
     }
   } catch (error) {
     console.error("Error syncing:", error);
   } finally {
     syncing.value = false;
+    lastSyncTime.value = getLastSyncTime();
   }
 }
 
-window.ipcRenderer.on("SetSync", (evt, newSync: boolean) => {
-  generating_report.value = newSync;
-});
-
-onUnmounted(() => {
-  intervals.forEach((x) => clearInterval(x));
-  intervals.length = 0;
-});
+window.ipcRenderer.on("SetSync", (evt, newSync: boolean) => {});
 
 onMounted(async () => {
   window.ipcRenderer.invoke("GetConfig").then((data: Options) => {
@@ -89,39 +64,26 @@ onMounted(async () => {
 
   try {
     syncing.value = true;
-    const data: DashboardDTO = await window.ipcRenderer.invoke(
-      "Get-Dashboard-DTO"
-    );
+    const data: DashboardDTO =
+      await window.ipcRenderer.invoke("Get-Dashboard-DTO");
     console.log(data);
     dto.value = data;
-
-    if (data.syncCount == 1) {
-      firstDialog.value = true;
-    }
 
     await sync();
     const s = await window.ipcRenderer.invoke("isSyncing");
     generating_report.value = s;
+    console.log("generating_report.value", generating_report.value);
   } catch (error) {
     console.error("Error fetching dashboard data:", error);
   }
-
-  intervals.push(
-    setInterval(() => {
-      sync();
-    }, THIRTY_MINUTES)
-  );
-
-  intervals.push(
-    setInterval(() => {
-      lastSyncTime.value = getLastSyncTime();
-    }, TIME_SYNC_INTERVAL)
-  );
 });
 
-const intervals: Timer[] = [];
+window.ipcRenderer.on("ShowWelcomeMessage", () => {
+  firstDialog.value = true;
+});
 
 const getLastSyncTime = () => {
+  console.log("Lastsynctime : " + dto.value?.lastSyncTime);
   if (!dto.value?.lastSyncTime) return "";
   return dayjs.duration(-dayjs().diff(dto.value.lastSyncTime)).humanize(true);
 };
@@ -142,13 +104,10 @@ const closeFirstDialog = () => {
   >
     <template #container="{ closeCallback }">
       <div class="w-full relative">
-        <img :src="GrainyColor" class="rounded-lg w-full h-full" />
+        <img :src="Hey" class="rounded-lg w-full h-full" />
         <div
           class="absolute inset-0 flex items-center justify-center text-3xl font-bold gap-5"
-        >
-          <img :src="Logo" class="w-14 h-14 mr-2 bg-black" />
-          <div>Hey! ✌️</div>
-        </div>
+        ></div>
       </div>
       <div
         class="font-bold flex flex-col gap-4 py-6 px-5 bg-black rounded-b-[1rem]"
@@ -168,7 +127,7 @@ const closeFirstDialog = () => {
           We're super excited to see what your learning journey looks like!
         </div>
         <Button severity="info" v-on:click="closeFirstDialog">
-          <div class="text-white">Understood!</div>
+          <div class="text-black">Understood!</div>
         </Button>
       </div>
     </template>
@@ -180,41 +139,45 @@ const closeFirstDialog = () => {
     <ProgressSpinner />
   </div>
   <div v-else class="flex flex-col w-full h-full overflow-auto">
-    <div class="flex flex-col flex-grow w-full h-full">
+    <div
+      style="
+        display: flex;
+        flex-direction: column;
+        /* ensure scroll or clip occurs if overflow */
+        height: 100%;
+      "
+      class="flex flex-col flex-grow w-full h-full items-center my-5"
+    >
+      <div class="mt-auto"></div>
       <div
-        class="flex w-full h-20 items-center px-10 my-5 justify-between gap-5"
+        class="flex w-[45rem] 1720:w-[91rem] h-20 items-center mb-5 justify-between gap-5"
       >
         <div>
           <img
-            v-if="dto.profile_picture.isUrl"
-            :src="dto.profile_picture.buffer"
+            :src="`${dto.profile_picture}?v=${dayjs().valueOf()}`"
             class="w-16 h-16 rounded-full dark:bg-black bg-white border-2 dark:border-[#e0e0e0] border-[#3d3e42]"
           />
-          <div v-else>
-            <img
-              :src="'data:image/png;base64,' + dto.profile_picture.buffer"
-              class="w-16 h-16 rounded-full dark:bg-black bg-white border-2 dark:border-[#e0e0e0] border-[#3d3e42]"
-            />
-          </div>
         </div>
         <div class="flex flex-col w-0 flex-grow text-black dark:text-white">
           <h1
-            class="flex items-center gap-2 bg-gradient-to-r text-lg xl:text-2xl font-bold"
+            class="flex items-center gap-2 bg-gradient-to-r text-lg 1720:text-2xl font-bold"
           >
-            <span class="w-f">Welcome back,</span>
+            <span class="whitespace-nowrap">Welcome back,</span>
 
             <div v-if="dto.userName == undefined">
               <Skeleton width="10rem" height="2rem" />
             </div>
-            <div class="flex-grow truncate" v-else>{{ dto.userName }} !</div>
+            <div v-else class="flex-grow truncate">
+              {{ dto.userName }}
+            </div>
           </h1>
           <div class="flex items-center syncNowButton">
             <div
-              class="xl:text-base text-sm font-bold flex items-center gap-1.5"
+              class="1720:text-base text-sm font-bold flex items-center gap-1.5"
             >
               Last synced
               <div v-if="lastSyncTime == ''">
-                <Skeleton width="10.2rem" height="1.5rem" />
+                <Skeleton width="8rem" height="1.5rem" />
               </div>
               <div v-else>
                 {{ lastSyncTime }}
@@ -227,14 +190,15 @@ const closeFirstDialog = () => {
               @click="() => sync()"
               :loading="disableActionButtons"
             >
-              <span class="font-semibold text-[#22A7D1] xl:text-base text-sm"
+              <span
+                class="font-semibold text-[var(--primary-color)] 1720:text-base text-sm"
                 >Sync Now</span
               >
               <i
                 :class="[
                   'pi',
                   disableActionButtons ? 'pi-spinner pi-spin' : 'pi-sync',
-                  'text-[#00E0FF]',
+                  'text-[var(--primary-color)]',
                 ]"
               />
             </Button>
@@ -247,43 +211,45 @@ const closeFirstDialog = () => {
             severity="info"
             @click="generateReport"
             :disabled="disableActionButtons"
-            aschild
+            class="flex items-center !rounded-full px-6 py-3 h-[2.5rem]"
           >
-            <i class="pi pi-plus-circle text-white mr-2" />
-            <span class="text-white font-bold">Generate Report</span>
+            <i class="pi pi-plus-circle text-white text-xl mr-2"></i>
+
+            <span class="text-white font-bold text-lg">Generate Report</span>
           </Button>
           <div
-            :class="`flex rounded-md bg-white h-8 text-black overflow-hidden ${
+            :class="`flex rounded-md bg-white h-8 text-black overflow-hidden z-10 ${
               disableActionButtons ? 'opacity-50' : ''
             }`"
-            v-if="config?.general.autogen.enabled"
+            v-if="true"
           >
-            <div class="bg-[#22A7D1] p-2">
+            <div class="bg-[var(--primary-color)] p-2">
               <img :src="Report" class="w-full h-full" />
             </div>
             <div
-              :class="`flex items-center px-2 font-semibold xl:text-base xl:mx-2 text-xs`"
+              :class="`flex items-center px-2 font-semibold 1720:text-base xl:mx-2 text-xs`"
             >
               <div>
                 New generated report
-                {{ dayjs(dto.nextReport).fromNow() }}
+                {{ dayjs(dto?.nextReport).fromNow() }}
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="flex w-full px-10 flex-grow 1720:mt-10">
+      <div class="flex w-full px-10 1720:mt-10">
         <DashboardBody :dto="dto" :syncing="generating_report" />
       </div>
+      <div class="mt-auto"></div>
     </div>
   </div>
 </template>
 
 <style>
 .generateButton > .p-button-info {
-  background-color: #22a7d1 !important;
-  border: 1px solid #22a7d1 !important;
+  background-color: var(--primary-color) !important;
+  border: 1px solid var(--primary-color) !important;
 }
 
 .syncNowButton > .p-button {

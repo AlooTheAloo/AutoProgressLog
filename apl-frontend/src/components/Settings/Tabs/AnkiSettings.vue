@@ -8,7 +8,6 @@ import SettingsPathPicker from "../Common/SettingsPathPicker.vue";
 import SettingsField from "../Common/SettingsField.vue";
 import Button from "primevue/button";
 import SettingsRadioSet from "../Common/SettingsRadioSet.vue";
-import { deck } from "../../../../apl-backend/config/configAnkiIntegration";
 import MultiSelect from "primevue/multiselect";
 import SettingsMultiSelect from "../Common/SettingsMultiSelect.vue";
 import Dialog from "primevue/dialog";
@@ -19,9 +18,11 @@ import AccordionHeader from "primevue/accordionheader";
 import AccordionContent from "primevue/accordioncontent";
 import Password from "primevue/password";
 import ProgressSpinner from "primevue/progressspinner";
+import AnkiIcon from "../../../assets/ank.png";
+import { deck } from "../../../../electron/main/Electron-Backend/SetupConfigBuilder";
 
 interface algorithm {
-  key: string;
+  key: RetentionMode;
   name: string;
 }
 
@@ -30,8 +31,8 @@ const props = defineProps<{
 }>();
 
 const retentionAlgorithms: algorithm[] = [
-  { key: "true_retention", name: "TrueRetention (recommended)" },
-  { key: "default_anki", name: "Default Anki Retention" },
+  { key: "TRUE_RETENTION", name: "TrueRetention (recommended)" },
+  { key: "ANKI_DEFAULT", name: "Default Anki Retention" },
 ];
 
 const emit = defineEmits<{
@@ -51,53 +52,88 @@ const ankiTestPassed = ref<boolean>(false);
 const canTest = ref<boolean>(true);
 
 const decks = ref<deck[]>([]);
-const selectedDecks = ref<number[]>([]);
+const selectedDecks = ref<string[]>([]);
 
 const easyAnkiVisible = ref<boolean>(false);
 const easy_username = ref<string>("");
 const easy_password = ref<string>("");
 const easy_url = ref<string>("https://sync.ankiweb.net");
 
-function updateTrackedDecks(value: number[]) {
-  if (props.config?.anki?.options == undefined) return;
+function updateTrackedDecks(value: string[]) {
+  if (props.config?.serverOptions.ankiOptions.options == undefined) return;
   emit("update:config", {
     ...props.config,
-    anki: {
-      ...props.config.anki,
-      options: { ...props.config.anki.options, trackedDecks: value },
+    serverOptions: {
+      ...props.config.serverOptions,
+      ankiOptions: {
+        enabled: true,
+        options: {
+          ...props.config.serverOptions.ankiOptions.options,
+          trackedDecks: value,
+        },
+      },
+    },
+  });
+}
+
+function updateAnkiUrl(value: string) {
+  if (props.config?.serverOptions.ankiOptions.options == undefined) return;
+  emit("update:config", {
+    ...props.config,
+    serverOptions: {
+      ...props.config.serverOptions,
+      ankiOptions: {
+        enabled: true,
+        options: {
+          ...props.config.serverOptions.ankiOptions.options,
+          url: value,
+        },
+      },
     },
   });
 }
 
 function updateRetentionAlgorithm(value: RetentionMode) {
-  if (props.config?.anki?.options == undefined) return;
+  console.log("updated to value is " + value);
+  if (props.config?.serverOptions.ankiOptions.options == undefined) return;
   emit("update:config", {
     ...props.config,
-    anki: {
-      ...props.config.anki,
-      options: { ...props.config.anki.options, retentionMode: value },
+    serverOptions: {
+      ...props.config.serverOptions,
+      ankiOptions: {
+        enabled: true,
+        options: {
+          ...props.config.serverOptions.ankiOptions.options,
+          retentionMode: value,
+        },
+      },
     },
   });
 }
 
+watch(props, () => {
+  if (props.config?.serverOptions.ankiOptions.options == undefined) return;
+  selectedDecks.value =
+    props.config?.serverOptions.ankiOptions.options?.trackedDecks;
+});
+
 function testKey() {
-  if (props.config?.anki.ankiIntegration == undefined) return;
+  if (props.config?.serverOptions.ankiOptions.options == undefined) return;
   testing_connection.value = true;
+  const opts = props.config.serverOptions.ankiOptions.options;
+  console.log("opts is " + JSON.stringify(opts));
   window.ipcRenderer
-    .invoke(
-      "test-anki-connection-key",
-      props.config.anki.ankiIntegration.key,
-      props.config.anki.ankiIntegration.url
-    )
+    .invoke("test-anki-connection-key", opts.ankiToken, opts.url)
     .then((retVal: { worked: boolean; decks: deck[]; key: string }) => {
       console.log("received " + JSON.stringify(retVal));
-      if (props.config?.anki.ankiIntegration == undefined) return;
       ankiTestPassed.value = retVal.worked;
+      if (opts == undefined) return;
       canTest.value = true;
       if (retVal.worked) {
-        setKey(retVal.key, props.config.anki.ankiIntegration.url);
+        setKey(retVal.key, opts.url);
         decks.value = retVal.decks;
-        selectedDecks.value = props.config?.anki?.options?.trackedDecks ?? [];
+        selectedDecks.value = opts.trackedDecks ?? [];
+        console.log("decks selected : " + selectedDecks.value);
       }
       testing_connection.value = false;
       emit("ankitest:worked", retVal.worked);
@@ -108,15 +144,18 @@ function setKey(key: string, url: string) {
   if (props.config == undefined) return;
   emit("update:config", {
     ...props.config,
-    anki: {
-      enabled: true,
-      ankiIntegration: {
-        key: key,
-        url: url,
-      },
-      options: props.config?.anki.options ?? {
-        retentionMode: "true_retention",
-        trackedDecks: [],
+    serverOptions: {
+      ...props.config.serverOptions,
+      ankiOptions: {
+        enabled: true,
+        options: {
+          ...(props.config.serverOptions.ankiOptions.options ?? {
+            retentionMode: "TRUE_RETENTION",
+            trackedDecks: [],
+          }),
+          ankiToken: key,
+          url: url,
+        },
       },
     },
   });
@@ -132,12 +171,17 @@ function testConnection() {
       url: easy_url.value,
     })
     .then((retVal: { worked: boolean; decks: deck[]; key: string }) => {
+      console.log("retval is " + retVal);
       if (props.config == undefined) return;
       ankiTestPassed.value = retVal.worked;
       canTest.value = true;
       if (retVal.worked) {
+        console.log(
+          "decks selected : " + JSON.stringify(props.config?.serverOptions)
+        );
         decks.value = retVal.decks;
-        selectedDecks.value = props.config?.anki?.options?.trackedDecks ?? [];
+        selectedDecks.value =
+          props.config?.serverOptions.ankiOptions.options?.trackedDecks ?? [];
         easyAnkiVisible.value = false;
         setKey(retVal.key, easy_url.value);
       }
@@ -147,15 +191,18 @@ function testConnection() {
 }
 
 function updateAnkiHostKey(value: string) {
-  if (props.config == undefined) return;
+  if (props.config?.serverOptions.ankiOptions.options == undefined) return;
   emit("update:config", {
     ...props.config,
-    anki: {
-      ...props.config.anki,
-      ankiIntegration:
-        props.config.anki.ankiIntegration == undefined
-          ? undefined
-          : { ...props.config.anki.ankiIntegration, key: value },
+    serverOptions: {
+      ...props.config.serverOptions,
+      ankiOptions: {
+        enabled: true,
+        options: {
+          ...props.config.serverOptions.ankiOptions.options,
+          ankiToken: value,
+        },
+      },
     },
   });
 }
@@ -163,7 +210,13 @@ function updateAnkiHostKey(value: string) {
 function updateAnki(value: boolean) {
   if (props.config == undefined) return;
   const savedConfig = props.config;
-  emit("update:config", { ...props.config, anki: { enabled: false } });
+  emit("update:config", {
+    ...props.config,
+    serverOptions: {
+      ...props.config.serverOptions,
+      ankiOptions: { enabled: false },
+    },
+  });
   if (!value) {
     emit("danger", {
       title: "Are you sure?",
@@ -177,23 +230,25 @@ function updateAnki(value: boolean) {
       },
       onNo: () => {
         if (props.config == undefined) return;
+
         emit("danger", undefined);
-        emit("update:config", { ...props.config, anki: { enabled: false } });
+
         emit("update:config", savedConfig);
       },
     });
   } else {
     emit("update:config", {
       ...props.config,
-      anki: {
-        enabled: true,
-        ankiIntegration: props.config.anki.ankiIntegration ?? {
-          key: "",
-          url: "https://sync.ankiweb.net",
-        },
-        options: props.config.anki.options ?? {
-          retentionMode: "true_retention",
-          trackedDecks: [],
+      serverOptions: {
+        ...props.config.serverOptions,
+        ankiOptions: {
+          enabled: true,
+          options: {
+            retentionMode: "TRUE_RETENTION",
+            trackedDecks: [],
+            ankiToken: "",
+            url: "",
+          },
         },
       },
     });
@@ -278,22 +333,32 @@ function updateAnki(value: boolean) {
     </div>
   </Dialog>
 
-  <div class="flex flex-col w-full gap-5 flex-grow" v-if="config != undefined">
+  <div
+    class="flex flex-col w-full gap-4 pt-6 flex-grow"
+    v-if="config != undefined"
+  >
     <div class="flex items-center h-12 gap-3">
       <h1 class="text-2xl font-bold dark:text-white text-black">
         Connection settings
       </h1>
+    </div>
+    <div class="flex items-center gap-4 mb-2">
+      <!-- match the same label styling/width used elsewhere -->
+      <label class="text-white font-semibold w-48"> Anki Setup </label>
+
       <Button
-        class="w-fit h-10"
-        v-on:click="easyAnkiVisible = true"
+        class="w-[250px] p-3 ml-[5.5rem] !rounded-full font-bold flex items-center"
+        @click="easyAnkiVisible = true"
         :loading="testing_connection"
       >
+        <img :src="AnkiIcon" alt="Anki" class="w-7 h-7 mr-2 flex-shrink-0" />
         Easy Anki setup
       </Button>
     </div>
 
+    {{ props.config?.serverOptions.ankiOptions.enabled }}
     <SettingsToggle
-      :value="config.anki.enabled"
+      :value="props.config?.serverOptions.ankiOptions.enabled ?? false"
       label="Synchronize Anki"
       help-text="When enabled, synchronizes and updates your Anki retention rate, mature cards and reviews with APL."
       @update:value="updateAnki"
@@ -301,40 +366,47 @@ function updateAnki(value: boolean) {
     />
 
     <SettingsField
-      :value="props.config?.anki.ankiIntegration?.key"
+      :value="props.config?.serverOptions.ankiOptions.options?.ankiToken"
       label="Anki Host Key"
       help-text="Your Anki Host key can be generated using the easy anki setup button above."
       @update:value="updateAnkiHostKey"
       password
-      :disabled="testing_connection"
+      :disabled="
+        testing_connection || !props.config?.serverOptions.ankiOptions.enabled
+      "
     >
     </SettingsField>
 
     <SettingsField
-      :value="props.config?.anki.ankiIntegration?.url"
+      :value="props.config?.serverOptions.ankiOptions.options?.url"
       label="Anki Backend URL"
       help-text="If you are using a self-hosted Anki backend, you can enter the URL here. Do not include the trailing slash."
-      :disabled="testing_connection"
-    >
-    </SettingsField>
+      :disabled="
+        testing_connection || !props.config?.serverOptions.ankiOptions.enabled
+      "
+      @update:value="updateAnkiUrl"
+    />
+
+    <div class="mt-2 ml-[18.5rem]">
+      <Button
+        class="w-[250px] p-3 !rounded-full font-bold"
+        @click="testKey"
+        :loading="testing_connection"
+        :disabled="!props.config?.serverOptions.ankiOptions.options?.ankiToken"
+      >
+        Test Anki connection
+      </Button>
+    </div>
 
     <div class="flex items-center h-12 gap-3">
       <h1 class="text-2xl font-bold dark:text-white text-black">
         Synchronization settings
       </h1>
-      <Button
-        class="w-fit h-10"
-        v-on:click="testKey"
-        :loading="testing_connection"
-        :disabled="props.config?.anki.ankiIntegration == null"
-      >
-        Test key
-      </Button>
     </div>
     <div class="flex flex-col w-full gap-5 flex-grow">
       <SettingsRadioSet
         :disabled="!ankiTestPassed || testing_connection"
-        :value="config.anki.options?.retentionMode"
+        :value="config.serverOptions.ankiOptions.options?.retentionMode"
         label="Retention Algorithm"
         help-text="The algorithm to use for retention calculations. The default is TrueRetention, which is the recommended algorithm."
         @update:value="updateRetentionAlgorithm"

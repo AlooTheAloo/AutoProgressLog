@@ -2,7 +2,7 @@
 .DS_Store
 
 apl-frontend/bun.lockb
-*/.env
+apl-server/.env.server
 apl-frontend/apl-backend/apl-visuals/visuals/report-data.json
 apl-frontend/apl-backend/apl-visuals/visuals/report-layout.json
 

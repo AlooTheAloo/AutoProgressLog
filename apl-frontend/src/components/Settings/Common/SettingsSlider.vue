@@ -71,7 +71,7 @@ function updateValue(value: number | number[]) {
       </div>
     </div>
     <div>
-      <p>
+      <p class="w-20">
         {{ endText }}
       </p>
     </div>

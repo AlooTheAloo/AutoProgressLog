@@ -4,7 +4,9 @@ import fs from "fs";
 import { SemVer, parse } from "semver";
 import { Version, appVersion } from "../consts/versioning.js";
 import { cache_location } from "./getConfig.js";
+import { Logger } from "./Log.js";
 
+// TODO: THIS ENTIRE THING GOTTA GO
 export class CacheManager {
   static setVersion = (version: string) => {
     this.set(
@@ -25,8 +27,7 @@ export class CacheManager {
 
   static exists = fs.existsSync(cache_location);
   static init = (time: number, cards: number) => {
-    console.log("Init time");
-
+    Logger.log(`Initializing cache manager`);
     this.set({
       list: [
         {
@@ -47,7 +48,6 @@ export class CacheManager {
         },
       ],
     });
-    console.log("Cache initialized");
   };
 
   static peek = () => {

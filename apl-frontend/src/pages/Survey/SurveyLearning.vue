@@ -37,12 +37,13 @@ import { useRouter } from "vue-router";
 import { onMounted, ref, watch } from "vue";
 import SelectButton from "primevue/selectbutton";
 import { useWindowSize } from "@vueuse/core";
-import { motion } from 'motion-v';
+import { motion } from "motion-v";
+import PlexusEffect from "../../components/Common/PlexusEffect.vue";
 
 const active = ref<string | undefined>("0");
 const panel = defineModel<number>("a");
 const selectedYears = defineModel<{ label: string; value: string } | undefined>(
-  "years",
+  "years"
 );
 const selectedLanguage = defineModel<
   { label: string; value: string } | undefined
@@ -201,7 +202,7 @@ function NextPage() {
     .invoke(
       "answer-survey-language",
       selectedLanguage.value?.value,
-      parseInt(selectedYears.value?.value ?? "-2"),
+      parseInt(selectedYears.value?.value ?? "-2")
     )
     .then((res: any) => {
       router.push("/survey/apps");
@@ -210,34 +211,48 @@ function NextPage() {
 </script>
 
 <template>
-  <SetupBackground/>
+  <SetupBackground />
+  <div
+    :style="{
+      backgroundImage: `linear-gradient(to bottom right, #add8ff, #d8b4fe)`,
+    }"
+    class="relative flex items-center justify-start h-screen pl-12"
+  >
+    <PlexusEffect class="absolute inset-0 z-0" />
 
-  <div class="flex w-screen">
+    <!-- Card -->
     <div
-      class="p-4 sm:p-12
-             flex flex-col justify-between
-             h-screen w-full max-w-[60rem] bg-black"
+      class="relative z-10 bg-black rounded-3xl p-12 flex flex-col justify-between items-start h-[90vh] max-h-[946px] w-full max-w-[899px] min-w-[600px]"
     >
       <div class="flex w-full items-center justify-between mb-6">
-        <img :src="Logo" alt="APL Logo" class="w-16 h-16 sm:w-20 sm:h-20"/>
-        <AccountDisplay/>
+        <img :src="Logo" alt="APL Logo" class="w-16 h-16 sm:w-20 sm:h-20" />
+        <AccountDisplay />
       </div>
       <motion.div
         :initial="{ opacity: 0, y: 20, filter: 'blur(10px)' }"
-        :animate="{ opacity: 1, y: 0, filter: 'blur(0px)', transition:{ duration: 0.6 } }"
+        :animate="{
+          opacity: 1,
+          y: 0,
+          filter: 'blur(0px)',
+          transition: { duration: 0.6 },
+        }"
         class="flex flex-col flex-1 space-y-6"
       >
         <h1
-          class="text-xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl
-                 font-semibold text-white leading-tight"
+          class="text-xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-semibold text-white leading-tight"
         >
           Tell us more about your learning journey.
         </h1>
-        <p class="text-xs sm:text-sm lg:text-base text-[#C0C0C0] leading-relaxed">
+        <p
+          class="text-xs sm:text-sm lg:text-base text-[#C0C0C0] leading-relaxed"
+        >
           We’d love to know which language you’re studying and for how long.
         </p>
 
-        <Accordion v-model:value="active" class="bg-[#18181B] rounded-lg p-2 space-y-4">
+        <Accordion
+          v-model:value="active"
+          class="bg-[#18181B] rounded-lg p-2 space-y-4"
+        >
           <AccordionPanel value="0">
             <AccordionHeader>
               <div class="font-semibold text-white text-2xl">
@@ -246,19 +261,24 @@ function NextPage() {
             </AccordionHeader>
             <AccordionContent>
               <p class="pb-4 text-[#C0C0C0]">
-                If you study multiple, choose the one you feel most comfortable with.
+                If you study multiple, choose the one you feel most comfortable
+                with.
               </p>
               <Listbox
                 v-model="selectedLanguage"
                 :options="languageList"
                 optionLabel="label"
-                :scrollHeight="height > 800 ? '300px' : height/3 + 'px'"
+                :scrollHeight="height > 800 ? '215px' : height / 3 + 'px'"
                 class="w-full"
               >
                 <template #option="{ option }">
-                  <div class="flex items-center gap-2 p-2 hover:bg-zinc-800 rounded cursor-pointer">
+                  <div
+                    class="flex items-center gap-2 p-2 hover:bg-zinc-800 rounded cursor-pointer"
+                  >
                     <span class="w-6" v-html="option.flag"></span>
-                    <span class="text-white font-semibold">{{ option.label }}</span>
+                    <span class="text-white font-semibold">{{
+                      option.label
+                    }}</span>
                   </div>
                 </template>
               </Listbox>
@@ -275,38 +295,44 @@ function NextPage() {
                 A rough estimate is fine—pick the closest range.
               </p>
               <SelectButton
-              v-model="selectedYears"
-              :options="timeList"
-              optionLabel="label"
-              dataKey="value"
-              class="w-full"
-              :optionStyle="{ width: '100%' }"
-            >
-              <template #option="{ option }">
-                <div
-                  v-tooltip.bottom="{
-                    value: option.description,
-                    pt: {
-                      arrow: { style: {} },
-                      text: { style: { fontSize: '0.8rem', textAlign: 'center', color: 'white' } }
-                    }
-                  }"
-                  class="w-full text-center px-4 py-2 hover:bg-zinc-800 rounded cursor-pointer text-white"
-                >
-                  {{ option.label }}
-                </div>
-              </template>
-            </SelectButton>
+                v-model="selectedYears"
+                :options="timeList"
+                optionLabel="label"
+                dataKey="value"
+                class="w-full"
+                :optionStyle="{ width: '100%' }"
+              >
+                <template #option="{ option }">
+                  <div
+                    v-tooltip.bottom="{
+                      value: option.description,
+                      pt: {
+                        arrow: { style: {} },
+                        text: {
+                          style: {
+                            fontSize: '0.8rem',
+                            textAlign: 'center',
+                            color: 'white',
+                          },
+                        },
+                      },
+                    }"
+                    class="w-full text-center px-4 py-2 hover:bg-zinc-800 rounded cursor-pointer text-white"
+                  >
+                    {{ option.label }}
+                  </div>
+                </template>
+              </SelectButton>
             </AccordionContent>
           </AccordionPanel>
         </Accordion>
       </motion.div>
 
-      <div class="flex justify-end mt-8">
+      <div class="w-full flex justify-end mt-8">
         <Button
           label="Continue"
           @click="NextPage"
-          class="w-[300px] p-3 !rounded-full"
+          class="w-[300px] p-3 rounded-full"
           :disabled="!selectedLanguage || !selectedYears"
         />
       </div>

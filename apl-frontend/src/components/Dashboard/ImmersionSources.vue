@@ -62,34 +62,6 @@ const dateString = computed(() => {
 });
 
 const sortedSources = computed(() => {
-  return [
-    {
-      name: "Youtube",
-      relativeValue: 300,
-      hr: "caca",
-    },
-    {
-      name: "Tiktok",
-      relativeValue: 300,
-      hr: "caca",
-    },
-    {
-      name: "Netflix",
-      relativeValue: 300,
-      hr: "caca",
-    },
-    {
-      name: "Anime",
-      relativeValue: 200,
-      hr: "pipi",
-    },
-    {
-      name: "Podcasts",
-      relativeValue: 100,
-      hr: "prout",
-    },
-  ];
-
   console.log("time to sort" + computedSources.value);
   const sort = computedSources.value.sort(
     (a, b) => b.relativeValue - a.relativeValue
@@ -132,7 +104,7 @@ const colors = computed(() => {
 });
 
 let gradient = new NWayInterpol(
-  "#24CAFF",
+  "#8B61D0",
   "#73D562",
   "#D57AFF",
   "#F74E8F",
@@ -216,7 +188,7 @@ let series /* Literally a calculus reference */ = computed(() => {
 
 <template>
   <div
-    class="flex flex-col text-black dark:text-white bg-[#ebebec] dark:bg-black rounded-lg w-0 flex-grow pt-5 border-2 border-transparent hover:border-[#22A7D1] trantiton-all duration-200"
+    class="flex flex-col text-black dark:text-white bg-[#ebebec] dark:bg-black rounded-lg w-0 flex-grow pt-5 border-2 border-transparent hover:border-[var(--primary-color)] trantiton-all duration-200"
   >
     <div class="flex font-extrabold 1720:text-2xl text-xl px-5">
       Immersion in the last 30 days
@@ -226,7 +198,7 @@ let series /* Literally a calculus reference */ = computed(() => {
     >
       {{ dateString }}
     </div>
-    <div class="flex">
+    <div class="flex items-center h-full">
       <!-- Left Section -->
       <div class="flex flex-col px-5 justify-center w-1/2">
         <!-- Title -->
@@ -258,7 +230,8 @@ let series /* Literally a calculus reference */ = computed(() => {
 
       <!-- List Section -->
       <ul
-        class="max-w-[21.5rem] 1720:flex hidden divide-black/60 dark:divide-white/60 w-fit mr-4 divide-y divide-dashed dark:text-white text-black flex-col justify-center"
+        style=""
+        class="min-w-[21.5rem] 1720:flex hidden divide-black/60 dark:divide-white/60 w-fit mr-4 divide-y divide-dashed dark:text-white text-black flex-col justify-center"
       >
         <li
           v-for="(x, i) in sortedSources"
@@ -271,9 +244,10 @@ let series /* Literally a calculus reference */ = computed(() => {
             }"
             class="w-5 h-3 rounded-md min-w-5"
           />
-          <p class="overflow-hidden truncate text-base font-normal">
+          <p class="overflow-hidden truncate text-base font-normal flex-grow">
             {{ x.name }}
           </p>
+          <p class="font-bold">{{ (x.relativeValue / 3600).toFixed(2) }} h</p>
         </li>
       </ul>
     </div>

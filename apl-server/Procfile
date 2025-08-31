@@ -1,0 +1,2 @@
+release: bunx prisma migrate deploy
+web: bun run start

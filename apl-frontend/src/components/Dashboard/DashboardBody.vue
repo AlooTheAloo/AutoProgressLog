@@ -8,6 +8,7 @@ import Calendar from "../../assets/Icons/calendar.png";
 
 import AppSmallWidget from "./AppSmallWidget.vue";
 import { computed } from "vue";
+//@ts-ignore
 import pluralize from "pluralize";
 import ImmersionSources from "./ImmersionSources.vue";
 import Skeleton from "primevue/skeleton";
@@ -59,7 +60,7 @@ const bottomText = computed(() => {
     <!-- Main Container -->
     <div class="flex flex-col justify-center gap-3 h-fit w-fit items-center">
       <!-- First Row -->
-      <div class="flex flex-wrap gap-3 justify-center">
+      <div class="flex gap-3 justify-center flex-col 1720:flex-row">
         <!-- Small Widgets Row -->
         <div class="flex flex-row gap-3 w-[45rem]">
           <Skeleton width="50%" height="9rem" />
@@ -72,8 +73,9 @@ const bottomText = computed(() => {
         </div>
       </div>
       <!-- Immersion Sources Section -->
-      <div class="flex-grow flex justify-start w-[45rem] xl:w-full">
-        <Skeleton :height="width > 1280 ? '40rem' : '24rem'" />
+      <div class="flex-grow flex justify-start w-[45rem] 1720:w-full gap-3">
+        <Skeleton :height="'24rem'" />
+        <Skeleton :height="'24rem'" />
       </div>
     </div>
   </div>
@@ -123,7 +125,8 @@ const bottomText = computed(() => {
               units="%"
               :value="{
                 current: dto.ankiDTO.retentionRate.toFixed(2),
-                delta: dto.ankiDTO.retentionRateDelta.toString(),
+                delta:
+                  dto.ankiDTO.retentionRateDelta.toFixed(2).toString() + '%',
               }"
               :image="Brain"
               :direction="dto.ankiDTO.retentionRateDelta"
@@ -147,7 +150,7 @@ const bottomText = computed(() => {
             />
           </div>
           <div v-else>
-            <div class="hidden xl:flex">
+            <div class="hidden 1720:flex">
               <motion.div
                 :initial="{
                   opacity: 0,
@@ -188,7 +191,7 @@ const bottomText = computed(() => {
         :transition="{
           delay: 0.1,
         }"
-        class="flex-grow flex justify-start w-[45rem] 1720:w-full gap-3"
+        class="flex-grow flex justify-start w-[45rem] h-[25rem] 1720:w-full gap-3"
       >
         <ImmersionSources :sources="dto.immersionDTO.immersionSources" />
         <ImmersionStreak :streak="dto.immersionDTO.immersionStreak" />

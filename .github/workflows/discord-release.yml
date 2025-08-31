@@ -1,0 +1,19 @@
+      - name: Notify via custom curl
+        run: |
+          curl -H "Content-Type: application/json" \
+            -X POST \
+            -d '{
+              "content": "${{ env.ROLES_TO_PING }}",
+              "embeds": [{
+                "title": "🚀 Release ${{ github.event.release.tag_name }}",
+                "description": "${{ github.event.release.body }}",
+                "url": "${{ github.event.release.html_url }}",
+                "color": 3066993,
+                "timestamp": "${{ github.event.release.published_at }}"
+              }],
+              "allowed_mentions": {
+                "roles": [1389478053712892065, 1389477717304545350]
+              }
+            }' ${{ secrets.DISCORD_WEBHOOK }}
+        env:
+          ROLES_TO_PING: "<@&1389478053712892065> <@&1389477717304545350>"

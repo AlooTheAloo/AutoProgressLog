@@ -21,6 +21,10 @@ const unsubscribe = ThemeManager.onThemeChange((newTheme) => {
   theme.value = newTheme;
 });
 
+onMounted(() => {
+  console.log("Theme is " + theme.value);
+});
+
 onUnmounted(() => {
   unsubscribe();
 });
@@ -124,6 +128,8 @@ const options = computed<ApexOptions>(() => {
   };
 });
 
+const SECONDS_IN_HOUR = 3600;
+
 const props = defineProps<{
   streak: number[];
 }>();
@@ -131,7 +137,7 @@ const props = defineProps<{
 const series = computed(() => {
   return [
     {
-      data: props.streak,
+      data: props.streak.map((x) => x / SECONDS_IN_HOUR),
     },
   ];
 });
@@ -139,7 +145,7 @@ const series = computed(() => {
 
 <template>
   <div
-    class="flex flex-col text-black dark:text-white bg-[#ebebec] dark:bg-black rounded-lg w-0 flex-grow pt-5 overflow-hidden border-2 border-transparent hover:border-[#22A7D1] trantiton-all duration-200"
+    class="flex flex-col text-black dark:text-white bg-[#ebebec] dark:bg-black rounded-lg w-0 flex-grow pt-5 overflow-hidden border-2 border-transparent hover:border-[var(--primary-color)] trantiton-all duration-200"
   >
     <div class="flex font-extrabold 1720:text-2xl text-xl px-5">
       Immersion Time

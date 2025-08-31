@@ -36,7 +36,7 @@ const value = ref<string>(props.value ?? "");
 
 <template>
   <div class="flex items-center gap-10 w-full h-12">
-    <div class="flex h-full items-center gap-2 w-64">
+    <div class="flex h-12 items-center gap-2 w-64">
       <p>
         {{ label }}
       </p>
@@ -46,8 +46,7 @@ const value = ref<string>(props.value ?? "");
           v-tooltip.top="props.helpText"
           place
           :src="help"
-          :class="`h-4 w-4 mt-2 ${props.link ? 'cursor-pointer' : ''}`"
-          @click="props.link ? openLink() : undefined"
+          class="h-4 w-4 mt-2"
         />
       </div>
     </div>

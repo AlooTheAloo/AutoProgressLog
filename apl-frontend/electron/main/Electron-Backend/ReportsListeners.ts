@@ -6,6 +6,7 @@ import { promises as fsPromises } from "fs";
 import sharp from "sharp";
 import { deleteSyncs } from "../../../apl-backend/Helpers/DataBase/DeleteDB";
 import { isGenerating } from "../../../apl-backend/generate/generate";
+import { Logger } from "../../../apl-backend/Helpers/Log";
 
 type ListReport = {
   id: number;
@@ -155,7 +156,10 @@ export function reportsListeners() {
         })
     );
     const endTime = dayjs();
-    console.log("Images took " + (endTime.diff(startTime, "ms") + " ms"));
+    Logger.log(
+      "Images took " + (endTime.diff(startTime, "ms") + " ms"),
+      "Reports"
+    );
     return {
       start: start,
       images: images,

@@ -2,8 +2,9 @@ import { App, BrowserWindow, Menu, ipcMain } from "electron";
 import { indexHtml, VITE_DEV_SERVER_URL, win } from "..";
 import { getConfig } from "../../../apl-backend/Helpers/getConfig";
 import { shell } from "electron";
+import { APLStorage } from "../Electron-Backend/util/auth";
 
-export function buildMenu(app: App) {
+export async function buildMenu(app: App) {
   const template: Electron.MenuItemConstructorOptions[] = [
     {
       label: app.name, // This will automatically use "Autoprogresslog" as the name
@@ -35,9 +36,15 @@ export function buildMenu(app: App) {
         }, // About menu item
         { type: "separator" },
         {
+          label: "Check for Updates",
+          click: () => {
+            ipcMain.emit("check-for-update");
+          },
+        },
+        {
           label: "Settings",
           accelerator: "CmdOrCtrl+,",
-          enabled: getConfig() != null,
+          enabled: (await APLStorage.get("setupComplete")) ?? false,
           click: () => {
             win?.webContents.send("router-push", "/app/settings");
           },

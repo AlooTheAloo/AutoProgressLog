@@ -14,11 +14,12 @@ import { useToast } from "primevue/usetoast";
 import Toast from "primevue/toast";
 import GeneralSettings from "../../components/Settings/Tabs/GeneralSettings.vue";
 import AccountSettings from "../../components/Settings/Tabs/AccountSettings.vue";
+import { useElementBounding, useWindowSize } from "@vueuse/core";
+import AppearanceSettings from "../../components/Settings/Tabs/AppearanceSettings.vue";
+import { ProgressSpinner, Skeleton } from "primevue";
 import AnkiSettings from "../../components/Settings/Tabs/AnkiSettings.vue";
 import TimeSettings from "../../components/Settings/Tabs/TimeSettings.vue";
 import ReportsSettings from "../../components/Settings/Tabs/ReportsSettings.vue";
-import { useElementBounding, useWindowSize } from "@vueuse/core";
-import AppearanceSettings from "../../components/Settings/Tabs/AppearanceSettings.vue";
 
 const router = useRouter();
 
@@ -35,6 +36,7 @@ const screen = useWindowSize();
 
 onMounted(() => {
   window.ipcRenderer.invoke("GetConfig").then((data: Options) => {
+    console.log("GetConfig", data);
     config.value = data;
     originalConfig.value = data;
   });
@@ -44,12 +46,24 @@ function save() {
   window.ipcRenderer
     .invoke("SetConfig", JSON.stringify(config.value))
     .then((data: Options) => {
+      console.log("new config dropped in : " + JSON.stringify(data));
+
       config.value = data;
       originalConfig.value = data;
       toast.add({
         severity: "success",
         summary: "Changes saved!",
         detail: "The changes were saved successfully.",
+        life: 5000,
+      });
+    })
+    .catch((e) => {
+      console.error("Failed to save config:", e);
+      toast.add({
+        severity: "error",
+        summary: "Failed to save changes!",
+        detail:
+          "Failed to save changes. Make sure all fields are valid and try again.",
         life: 5000,
       });
     });
@@ -60,6 +74,7 @@ function reset() {
 
 function setConfig(newconfig: Options) {
   config.value = newconfig;
+  console.log("new config dropped in : " + JSON.stringify(newconfig));
 }
 
 function createWarning(warningProps: WarningProps | undefined) {
@@ -116,7 +131,7 @@ function ankiTest(worked: boolean) {
     <div class="flex flex-col flex-grow w-full h-full">
       <div class="flex w-full h-20 items-center px-10 mt-5 justify-between">
         <h1
-          class="bg-gradient-to-r bg-clip-text text-4xl font-extrabold text-transparent from-[#89BDFF] to-[#40ffff]"
+          class="bg-gradient-to-r bg-clip-text text-4xl font-extrabold text-transparent from-[var(--primary-color)] to-[var(--primary-color)]"
         >
           Settings
         </h1>
@@ -127,27 +142,32 @@ function ankiTest(worked: boolean) {
             value="0"
             class="w-full"
             :dt="{
-              activeBarBackground: '#2BFAFA',
-              tabActiveBorderColor: '#2BFAFA',
+              activeBarBackground: 'var(--primary-color)',
+              tabActiveBorderColor: 'var(--primary-color)',
             }"
           >
-            <div class="w-0">
-              <TabList
-                pt:activeBar="my-class"
-                pt:tabList="my-class-2"
-                class="w-0"
-              >
-                <Tab value="0">General</Tab>
-                <Tab value="1">Account</Tab>
-                <Tab value="2">Appearance</Tab>
-                <Tab value="3">Anki</Tab>
-                <Tab value="4">Time Tracking</Tab>
-                <Tab value="5" disabled>Notifications</Tab>
-                <Tab value="6">Reports</Tab>
-              </TabList>
+            <div class="relative w-full">
+              <div
+                class="absolute bottom-0 left-0 w-full border-b border-[#e2e8f0] dark:border-gray-700 z-0"
+              ></div>
+              <div class="w-0 relative z-10">
+                <TabList
+                  pt:activeBar="tablist-bar"
+                  pt:tabList="tablist"
+                  class="w-0"
+                >
+                  <Tab value="0">General</Tab>
+                  <Tab value="1">Account</Tab>
+                  <Tab value="2">Appearance</Tab>
+                  <Tab value="3">Anki</Tab>
+                  <Tab value="4">Time Tracking</Tab>
+                  <Tab value="5" disabled>Notifications</Tab>
+                  <Tab value="6">Reports</Tab>
+                </TabList>
+              </div>
             </div>
-
             <div
+              v-if="config != undefined"
               class="overflow-y-auto"
               ref="settingsParent"
               :style="{
@@ -192,6 +212,19 @@ function ankiTest(worked: boolean) {
                 </TabPanel>
               </TabPanels>
             </div>
+            <div
+              v-else
+              :style="{
+                height: screen.height.value - 200 + 'px',
+              }"
+              class="flex flex-col w-full gap-6 pt-6"
+            >
+              <Skeleton
+                v-for="index in 10"
+                :key="index"
+                style="height: 48px"
+              ></Skeleton>
+            </div>
           </Tabs>
         </div>
       </div>
@@ -205,14 +238,14 @@ function ankiTest(worked: boolean) {
         JSON.stringify(originalConfig) == JSON.stringify(config) ? '4rem' : '',
     }"
   >
-    <div class=" ">
+    <div class="flex gap-4">
       <Button
         :aria-hidden="JSON.stringify(originalConfig) == JSON.stringify(config)"
         :tabindex="
           JSON.stringify(originalConfig) != JSON.stringify(config) ? '0' : '-1'
         "
         @click="save"
-        class="w-72"
+        class="w-48"
         >Save</Button
       >
       <Button
@@ -230,12 +263,12 @@ function ankiTest(worked: boolean) {
 </template>
 
 <style>
-.my-class {
+.tablist-bar {
   height: 4px !important;
   border-radius: 1rem;
 }
 
-.my-class-2 {
+.tablist {
   background-color: transparent !important;
 }
 </style>

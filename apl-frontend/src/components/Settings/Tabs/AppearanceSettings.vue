@@ -17,17 +17,20 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <div class="flex flex-col w-full gap-2" v-if="config != undefined">
+  <div class="flex flex-col w-full gap-6 pt-6" v-if="config != undefined">
     <SettingsToggle
-      :value="config?.appearance.glow"
+      :value="config?.localOptions.appearance.glow"
       label="Enable glow"
-      help-text="Enables glow effects on the top left and bottom right corners of the app. Can cause slight performance dips."
+      help-text="Enables glow effects on the top right corner of the app. Can cause slight performance dips."
       @update:value="
         $emit('update:config', {
           ...config,
-          appearance: {
-            ...config.appearance,
-            glow: $event,
+          localOptions: {
+            ...config.localOptions,
+            appearance: {
+              ...config.localOptions.appearance,
+              glow: $event,
+            },
           },
         })
       "

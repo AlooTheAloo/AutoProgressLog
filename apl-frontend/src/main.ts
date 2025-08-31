@@ -1,8 +1,8 @@
 import { createApp } from "vue";
+import { dialog } from "./util/DialogRenderer/dialog";
 import App from "./App.vue";
 import { createMemoryHistory, createRouter, RouteRecordRaw } from "vue-router";
 import "./style.css";
-import PageSelector from "./pages/PageSelector.vue";
 import PrimeVue from "primevue/config";
 import Aura from "@primevue/themes/aura";
 import { definePreset } from "@primevue/themes";
@@ -76,7 +76,12 @@ dayjs.extend(duration);
 dayjs.extend(relativeTime);
 dayjs.extend(advancedFormat);
 
-createApp(App)
+const app = createApp(App);
+
+// @ts-ignore
+app.config.globalProperties.$dialog = dialog;
+
+app
   .use(ConfirmationService)
   .use(ToastService)
   .use(router)

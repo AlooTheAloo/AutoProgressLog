@@ -3,10 +3,11 @@ import DatePicker from "primevue/datepicker";
 import { Options } from "../../../../apl-backend/types/options";
 import SettingsToggle from "../Common/SettingsToggle.vue";
 import help from "../../../assets/Icons/help.png";
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { watch } from "vue";
 import SettingsDatePicker from "../Common/SettingsDatePicker.vue";
 import SettingsResetSettings from "../Common/SettingsResetSettings.vue";
+import dayjs from "dayjs";
 
 const props = defineProps<{
   config: Options | undefined;
@@ -19,44 +20,54 @@ const emit = defineEmits<{
 
 const selectedTime = ref<Date | undefined>();
 
-watch(props, () => {
-  const time = props.config?.general.autogen.options?.generationTime;
-  if (time == undefined) return;
-  const date = new Date();
-  date.setHours(time.hours);
-  date.setMinutes(time.minutes);
-  console.log(date);
-  selectedTime.value = date;
-  console.log(selectedTime.value);
+onMounted(() => {
+  console.log("props", props);
 });
+
+watch(
+  props,
+  () => {
+    console.log("in watch");
+    const m_time = props.config?.serverOptions.userOptions.autoGenTime;
+    console.log("time", m_time);
+    if (m_time == undefined || m_time == null) return;
+    console.log("time", m_time);
+    const time = dayjs(m_time);
+    const date = new Date();
+    date.setHours(time.hour());
+    date.setMinutes(time.minute());
+    console.log("date", date.toDateString());
+    console.log(date);
+    selectedTime.value = date;
+    console.log(selectedTime.value);
+  },
+  {
+    immediate: true,
+  }
+);
 
 function updateTime(value: Date) {
   if (props.config == undefined) return;
   emit(
     "update:config",
-    !props.config.general.autogen.enabled
+    props.config.serverOptions.userOptions.autoGenTime == null
       ? {
           ...props.config,
-          general: {
-            ...props.config.general,
-            autogen: {
-              enabled: false,
+          serverOptions: {
+            ...props.config.serverOptions,
+            userOptions: {
+              ...props.config.serverOptions.userOptions,
+              autoGenTime: value,
             },
           },
         }
       : {
           ...props.config,
-          general: {
-            ...props.config?.general,
-            autogen: {
-              enabled: props.config?.general.autogen.enabled,
-              options: {
-                ...props.config?.general.autogen.options,
-                generationTime: {
-                  hours: value.getHours(),
-                  minutes: value.getMinutes(),
-                },
-              },
+          serverOptions: {
+            ...props.config.serverOptions,
+            userOptions: {
+              ...props.config.serverOptions.userOptions,
+              autoGenTime: value,
             },
           },
         }
@@ -67,30 +78,21 @@ function ToggleAutogen(value: boolean) {
   if (props.config == undefined) return;
   emit("update:config", {
     ...props.config,
-    general: {
-      ...props.config.general,
-      autogen: value
-        ? {
-            enabled: true,
-            options: {
-              generationTime: {
-                hours: 0,
-                minutes: 0,
-              },
-            },
-          }
-        : {
-            enabled: false,
-          },
+    serverOptions: {
+      ...props.config.serverOptions,
+      userOptions: {
+        ...props.config.serverOptions.userOptions,
+        autoGenTime: value ? dayjs().startOf("day").toDate() : null,
+      },
     },
   });
 }
 </script>
 
 <template>
-  <div class="flex flex-col w-full gap-2" v-if="config != undefined">
+  <div class="flex flex-col w-full gap-6 pt-6" v-if="config != undefined">
     <SettingsToggle
-      :value="config.general.autogen.enabled"
+      :value="config.serverOptions.userOptions.autoGenTime != null"
       label="Automatic Report Generation"
       help-text="Automatically generate reports at a predetermined time interval. If your computer is turned off or disconnected from the internet, the reports will not be generated."
       @update:value="ToggleAutogen($event)"
@@ -100,18 +102,24 @@ function ToggleAutogen(value: boolean) {
       :value="selectedTime"
       label="Time to Generate Reports"
       @update:value="updateTime"
-      :disabled="!props.config?.general.autogen.enabled"
+      :disabled="config.serverOptions.userOptions.autoGenTime == null"
       help-text="The time at which reports will be generated every day"
     />
 
     <SettingsToggle
-      :value="config.general.discordIntegration"
+      :value="config.localOptions.general.discordIntegration"
       label="Enable Discord RPC"
       help-text="This will enable the Discord Rich Presence. When immersing, the app will show your current immersion time and immersion activity in the discord status."
       @update:value="
         $emit('update:config', {
           ...config,
-          general: { ...config.general, discordIntegration: $event },
+          localOptions: {
+            ...config.localOptions,
+            general: {
+              ...config.localOptions.general,
+              discordIntegration: $event,
+            },
+          },
         })
       "
     />

@@ -1,0 +1,142 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+generator prismabox {
+  provider                    = "prismabox"
+  output                      = "./types"
+  typeboxImportVariableName   = "t"
+  typeboxImportDependencyName = "elysia"
+  additionalProperties        = false
+  inputModel                  = true
+}
+
+model User {
+  id                  Int                 @id @default(autoincrement())
+  email               String              @unique
+  userName            String?
+  profilePicture      String?
+  config              UserConfig?
+  tokens              Token[]
+  immersionActivities ImmersionActivity[]
+  reports             Report[]
+  syncData            SyncData[]
+}
+
+model Token {
+  id         Int       @id @default(autoincrement())
+  token      String    @unique
+  type       TokenType
+  valid      Boolean   @default(true)
+  expiration DateTime?
+  createdAt  DateTime  @default(now())
+  lastUsedAt DateTime  @default(now())
+  deviceId   String?
+  deviceName String?
+  userAgent  String?
+  userId     Int
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token, userId])
+}
+
+model SyncData {
+  id                 Int       @id @default(autoincrement())
+  generationTime     DateTime  @default(now())
+  ankiData           AnkiData?
+  userId             Int
+  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  report             Report?
+  totalImmersionTime Int
+
+  @@index([userId])
+}
+
+model AnkiData {
+  id                Int      @id @default(autoincrement())
+  totalCardsStudied Int
+  cardsStudied      Int
+  mature            Int
+  retention         Float
+  syncDataId        Int      @unique
+  syncData          SyncData @relation(fields: [syncDataId], references: [id], onDelete: Cascade)
+
+  @@index([syncDataId])
+}
+
+model ImmersionActivity {
+  id           Int      @id @default(autoincrement())
+  createdAt    DateTime
+  seconds      Int
+  activityName String
+  userId       Int
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Report {
+  id         Int      @id @default(autoincrement())
+  reportNo   Int
+  score      Int
+  streak     Streak?
+  userId     Int
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  syncData   SyncData @relation(fields: [syncDataId], references: [id], onDelete: Cascade)
+  syncDataId Int      @unique
+
+  @@unique([reportNo, userId])
+  @@index([userId])
+  @@index([syncDataId])
+}
+
+model Streak {
+  id              Int    @id @default(autoincrement())
+  ankiStreak      Int
+  immersionStreak Int
+  reportId        Int    @unique
+  report          Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  @@index([reportId])
+}
+
+model UserConfig {
+  id          Int         @id @default(autoincrement())
+  togglToken  String
+  togglUserId String
+  ankiConfig  AnkiConfig?
+  autoGenTime DateTime?   @db.Timetz(6)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  userId      Int         @unique
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model AnkiConfig {
+  id            Int               @id @default(autoincrement())
+  url           String            @default("https://sync.ankiweb.net/")
+  ankiToken     String
+  retentionMode AnkiRetentionMode
+  trackedDecks  String[]
+  userConfigId  Int               @unique
+  userConfig    UserConfig        @relation(fields: [userConfigId], references: [id], onDelete: Cascade)
+
+  @@index([userConfigId])
+}
+
+enum TokenType {
+  EMAIL
+  SESSION
+}
+
+enum AnkiRetentionMode {
+  ANKI_DEFAULT
+  TRUE_RETENTION
+}

@@ -205,13 +205,13 @@ function nf(num: number) {
       <div class="flex w-full h-20 items-center px-10 my-5 justify-between">
         <div class="flex flex-col">
           <h1
-            class="bg-gradient-to-r bg-clip-text text-4xl font-extrabold text-transparent from-[#89BDFF] to-[#40ffff]"
+            class="bg-gradient-to-r bg-clip-text text-4xl font-extrabold text-transparent from-[var(--primary-color)] to-[var(--primary-color)]"
           >
             Generated Reports
           </h1>
         </div>
       </div>
-      <div class="flex w-full px-10 flex-grow caca">
+      <div class="flex w-full px-10 flex-grow reportListview">
         <div class="flex w-full px-2 py-2 h-fit rounded-lg">
           <DataView
             dataKey=""
@@ -239,7 +239,7 @@ function nf(num: number) {
                       <div
                         class="w-full flex flex-col sm:flex-row sm:items-center gap-4 dark:bg-black bg-[#eeeeef] overflow-hidden rounded-md pr-5"
                       >
-                        <div class="w-3 h-full bg-[#24CAFF]"></div>
+                        <div class="w-3 h-full bg-[var(--primary-color)]"></div>
                         <div class="w-14 py-4">
                           <div v-if="images == undefined" class="w-14 h-14">
                             <Skeleton height="3.5rem"></Skeleton>
@@ -285,7 +285,7 @@ function nf(num: number) {
                               </div>
 
                               <span
-                                class="font-medium text-surface-500 dark:text-surface-400 text-sm text-[#24CAFF] italic"
+                                class="font-medium text-surface-500 dark:text-surface-400 text-sm text-[var(--primary-color)] italic"
                               >
                                 <span v-if="item.date.isSame(dayjs(), 'd')">
                                   Today
@@ -407,7 +407,7 @@ function nf(num: number) {
   </div>
 </template>
 <style>
-.caca {
+.reportListview {
   --p-dataview-content-background: transparent !important;
   --p-paginator-background: transparent !important;
   --p-dataview-paginator-bottom-border-width: 0px !important;

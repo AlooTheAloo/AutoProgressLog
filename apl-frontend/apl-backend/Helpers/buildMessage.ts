@@ -1,7 +1,6 @@
 import { relativeActivity } from "../types/activity.js";
 import { cache } from "../types/cache.js";
 import path from "path";
-import puppeteer, { BoundingBox, Page, Puppeteer } from "puppeteer";
 import { fileURLToPath } from "url";
 import { ReportData, TPlusDelta } from "../types/reportdata.js";
 import dayjs from "dayjs";
@@ -10,8 +9,10 @@ import { arithmeticWeightedMean } from "./util.js";
 import { getConfig } from "./getConfig.js";
 import color from "color";
 import { Layout } from "../apl-visuals/src/types/report-data.js";
-import { Browser, getInstalledBrowsers } from "@puppeteer/browsers";
 import { app } from "electron";
+import playwright, { Page } from "playwright";
+import { Browser, getInstalledBrowsers } from "@puppeteer/browsers";
+import { Logger } from "./Log.js";
 
 declare global {
   interface Window {
@@ -35,6 +36,7 @@ export async function getChromiumExecPath() {
   const browsers = await getInstalledBrowsers({
     cacheDir: cachedir,
   });
+
   return browsers.filter((x) => x.browser == Browser.CHROME).at(0)
     ?.executablePath;
 }
@@ -48,9 +50,8 @@ export async function buildImage(
   const outputPath = `${options.outputFile.path}${path.sep}${options.outputFile.name} ${reportData.reportNo}${options.outputFile.extension}`;
 
   const execpath = await getChromiumExecPath();
-  console.log("execpath is " + execpath);
-  console.log(11.1);
-  const browser = await puppeteer.launch({
+
+  const browser = await playwright.chromium.launch({
     headless: true,
     devtools: true,
     args: [
@@ -61,27 +62,46 @@ export async function buildImage(
     executablePath: execpath,
   });
 
-  console.log(11.2);
   const page = await browser.newPage();
-  console.log(11.3);
 
-  await page.evaluateOnNewDocument(
-    (data, layout) => {
-      window.apl_ReportData = data;
-      window.apl_ReportLayout = layout;
-    },
-    reportData,
-    reportLayout
+  // 1) Log browser console messages:
+  page.on("console", (msg) => {
+    Logger.log(`${msg.type()}: ${msg.text()}`, "Playwright");
+  });
+
+  // 2) Log unhandled exceptions in the page context:
+  page.on("pageerror", (error) => {
+    Logger.log(`${error}`, "Playwright");
+  });
+
+  // 3) Log any failed network requests:
+  page.on("requestfailed", (request) => {
+    Logger.log(
+      `Request failed : ${request.url()} — ${request.failure()?.errorText}`,
+      "Playwright"
+    );
+  });
+
+  // 4) (Optional) Log all network requests/responses
+  page.on("request", (r) =>
+    Logger.log(`Request: ${r.method()} ${r.url()}`, "Playwright")
+  );
+  page.on("response", (r) =>
+    Logger.log(`Response: ${r.status()} ${r.url()})`, "Playwright")
   );
 
-  console.log(11.4);
+  await page.addInitScript(
+    ([data, layout]) => {
+      window.apl_ReportData = data as any;
+      window.apl_ReportLayout = layout as any;
+    },
+    [reportData, reportLayout]
+  );
 
-  page.setViewport({
-    width: (2000 * options.outputQuality) / 2,
-    height: 5000,
-    deviceScaleFactor: options.outputQuality / 2,
+  await page.setViewportSize({
+    width: Math.round((2000 * options.outputQuality) / 2),
+    height, // ← use the same `height` you’ll pass to tryScreenshot
   });
-  console.log(11.5);
 
   const isDev = process.env.NODE_ENV === "development";
 
@@ -104,44 +124,40 @@ export async function buildImage(
         "index.html"
       );
 
-  await page.goto(`file:${visualsPath}`);
-
-  console.log(11.6);
-
-  await page.waitForNetworkIdle();
-  console.log(11.7);
+  await page.goto(`file:${visualsPath}`, { waitUntil: "networkidle" });
 
   await tryScreenshot(
     page,
-    outputPath,
-    {
-      width: 1586,
-      height,
-      x: 0,
-      y: 0,
-    },
-    extensionToType(options.outputFile.extension)
+    outputPath as any,
+    { width: 1586, height, x: 0, y: 0 },
+    extensionToType(options.outputFile.extension),
+    3,
+    30_000
   );
-
-  console.log(11.8);
-
   await browser.close();
-  console.log(11.9);
-
   return outputPath;
 }
+
+type clip = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
 async function tryScreenshot(
   page: Page,
-  path: string,
-  clip: BoundingBox,
-  type: "png" | "jpeg" | "webp" | undefined,
+  path: `${string}.png` | `${string}.jpeg`,
+  clip: clip,
+  type: "png" | "jpeg" | undefined,
   maxRetries = 3,
   timeoutMs = 5000
 ) {
+  await page.evaluate(() => requestAnimationFrame(() => {}));
   for (let i = 0; i < maxRetries; i++) {
     try {
       await Promise.race([
-        page.screenshot({ path, type, clip }),
+        page.screenshot({ path, type: type, clip }),
         new Promise((_, reject) =>
           setTimeout(() => reject(new Error("Screenshot timed out")), timeoutMs)
         ),
@@ -159,7 +175,6 @@ const extensionToType = (ext: ReportExtension) => {
   if (ext == ".png") return "png";
   if (ext == ".jpg") return "jpeg";
   if (ext == ".jpeg") return "jpeg";
-  if (ext == ".webp") return "webp";
 };
 
 const MOVING_AVERAGE_SIZE = 7;
@@ -207,13 +222,10 @@ export function buildJSON(
     .slice(0, MOVING_AVERAGE_SIZE)
     .map((x) => x.seconds);
   const oldAverage = arithmeticWeightedMean(lastnElements);
-  console.log("LastnElements are " + JSON.stringify(lastnElements));
   const newnElements = [
     builderDTO.timeToAdd,
     ...lastnElements.slice(0, MOVING_AVERAGE_SIZE - 1),
   ];
-  console.log("NewnElements are " + JSON.stringify(newnElements));
-
   const newAverage = arithmeticWeightedMean(newnElements);
 
   const ImmersionScore = builderDTO.timeToAdd;

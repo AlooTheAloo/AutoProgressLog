@@ -17,15 +17,39 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <div class="flex flex-col w-full gap-2" v-if="config != undefined">
+  <div class="flex flex-col w-full gap-6 pt-6" v-if="config != undefined">
     <SettingsField
-      :value="config?.account?.userName"
+      :value="config.serverOptions.userProfile.userName ?? undefined"
       label="Username"
       placeholder="Enter your username"
       @update:value="
         $emit('update:config', {
           ...config,
-          account: { ...config.account, userName: $event },
+          serverOptions: {
+            ...config.serverOptions,
+            userProfile: {
+              ...config.serverOptions.userProfile,
+              userName: $event,
+            },
+          },
+        })
+      "
+    />
+
+    <SettingsField
+      :value="config.serverOptions.userProfile.email"
+      label="Email"
+      placeholder="Enter your email"
+      @update:value="
+        $emit('update:config', {
+          ...config,
+          serverOptions: {
+            ...config.serverOptions,
+            userProfile: {
+              ...config.serverOptions.userProfile,
+              email: $event,
+            },
+          },
         })
       "
     />
@@ -33,6 +57,7 @@ const emit = defineEmits<{
     <SettingsFileUpload
       label="Profile picture"
       help-text="Changes the profile picture in the app. This will automatically be uploaded and applied."
+      @update:pfp=""
     />
   </div>
 </template>
