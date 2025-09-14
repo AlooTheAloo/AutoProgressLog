@@ -41,14 +41,28 @@ onMounted(() => {
       window.navigator.userAgent
     );
 
-    if (resp) {
-      // TODO : Continue logic
+    if (!resp) {
+      alert("Invalid email or token");
+    } else if (resp == "signup" || resp == "login") {
+      migrating.value = true;
+      window.ipcRenderer.invoke("legacy-migration").then((x) => {
+        if (x) {
+          window.ipcRenderer.invoke("update-2_0_0_done").then(() => {
+            router.push("/update-app");
+          });
+        } else {
+          alert(
+            "Migration failed. Please try again later or open an issue on github."
+          );
+        }
+      });
     }
   });
 });
 
 const email = ref("");
 const countdown = ref(0);
+const migrating = ref(false);
 let timerId: number | null = null;
 
 const isEmailValid = computed(() => {
@@ -69,20 +83,10 @@ function startTimer() {
 
 const emailSent = ref(false);
 
-function NextPage() {
-  router.push("/setup/complete");
-}
-
 function SendEmail() {
   emailSent.value = true;
   window.ipcRenderer.invoke("Send-Email", email.value);
   startTimer();
-}
-
-function caca() {
-  window.ipcRenderer.invoke("update-2_0_0_done").then(() => {
-    router.push("/update-app");
-  });
 }
 
 onUnmounted(() => {
@@ -109,7 +113,10 @@ onUnmounted(() => {
       }"
       class="p-4 sm:p-12 flex flex-col justify-between w-full max-w-[40rem] rounded-2xl bg-black transition-all duration-500"
     >
-      <div class="flex flex-col items-start space-y-6 w-full h-full">
+      <div
+        class="flex flex-col items-start space-y-6 w-full h-full"
+        v-if="!migrating"
+      >
         <motion.div
           :initial="{ opacity: 0, y: 20, filter: 'blur(10px)' }"
           :animate="{
@@ -144,12 +151,9 @@ onUnmounted(() => {
               v-model="email"
             />
           </div>
-          <Button @click="caca" class="w-[200px] p-3 !rounded-full">
-            caca
-          </Button>
           <div class="w-full flex justify-end">
             <Button
-              @click="NextPage"
+              @click="SendEmail"
               :disabled="!isEmailValid || countdown > 0"
               class="w-[200px] p-3 !rounded-full transition-all"
             >
@@ -185,6 +189,25 @@ onUnmounted(() => {
             check your inbox for a link to continue. This may take up to 30
             minutes (blame google and microsoft lol)
           </p>
+        </motion.div>
+      </div>
+      <div class="flex flex-col items-start space-y-6 w-full h-full" v-else>
+        <motion.div
+          :initial="{ opacity: 0, y: 20, filter: 'blur(10px)' }"
+          :animate="{
+            opacity: 1,
+            y: 0,
+            filter: 'blur(0px)',
+            transition: { duration: 0.6 },
+          }"
+          class="flex flex-col items-start w-full flex-grow justify-center gap-8"
+        >
+          <h1
+            class="text-3xl w-full font-semibold text-white leading-tight text-center"
+          >
+            Migrating to the new platform. This may take a while.
+          </h1>
+          <ProgressSpinner />
         </motion.div>
       </div>
     </motion.div>

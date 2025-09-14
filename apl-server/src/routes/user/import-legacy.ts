@@ -3,11 +3,9 @@ import { TokenType, AnkiRetentionMode } from "@prisma/client";
 import { Database } from "bun:sqlite";
 import prisma from "../../db/client";
 import { authGuard } from "../../middlewares/authGuard";
-import StorageHTTPClient from "../../../apl-storage/src/services/anki/StorageHTTPClient";
-import {
-  CreateAndTrimDatabase,
-  getDBPath,
-} from "../../../apl-storage/src/services/db";
+import Toggl from "toggl-track";
+import AnkiStorage from "../../services/anki/AnkiStorage";
+import { DEFAULT_ANKI_URL } from "../../services/anki/AnkiHTTPClient";
 
 function fromEpochMaybeMs(x: number): Date {
   return new Date(x < 1_000_000_000_000 ? x * 1000 : x);
@@ -29,7 +27,7 @@ function toRetentionMode(raw: unknown): AnkiRetentionMode {
 export const importLegacyRoute = new Elysia({ name: "import-legacy" })
   .use(authGuard)
   .post(
-    "/import/legacy",
+    "/import-legacy",
     async ({ user, body, set }) => {
       // --- 1) Auth ---
       if (!user) {
@@ -107,6 +105,7 @@ export const importLegacyRoute = new Elysia({ name: "import-legacy" })
       }>;
 
       // --- 4) Migrate configuration ---
+
       const autogenEnabled = !!cfg?.general?.autogen?.enabled;
       const genH = Number(
         cfg?.general?.autogen?.options?.generationTime?.hours ?? 0
@@ -129,9 +128,15 @@ export const importLegacyRoute = new Elysia({ name: "import-legacy" })
         : [];
       const retentionMode = toRetentionMode(cfg?.anki?.options?.retentionMode);
 
-      // For required field togglUserId, we can't hit Toggl here; ensure something non-empty.
-      const DEFAULT_TOGGL_USER_ID = "MIGRATED";
+      console.log("togglToken is " + togglToken);
+      const me = await new Toggl({
+        auth: {
+          token: togglToken,
+        },
+      }).me.get();
 
+      const TOGGL_UID = me.id.toString();
+      console.log("TOGGL_UID is " + TOGGL_UID);
       // Upsert user profile fields
       await prisma.user.update({
         where: { id: userId },
@@ -149,7 +154,7 @@ export const importLegacyRoute = new Elysia({ name: "import-legacy" })
           data: {
             userId,
             togglToken: togglToken ?? "", // must be non-null per schema
-            togglUserId: DEFAULT_TOGGL_USER_ID,
+            togglUserId: TOGGL_UID,
             autoGenTime,
             ankiConfig:
               ankiEnabled && ankiToken
@@ -170,7 +175,7 @@ export const importLegacyRoute = new Elysia({ name: "import-legacy" })
           data: {
             togglToken: togglToken ?? existingCfg.togglToken,
             // keep existing togglUserId if present; otherwise fill default
-            togglUserId: existingCfg.togglUserId || DEFAULT_TOGGL_USER_ID,
+            togglUserId: existingCfg.togglUserId || TOGGL_UID,
             autoGenTime,
             ankiConfig:
               ankiEnabled && ankiToken
@@ -197,20 +202,12 @@ export const importLegacyRoute = new Elysia({ name: "import-legacy" })
 
       // Install database
       if (ankiEnabled) {
-        const file = await new StorageHTTPClient(
-          ankiToken,
-          ankiUrl
-        ).downloadInitialDatabase();
-
-        if (!file) {
-          set.status = 500;
-          return { error: "Failed to download the database from Anki servers" };
-        }
-        const filepath = getDBPath(userId);
         try {
-          await CreateAndTrimDatabase(filepath, file);
-          set.status = 200;
-          return { message: "Database created successfully" };
+          await AnkiStorage.requestAnkiDBDownload(
+            user.id,
+            ankiToken,
+            ankiUrl ?? DEFAULT_ANKI_URL
+          );
         } catch (e: any) {
           set.status = 500;
           return { error: e.message };
@@ -262,9 +259,13 @@ export const importLegacyRoute = new Elysia({ name: "import-legacy" })
       }
 
       // --- 7) Migrate Reports (+Streak) from cache.json ---
+      console.log("Cachejson : " + JSON.stringify(cacheJson));
+      console.log("Cachejson.list : " + JSON.stringify(cacheJson.list));
+
       const items: any[] = Array.isArray(cacheJson?.list) ? cacheJson.list : [];
       let upsertedReports = 0;
 
+      console.log("items is " + JSON.stringify(items));
       for (const item of items) {
         const reportNo = Number(item.reportNo);
         const score = Number(item.score ?? 0);
