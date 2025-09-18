@@ -56,6 +56,7 @@ export const UserRelations = t.Object(
         {
           id: t.Integer(),
           createdAt: t.Date(),
+          activityTogglId: t.String(),
           seconds: t.Integer(),
           activityName: t.String(),
           userId: t.Integer(),

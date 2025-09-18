@@ -70,12 +70,13 @@ model AnkiData {
 }
 
 model ImmersionActivity {
-  id           Int      @id @default(autoincrement())
-  createdAt    DateTime
-  seconds      Int
-  activityName String
-  userId       Int
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id              Int      @id @default(autoincrement())
+  createdAt       DateTime
+  activityTogglId String   @unique
+  seconds         Int
+  activityName    String
+  userId          Int
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
