@@ -109,7 +109,7 @@ model Streak {
 model UserConfig {
   id          Int         @id @default(autoincrement())
   togglToken  String
-  togglUserId String
+  togglUserId String      @unique
   ankiConfig  AnkiConfig?
   autoGenTime DateTime?   @db.Timetz(6)
   createdAt   DateTime    @default(now())
