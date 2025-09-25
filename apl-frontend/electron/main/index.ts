@@ -184,15 +184,19 @@ app.on("ready", async () => {
     await checkHealth(getConfig());
   }
 
-  if (!VersionManager.exists() && (await APLStorage.get("setupComplete"))) {
+  if (!VersionManager.exists()) {
     await VersionManager.init();
   }
 
   // ZFSTD
   await init();
 
-  if (await APLStorage.get("setupComplete")) {
+  console.log("Checking if setup is complete");
+  console.log(await APLStorage.get("setupComplete"));
+  const ver = await VersionManager.verifyVersion();
+  if ((await APLStorage.get("setupComplete")) && ver) {
     try {
+      console.log("Trying to init socket client");
       // TODO : Add an API call to create the webhook
       await new SocketClient().init({
         token: (await APLStorage.get("token")) as string,

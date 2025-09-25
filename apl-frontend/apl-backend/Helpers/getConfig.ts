@@ -145,7 +145,6 @@ export async function getConfig(
     serverConfigCache != null &&
     now - serverConfigCache.fetchedAt < ttlMs;
 
-  console.log("cacheValid is " + cacheValid);
   if (cacheValid && serverConfigCache != null) {
     return {
       localOptions: localConfig,

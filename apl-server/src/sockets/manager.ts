@@ -26,7 +26,7 @@ export class SocketManager {
     if (message.type === "auth") {
       const { token } = message.payload;
       const data = await tokenToTogglData(token);
-
+      console.log(data);
       console.log("Auth attempt for ", "Socket");
 
       if (!data) {

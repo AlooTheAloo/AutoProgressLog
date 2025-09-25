@@ -4,7 +4,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { ReportData, TPlusDelta } from "../types/reportdata.js";
 import dayjs from "dayjs";
-import { outputOptions, ReportExtension } from "../types/options.js";
+import { OutputOptions, ReportExtension } from "../types/options.js";
 import { arithmeticWeightedMean } from "./util.js";
 import { getConfig } from "./getConfig.js";
 import color from "color";
@@ -42,7 +42,7 @@ export async function getChromiumExecPath() {
 }
 
 export async function buildImage(
-  options: outputOptions,
+  options: OutputOptions,
   height: number = 1775,
   reportData: ReportData,
   reportLayout: Layout

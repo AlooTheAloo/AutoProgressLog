@@ -28,7 +28,6 @@ export function globalListeners() {
   });
 
   ipcMain.handle("Update-App-Schema", async (event, args) => {
-    console.log("Update schema is called");
     await upgrade_schema((await VersionManager.SemVer()).toString());
     win?.webContents.send("router-push", "/app/dashboard");
     win?.webContents.send("is-setup-complete", true);

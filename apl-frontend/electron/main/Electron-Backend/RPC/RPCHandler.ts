@@ -8,6 +8,8 @@ import { Options } from "../../../../apl-backend/types/options";
 import { SocketClient } from "../Socket/SocketClient";
 import { Socket } from "dgram";
 import { Logger } from "../../../../apl-backend/Helpers/Log";
+import { APLStorage } from "../util/auth";
+import { DashboardDTO } from "../types/Dashboard";
 
 type miniEvent = {
   activity: string;
@@ -67,10 +69,16 @@ async function createListeners() {
 
   SocketClient.instance.on("ActivityStart", async (event) => {
     Logger.log("Start Activity", "Socket");
-    const lastEntry = await GetLastEntry();
+
+    const lastEntry = (await APLStorage.get<DashboardDTO>(
+      "Cached_DTO"
+    )) as DashboardDTO;
+
     const seconds =
-      (lastEntry?.toggl?.totalSeconds ?? 0) +
+      (lastEntry?.immersionDTO.totalImmersion ?? 0) +
       Math.abs(dayjs(event.start).diff(dayjs(), "seconds"));
+
+    console.log("seconds is " + seconds);
 
     if (!rpc?.isConnected) await rpc?.login();
     await rpc!.user?.setActivity({

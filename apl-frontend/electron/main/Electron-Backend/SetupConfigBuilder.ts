@@ -124,8 +124,9 @@ export function setupListeners() {
 
         const isLogin = config.response.headers.get("content-length") != "0";
         if (isLogin) {
-          APLStorage.set("token", retVal.data.token);
-          APLStorage.set("setupComplete", true);
+          await APLStorage.set("token", retVal.data.token);
+          console.log("token has been set!");
+          await APLStorage.set("setupComplete", true);
           win?.webContents.send("is-setup-complete", true);
           return "login";
         } else return "signup";
@@ -139,6 +140,7 @@ export function setupListeners() {
   });
 
   ipcMain.handle("SetupComplete", async (event: any, arg: any) => {
+    console.log("token has been get!");
     await new SocketClient().init({
       token: (await APLStorage.get("token")) as string,
     });
@@ -193,7 +195,7 @@ export function setupListeners() {
 
     if (resp.status == 200) {
       console.log("setup complete !!!");
-      APLStorage.set("setupComplete", true);
+      await APLStorage.set("setupComplete", true);
     }
 
     invalidateConfigCache();

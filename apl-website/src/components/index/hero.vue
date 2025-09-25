@@ -90,10 +90,10 @@
               Download the app
             </RainbowButton>
             <button
-              @click="openVideo"
+              disabled
               class="text-xs sm:text-base flex relative bg-white text-black px-4 py-2 flex-12 flex-col items-center justify-center overflow-hidden rounded-full border shadow-xl"
             >
-              Watch the trailer
+              Trailer coming soon!
             </button>
           </Motion>
         </Motion>

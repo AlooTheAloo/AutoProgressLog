@@ -28,7 +28,6 @@ export async function runSync() {
     else
       fetchedDTO.data.profile_picture = `http://${SERVER_URL}${fetchedDTO.data.profile_picture}`;
 
-    console.log("Returning : " + JSON.stringify(fetchedDTO.data));
     await APLStorage.set("Cached_DTO", fetchedDTO.data);
     return fetchedDTO.data;
   } catch (e) {

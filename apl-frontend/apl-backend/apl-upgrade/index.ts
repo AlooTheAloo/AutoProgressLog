@@ -28,5 +28,6 @@ export async function launchUpgrade(
   );
   await upgradeFunc();
   Logger.log("Upgraded to " + version_target, "Upgrade");
+  if (!VersionManager.exists()) VersionManager.init();
   VersionManager.setVersion(version_target);
 }

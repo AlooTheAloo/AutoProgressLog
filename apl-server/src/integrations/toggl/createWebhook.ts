@@ -29,6 +29,7 @@ export default async function createWebhook(
   workspaceID = -1,
   togglToken: string
 ): Promise<{ uid: number; workspaceID: number } | undefined> {
+  console.log("Creating webhook for url " + wh_link);
   if (!togglToken) return;
   const toggl = new Toggl({
     auth: {
@@ -56,13 +57,20 @@ export default async function createWebhook(
   const wh = ls.find((x) => x.description == wh_name);
   if (wh != undefined) {
     console.log("Updating webhook ! setting callback to " + wh_link);
-    await client.updateSubscription({
-      subscription_id: wh.subscription_id,
-      workspace_id: wh.workspace_id,
-      url_callback: wh_link,
-      ...evt_props,
-    });
-    console.log("updated subscription!!! " + workspaceID);
+
+    if (wh.has_pending_events) {
+      await client.deleteSubscription({
+        subscription_id: wh.subscription_id,
+        workspace_id: wh.workspace_id,
+      });
+    } else {
+      await client.updateSubscription({
+        subscription_id: wh.subscription_id,
+        workspace_id: wh.workspace_id,
+        url_callback: wh_link,
+        ...evt_props,
+      });
+    }
     return { uid, workspaceID };
   }
   await client.createSubscription({

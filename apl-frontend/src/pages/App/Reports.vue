@@ -1,22 +1,22 @@
 <script setup lang="ts">
 import Button from "primevue/button";
 import DataView from "primevue/dataview";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
 import dayjs, { Dayjs } from "dayjs";
-import ProgressSpinner from "primevue/progressspinner";
 import { PageState } from "primevue/paginator";
-import Skeleton from "primevue/skeleton";
 import score from "../../../src/assets/rewarded.png";
 import ConfirmPopup from "primevue/confirmpopup";
 import { useConfirm } from "primevue/useconfirm";
 import Toast from "primevue/toast";
 import { useToast } from "primevue/usetoast";
-import InputText from "primevue/inputtext";
 import Dialog from "primevue/dialog";
 import { motion, AnimatePresence } from "motion-v";
 import { CopyReportToast } from "../../../electron/main/Electron-Backend/ReportsListeners";
 import pluralize from "pluralize";
+import Report from "../Report/src/components/Report.vue";
+import domtoimage from 'dom-to-image';
+
 
 const rows = 6;
 const router = useRouter();
@@ -45,20 +45,6 @@ async function getReports() {
 
 let lastFrom = 0;
 
-async function getImages(from: number, count: number) {
-  lastFrom = from;
-  return new Promise<void>((res, rej) => {
-    window.ipcRenderer
-      .invoke("Get-Images", from, from + count)
-      .then((data: { start: number; images: string[] }) => {
-        if (data.start == lastFrom) {
-          images.value = data.images;
-        }
-        res();
-      });
-  });
-}
-
 function openImage(id: string) {
   window.ipcRenderer.invoke("Get-Image", id).then((x) => {
     imageViewerImage.value = {
@@ -72,7 +58,6 @@ function openImage(id: string) {
 onMounted(() => {
   window.ipcRenderer.invoke("loadReportsPage").then(() => {
     getReports();
-    getImages(0, rows);
   });
 });
 
@@ -100,7 +85,6 @@ function revertReport(evt: Event) {
       reverting.value = true;
       window.ipcRenderer.invoke("Reverse-Report").then(async (x) => {
         await getReports();
-        await getImages(0, rows);
         reverting.value = false;
       });
     },
@@ -113,7 +97,6 @@ const images = ref<string[] | undefined>(undefined);
 const first = ref<number>(0);
 
 const pageChanged = (event: PageState) => {
-  getImages(event.first, event.rows);
   first.value = event.first;
 };
 
@@ -151,6 +134,57 @@ const imageViewerImage = ref<{ image?: string; id?: string; shown: boolean }>({
 function nf(num: number) {
   return new Intl.NumberFormat("en-US", { useGrouping: true }).format(num);
 }
+
+var host = ref<HTMLElement | null>(null);
+
+const BASE_W = 1586;
+const BASE_H = 1800;
+
+const mockReportData = {
+  reportNo: 1,
+  time: "2025-09-24T12:00:00Z",
+
+  matureCards: [
+    { reportNo: 1, matureCardCount: 120 },
+    { reportNo: 0, matureCardCount: 115 },
+  ],
+  retentionRate: { current: 0.92, delta: +0.02 },
+  totalReviews: { current: 350, delta: +15 },
+  AnkiStreak: { current: 45, delta: +1 },
+  AnkiData: [
+    { reportNo: 0, value: 335 },
+    { reportNo: 1, value: 350 },
+  ],
+
+  ImmersionTime: { current: 180, delta: +20 }, // minutes
+  AverageImmersionTime: { current: 150, delta: +10 },
+  ImmersionLog: [
+    { name: "Anime", relativeValue: 60 },
+    { name: "Reading", relativeValue: 40 },
+    { name: "Listening", relativeValue: 80 },
+  ],
+  ImmersionData: [
+    { reportNo: 0, value: 160 },
+    { reportNo: 1, value: 180 },
+  ],
+  ImmersionStreak: { current: 30, delta: +1 },
+  MonthlyImmersion: 4200, // minutes
+  BestImmersion: { current: 240, delta: 0 },
+
+  ImmersionScore: 78,
+  AnkiScore: 82,
+  TotalScore: 160,
+
+  lastDaysPoints: [20, 25, 18, 30, 28, 22, 35],
+};
+
+const mockLayout = {
+  layout: [
+    ["mature", "ankidata", "ankistreak"],
+    ["immersiondata", "immersionlog", "immersionstreak"],
+  ],
+  gradient: ["#FF0000", "#D57AFF", "#74B4FF"],
+};
 </script>
 
 <template>
@@ -177,7 +211,24 @@ function nf(num: number) {
     v-if="!reports"
     class="flex flex-col w-full h-full items-center justify-center"
   >
-    <ProgressSpinner />
+    <div
+      class=""
+      :style="{
+        width: `${BASE_W}px`,
+        height: `${BASE_H}px`,
+        transform: `scale(${0.5})`,
+      }"
+    >
+      <Report
+        :layout="mockLayout"
+        :reportData="mockReportData"
+        ref="host"
+      ></Report>
+
+      <Button @click="domtoimage.toPng(host).then(x => console.log(x))"></Button>
+        Caca
+      </Button>
+    </div>
   </div>
   <div
     v-else-if="reports.length == 0"
@@ -241,13 +292,7 @@ function nf(num: number) {
                       >
                         <div class="w-3 h-full bg-[var(--primary-color)]"></div>
                         <div class="w-14 py-4">
-                          <div v-if="images == undefined" class="w-14 h-14">
-                            <Skeleton height="3.5rem"></Skeleton>
-                          </div>
-                          <div
-                            v-else
-                            class="h-14 flex items-center justify-center"
-                          >
+                          <div class="h-14 flex items-center justify-center">
                             <div
                               role="button"
                               @click="openImage(item.id)"

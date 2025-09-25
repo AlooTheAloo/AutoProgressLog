@@ -54,6 +54,7 @@ onMounted(() => {
           alert(
             "Migration failed. Please try again later or open an issue on github."
           );
+          migrating.value = false;
         }
       });
     }

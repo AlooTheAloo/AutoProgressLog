@@ -9,6 +9,7 @@ import client from "../db/client";
  */
 export async function tokenToTogglData(token: string) {
   try {
+    console.log("trying to convert token to toggl data" + token);
     const user = await client.user.findFirst({
       where: {
         tokens: {
@@ -25,6 +26,7 @@ export async function tokenToTogglData(token: string) {
       },
     });
 
+    console.log("user is " + user);
     return user?.config ?? null;
   } catch (e) {
     return null;
