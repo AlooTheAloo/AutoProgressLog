@@ -144,9 +144,9 @@ function openDownloads() {
   router.push("/downloads");
 }
 
-function openVideo() {
-  window.open("https://youtu.be/qLt7HWdLydo?si=7uzEyXAjT2_yCyng&t=0", "_blank");
-}
+// function openVideo() {
+//   window.open("https://youtu.be/qLt7HWdLydo?si=7uzEyXAjT2_yCyng&t=0", "_blank");
+// }
 </script>
 
 <style>
