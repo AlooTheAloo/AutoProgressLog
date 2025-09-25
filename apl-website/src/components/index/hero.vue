@@ -85,16 +85,16 @@
           >
             <RainbowButton
               @click="openDownloads"
-              class="text-xs sm:text-base relative bg-black px-4 py-2 text-white flexw-12 flex-col items-center justify-center overflow-hidden rounded-full border shadow-xl"
+              class="text-xs sm:text-base relative bg-black px-4 py-2 text-white flex-col items-center justify-center overflow-hidden rounded-full border shadow-xl"
             >
               Download the app
             </RainbowButton>
-            <button
+            <Button
               disabled
-              class="text-xs sm:text-base flex relative bg-white text-black px-4 py-2 flex-12 flex-col items-center justify-center overflow-hidden rounded-full border shadow-xl"
+              class="text-xs sm:text-base flex relative bg-white text-black px-4 py-2 flex-12 h-[2.75rem] flex-col items-center justify-center overflow-hidden rounded-full border shadow-xl"
             >
-              Trailer coming soon!
-            </button>
+              Trailer coming soon
+            </Button>
           </Motion>
         </Motion>
       </div>
@@ -132,6 +132,7 @@ import macos_apl from "../../assets/APL_Macbook.png";
 import { RainbowButton } from "../ui/rainbow-button";
 import TextHighlight from "../ui/text-highlight/TextHighlight.vue";
 import { useRouter } from "vue-router";
+import Button from "../ui/button/Button.vue";
 
 const { scrollYProgress } = useScroll();
 
@@ -143,9 +144,9 @@ function openDownloads() {
   router.push("/downloads");
 }
 
-function openVideo() {
-  window.open("https://youtu.be/qLt7HWdLydo?si=7uzEyXAjT2_yCyng&t=0", "_blank");
-}
+// function openVideo() {
+//   window.open("https://youtu.be/qLt7HWdLydo?si=7uzEyXAjT2_yCyng&t=0", "_blank");
+// }
 </script>
 
 <style>
