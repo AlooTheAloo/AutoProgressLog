@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import upArrow from "../../public/Icons/Up-Arrow.svg";
-import downArrow from "../../public/Icons/Down-Arrow.svg";
+import upArrow from "../../public/Icons/Up-Arrow.png";
+import downArrow from "../../public/Icons/Down-Arrow.png";
 
 const props = defineProps<{
   delta: number | string;

@@ -14,5 +14,6 @@
     "noEmit": true,
     "strict": true
   },
-  "include": ["src", "apl-backend/**/*", "electron"]
+  "include": ["src", "apl-backend/**/*", "electron"],
+  "exclude": ["../apl-server/**/*.*"]
 }

@@ -1,5 +1,6 @@
 import { ipcMain } from "electron";
 import { isGenerating } from "../../../apl-backend/generate/generate";
+import { writeFileSync } from "fs";
 
 type ListReport = {
   id: number;
@@ -23,6 +24,16 @@ export function reportsListeners() {
   ipcMain.handle("Open-Report", async (event, id: string) => {});
 
   ipcMain.handle("Copy-Report", async (event, id: string) => {});
+
+  ipcMain.handle("Export-Image", async (event, Image: string) => {
+    console.log("caca");
+    const base64 = Image.replace(/^data:image\/\w+;base64,/, "");
+    const buffer = Buffer.from(base64, "base64");
+    await writeFileSync(
+      "/Users/philipanthony-davis/Desktop/School/Automne 2025/caca.png",
+      buffer
+    );
+  });
 
   ipcMain.handle("loadReportsPage", async (evt) => {
     while (isGenerating) {

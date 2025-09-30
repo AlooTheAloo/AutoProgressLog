@@ -14,9 +14,6 @@ import Dialog from "primevue/dialog";
 import { motion, AnimatePresence } from "motion-v";
 import { CopyReportToast } from "../../../electron/main/Electron-Backend/ReportsListeners";
 import pluralize from "pluralize";
-import Report from "../Report/src/components/Report.vue";
-import domtoimage from 'dom-to-image';
-
 
 const rows = 6;
 const router = useRouter();
@@ -32,13 +29,13 @@ type ListReport = {
 async function getReports() {
   return new Promise<void>((res, rej) => {
     window.ipcRenderer.invoke("Get-Reports").then((data: any) => {
-      reports.value = data.map((x: any) => {
-        return {
-          ...x,
-          date: dayjs(x.date),
-        };
-      });
-      res();
+      // reports.value = data.map((x: any) => {
+      //   return {
+      //     ...x,
+      //     date: dayjs(x.date),
+      //   };
+      // });
+      // res();
     });
   });
 }
@@ -134,57 +131,6 @@ const imageViewerImage = ref<{ image?: string; id?: string; shown: boolean }>({
 function nf(num: number) {
   return new Intl.NumberFormat("en-US", { useGrouping: true }).format(num);
 }
-
-var host = ref<HTMLElement | null>(null);
-
-const BASE_W = 1586;
-const BASE_H = 1800;
-
-const mockReportData = {
-  reportNo: 1,
-  time: "2025-09-24T12:00:00Z",
-
-  matureCards: [
-    { reportNo: 1, matureCardCount: 120 },
-    { reportNo: 0, matureCardCount: 115 },
-  ],
-  retentionRate: { current: 0.92, delta: +0.02 },
-  totalReviews: { current: 350, delta: +15 },
-  AnkiStreak: { current: 45, delta: +1 },
-  AnkiData: [
-    { reportNo: 0, value: 335 },
-    { reportNo: 1, value: 350 },
-  ],
-
-  ImmersionTime: { current: 180, delta: +20 }, // minutes
-  AverageImmersionTime: { current: 150, delta: +10 },
-  ImmersionLog: [
-    { name: "Anime", relativeValue: 60 },
-    { name: "Reading", relativeValue: 40 },
-    { name: "Listening", relativeValue: 80 },
-  ],
-  ImmersionData: [
-    { reportNo: 0, value: 160 },
-    { reportNo: 1, value: 180 },
-  ],
-  ImmersionStreak: { current: 30, delta: +1 },
-  MonthlyImmersion: 4200, // minutes
-  BestImmersion: { current: 240, delta: 0 },
-
-  ImmersionScore: 78,
-  AnkiScore: 82,
-  TotalScore: 160,
-
-  lastDaysPoints: [20, 25, 18, 30, 28, 22, 35],
-};
-
-const mockLayout = {
-  layout: [
-    ["mature", "ankidata", "ankistreak"],
-    ["immersiondata", "immersionlog", "immersionstreak"],
-  ],
-  gradient: ["#FF0000", "#D57AFF", "#74B4FF"],
-};
 </script>
 
 <template>
@@ -210,26 +156,7 @@ const mockLayout = {
   <div
     v-if="!reports"
     class="flex flex-col w-full h-full items-center justify-center"
-  >
-    <div
-      class=""
-      :style="{
-        width: `${BASE_W}px`,
-        height: `${BASE_H}px`,
-        transform: `scale(${0.5})`,
-      }"
-    >
-      <Report
-        :layout="mockLayout"
-        :reportData="mockReportData"
-        ref="host"
-      ></Report>
-
-      <Button @click="domtoimage.toPng(host).then(x => console.log(x))"></Button>
-        Caca
-      </Button>
-    </div>
-  </div>
+  ></div>
   <div
     v-else-if="reports.length == 0"
     class="flex flex-col w-full h-full items-center justify-center"

@@ -4,7 +4,7 @@ import {
   Options,
   UserProfile,
 } from "../types/options.js";
-import fs from "fs";
+import fs, { readFileSync, writeFileSync } from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import electron from "electron";
@@ -115,6 +115,15 @@ async function fetchServerOptions(): Promise<APLServerOptions | null> {
   };
 
   return serverOptions;
+}
+
+export async function getLegacyConfig(): Promise<any> {
+  const config = await readFileSync(configPath);
+  return JSON.parse(config.toString());
+}
+
+export async function setLegacyConfig(config: any) {
+  writeFileSync(configPath, JSON.stringify(config, null, 2));
 }
 
 /**
