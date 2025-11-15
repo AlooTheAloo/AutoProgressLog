@@ -111,13 +111,21 @@ model UserConfig {
   togglToken  String
   togglUserId String      @unique
   ankiConfig  AnkiConfig?
-  autoGenTime DateTime?   @db.Timetz(6)
+  autoGenTime AutoGenConfig?
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
   userId      Int         @unique
   user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+}
+
+model AutoGenConfig {
+  id          Int         @id @default(autoincrement())
+  secondsSinceMidnight    Int
+  timezone                String
+  userConfigId Int        @unique
+  userConfig  UserConfig  @relation(fields: [userConfigId], references: [id], onDelete: Cascade)
 }
 
 model AnkiConfig {

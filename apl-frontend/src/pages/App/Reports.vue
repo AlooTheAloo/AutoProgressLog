@@ -14,6 +14,9 @@ import Dialog from "primevue/dialog";
 import { motion, AnimatePresence } from "motion-v";
 import { CopyReportToast } from "../../../electron/main/Electron-Backend/ReportsListeners";
 import pluralize from "pluralize";
+import ExportableReport from "../../components/Common/ExportableReport.vue";
+import { Layout, ReportData } from "../Report/src/types/report-data";
+import { ProgressSpinner } from "primevue";
 
 const rows = 6;
 const router = useRouter();
@@ -122,6 +125,71 @@ function copyReport(id: string) {
   });
 }
 
+const mockLayout: Layout = {
+  layout: [
+    ["mature", "ankidata", "ankistreak"],
+    ["immersiondata", "immersionlog", "immersionstreak"],
+  ],
+  gradient: ["#FF0000", "#D57AFF", "#74B4FF"],
+};
+
+const mockReport: ReportData = {
+  reportNo: 1,
+  time: "Generated on the 1st of January 2023 at 12:00",
+  matureCards: [
+    {
+      reportNo: 1,
+      matureCardCount: 0,
+    },
+  ],
+  retentionRate: {
+    current: 0,
+    delta: 0,
+  },
+  totalReviews: {
+    current: 0,
+    delta: 0,
+  },
+  AnkiStreak: {
+    current: 0,
+    delta: 0,
+  },
+  AnkiData: [
+    {
+      reportNo: 1,
+      value: 0,
+    },
+  ],
+  ImmersionTime: {
+    current: 0,
+    delta: 0,
+  },
+  AverageImmersionTime: {
+    current: 0,
+    delta: 0,
+  },
+  MonthlyImmersion: 0,
+  BestImmersion: {
+    current: 0,
+    delta: 0,
+  },
+  ImmersionLog: [],
+  ImmersionData: [
+    {
+      reportNo: 1,
+      value: 0,
+    },
+  ],
+  ImmersionStreak: {
+    current: 0,
+    delta: 0,
+  },
+  ImmersionScore: 0,
+  AnkiScore: 0,
+  TotalScore: 0,
+  lastDaysPoints: [0, 0, 0, 0, 0, 0, 0, 0],
+};
+
 const imageViewerImage = ref<{ image?: string; id?: string; shown: boolean }>({
   image: undefined,
   id: undefined,
@@ -156,7 +224,15 @@ function nf(num: number) {
   <div
     v-if="!reports"
     class="flex flex-col w-full h-full items-center justify-center"
-  ></div>
+  >
+    <ProgressSpinner />
+
+    <!-- <ExportableReport
+      :report-scale="0.2"
+      :layout="mockLayout"
+      :reportData="mockReport"
+    ></ExportableReport> -->
+  </div>
   <div
     v-else-if="reports.length == 0"
     class="flex flex-col w-full h-full items-center justify-center"

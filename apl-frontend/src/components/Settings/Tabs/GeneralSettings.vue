@@ -9,6 +9,9 @@ import SettingsDatePicker from "../Common/SettingsDatePicker.vue";
 import SettingsResetSettings from "../Common/SettingsResetSettings.vue";
 import dayjs from "dayjs";
 
+const timezone = () =>
+  Intl.DateTimeFormat().resolvedOptions().timeZone ?? "America/Toronto";
+
 const props = defineProps<{
   config: Options | undefined;
 }>();
@@ -30,16 +33,25 @@ watch(
     console.log("in watch");
     const m_time = props.config?.serverOptions.userOptions.autoGenTime;
     console.log("time", m_time);
-    if (m_time == undefined || m_time == null) return;
-    console.log("time", m_time);
-    const time = dayjs(m_time);
+
+    if (!m_time || typeof m_time.secondsSinceMidnight !== "number") return;
+
+    // Create a new Date for today
     const date = new Date();
-    date.setHours(time.hour());
-    date.setMinutes(time.minute());
-    console.log("date", date.toDateString());
-    console.log(date);
+
+    // Calculate hours, minutes, seconds from secondsSinceMidnight
+    const totalSeconds = m_time.secondsSinceMidnight;
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+
+    // Apply to current date
+    date.setHours(hours, minutes, seconds, 0);
+
+    console.log("Converted time:", { hours, minutes, seconds });
+    console.log("Date object:", date);
     selectedTime.value = date;
-    console.log(selectedTime.value);
+    console.log("selectedTime:", selectedTime.value);
   },
   {
     immediate: true,
@@ -48,30 +60,28 @@ watch(
 
 function updateTime(value: Date) {
   if (props.config == undefined) return;
-  emit(
-    "update:config",
-    props.config.serverOptions.userOptions.autoGenTime == null
-      ? {
-          ...props.config,
-          serverOptions: {
-            ...props.config.serverOptions,
-            userOptions: {
-              ...props.config.serverOptions.userOptions,
-              autoGenTime: value,
-            },
-          },
-        }
+  console.log("Autogentime : " + value);
+  const valueAsConfig =
+    value == null
+      ? null
       : {
-          ...props.config,
-          serverOptions: {
-            ...props.config.serverOptions,
-            userOptions: {
-              ...props.config.serverOptions.userOptions,
-              autoGenTime: value,
-            },
-          },
-        }
-  );
+          secondsSinceMidnight: Math.floor(
+            value.getHours() * 3600 +
+              value.getMinutes() * 60 +
+              value.getSeconds()
+          ),
+          timezone: timezone(),
+        };
+  emit("update:config", {
+    ...props.config,
+    serverOptions: {
+      ...props.config.serverOptions,
+      userOptions: {
+        ...props.config.serverOptions.userOptions,
+        autoGenTime: valueAsConfig,
+      },
+    },
+  });
 }
 
 function ToggleAutogen(value: boolean) {
@@ -82,7 +92,9 @@ function ToggleAutogen(value: boolean) {
       ...props.config.serverOptions,
       userOptions: {
         ...props.config.serverOptions.userOptions,
-        autoGenTime: value ? dayjs().startOf("day").toDate() : null,
+        autoGenTime: value
+          ? { secondsSinceMidnight: 0, timezone: timezone() }
+          : null,
       },
     },
   });

@@ -29,6 +29,7 @@ export function settingsListeners() {
   });
 
   ipcMain.handle("SetConfig", async (event: any, arg: string) => {
+    console.log("SetConfig is called with arg " + arg);
     const auth = {
       headers: {
         authorization: `Bearer ${await APLStorage.get("token")}`,
@@ -39,11 +40,19 @@ export function settingsListeners() {
     writeFileSync(configPath, arg);
     updateConfig();
     const conf: Options = JSON.parse(arg);
+    console.log("AGT is " + conf.serverOptions.userOptions.autoGenTime);
     await setServerConfigAndInvalidate(async () => {
       APLStorage.set("localConfig", conf.localOptions);
-      await EdenClient.user.config.patch(conf.serverOptions.userOptions, auth);
-      await EdenClient.user.me.patch(conf.serverOptions.userProfile, auth);
-
+      const res1 = await EdenClient.user.config.patch(
+        conf.serverOptions.userOptions,
+        auth
+      );
+      const res2 = await EdenClient.user.me.patch(
+        conf.serverOptions.userProfile,
+        auth
+      );
+      console.log("res1 is " + JSON.stringify(res1));
+      console.log("res2 is " + JSON.stringify(res2));
       const currentAnkiSettings = await EdenClient.user.config.anki.get(auth);
       if (
         currentAnkiSettings.status == 200 &&

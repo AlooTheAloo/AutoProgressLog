@@ -191,8 +191,6 @@ app.on("ready", async () => {
   // ZFSTD
   await init();
 
-  console.log("Checking if setup is complete");
-  console.log(await APLStorage.get("setupComplete"));
   const ver = await VersionManager.verifyVersion();
   if ((await APLStorage.get("setupComplete")) && ver) {
     try {

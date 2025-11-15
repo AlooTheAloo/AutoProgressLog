@@ -47,15 +47,24 @@ export class APLStorage {
   // Overload signatures
   static async get<T>(key: StorageKey): Promise<T | undefined | null>;
   static async get(key: StorageKey): Promise<string | undefined | null>;
+  static async get<T>(
+    key: StorageKey,
+    defaultValue: T | null
+  ): Promise<T | undefined | null>;
+  static async get(
+    key: StorageKey,
+    defaultValue: any
+  ): Promise<string | undefined | null>;
 
   // Implementation
   static async get<T = unknown>(
-    key: StorageKey
+    key: StorageKey,
+    defaultValue: T | null = null
   ): Promise<T | string | undefined | null> {
     return new Promise((resolve, reject) => {
       electronStore.has(key, (err: unknown, hasKey: boolean) => {
         if (err) return reject(err);
-        if (!hasKey) return resolve(undefined);
+        if (!hasKey) return resolve(defaultValue);
 
         // @ts-ignore electron-json-storage-style API
         electronStore.get(key, (error: unknown, data?: { value?: unknown }) => {

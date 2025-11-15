@@ -17,7 +17,7 @@ export const meRoutes = new Elysia({ name: "me-routes" })
     },
     {
       headers: authHeaders,
-      response: __nullable__(PublicUser),
+      response: t.Nullable(PublicUser),
       detail: {
         description: "Get the current authenticated user",
         tags: ["User"],
@@ -32,16 +32,16 @@ export const meRoutes = new Elysia({ name: "me-routes" })
         where: { id: user.id },
         data: body,
       });
-
       return {
-        ...updatedUser,
-        id: undefined,
+        email: updatedUser.email,
+        userName: updatedUser.userName,
+        profilePicture: updatedUser.profilePicture,
       };
     },
     {
       headers: authHeaders,
       body: PublicMutateUser,
-      response: __nullable__(PublicUser),
+      response: t.Nullable(PublicUser),
       detail: {
         description: "Update the current authenticated user",
         tags: ["User"],

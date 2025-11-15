@@ -1,0 +1,55 @@
+{
+  "data": null,
+  "error": {
+    "status": 422,
+    "value": {
+      "type": "validation",
+      "on": "response",
+      "summary": "Value should be one of 'object', 'null'",
+      "property": "root",
+      "message": "Expected union value",
+      "expected": { "email": "", "userName": null, "profilePicture": null },
+      "found": {
+        "email": "pekocoj226@elygifts.com",
+        "userName": "AlooTheAloo",
+        "profilePicture": null
+      },
+      "errors": [
+        {
+          "type": 62,
+          "schema": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string" },
+                  "userName": {
+                    "anyOf": [{ "type": "null" }, { "type": "string" }]
+                  },
+                  "profilePicture": {
+                    "anyOf": [{ "type": "null" }, { "type": "string" }]
+                  }
+                },
+                "required": ["email", "userName", "profilePicture"]
+              },
+              { "type": "null" }
+            ]
+          },
+          "path": "",
+          "value": {
+            "email": "pekocoj226@elygifts.com",
+            "userName": "AlooTheAloo",
+            "profilePicture": null
+          },
+          "message": "Expected union value",
+          "errors": [{ "iterator": {} }, { "iterator": {} }],
+          "summary": "Value should be one of 'object', 'null'"
+        }
+      ]
+    }
+  },
+  "response": {},
+  "status": 422,
+  "headers": {}
+}

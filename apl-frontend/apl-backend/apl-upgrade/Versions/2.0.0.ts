@@ -85,6 +85,7 @@ export default async function upgrade_2_0_0() {
           ...localConfig,
         });
 
+        console.log("res : " + JSON.stringify(res));
         return res.status == 200;
       } catch (e) {
         console.log(e);

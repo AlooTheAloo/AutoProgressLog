@@ -14,6 +14,9 @@ export class VersionManager {
   };
 
   static verifyVersion = async () => {
+    console.log("exist " + this.exists());
+    console.log("es" + existsSync(cache_location));
+    console.log("comp " + ((await this.SemVer()).compare(appVersion) == 0));
     if (this.exists() == false) return null;
     if (existsSync(cache_location)) return false; // Before v2
     return (await this.SemVer()).compare(appVersion) == 0;

@@ -87,11 +87,15 @@ async function restoreCacheFromStorageOnce() {
 
 // Fetch server-side config (no caching here)
 async function fetchServerOptions(): Promise<APLServerOptions | null> {
+  if ((await APLStorage.get("setupComplete", false)) == false) return null;
+
   const auth = {
     headers: {
       authorization: `Bearer ${await APLStorage.get("token")}`,
     },
   };
+
+  console.log(JSON.stringify(await EdenClient.user.config.get(auth)));
 
   const [userConfig, ankiConfig, userProfile] = await Promise.all([
     EdenClient.user.config.get(auth),
@@ -102,8 +106,10 @@ async function fetchServerOptions(): Promise<APLServerOptions | null> {
   console.log(ankiConfig.status);
   console.log("ankiconf is : " + JSON.stringify(ankiConfig.data));
 
+  console.log("uc : " + JSON.stringify(userConfig.data));
+  console.log("up : " + JSON.stringify(userProfile.data));
+
   if (userConfig.data == null) return null;
-  if (userProfile.data == null) return null;
   if (userProfile.data == null) return null;
   const serverOptions: APLServerOptions = {
     userOptions: userConfig.data,
@@ -176,9 +182,9 @@ export async function getConfig(
     console.log("fetching server options");
     const fresh = await fetchServerOptions();
     console.log("fresh is " + JSON.stringify(fresh));
-    if (fresh == null)
+    if (fresh == null) {
       return Promise.reject(new Error("No user config on server"));
-    else {
+    } else {
       const entry = { data: fresh, fetchedAt: Date.now() };
       serverConfigCache = entry;
       // Persist (best-effort)

@@ -9,7 +9,6 @@ export const UserConfigPlain = t.Object(
     id: t.Integer(),
     togglToken: t.String(),
     togglUserId: t.String(),
-    autoGenTime: __nullable__(t.Date()),
     createdAt: t.Date(),
     updatedAt: t.Date(),
     userId: t.Integer(),
@@ -35,6 +34,17 @@ export const UserConfigRelations = t.Object(
         { additionalProperties: false },
       ),
     ),
+    autoGenTime: __nullable__(
+      t.Object(
+        {
+          id: t.Integer(),
+          secondsSinceMidnight: t.Integer(),
+          timezone: t.String(),
+          userConfigId: t.Integer(),
+        },
+        { additionalProperties: false },
+      ),
+    ),
     user: t.Object(
       {
         id: t.Integer(),
@@ -49,21 +59,31 @@ export const UserConfigRelations = t.Object(
 );
 
 export const UserConfigPlainInputCreate = t.Object(
-  { togglToken: t.String(), autoGenTime: t.Optional(__nullable__(t.Date())) },
+  { togglToken: t.String() },
   { additionalProperties: false },
 );
 
 export const UserConfigPlainInputUpdate = t.Object(
-  {
-    togglToken: t.Optional(t.String()),
-    autoGenTime: t.Optional(__nullable__(t.Date())),
-  },
+  { togglToken: t.Optional(t.String()) },
   { additionalProperties: false },
 );
 
 export const UserConfigRelationsInputCreate = t.Object(
   {
     ankiConfig: t.Optional(
+      t.Object(
+        {
+          connect: t.Object(
+            {
+              id: t.Integer({ additionalProperties: false }),
+            },
+            { additionalProperties: false },
+          ),
+        },
+        { additionalProperties: false },
+      ),
+    ),
+    autoGenTime: t.Optional(
       t.Object(
         {
           connect: t.Object(
@@ -108,6 +128,20 @@ export const UserConfigRelationsInputUpdate = t.Partial(
           { additionalProperties: false },
         ),
       ),
+      autoGenTime: t.Partial(
+        t.Object(
+          {
+            connect: t.Object(
+              {
+                id: t.Integer({ additionalProperties: false }),
+              },
+              { additionalProperties: false },
+            ),
+            disconnect: t.Boolean(),
+          },
+          { additionalProperties: false },
+        ),
+      ),
       user: t.Object(
         {
           connect: t.Object(
@@ -135,7 +169,6 @@ export const UserConfigWhere = t.Partial(
           id: t.Integer(),
           togglToken: t.String(),
           togglUserId: t.String(),
-          autoGenTime: t.Date(),
           createdAt: t.Date(),
           updatedAt: t.Date(),
           userId: t.Integer(),
@@ -185,7 +218,6 @@ export const UserConfigWhereUnique = t.Recursive(
               id: t.Integer(),
               togglToken: t.String(),
               togglUserId: t.String(),
-              autoGenTime: t.Date(),
               createdAt: t.Date(),
               updatedAt: t.Date(),
               userId: t.Integer(),
@@ -219,7 +251,12 @@ export const UserConfigSelect = t.Partial(
 
 export const UserConfigInclude = t.Partial(
   t.Object(
-    { ankiConfig: t.Boolean(), user: t.Boolean(), _count: t.Boolean() },
+    {
+      ankiConfig: t.Boolean(),
+      autoGenTime: t.Boolean(),
+      user: t.Boolean(),
+      _count: t.Boolean(),
+    },
     { additionalProperties: false },
   ),
 );
@@ -234,9 +271,6 @@ export const UserConfigOrderBy = t.Partial(
         additionalProperties: false,
       }),
       togglUserId: t.Union([t.Literal("asc"), t.Literal("desc")], {
-        additionalProperties: false,
-      }),
-      autoGenTime: t.Union([t.Literal("asc"), t.Literal("desc")], {
         additionalProperties: false,
       }),
       createdAt: t.Union([t.Literal("asc"), t.Literal("desc")], {

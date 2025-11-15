@@ -1,5 +1,5 @@
 import Elysia, { t } from "elysia";
-import { TokenType, AnkiRetentionMode } from "@prisma/client";
+import { TokenType, AnkiRetentionMode, AutoGenConfig } from "@prisma/client";
 import { Database } from "bun:sqlite";
 import prisma from "../../db/client";
 import { authGuard } from "../../middlewares/authGuard";
@@ -9,6 +9,17 @@ import { DEFAULT_ANKI_URL } from "../../services/anki/AnkiHTTPClient";
 
 function fromEpochMaybeMs(x: number): Date {
   return new Date(x < 1_000_000_000_000 ? x * 1000 : x);
+}
+
+function toAutoGenTime(
+  hours = 0,
+  minutes = 0,
+  tz: string = "America/Toronto"
+): Omit<AutoGenConfig, "id" | "userConfigId"> | undefined {
+  return {
+    secondsSinceMidnight: hours * 60 * 60 + minutes * 60,
+    timezone: tz,
+  };
 }
 
 function toTimeOnlyDate(hours = 0, minutes = 0): Date {
@@ -113,7 +124,9 @@ export const importLegacyRoute = new Elysia({ name: "import-legacy" })
       const genM = Number(
         cfg?.general?.autogen?.options?.generationTime?.minutes ?? 0
       );
-      const autoGenTime = autogenEnabled ? toTimeOnlyDate(genH, genM) : null;
+      const autoGenTime = autogenEnabled
+        ? toAutoGenTime(genH, genM)
+        : undefined;
 
       const togglToken = cfg?.toggl?.togglToken ?? null;
       const userName = cfg?.account?.userName ?? null;
@@ -155,7 +168,12 @@ export const importLegacyRoute = new Elysia({ name: "import-legacy" })
             userId,
             togglToken: togglToken ?? "", // must be non-null per schema
             togglUserId: TOGGL_UID,
-            autoGenTime,
+            autoGenTime:
+              autoGenTime == undefined
+                ? undefined
+                : {
+                    create: autoGenTime,
+                  },
             ankiConfig:
               ankiEnabled && ankiToken
                 ? {
@@ -176,7 +194,12 @@ export const importLegacyRoute = new Elysia({ name: "import-legacy" })
             togglToken: togglToken ?? existingCfg.togglToken,
             // keep existing togglUserId if present; otherwise fill default
             togglUserId: existingCfg.togglUserId || TOGGL_UID,
-            autoGenTime,
+            autoGenTime:
+              autoGenTime == undefined
+                ? undefined
+                : {
+                    create: autoGenTime,
+                  },
             ankiConfig:
               ankiEnabled && ankiToken
                 ? {
@@ -241,6 +264,7 @@ export const importLegacyRoute = new Elysia({ name: "import-legacy" })
       let createdActivities = 0;
       // Insert in manageable batches to reduce transaction size
       const BATCH = 200;
+
       for (let i = 0; i < activityRows.length; i += BATCH) {
         const chunk = activityRows.slice(i, i + BATCH);
         await prisma.$transaction(
@@ -251,6 +275,7 @@ export const importLegacyRoute = new Elysia({ name: "import-legacy" })
                 createdAt: fromEpochMaybeMs(a.time),
                 seconds: a.seconds,
                 activityName: a.activityName,
+                activityTogglId: a.id.toString(),
               },
             })
           )

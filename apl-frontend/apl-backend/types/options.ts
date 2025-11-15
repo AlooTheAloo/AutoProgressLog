@@ -15,7 +15,10 @@ export type APLLocalOptions = {
 
 export type APLServerOptions = {
   userOptions: {
-    autoGenTime: Date | null;
+    autoGenTime: {
+      secondsSinceMidnight: number;
+      timezone: string;
+    } | null;
     togglToken: string;
     togglUserId: string;
   };

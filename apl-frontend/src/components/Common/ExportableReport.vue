@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { Layout, ReportData } from "../../pages/Report/src/types/report-data";
 import { onMounted, ref } from "vue";
-import Report from "../Report/src/components/Report.vue";
+import Report from "../../pages/Report/src/components/Report.vue";
 import domToImage from "dom-to-image";
+import { Options } from "../../../apl-backend/types/options";
 
 const reportdata = ref<ReportData | null>(null);
 const layoutdata = ref<Layout | null>(null);
@@ -19,23 +20,40 @@ const props = defineProps<{
   reportScale: number;
 }>();
 
-function exportImage() {
-  if (!host.value) return;
+// async function exportImage() {
+//   if (!host.value) return;
 
-  domToImage
-    .toPng(host.value, {
-      width: BASE_W,
-      height: BASE_H,
-      style: {
-        transformOrigin: "top left",
-        transform: `scale(${1 / props.reportScale})`,
-      },
-      quality: 1,
-    })
-    .then((x) => {
-      window.ipcRenderer.invoke("Export-Image", x);
-    });
-}
+//   const cfg: Options = await window.ipcRenderer.invoke("GetConfig");
+
+//   const outOpts = cfg.localOptions.outputOptions;
+
+//   const params = {
+//     width: BASE_W,
+//     height: BASE_H,
+//     style: {
+//       transformOrigin: "top left",
+//       transform: `scale(${1 / props.reportScale})`,
+//     },
+//     quality: outOpts.outputQuality,
+//   };
+
+//   let promise;
+
+//   const e = outOpts.outputFile.extension;
+
+//   if (e == ".jpeg" || e == ".jpg") {
+//     promise = domToImage.toJpeg(host.value, params);
+//   } else if (e == ".png") {
+//     promise = domToImage.toPng(host.value, params);
+//   } else {
+//     alert("Invalid extension");
+//     return;
+//   }
+
+//   promise.then((x) => {
+//     window.ipcRenderer.invoke("Export-Image", x);
+//   });
+// }
 </script>
 
 <template>
@@ -53,5 +71,5 @@ function exportImage() {
     </div>
   </div>
 
-  <Button @click="exportImage"> export that shit </Button>
+  <!-- <Button @click="exportImage"> export that shit </Button> -->
 </template>

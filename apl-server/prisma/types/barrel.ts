@@ -8,6 +8,7 @@ export * from "./ImmersionActivity";
 export * from "./Report";
 export * from "./Streak";
 export * from "./UserConfig";
+export * from "./AutoGenConfig";
 export * from "./AnkiConfig";
 export * from "./__nullable__";
 export * from "./__transformDate__";

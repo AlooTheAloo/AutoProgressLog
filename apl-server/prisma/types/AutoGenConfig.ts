@@ -4,22 +4,17 @@ import { __transformDate__ } from "./__transformDate__";
 
 import { __nullable__ } from "./__nullable__";
 
-export const AnkiConfigPlain = t.Object(
+export const AutoGenConfigPlain = t.Object(
   {
     id: t.Integer(),
-    url: t.String(),
-    ankiToken: t.String(),
-    retentionMode: t.Union(
-      [t.Literal("ANKI_DEFAULT"), t.Literal("TRUE_RETENTION")],
-      { additionalProperties: false },
-    ),
-    trackedDecks: t.Array(t.String(), { additionalProperties: false }),
+    secondsSinceMidnight: t.Integer(),
+    timezone: t.String(),
     userConfigId: t.Integer(),
   },
   { additionalProperties: false },
 );
 
-export const AnkiConfigRelations = t.Object(
+export const AutoGenConfigRelations = t.Object(
   {
     userConfig: t.Object(
       {
@@ -36,36 +31,20 @@ export const AnkiConfigRelations = t.Object(
   { additionalProperties: false },
 );
 
-export const AnkiConfigPlainInputCreate = t.Object(
+export const AutoGenConfigPlainInputCreate = t.Object(
+  { secondsSinceMidnight: t.Integer(), timezone: t.String() },
+  { additionalProperties: false },
+);
+
+export const AutoGenConfigPlainInputUpdate = t.Object(
   {
-    url: t.Optional(t.String()),
-    ankiToken: t.String(),
-    retentionMode: t.Union(
-      [t.Literal("ANKI_DEFAULT"), t.Literal("TRUE_RETENTION")],
-      { additionalProperties: false },
-    ),
-    trackedDecks: t.Array(t.String(), { additionalProperties: false }),
+    secondsSinceMidnight: t.Optional(t.Integer()),
+    timezone: t.Optional(t.String()),
   },
   { additionalProperties: false },
 );
 
-export const AnkiConfigPlainInputUpdate = t.Object(
-  {
-    url: t.Optional(t.String()),
-    ankiToken: t.Optional(t.String()),
-    retentionMode: t.Optional(
-      t.Union([t.Literal("ANKI_DEFAULT"), t.Literal("TRUE_RETENTION")], {
-        additionalProperties: false,
-      }),
-    ),
-    trackedDecks: t.Optional(
-      t.Array(t.String(), { additionalProperties: false }),
-    ),
-  },
-  { additionalProperties: false },
-);
-
-export const AnkiConfigRelationsInputCreate = t.Object(
+export const AutoGenConfigRelationsInputCreate = t.Object(
   {
     userConfig: t.Object(
       {
@@ -82,7 +61,7 @@ export const AnkiConfigRelationsInputCreate = t.Object(
   { additionalProperties: false },
 );
 
-export const AnkiConfigRelationsInputUpdate = t.Partial(
+export const AutoGenConfigRelationsInputUpdate = t.Partial(
   t.Object(
     {
       userConfig: t.Object(
@@ -101,7 +80,7 @@ export const AnkiConfigRelationsInputUpdate = t.Partial(
   ),
 );
 
-export const AnkiConfigWhere = t.Partial(
+export const AutoGenConfigWhere = t.Partial(
   t.Recursive(
     (Self) =>
       t.Object(
@@ -110,22 +89,17 @@ export const AnkiConfigWhere = t.Partial(
           NOT: t.Union([Self, t.Array(Self, { additionalProperties: false })]),
           OR: t.Array(Self, { additionalProperties: false }),
           id: t.Integer(),
-          url: t.String(),
-          ankiToken: t.String(),
-          retentionMode: t.Union(
-            [t.Literal("ANKI_DEFAULT"), t.Literal("TRUE_RETENTION")],
-            { additionalProperties: false },
-          ),
-          trackedDecks: t.Array(t.String(), { additionalProperties: false }),
+          secondsSinceMidnight: t.Integer(),
+          timezone: t.String(),
           userConfigId: t.Integer(),
         },
         { additionalProperties: false },
       ),
-    { $id: "AnkiConfig" },
+    { $id: "AutoGenConfig" },
   ),
 );
 
-export const AnkiConfigWhereUnique = t.Recursive(
+export const AutoGenConfigWhereUnique = t.Recursive(
   (Self) =>
     t.Intersect(
       [
@@ -161,15 +135,8 @@ export const AnkiConfigWhereUnique = t.Recursive(
           t.Object(
             {
               id: t.Integer(),
-              url: t.String(),
-              ankiToken: t.String(),
-              retentionMode: t.Union(
-                [t.Literal("ANKI_DEFAULT"), t.Literal("TRUE_RETENTION")],
-                { additionalProperties: false },
-              ),
-              trackedDecks: t.Array(t.String(), {
-                additionalProperties: false,
-              }),
+              secondsSinceMidnight: t.Integer(),
+              timezone: t.String(),
               userConfigId: t.Integer(),
             },
             { additionalProperties: false },
@@ -178,17 +145,15 @@ export const AnkiConfigWhereUnique = t.Recursive(
       ],
       { additionalProperties: false },
     ),
-  { $id: "AnkiConfig" },
+  { $id: "AutoGenConfig" },
 );
 
-export const AnkiConfigSelect = t.Partial(
+export const AutoGenConfigSelect = t.Partial(
   t.Object(
     {
       id: t.Boolean(),
-      url: t.Boolean(),
-      ankiToken: t.Boolean(),
-      retentionMode: t.Boolean(),
-      trackedDecks: t.Boolean(),
+      secondsSinceMidnight: t.Boolean(),
+      timezone: t.Boolean(),
       userConfigId: t.Boolean(),
       userConfig: t.Boolean(),
       _count: t.Boolean(),
@@ -197,30 +162,23 @@ export const AnkiConfigSelect = t.Partial(
   ),
 );
 
-export const AnkiConfigInclude = t.Partial(
+export const AutoGenConfigInclude = t.Partial(
   t.Object(
-    {
-      retentionMode: t.Boolean(),
-      userConfig: t.Boolean(),
-      _count: t.Boolean(),
-    },
+    { userConfig: t.Boolean(), _count: t.Boolean() },
     { additionalProperties: false },
   ),
 );
 
-export const AnkiConfigOrderBy = t.Partial(
+export const AutoGenConfigOrderBy = t.Partial(
   t.Object(
     {
       id: t.Union([t.Literal("asc"), t.Literal("desc")], {
         additionalProperties: false,
       }),
-      url: t.Union([t.Literal("asc"), t.Literal("desc")], {
+      secondsSinceMidnight: t.Union([t.Literal("asc"), t.Literal("desc")], {
         additionalProperties: false,
       }),
-      ankiToken: t.Union([t.Literal("asc"), t.Literal("desc")], {
-        additionalProperties: false,
-      }),
-      trackedDecks: t.Union([t.Literal("asc"), t.Literal("desc")], {
+      timezone: t.Union([t.Literal("asc"), t.Literal("desc")], {
         additionalProperties: false,
       }),
       userConfigId: t.Union([t.Literal("asc"), t.Literal("desc")], {
@@ -231,16 +189,17 @@ export const AnkiConfigOrderBy = t.Partial(
   ),
 );
 
-export const AnkiConfig = t.Composite([AnkiConfigPlain, AnkiConfigRelations], {
-  additionalProperties: false,
-});
-
-export const AnkiConfigInputCreate = t.Composite(
-  [AnkiConfigPlainInputCreate, AnkiConfigRelationsInputCreate],
+export const AutoGenConfig = t.Composite(
+  [AutoGenConfigPlain, AutoGenConfigRelations],
   { additionalProperties: false },
 );
 
-export const AnkiConfigInputUpdate = t.Composite(
-  [AnkiConfigPlainInputUpdate, AnkiConfigRelationsInputUpdate],
+export const AutoGenConfigInputCreate = t.Composite(
+  [AutoGenConfigPlainInputCreate, AutoGenConfigRelationsInputCreate],
+  { additionalProperties: false },
+);
+
+export const AutoGenConfigInputUpdate = t.Composite(
+  [AutoGenConfigPlainInputUpdate, AutoGenConfigRelationsInputUpdate],
   { additionalProperties: false },
 );
