@@ -140,6 +140,9 @@ export async function setLegacyConfig(config: any) {
 export async function getConfig(
   opts: { forceRefresh?: boolean; ttlMs?: number } = {}
 ): Promise<Options | null> {
+  const setupComplete = await APLStorage.get("setupComplete");
+  if (!setupComplete) return null;
+
   await restoreCacheFromStorageOnce();
 
   const ttlMs = opts.ttlMs ?? 120_000; // default: 2 minutes
@@ -179,9 +182,7 @@ export async function getConfig(
   }
   // Do the fetch (deduped)
   inFlight = (async () => {
-    console.log("fetching server options");
     const fresh = await fetchServerOptions();
-    console.log("fresh is " + JSON.stringify(fresh));
     if (fresh == null) {
       return Promise.reject(new Error("No user config on server"));
     } else {

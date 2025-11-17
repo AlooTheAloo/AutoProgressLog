@@ -39,6 +39,7 @@
     "apexcharts": "^4.7.0",
     "axios": "^1.10.0",
     "chromium-bidi": "^7.0.0",
+    "color": "^5.0.3",
     "country-flag-icons": "^1.5.19",
     "d3-interpolate": "^3.0.1",
     "dayjs": "^1.11.13",

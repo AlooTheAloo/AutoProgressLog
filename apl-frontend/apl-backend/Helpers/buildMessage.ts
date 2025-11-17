@@ -7,13 +7,12 @@ import dayjs from "dayjs";
 import { OutputOptions, ReportExtension } from "../types/options.js";
 import { arithmeticWeightedMean } from "./util.js";
 import { getConfig } from "./getConfig.js";
-import color from "color";
-import { Layout } from "../apl-visuals/src/types/report-data.js";
 import { app } from "electron";
 import playwright, { Page } from "playwright";
 import { Browser, getInstalledBrowsers } from "@puppeteer/browsers";
 import { Logger } from "./Log.js";
-
+import { Layout } from "../../src/pages/Report/src/types/report-data.js";
+import color from "color";
 declare global {
   interface Window {
     apl_ReportData: ReportData;
@@ -185,13 +184,13 @@ interface builderDTO {
   bestSeconds: TPlusDelta<number>;
 }
 
-export function buildJSON(
+export async function buildJSON(
   ankiData: ankiData,
   allEvents: relativeActivity[],
   lastCaches: cache[],
   builderDTO: builderDTO
-): ReportData {
-  const options = getConfig();
+): Promise<ReportData> {
+  const options = await getConfig();
   if (options == undefined) throw new Error("No config found");
 
   const date = dayjs();
@@ -202,7 +201,7 @@ export function buildJSON(
   let ankiStreak = 0;
   let ankiScore = 0;
 
-  if (options.anki.enabled) {
+  if (options.serverOptions.ankiOptions.enabled) {
     ankiDelta = ankiData.reviewCount - lastCache.totalCardsStudied;
     ankiStreak =
       lastCache.ankiStreak + (ankiDelta == 0 ? -lastCache.ankiStreak : 1);
@@ -344,7 +343,7 @@ export type layout = {
 };
 
 export async function buildLayout(): Promise<layout | undefined> {
-  const config = getConfig();
+  const config = await getConfig();
   if (config == undefined) return;
 
   let gradient: string[] = [];
@@ -376,7 +375,7 @@ export async function buildLayout(): Promise<layout | undefined> {
     gradient = ["#FF0000", "#D57AFF", "#74B4FF"];
   }
 
-  if (config.anki.enabled) {
+  if (config.serverOptions.ankiOptions.enabled) {
     return {
       layout: LAYOUT_FULL,
       gradient: gradient,

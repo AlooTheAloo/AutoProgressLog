@@ -5,7 +5,6 @@ import {
   getLegacyConfig,
   setLegacyConfig,
 } from "../../Helpers/getConfig";
-import { setConfig } from "../../config/configManager";
 import upgrade_1_0_1 from "./1.0.1";
 
 interface previous_config {
