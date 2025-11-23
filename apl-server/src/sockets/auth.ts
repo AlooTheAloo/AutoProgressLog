@@ -8,6 +8,7 @@ import client from "../db/client";
  * @returns The user ID and token or null if the token is invalid.
  */
 export async function tokenToTogglData(token: string) {
+  console.log(token);
   try {
     console.log("trying to convert token to toggl data" + token);
     const user = await client.user.findFirst({

@@ -22,6 +22,7 @@ export async function runSync() {
         authorization: `Bearer ${await APLStorage.get("token")}`,
       },
     });
+    console.log("fetchedDTO is " + JSON.stringify(fetchedDTO));
     if (fetchedDTO.data == null) return null;
     if (fetchedDTO.data.profile_picture == "")
       fetchedDTO.data.profile_picture = DEFAULT_PFP;
@@ -29,8 +30,10 @@ export async function runSync() {
       fetchedDTO.data.profile_picture = `http://${SERVER_URL}${fetchedDTO.data.profile_picture}`;
 
     await APLStorage.set("Cached_DTO", fetchedDTO.data);
+    console.log("fetchedDTO.data is " + JSON.stringify(fetchedDTO.data));
     return fetchedDTO.data;
   } catch (e) {
+    console.log("gros pipi");
     NotificationManager.notify({
       header: "Cannot complete sync!!",
       content:

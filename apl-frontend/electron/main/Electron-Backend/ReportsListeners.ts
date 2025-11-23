@@ -2,6 +2,7 @@ import { ipcMain } from "electron";
 import { isGenerating } from "../../../apl-backend/generate/generate";
 import { writeFileSync } from "fs";
 import { getConfig } from "../../../apl-backend/Helpers/getConfig";
+import path from "path";
 
 type ListReport = {
   id: number;
@@ -16,22 +17,53 @@ export type CopyReportToast = {
   reportNo?: string;
 };
 
+import { EdenClient } from "./api/ApiManager";
+import { APLStorage } from "./util/auth";
+import { ReportData } from "../../../apl-backend/types/reportdata";
+
 export function reportsListeners() {
   // Handle the Get-Reports IPC request
-  ipcMain.handle("Get-Reports", async (event, args) => {});
+  ipcMain.handle("Get-Reports", async (event, args) => {
+    const token = await APLStorage.get("token");
+    const { data, error } = await EdenClient.user.reports.get({
+        headers: { authorization: `Bearer ${token}` }
+    });
+    if (error) {
+      console.error("Error fetching reports:", error);
+      return [];
+    }
+    return data;
+  });
 
   ipcMain.handle("Get-Image", async (event, id: string) => {});
 
-  ipcMain.handle("Open-Report", async (event, id: string) => {});
-
   ipcMain.handle("Copy-Report", async (event, id: string) => {});
 
-  ipcMain.handle("Export-Image", async (event, Image: string) => {
-    const base64 = Image.replace(/^data:image\/\w+;base64,/, "");
-    const buffer = Buffer.from(base64, "base64");
-    const f = (await getConfig())?.localOptions.outputOptions.outputFile;
-    if (!f) return;
-    await writeFileSync(f.path + f.name + " " + 100 + f.extension, buffer);
+  ipcMain.handle("Open-Report", async (event, id: string) => {});
+
+  ipcMain.handle("Export-Image", async (event, Image: string, reportNo: number) => {
+    try {
+      const base64 = Image.replace(/^data:image\/\w+;base64,/, "");
+      const buffer = Buffer.from(base64, "base64");
+      const config = await getConfig();
+      const f = config?.localOptions.outputOptions.outputFile;
+      
+      if (!f) {
+        console.error("Output file configuration missing");
+        return { success: false, error: "Configuration missing" };
+      }
+      
+      // Ensure path ends with separator or use path.join if f.path is a directory
+      const fileName = `${f.name} ${reportNo}${f.extension}`;
+      const filePath = path.join(f.path, fileName);
+      
+      await writeFileSync(filePath, buffer);
+      console.log("Image saved to:", filePath);
+      return { success: true, path: filePath };
+    } catch (error) {
+      console.error("Error saving image:", error);
+      return { success: false, error: error };
+    }
   });
 
   ipcMain.handle("loadReportsPage", async (evt) => {
@@ -39,6 +71,21 @@ export function reportsListeners() {
       await new Promise((res) => setTimeout(res, 50));
     }
     return true;
+  });
+
+  ipcMain.handle("Get-Report-Details", async (event, id: string) => {
+    const token = await APLStorage.get("token");
+    const { data, error } = await EdenClient.user.report({ id }).get({
+      headers: { authorization: `Bearer ${token}` },
+    });
+    if (error) {
+      console.error("Error fetching report details:", error);
+      return null;
+    }
+
+    console.log("Report : " + JSON.stringify(data));
+    
+    return data as ReportData;
   });
 
   ipcMain.handle("Reverse-Report", async (event) => {});

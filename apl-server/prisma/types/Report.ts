@@ -11,6 +11,8 @@ export const ReportPlain = t.Object(
     score: t.Integer(),
     userId: t.Integer(),
     syncDataId: t.Integer(),
+    averageImmersionTime: t.Integer(),
+    bestImmersionTime: t.Integer(),
   },
   { additionalProperties: false },
 );
@@ -46,17 +48,33 @@ export const ReportRelations = t.Object(
       },
       { additionalProperties: false },
     ),
+    metadata: __nullable__(
+      t.Object(
+        { id: t.Integer(), reportId: t.Integer(), hasAnki: t.Boolean() },
+        { additionalProperties: false },
+      ),
+    ),
   },
   { additionalProperties: false },
 );
 
 export const ReportPlainInputCreate = t.Object(
-  { reportNo: t.Integer(), score: t.Integer() },
+  {
+    reportNo: t.Integer(),
+    score: t.Integer(),
+    averageImmersionTime: t.Integer(),
+    bestImmersionTime: t.Integer(),
+  },
   { additionalProperties: false },
 );
 
 export const ReportPlainInputUpdate = t.Object(
-  { reportNo: t.Optional(t.Integer()), score: t.Optional(t.Integer()) },
+  {
+    reportNo: t.Optional(t.Integer()),
+    score: t.Optional(t.Integer()),
+    averageImmersionTime: t.Optional(t.Integer()),
+    bestImmersionTime: t.Optional(t.Integer()),
+  },
   { additionalProperties: false },
 );
 
@@ -96,6 +114,19 @@ export const ReportRelationsInputCreate = t.Object(
         ),
       },
       { additionalProperties: false },
+    ),
+    metadata: t.Optional(
+      t.Object(
+        {
+          connect: t.Object(
+            {
+              id: t.Integer({ additionalProperties: false }),
+            },
+            { additionalProperties: false },
+          ),
+        },
+        { additionalProperties: false },
+      ),
     ),
   },
   { additionalProperties: false },
@@ -140,6 +171,20 @@ export const ReportRelationsInputUpdate = t.Partial(
         },
         { additionalProperties: false },
       ),
+      metadata: t.Partial(
+        t.Object(
+          {
+            connect: t.Object(
+              {
+                id: t.Integer({ additionalProperties: false }),
+              },
+              { additionalProperties: false },
+            ),
+            disconnect: t.Boolean(),
+          },
+          { additionalProperties: false },
+        ),
+      ),
     },
     { additionalProperties: false },
   ),
@@ -158,6 +203,8 @@ export const ReportWhere = t.Partial(
           score: t.Integer(),
           userId: t.Integer(),
           syncDataId: t.Integer(),
+          averageImmersionTime: t.Integer(),
+          bestImmersionTime: t.Integer(),
         },
         { additionalProperties: false },
       ),
@@ -218,6 +265,8 @@ export const ReportWhereUnique = t.Recursive(
               score: t.Integer(),
               userId: t.Integer(),
               syncDataId: t.Integer(),
+              averageImmersionTime: t.Integer(),
+              bestImmersionTime: t.Integer(),
             },
             { additionalProperties: false },
           ),
@@ -239,6 +288,9 @@ export const ReportSelect = t.Partial(
       user: t.Boolean(),
       syncData: t.Boolean(),
       syncDataId: t.Boolean(),
+      averageImmersionTime: t.Boolean(),
+      bestImmersionTime: t.Boolean(),
+      metadata: t.Boolean(),
       _count: t.Boolean(),
     },
     { additionalProperties: false },
@@ -251,6 +303,7 @@ export const ReportInclude = t.Partial(
       streak: t.Boolean(),
       user: t.Boolean(),
       syncData: t.Boolean(),
+      metadata: t.Boolean(),
       _count: t.Boolean(),
     },
     { additionalProperties: false },
@@ -273,6 +326,12 @@ export const ReportOrderBy = t.Partial(
         additionalProperties: false,
       }),
       syncDataId: t.Union([t.Literal("asc"), t.Literal("desc")], {
+        additionalProperties: false,
+      }),
+      averageImmersionTime: t.Union([t.Literal("asc"), t.Literal("desc")], {
+        additionalProperties: false,
+      }),
+      bestImmersionTime: t.Union([t.Literal("asc"), t.Literal("desc")], {
         additionalProperties: false,
       }),
     },

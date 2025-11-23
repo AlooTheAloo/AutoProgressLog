@@ -4,6 +4,7 @@ import { verifyProviderRoutes } from "./verifyProvider";
 import { syncRoute } from "./sync";
 import { meRoutes } from "./me";
 import { importLegacyRoute } from "./import-legacy";
+import { reportRoute } from "./report";
 
 export const userRoutes = new Elysia({ name: "user-routes" }).group(
   "/user",
@@ -14,4 +15,5 @@ export const userRoutes = new Elysia({ name: "user-routes" }).group(
       .use(meRoutes)
       .use(verifyProviderRoutes)
       .use(importLegacyRoute)
+      .use(reportRoute)
 );

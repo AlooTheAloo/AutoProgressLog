@@ -154,7 +154,12 @@ export function setupListeners() {
       {
         togglToken: togglAccount.api_token,
         togglUserId: togglAccount.id.toString(),
-        autoGenTime: dayjs().startOf("day").toDate(),
+        autoGenTime: {
+          secondsSinceMidnight: 0,
+          timezone:
+            Intl.DateTimeFormat().resolvedOptions().timeZone ??
+            "America/Toronto",
+        },
       },
       {
         headers: {

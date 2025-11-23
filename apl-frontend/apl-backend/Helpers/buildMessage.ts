@@ -184,148 +184,148 @@ interface builderDTO {
   bestSeconds: TPlusDelta<number>;
 }
 
-export async function buildJSON(
-  ankiData: ankiData,
-  allEvents: relativeActivity[],
-  lastCaches: cache[],
-  builderDTO: builderDTO
-): Promise<ReportData> {
-  const options = await getConfig();
-  if (options == undefined) throw new Error("No config found");
+// export async function buildJSON(
+//   ankiData: ankiData,
+//   allEvents: relativeActivity[],
+//   lastCaches: cache[],
+//   builderDTO: builderDTO
+// ): Promise<ReportData> {
+//   const options = await getConfig();
+//   if (options == undefined) throw new Error("No config found");
 
-  const date = dayjs();
-  const lastCache = lastCaches[0];
-  const reportNo = lastCache.reportNo + 1;
+//   const date = dayjs();
+//   const lastCache = lastCaches[0];
+//   const reportNo = lastCache.reportNo + 1;
 
-  let ankiDelta = 0;
-  let ankiStreak = 0;
-  let ankiScore = 0;
+//   let ankiDelta = 0;
+//   let ankiStreak = 0;
+//   let ankiScore = 0;
 
-  if (options.serverOptions.ankiOptions.enabled) {
-    ankiDelta = ankiData.reviewCount - lastCache.totalCardsStudied;
-    ankiStreak =
-      lastCache.ankiStreak + (ankiDelta == 0 ? -lastCache.ankiStreak : 1);
-    ankiScore =
-      ankiDelta +
-      (lastCache.mature == 0 || reportNo == 1
-        ? 0
-        : Math.max(ankiData.matureCount - (lastCache.mature ?? 0), 0) * 100);
-  }
+//   if (options.serverOptions.ankiOptions.enabled) {
+//     ankiDelta = ankiData.reviewCount - lastCache.totalCardsStudied;
+//     ankiStreak =
+//       lastCache.ankiStreak + (ankiDelta == 0 ? -lastCache.ankiStreak : 1);
+//     ankiScore =
+//       ankiDelta +
+//       (lastCache.mature == 0 || reportNo == 1
+//         ? 0
+//         : Math.max(ankiData.matureCount - (lastCache.mature ?? 0), 0) * 100);
+//   }
 
-  const immersionStreak =
-    lastCache.immersionStreak +
-    (builderDTO.timeToAdd == 0 ? -lastCache.immersionStreak : 1);
+//   const immersionStreak =
+//     lastCache.immersionStreak +
+//     (builderDTO.timeToAdd == 0 ? -lastCache.immersionStreak : 1);
 
-  let lastnElements = lastCaches
-    .filter((x) => x.reportNo != 0)
-    .slice(0, MOVING_AVERAGE_SIZE)
-    .map((x) => x.seconds);
-  const oldAverage = arithmeticWeightedMean(lastnElements);
-  const newnElements = [
-    builderDTO.timeToAdd,
-    ...lastnElements.slice(0, MOVING_AVERAGE_SIZE - 1),
-  ];
-  const newAverage = arithmeticWeightedMean(newnElements);
+//   let lastnElements = lastCaches
+//     .filter((x) => x.reportNo != 0)
+//     .slice(0, MOVING_AVERAGE_SIZE)
+//     .map((x) => x.seconds);
+//   const oldAverage = arithmeticWeightedMean(lastnElements);
+//   const newnElements = [
+//     builderDTO.timeToAdd,
+//     ...lastnElements.slice(0, MOVING_AVERAGE_SIZE - 1),
+//   ];
+//   const newAverage = arithmeticWeightedMean(newnElements);
 
-  const ImmersionScore = builderDTO.timeToAdd;
-  const TotalScore = ImmersionScore + (ankiScore ?? 0);
+//   const ImmersionScore = builderDTO.timeToAdd;
+//   const TotalScore = ImmersionScore + (ankiScore ?? 0);
 
-  const reportData: ReportData = {
-    reportNo: reportNo,
-    time: `Generated on the ${date.format("Do")} of ${date
-      .format("MMMM")
-      .toLowerCase()} ${date.format("YYYY")} at ${date.format("HH:mm")}`,
-    matureCards: [
-      {
-        reportNo: reportNo,
-        matureCardCount: ankiData.matureCount,
-      },
-      ...lastCaches
-        .slice(0, MATURE_HISTORY - 1)
-        .filter((x) => x.reportNo != 0)
-        .map((x) => {
-          return {
-            reportNo: x.reportNo,
-            matureCardCount: x.mature ?? 0,
-          };
-        }),
-    ],
-    retentionRate: {
-      current: ankiData.retention,
-      delta: ankiData.retention - (lastCache.retention ?? 0),
-    },
-    totalReviews: {
-      current: ankiData.reviewCount,
-      delta: ankiDelta,
-    },
-    AnkiStreak: {
-      current: ankiStreak,
-      delta: ankiStreak - lastCache.ankiStreak,
-    },
-    AnkiData: [
-      {
-        reportNo: reportNo,
-        value: ankiDelta,
-      },
-      ...lastCaches
-        .slice(0, 24)
-        .filter((x) => x.reportNo != 0)
-        .map((x) => {
-          return {
-            reportNo: x.reportNo,
-            value: x.cardsStudied ?? 0,
-          };
-        }),
-    ],
-    ImmersionTime: {
-      current: Math.floor(
-        (builderDTO.timeToAdd + lastCache.totalSeconds) / 3600
-      ),
-      delta:
-        Math.floor((builderDTO.timeToAdd + lastCache.totalSeconds) / 3600) -
-        Math.floor(lastCache.totalSeconds / 3600),
-    },
-    AverageImmersionTime: {
-      current: newAverage,
-      delta: newAverage - oldAverage,
-    },
-    MonthlyImmersion: builderDTO.monthTime,
-    BestImmersion: builderDTO.bestSeconds,
-    ImmersionLog: allEvents,
-    ImmersionData: [
-      {
-        reportNo: reportNo,
-        value: builderDTO.timeToAdd,
-      },
-      ...lastCaches
-        .slice(0, 24)
-        .filter((x) => x.reportNo != 0)
-        .map((x) => {
-          return {
-            reportNo: x.reportNo,
-            value: x.seconds ?? 0,
-          };
-        }),
-    ],
-    ImmersionStreak: {
-      current: immersionStreak,
-      delta: immersionStreak - lastCache.immersionStreak,
-    },
-    ImmersionScore: ImmersionScore,
-    AnkiScore: ankiScore,
-    TotalScore: TotalScore,
-    lastDaysPoints: cumulativeSum(
-      [
-        TotalScore,
-        ...lastCaches
-          .slice(0, 9)
-          .filter((x) => x.reportNo != 0)
-          .map((x) => x.score),
-      ].reverse()
-    ),
-  };
-  return reportData;
-}
+//   const reportData: ReportData = {
+//     reportNo: reportNo,
+//     time: `Generated on the ${date.format("Do")} of ${date
+//       .format("MMMM")
+//       .toLowerCase()} ${date.format("YYYY")} at ${date.format("HH:mm")}`,
+//     matureCards: [
+//       {
+//         reportNo: reportNo,
+//         matureCardCount: ankiData.matureCount,
+//       },
+//       ...lastCaches
+//         .slice(0, MATURE_HISTORY - 1)
+//         .filter((x) => x.reportNo != 0)
+//         .map((x) => {
+//           return {
+//             reportNo: x.reportNo,
+//             matureCardCount: x.mature ?? 0,
+//           };
+//         }),
+//     ],
+//     retentionRate: {
+//       current: ankiData.retention,
+//       delta: ankiData.retention - (lastCache.retention ?? 0),
+//     },
+//     totalReviews: {
+//       current: ankiData.reviewCount,
+//       delta: ankiDelta,
+//     },
+//     AnkiStreak: {
+//       current: ankiStreak,
+//       delta: ankiStreak - lastCache.ankiStreak,
+//     },
+//     AnkiData: [
+//       {
+//         reportNo: reportNo,
+//         value: ankiDelta,
+//       },
+//       ...lastCaches
+//         .slice(0, 24)
+//         .filter((x) => x.reportNo != 0)
+//         .map((x) => {
+//           return {
+//             reportNo: x.reportNo,
+//             value: x.cardsStudied ?? 0,
+//           };
+//         }),
+//     ],
+//     ImmersionTime: {
+//       current: Math.floor(
+//         (builderDTO.timeToAdd + lastCache.totalSeconds) / 3600
+//       ),
+//       delta:
+//         Math.floor((builderDTO.timeToAdd + lastCache.totalSeconds) / 3600) -
+//         Math.floor(lastCache.totalSeconds / 3600),
+//     },
+//     AverageImmersionTime: {
+//       current: newAverage,
+//       delta: newAverage - oldAverage,
+//     },
+//     MonthlyImmersion: builderDTO.monthTime,
+//     BestImmersion: builderDTO.bestSeconds,
+//     ImmersionLog: allEvents,
+//     ImmersionData: [
+//       {
+//         reportNo: reportNo,
+//         value: builderDTO.timeToAdd,
+//       },
+//       ...lastCaches
+//         .slice(0, 24)
+//         .filter((x) => x.reportNo != 0)
+//         .map((x) => {
+//           return {
+//             reportNo: x.reportNo,
+//             value: x.seconds ?? 0,
+//           };
+//         }),
+//     ],
+//     ImmersionStreak: {
+//       current: immersionStreak,
+//       delta: immersionStreak - lastCache.immersionStreak,
+//     },
+//     ImmersionScore: ImmersionScore,
+//     AnkiScore: ankiScore,
+//     TotalScore: TotalScore,
+//     lastDaysPoints: cumulativeSum(
+//       [
+//         TotalScore,
+//         ...lastCaches
+//           .slice(0, 9)
+//           .filter((x) => x.reportNo != 0)
+//           .map((x) => x.score),
+//       ].reverse()
+//     ),
+//   };
+//   return reportData;
+// }
 
 const LAYOUT_FULL = [
   ["mature", "ankidata", "ankistreak"],

@@ -92,7 +92,7 @@ const handleClick = (path: string | undefined) => {
 
 const props = defineProps<{
   currentRoute: AppPath;
-  showSidebar: boolean;
+  showSidebar: boolean | null;
 }>();
 
 const updateInfo = ref<UpdateInfo | null>(null);
@@ -100,7 +100,7 @@ const glow = ref<boolean>(false);
 
 onMounted(() => {
   window.ipcRenderer.invoke("GetConfig").then((data: Options) => {
-    console.log(data);
+    if (data == null) return;
     glow.value = data.localOptions.appearance.glow;
   });
   window.ipcRenderer.on("config-change", (e, args: Options) => {
@@ -233,7 +233,7 @@ const toastValue = ref<UserDialog>();
         'w-20': !sidebarState,
         'w-48': sidebarState,
       }"
-      v-if="props.showSidebar"
+      v-if="props.showSidebar ?? false"
     >
       <motion.div
         layoutRoot

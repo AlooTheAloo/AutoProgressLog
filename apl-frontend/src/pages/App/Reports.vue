@@ -32,13 +32,14 @@ type ListReport = {
 async function getReports() {
   return new Promise<void>((res, rej) => {
     window.ipcRenderer.invoke("Get-Reports").then((data: any) => {
-      // reports.value = data.map((x: any) => {
-      //   return {
-      //     ...x,
-      //     date: dayjs(x.date),
-      //   };
-      // });
-      // res();
+      reports.value = data.map((x: any) => {
+        return {
+          ...x,
+          date: dayjs(x.date),
+        };
+      });
+      images.value = new Array(data.length).fill("");
+      res();
     });
   });
 }
@@ -100,8 +101,67 @@ const pageChanged = (event: PageState) => {
   first.value = event.first;
 };
 
-function openReport(id: string) {
-  window.ipcRenderer.invoke("Open-Report", id);
+const reportViewer = ref<{
+  shown: boolean;
+  reportData?: ReportData;
+  layout?: Layout;
+}>({
+  shown: false,
+  reportData: undefined,
+  layout: undefined,
+});
+
+const exportableReportRef = ref<InstanceType<typeof ExportableReport> | null>(
+  null
+);
+
+const LAYOUT_FULL = [
+  ["mature", "ankidata", "ankistreak"],
+  ["immersiondata", "immersionlog", "immersionstreak"],
+];
+
+const LAYOUT_ANKILESS = [
+  ["immersionlog", "immersiondata"],
+  ["moreimmersiondata", "immersionstreak"],
+];
+
+async function openReport(id: string) {
+  const report: ReportData = await window.ipcRenderer.invoke("Get-Report-Details", id);
+  if (report) {
+    reportViewer.value = {
+      shown: true,
+      reportData: report,
+      layout: {
+        layout: LAYOUT_ANKILESS,
+        gradient: ["#FF0000", "#D57AFF", "#74B4FF"],
+      }
+    };
+  }
+}
+
+async function saveReportToFile() {
+  const result = await exportableReportRef.value?.exportImage();
+  if (result?.success) {
+    toast.add({
+      severity: "success",
+      summary: "Report Saved",
+      detail: `Saved to ${result.path}`,
+      life: 5000,
+    });
+  } else {
+    toast.add({
+      severity: "error",
+      summary: "Save Failed",
+      detail: result?.error || "Unknown error occurred",
+      life: 5000,
+    });
+  }
+}
+
+function copyReportImage() {
+  // TODO: Implement copy to clipboard if needed, or reuse exportImage with a flag
+  // For now, let's just use the save to file as the primary export
+  saveReportToFile();
 }
 
 const toast = useToast();
@@ -203,6 +263,32 @@ function nf(num: number) {
 
 <template>
   <Toast />
+
+  <Dialog
+    v-model:visible="reportViewer.shown"
+    modal
+    :dismissableMask="true"
+    :draggable="false"
+    :header="`Report # ${reportViewer.reportData?.reportNo}`"
+    :style="{ width: 'fit-content', maxWidth: '90vw' }"
+  >
+    <div class="flex flex-col items-center gap-4">
+      <ExportableReport
+        v-if="reportViewer.reportData && reportViewer.layout"
+        ref="exportableReportRef"
+        :reportData="reportViewer.reportData"
+        :layout="reportViewer.layout"
+        :reportScale="0.4"
+      />
+      <div class="flex gap-2">
+        <Button
+          label="Save to File"
+          icon="pi pi-download"
+          @click="saveReportToFile"
+        />
+      </div>
+    </div>
+  </Dialog>
 
   <Dialog
     v-model:visible="imageViewerImage.shown"
@@ -415,8 +501,8 @@ function nf(num: number) {
                               ></Button>
                               <Button
                                 v-on:click="openReport(item.id)"
-                                icon="pi pi-folder-open"
-                                label="Open"
+                                icon="pi pi-eye"
+                                label="View"
                                 :disabled="!item.fileExists"
                                 v-tooltip.top="{
                                   value: item.fileExists

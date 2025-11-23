@@ -23,13 +23,10 @@ export async function buildReport(userId: number) {
         );
     }
 
-    // Get Previous SyncData with not null ankiData
+    // Get Previous SyncData
     const previousSync = await client.syncData.findFirst({
         where: {
             userId: userId,
-            ankiData: {
-                isNot: null,
-            }
         },
         orderBy: {
             generationTime: 'desc',
@@ -42,12 +39,6 @@ export async function buildReport(userId: number) {
     const previousSyncReport = await client.syncData.findFirst({
         where: {
             userId: userId,
-            ankiData: {
-                isNot: null,
-            },
-            report: {
-                isNot: null,
-            }
         },
         orderBy: {
             generationTime: 'desc',
@@ -57,6 +48,34 @@ export async function buildReport(userId: number) {
             report: {include: {streak: true}},
         }
     });
+
+    // Get 10 last reports
+    const previousReports = await client.report.findMany({
+        where: {
+            userId: userId,
+            reportNo: {
+                gte: (previousSyncReport?.report?.reportNo ?? 0) - 10,
+            }
+        },
+        orderBy: {
+            reportNo: 'desc',
+        },
+        include: {
+            syncData: true
+        }
+    });
+
+    console.log(previousReports);   
+
+    const times = previousReports.map((x, i) => {
+        return x.syncData.totalImmersionTime - previousReports[i + 1]?.syncData.totalImmersionTime;
+    });
+
+    console.log(times);
+
+    // const averageImmersionTime = arithmeticWeightedMean(times);
+
+
     if (!previousSync) {
         console.log("No previous sync with report found for user " + userId);
     }
@@ -65,12 +84,13 @@ export async function buildReport(userId: number) {
         where: {userId},
         _sum: {seconds: true},
     });
+    console.log("ankiToken || url" + (ankiToken || url));
     await client.syncData.create({
         data: {
             userId,
             totalImmersionTime: totalImmersion._sum.seconds ?? 0,
             ankiData:
-                ankiToken || url
+                (ankiToken != undefined || url != undefined)
                     ? {
                         create: {
                             totalCardsStudied: await AnkiStorage.getAnkiCardReviewCount(
@@ -100,15 +120,36 @@ export async function buildReport(userId: number) {
                                 ? (previousSyncReport?.report?.streak?.immersionStreak ?? 0) + 1
                                 : 0,
 
-                            ankiStreak: (previousSyncReport?.ankiData?.totalCardsStudied ?? 0 <
+                            ankiStreak: (ankiToken != undefined || url != undefined) ? ((previousSyncReport?.ankiData?.totalCardsStudied ?? 0 <
                                 (await AnkiStorage.getAnkiCardReviewCount(userId)).totalCount)
                                 ? (previousSyncReport?.report?.streak?.ankiStreak ?? 0) + 1
-                                : 0,
+                                : 0) : 0,
                         }
-                    }
+                    },
+                    metadata:  {
+                        create: {
+                            hasAnki: (ankiToken != null || url != null),
+                        }
+                    },
+                    averageImmersionTime: 0,
+                    bestImmersionTime: 0,
                 }
             }
         },
         include: {ankiData: true},
     });
+
+}
+
+
+export function arithmeticWeightedMean(array: number[]): number {
+  if (array.length === 0) return 0;
+
+  const n = array.length;
+  const s = (n * (n + 1)) / 2;
+  return (
+    array.reduce((a, b, i) => {
+      return a + b * (n - i);
+    }, 0) / s
+  );
 }

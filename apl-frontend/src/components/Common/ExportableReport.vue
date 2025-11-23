@@ -20,40 +20,58 @@ const props = defineProps<{
   reportScale: number;
 }>();
 
-// async function exportImage() {
-//   if (!host.value) return;
+async function exportImage() {
+  console.log("Exporting image...");
+  if (!host.value) {
+    console.error("Host element not found");
+    return;
+  }
 
-//   const cfg: Options = await window.ipcRenderer.invoke("GetConfig");
+  try {
+    const cfg: Options = await window.ipcRenderer.invoke("GetConfig");
+    console.log("Config retrieved:", cfg);
 
-//   const outOpts = cfg.localOptions.outputOptions;
+    const outOpts = cfg.localOptions.outputOptions;
 
-//   const params = {
-//     width: BASE_W,
-//     height: BASE_H,
-//     style: {
-//       transformOrigin: "top left",
-//       transform: `scale(${1 / props.reportScale})`,
-//     },
-//     quality: outOpts.outputQuality,
-//   };
+    const params = {
+      width: BASE_W,
+      height: BASE_H,
+      style: {
+        transformOrigin: "top left",
+        transform: `scale(${1 / props.reportScale})`,
+      },
+      quality: outOpts.outputQuality,
+    };
 
-//   let promise;
+    let promise;
 
-//   const e = outOpts.outputFile.extension;
+    const e = outOpts.outputFile.extension;
 
-//   if (e == ".jpeg" || e == ".jpg") {
-//     promise = domToImage.toJpeg(host.value, params);
-//   } else if (e == ".png") {
-//     promise = domToImage.toPng(host.value, params);
-//   } else {
-//     alert("Invalid extension");
-//     return;
-//   }
+    if (e == ".jpeg" || e == ".jpg") {
+      promise = domToImage.toJpeg(host.value, params);
+    } else if (e == ".png") {
+      promise = domToImage.toPng(host.value, params);
+    } else {
+      alert("Invalid extension");
+      return;
+    }
 
-//   promise.then((x) => {
-//     window.ipcRenderer.invoke("Export-Image", x);
-//   });
-// }
+    return promise.then((x) => {
+      console.log("Image generated, sending to backend...");
+      return window.ipcRenderer.invoke("Export-Image", x, props.reportData.reportNo);
+    }).catch((err) => {
+      console.error("Error generating image:", err);
+      return { success: false, error: err };
+    });
+  } catch (error) {
+    console.error("Error in exportImage:", error);
+    return { success: false, error: error };
+  }
+}
+
+defineExpose({
+  exportImage,
+});
 </script>
 
 <template>

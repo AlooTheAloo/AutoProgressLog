@@ -62,7 +62,6 @@ const dateString = computed(() => {
 });
 
 const sortedSources = computed(() => {
-  console.log("time to sort" + computedSources.value);
   const sort = computedSources.value.sort(
     (a, b) => b.relativeValue - a.relativeValue
   );
@@ -80,7 +79,6 @@ const sortedSources = computed(() => {
       colorIndex: 727,
     });
   }
-  console.log("We're done !!" + arr);
   return arr
     .filter((x) => x.enabled)
     .map((x) => {

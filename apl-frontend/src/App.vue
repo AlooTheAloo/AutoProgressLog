@@ -8,7 +8,7 @@ import { appPath } from "./pages/routes/appRoutes";
 import { ThemeManager } from "./util/theme-manager";
 
 const router = useRouter();
-const showSideBar = ref(false);
+const showSideBar = ref<boolean | null>(false);
 
 const isLoading = ref(true);
 onMounted(() => {
@@ -22,7 +22,6 @@ onMounted(() => {
     });
     window.ipcRenderer.on("set-sidebar-state", (_e, value) => {
       showSideBar.value = value;
-      console.log("showSideBar is " + value);
     });
   }
 });

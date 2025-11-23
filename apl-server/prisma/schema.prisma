@@ -90,10 +90,21 @@ model Report {
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   syncData   SyncData @relation(fields: [syncDataId], references: [id], onDelete: Cascade)
   syncDataId Int      @unique
+  averageImmersionTime Int
+  bestImmersionTime Int
+  metadata   ReportMetadata?
 
   @@unique([reportNo, userId])
   @@index([userId])
   @@index([syncDataId])
+}
+
+
+model ReportMetadata {
+  id       Int    @id @default(autoincrement())
+  reportId Int    @unique
+  report   Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  hasAnki  Boolean
 }
 
 model Streak {

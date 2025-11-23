@@ -4,6 +4,7 @@ import client from "../../db/client";
 import AnkiStorage from "../../services/anki/AnkiStorage";
 import NormalSyncer from "../../services/anki/NormalSyncer";
 import AnkiHTTPClient from "../../services/anki/AnkiHTTPClient";
+import dayjs from "dayjs";
 
 // -- SCHEMAS --
 const ImmersionDTOSchema = t.Object({
@@ -264,14 +265,27 @@ export const syncRoute = new Elysia({ name: "sync-route" }).use(authGuard).post(
 
     if (autoGenTime) {
       console.log("Auto-gen time from config:", autoGenTime);
-      const candidate = new Date(now);
-      candidate.setHours(
-        autoGenTime.getHours(),
-        autoGenTime.getMinutes(),
-        autoGenTime.getSeconds(),
-        0
+
+      const seconds = autoGenTime.secondsSinceMidnight % 60;
+      const minutes = Math.floor(
+        (autoGenTime.secondsSinceMidnight % 3600) / 60
       );
+      const hours = Math.floor(autoGenTime.secondsSinceMidnight / 3600);
+
+      console.log(
+        `${dayjs().format("YYYY-MM-DD")} ${hours}:${minutes}:${seconds}`
+      );
+
+      const candidate = dayjs
+        .tz(
+          `${dayjs().format("YYYY-MM-DD")} ${hours}:${minutes}:${seconds}`,
+          autoGenTime.timezone
+        )
+        .toDate();
+
       if (candidate <= now) candidate.setDate(candidate.getDate() + 1);
+      console.log("candidate is " + candidate);
+
       nextReport = candidate.getTime();
       console.log(
         "Next report scheduled at:",

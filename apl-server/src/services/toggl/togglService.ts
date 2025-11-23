@@ -34,10 +34,13 @@ const ignore = (tags: string[]) =>
   );
 
 export async function ManualSync(userID: number) {
+  console.log("--- MANUAL SYNC START ---");
   const cfg = await client.userConfig.findUnique({
     where: { userId: userID },
     select: { togglToken: true, togglUserId: true },
   });
+  console.log("CONFIG IS " + JSON.stringify(cfg));
+
   if (cfg == undefined) return false;
 
   const since = dayjs().subtract(3, "month").add(1, "day");
@@ -52,6 +55,8 @@ export async function ManualSync(userID: number) {
     since: dayjs(since).unix().toString(),
   });
 
+  console.log("ENTRIES : " + entries.length);
+
   // Only keep events that are finished
   entries = entries.filter((x) => x.stop != null);
 
@@ -64,6 +69,20 @@ export async function ManualSync(userID: number) {
       x.server_deleted_at == null &&
       x.stop != null
     );
+  });
+
+  await client.immersionActivity.createMany({
+    data: entries.map((e) => {
+      return {
+        userId: userID,
+        activityName: e.description,
+        activityTogglId: e.id.toString(),
+        createdAt: new Date(e.start),
+        seconds: Math.floor(
+          (new Date(e.stop).getTime() - new Date(e.start).getTime()) / 1000
+        ),
+      };
+    }),
   });
 }
 

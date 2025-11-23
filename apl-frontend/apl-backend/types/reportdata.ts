@@ -23,6 +23,11 @@ export type ReportData = {
   TotalScore: number;
 
   lastDaysPoints: number[];
+
+  metadata: {
+    hasAnki: boolean;
+    
+  }
 };
 
 export type RelativeReportData = {

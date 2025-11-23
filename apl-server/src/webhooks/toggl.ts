@@ -124,6 +124,7 @@ export const togglWebhook = new Elysia({ name: "toggl-webhook" }).post(
               data: {
                 userId: aplUser.id,
                 activityName: payload.description,
+                activityTogglId: payload.id.toString(),
                 createdAt: new Date(payload.start),
                 seconds: Math.floor(
                   (new Date(payload.stop).getTime() -

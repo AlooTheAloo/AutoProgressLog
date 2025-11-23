@@ -46,6 +46,8 @@ export const SyncDataRelations = t.Object(
           score: t.Integer(),
           userId: t.Integer(),
           syncDataId: t.Integer(),
+          averageImmersionTime: t.Integer(),
+          bestImmersionTime: t.Integer(),
         },
         { additionalProperties: false },
       ),

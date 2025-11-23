@@ -72,7 +72,6 @@ onMounted(async () => {
     await sync();
     const s = await window.ipcRenderer.invoke("isSyncing");
     generating_report.value = s;
-    console.log("generating_report.value", generating_report.value);
   } catch (error) {
     console.error("Error fetching dashboard data:", error);
   }
@@ -80,6 +79,7 @@ onMounted(async () => {
 
 window.ipcRenderer.on("ShowWelcomeMessage", () => {
   firstDialog.value = true;
+  console.log("wow");
 });
 
 const getLastSyncTime = () => {
@@ -230,7 +230,7 @@ const closeFirstDialog = () => {
               :class="`flex items-center px-2 font-semibold 1720:text-base xl:mx-2 text-xs`"
             >
               <div>
-                New generated report
+                Next generated report
                 {{ dayjs(dto?.nextReport).fromNow() }}
               </div>
             </div>

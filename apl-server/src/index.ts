@@ -7,6 +7,14 @@ import { registeredRoutes } from "./routes";
 import AnkiStorage from "./services/anki/AnkiStorage";
 import { init as zstdinit } from "@bokuweb/zstd-wasm";
 import { startTunnel } from "./services/ngrok/dev-tunnel";
+import dayjs from "dayjs";
+import duration from "dayjs/plugin/duration";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+dayjs.extend(duration);
 
 const sm = new SocketManager();
 export const app = new Elysia()

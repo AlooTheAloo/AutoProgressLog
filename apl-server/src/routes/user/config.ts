@@ -9,10 +9,8 @@ import deleteWebhook from "../../integrations/toggl/deleteWebhook";
 import Toggl from "toggl-track";
 import { reportCronPlugin } from "../../middlewares/cronReportGenerator";
 import { buildReport } from "../../services/reports/buildReport";
-import {
-  AutoGenConfig,
-  AutoGenConfigPlain,
-} from "../../../prisma/types/AutoGenConfig";
+import { AutoGenConfigPlain } from "../../../prisma/types/AutoGenConfig";
+import { ManualSync } from "../../services/toggl/togglService";
 
 const PublicAutoGenConfig = t.Object(
   {
@@ -39,6 +37,12 @@ const PublicAnkiConfig = t.Omit(AnkiConfigPlain, [
   "id",
   "userConfigId",
 ] as const);
+
+const UserConfigCreateBody = t.Object({
+  togglToken: t.String(),
+  togglUserId: t.String(),
+  autoGenTime: PublicAutoGenConfig, // { secondsSinceMidnight, timezone }
+});
 
 /**
  * ## /config Routes (Grouped under configRoutes)
@@ -271,16 +275,22 @@ export const configRoutes = new Elysia({ name: "config-routes" })
       });
 
       if (createdConfig.autoGenTime) reportCron.attach(user.id);
-      return createdConfig;
+      await ManualSync(user.id);
+      return {
+        ...createdConfig,
+        autoGenTime:
+          createdConfig.autoGenTime == null
+            ? null
+            : {
+                secondsSinceMidnight:
+                  createdConfig.autoGenTime?.secondsSinceMidnight,
+                timezone: createdConfig.autoGenTime?.timezone,
+              },
+      };
     },
     {
       headers: authHeaders,
-      body: t.Intersect([
-        t.Omit(UserConfigPlain, ["id", "userId", "createdAt", "updatedAt"]),
-        t.Object({
-          autoGenTime: AutoGenConfigPlain,
-        }),
-      ]),
+      body: UserConfigCreateBody,
       response: PublicUserConfig,
       detail: {
         summary: "Create user configuration",

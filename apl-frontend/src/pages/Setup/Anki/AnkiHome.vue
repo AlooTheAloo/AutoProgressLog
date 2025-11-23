@@ -51,6 +51,7 @@ onMounted(() => {
   window.ipcRenderer
     .invoke("get-anki-credentials")
     .then((credentials: AnkiLogin) => {
+      if (credentials == null) return;
       if (credentials.username && credentials.password) {
         email.value = credentials.username;
         password.value = credentials.password;

@@ -43,10 +43,12 @@ export async function runChecks(): Promise<boolean> {
 }
 
 export async function CreateDTO(): Promise<Partial<DashboardDTO> | null> {
+  console.log("Creating dto :3");
   const dto = (await APLStorage.get<DashboardDTO>(
     "Cached_DTO"
   )) as DashboardDTO;
 
+  console.log("dto is " + JSON.stringify(dto));
   if (dto) return dto;
   else {
     win?.webContents.send("ShowWelcomeMessage");
