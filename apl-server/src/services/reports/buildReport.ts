@@ -84,7 +84,6 @@ export async function buildReport(userId: number) {
         where: {userId},
         _sum: {seconds: true},
     });
-    console.log("ankiToken || url" + (ankiToken || url));
     await client.syncData.create({
         data: {
             userId,

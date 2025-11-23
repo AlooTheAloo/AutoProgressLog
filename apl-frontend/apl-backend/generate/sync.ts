@@ -33,7 +33,6 @@ export async function runSync() {
     console.log("fetchedDTO.data is " + JSON.stringify(fetchedDTO.data));
     return fetchedDTO.data;
   } catch (e) {
-    console.log("gros pipi");
     NotificationManager.notify({
       header: "Cannot complete sync!!",
       content:

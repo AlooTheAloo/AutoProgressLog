@@ -15,5 +15,5 @@ const cardDedulicatorVisible = ref(false);
   >
     <CardDeduplicatorPanel />
   </Dialog>
-  <Button @click="cardDedulicatorVisible = true">cacas</Button>
+  <Button @click="cardDedulicatorVisible = true"></Button>
 </template>
