@@ -123,8 +123,7 @@ export const reportRoute = new Elysia({name: 'report-route'}).use(authGuard)
     .get(
         "/report/:id",
         async ({user, params: {id}}) => {
-            const report = await getReport(user.id, parseInt(id));
-            return report;
+            return await getReport(user.id, parseInt(id));
         },
         {
             headers: authHeaders,
