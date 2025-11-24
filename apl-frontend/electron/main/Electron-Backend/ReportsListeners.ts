@@ -23,15 +23,24 @@ import { ReportData } from "../../../apl-backend/types/reportdata";
 
 export function reportsListeners() {
   // Handle the Get-Reports IPC request
-  ipcMain.handle("Get-Reports", async (event, args) => {
+  ipcMain.handle("Get-Reports", async (event, page, pagesize) => {
+
     const token = await APLStorage.get("token");
+    console.log("Getting reports...");
+
     const { data, error } = await EdenClient.user.reports.get({
-        headers: { authorization: `Bearer ${token}` }
+        headers: { authorization: `Bearer ${token}` },
+        query: {
+          page: page,
+          pageSize: pagesize,
+        }
     });
+    console.log("GOT " + JSON.stringify(data));
     if (error) {
       console.error("Error fetching reports:", error);
       return [];
     }
+    console.log("Reports fetched successfully");
     return data;
   });
 

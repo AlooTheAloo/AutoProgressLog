@@ -33,27 +33,38 @@ type ListReport = {
   revertable?: boolean;
 };
 
-async function getReports() {
+type Page = {
+  page: number;
+  pageSize: number;
+  total: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+  nextPage: number;
+  prevPage: number;
+  data: ListReport[];
+}
+
+async function getReports(page: number) {
   return new Promise<void>((res, rej) => {
-    window.ipcRenderer.invoke("Get-Reports").then((data: any) => {
-      reports.value = data.map((x: any) => {
-        return {
-          ...x,
-          date: dayjs(x.date),
+    window.ipcRenderer.invoke("Get-Reports", page, 6).then((page: Page) => {
+      // Fill array with nulls
+      reports.value = Array.from({ length: page.total }, () => undefined);
+      for(let i = 0; i < page.data.length; i++) {
+        reports.value[(page.page - 1) * page.pageSize + i] = {
+          ...page.data[i],
+          date: dayjs(page.data[i].date)
         };
-      });
-      images.value = new Array(data.length).fill("");
+        console.log("Setting report " + ((page.page - 1) * page.pageSize + i) + " to " + JSON.stringify(page.data[i]));
+      }
       res();
     });
   });
 }
 
-let lastFrom = 0;
-
-
 onMounted(() => {
   window.ipcRenderer.invoke("loadReportsPage").then(() => {
-    getReports();
+    getReports(0);
   });
 });
 
@@ -77,23 +88,22 @@ function revertReport(evt: Event) {
       severity: "danger",
     },
     accept: () => {
-      images.value = undefined;
       reverting.value = true;
-      window.ipcRenderer.invoke("Reverse-Report").then(async (x) => {
-        await getReports();
-        reverting.value = false;
-      });
+      // window.ipcRenderer.invoke("Reverse-Report").then(async (x) => {
+      //   await getReports();
+      //   reverting.value = false;
+      // });
     },
     reject: () => {},
   });
 }
 
-const reports = ref<ListReport[] | undefined>(undefined);
-const images = ref<string[] | undefined>(undefined);
+const reports = ref<(ListReport|undefined)[] | undefined>(undefined);
 const first = ref<number>(0);
 
 const pageChanged = (event: PageState) => {
   first.value = event.first;
+  getReports(event.page + 1);
 };
 
 const reportViewer = ref<{
@@ -178,75 +188,6 @@ async function copyReport(id: string) {
       life: 5000,
     });
   }
-};
-
-
-const mockLayout: Layout = {
-  layout: [
-    ["mature", "ankidata", "ankistreak"],
-    ["immersiondata", "immersionlog", "immersionstreak"],
-  ],
-  gradient: ["#a855f7", "#ec4899", "#3b82f6"],
-};
-
-const mockReport: ReportData = {
-  reportNo: 1,
-  time: "Generated on the 1st of January 2023 at 12:00",
-  matureCards: [
-    {
-      reportNo: 1,
-      matureCardCount: 0,
-    },
-  ],
-  retentionRate: {
-    current: 0,
-    delta: 0,
-  },
-  totalReviews: {
-    current: 0,
-    delta: 0,
-  },
-  AnkiStreak: {
-    current: 0,
-    delta: 0,
-  },
-  AnkiData: [
-    {
-      reportNo: 1,
-      value: 0,
-    },
-  ],
-  ImmersionTime: {
-    current: 0,
-    delta: 0,
-  },
-  AverageImmersionTime: {
-    current: 0,
-    delta: 0,
-  },
-  MonthlyImmersion: 0,
-  BestImmersion: {
-    current: 0,
-    delta: 0,
-  },
-  ImmersionLog: [],
-  ImmersionData: [
-    {
-      reportNo: 1,
-      value: 0,
-    },
-  ],
-  ImmersionStreak: {
-    current: 0,
-    delta: 0,
-  },
-  ImmersionScore: 0,
-  AnkiScore: 0,
-  TotalScore: 0,
-  lastDaysPoints: [0, 0, 0, 0, 0, 0, 0, 0],
-  metadata: {
-    hasAnki: true,
-  },
 };
 
 const imageViewerImage = ref<{ image?: string; id?: string; shown: boolean }>({
@@ -339,6 +280,7 @@ function nf(num: number) {
       </div>
     </div>
     
+    
     <!-- Loading State -->
     <div v-else class="flex items-center justify-center p-8">
       <ProgressSpinner />
@@ -419,122 +361,126 @@ function nf(num: number) {
           >
             <template #list="slotProps">
               <div class="flex flex-col">
-                <AnimatePresence :key="first">
-                  <motion.div
+                <AnimatePresence>
+                  <template
                     v-for="(item, index) in slotProps.items as ListReport[]"
                     :key="index + first"
-                    :initial="{ x: 50, opacity: 0, filter: 'blur(10px)' }"
-                    :while-in-view="{ x: 0, opacity: 1, filter: 'blur(0px)' }"
-                    :transition="{
-                      delay: index * 0.01,
-                    }"
-                    :exit="{ opacity: 0 }"
                   >
-                    <div class="py-2 flex">
-                      <div
-                        class="w-full flex flex-col sm:flex-row sm:items-center gap-4 dark:bg-black bg-[#eeeeef] overflow-hidden rounded-md pr-5"
-                      >
-                        <div class=" py-4 w-3 h-full bg-[var(--primary-color)]"></div>
-
+                    <motion.div
+                      v-if="item != undefined"
+                      :initial="{ x: 50, opacity: 0, filter: 'blur(10px)' }"
+                      :animate="{ x: 0, opacity: 1, filter: 'blur(0px)' }"
+                      :transition="{
+                        delay: index * 0.1,
+                      }"
+                      :exit="{ opacity: 0, transition: { duration: 0 } }"
+                    >
+                      <div class="py-2 flex">
                         <div
-                          class="flex py-3 flex-col md:flex-row justify-between md:items-center flex-1 gap-6"
+                          class="w-full flex flex-col sm:flex-row sm:items-center gap-4 dark:bg-black bg-[#eeeeef] overflow-hidden rounded-md pr-5"
                         >
+                          <div class=" py-4 w-3 h-full bg-[var(--primary-color)]"></div>
+
                           <div
-                            class="flex flex-row md:flex-col justify-between items-start"
+                            class="flex py-3 flex-col md:flex-row justify-between md:items-center flex-1 gap-6"
                           >
-                            <div class="flex items-center gap-2">
-                              <div class="text-lg font-medium">
-                                Report #{{ item.id }}
-                              </div>
+                            <div
+                              class="flex flex-row md:flex-col justify-between items-start"
+                            >
+                              <div class="flex items-center gap-2">
+                                <div class="text-lg font-medium">
+                                  Report #{{ item.id }}
+                                </div>
 
-                              <span
-                                class="font-medium text-surface-500 dark:text-surface-400 text-sm text-[var(--primary-color)] italic"
-                              >
-                                <span v-if="item.date.isSame(dayjs(), 'd')">
-                                  Today
-                                </span>
                                 <span
-                                  v-else-if="item.date.isSame(dayjs().subtract(1, 'day'), 'day')"
+                                  class="font-medium text-surface-500 dark:text-surface-400 text-sm text-[var(--primary-color)] italic"
                                 >
-                                  Yesterday
-                                </span>
-                                <span v-else>
-                                  {{ item.date.format("Do") }}
-                                  of
-                                  {{ item.date.format("MMMM").toLowerCase() }}
-                                  {{ item.date.format("YYYY") }}
-                                </span>
+                                  <span v-if="item.date.isSame(dayjs(), 'd')">
+                                    Today
+                                  </span>
+                                  <span
+                                    v-else-if="item.date.isSame(dayjs().subtract(1, 'day'), 'day')"
+                                  >
+                                    Yesterday
+                                  </span>
+                                  <span v-else>
+                                    {{ item.date.format("Do") }}
+                                    of
+                                    {{ item.date.format("MMMM").toLowerCase() }}
+                                    {{ item.date.format("YYYY") }}
+                                  </span>
 
-                                at
-                                {{ item.date.format("h:mm a") }}
-                              </span>
-                            </div>
-                            <div class="gap-2 flex mt-1">
-                              <div
-                                class="flex bg-white items-center px-2 rounded-lg h-6"
-                              >
-                                <img :src="score" class="w-4 h-4 invert" />
-                                <span
-                                  class="ml-2 font-medium text-black text-sm"
-                                  >{{
-                                    nf(item.score.totalScore) + " " + pluralize("pt")
-                                  }}</span
+                                  at
+                                  {{ item.date.format("h:mm a") }}
+                                </span>
+                              </div>
+                              <div class="gap-2 flex mt-1">
+                                <div
+                                  class="flex bg-white items-center px-2 rounded-lg h-6"
                                 >
+                                  <img :src="score" class="w-4 h-4 invert" />
+                                  <span
+                                    class="ml-2 font-medium text-black text-sm"
+                                    >{{
+                                      nf(item.score.totalScore) + " " + pluralize("pt")
+                                    }}</span
+                                  >
+                                </div>
                               </div>
                             </div>
-                          </div>
-                          <div class="flex flex-col md:items-end gap-8">
-                            <div class="flex flex-col md:flex-row gap-2">
-                              <Button
-                                v-if="item.revertable"
-                                severity="danger"
-                                :disabled="reverting"
-                                @click="revertReport($event)"
-                                class="h-8"
-                              >
-                                <i
-                                  v-if="reverting"
-                                  :class="[
-                                    'pi',
-                                    'pi-spinner pi-spin text-white',
-                                  ]"
-                                />
-                                <i v-else class="pi pi-undo text-white" />
-                              </Button>
+                            <div class="flex flex-col md:items-end gap-8">
+                              <div class="flex flex-col md:flex-row gap-2">
+                                <Button
+                                  v-if="item.revertable"
+                                  severity="danger"
+                                  :disabled="reverting"
+                                  @click="revertReport($event)"
+                                  class="h-8"
+                                >
+                                  <i
+                                    v-if="reverting"
+                                    :class="[
+                                      'pi',
+                                      'pi-spinner pi-spin text-white',
+                                    ]"
+                                  />
+                                  <i v-else class="pi pi-undo text-white" />
+                                </Button>
 
-                              
-                              <Button
-                                v-on:click="openReport(item.id)"
-                                icon="pi pi-eye"
-                                label="View"
-                                :disabled="!item.fileExists"
-                                v-tooltip.top="{
-                                  value: item.fileExists
-                                    ? ''
-                                    : 'Report file could not be found',
-                                  pt: {
-                                    arrow: {
-                                      style: {
-                                        backgroundColor: '',
+                                
+                                <Button
+                                  v-on:click="openReport(item.id)"
+                                  icon="pi pi-eye"
+                                  label="View"
+                                  :disabled="!item.fileExists"
+                                  v-tooltip.top="{
+                                    value: item.fileExists
+                                      ? ''
+                                      : 'Report file could not be found',
+                                    pt: {
+                                      arrow: {
+                                        style: {
+                                          backgroundColor: '',
+                                        },
+                                      },
+                                      text: {
+                                        style: {
+                                          fontSize: '0.6rem',
+                                          textAlign: 'center',
+                                          color: 'white',
+                                        },
                                       },
                                     },
-                                    text: {
-                                      style: {
-                                        fontSize: '0.6rem',
-                                        textAlign: 'center',
-                                        color: 'white',
-                                      },
-                                    },
-                                  },
-                                }"
-                                class="flex-auto md:flex-initial whitespace-nowrap h-8"
-                              ></Button>
+                                  }"
+                                  class="flex-auto md:flex-initial whitespace-nowrap h-8"
+                                ></Button>
+                              </div>
                             </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  </motion.div>
+                    </motion.div>
+                  </template>
                 </AnimatePresence>
               </div>
             </template>
