@@ -297,10 +297,14 @@ export const syncRoute = new Elysia({name: "sync-route"}).use(authGuard).post(
 
         console.log("=== SYNC COMPLETE for user:", userId, "===");
 
+        console.log("amt is " + (await client.syncData.count({
+            where: {userId}
+        })));
         if ((await client.syncData.count({
             where: {userId}
-        })) == 1) {
-            client.syncData.update({
+        })) == 2) {
+          console.log("caca.")
+            await client.syncData.update({
                 where: {id: createdSync.id},
                 data: {
                     report: {

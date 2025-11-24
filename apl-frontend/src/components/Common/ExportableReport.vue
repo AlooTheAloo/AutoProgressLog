@@ -8,9 +8,7 @@ import { Options } from "../../../apl-backend/types/options";
 const reportdata = ref<ReportData | null>(null);
 const layoutdata = ref<Layout | null>(null);
 
-// TODO : no they're not
-const BASE_W = 1586;
-const BASE_H = 1800;
+
 
 const host = ref<HTMLElement | null>(null);
 
@@ -18,13 +16,15 @@ const props = defineProps<{
   reportData: ReportData;
   layout: Layout;
   reportScale: number;
+  BASE_W: number;
+  BASE_H: number;
 }>();
 
-async function exportImage() {
+async function exportImage(toclipboard = false) {
   console.log("Exporting image...");
   if (!host.value) {
     console.error("Host element not found");
-    return;
+    return { success: false, error: "Host element not found" };
   }
 
   try {
@@ -34,8 +34,8 @@ async function exportImage() {
     const outOpts = cfg.localOptions.outputOptions;
 
     const params = {
-      width: BASE_W,
-      height: BASE_H,
+      width: props.BASE_W,
+      height: props.BASE_H,
       style: {
         transformOrigin: "top left",
         transform: `scale(${1 / props.reportScale})`,
@@ -58,7 +58,7 @@ async function exportImage() {
 
     return promise.then((x) => {
       console.log("Image generated, sending to backend...");
-      return window.ipcRenderer.invoke("Export-Image", x, props.reportData.reportNo);
+      return window.ipcRenderer.invoke("Export-Image", x, props.reportData.reportNo, toclipboard);
     }).catch((err) => {
       console.error("Error generating image:", err);
       return { success: false, error: err };
@@ -85,7 +85,7 @@ defineExpose({
       }"
       class="flex justify-start items-start"
     >
-      <Report :reportData="reportData" :layout="layout" />
+      <Report :reportData="reportData" :layout="layout" :BASE_W="BASE_W" :BASE_H="BASE_H" />
     </div>
   </div>
 

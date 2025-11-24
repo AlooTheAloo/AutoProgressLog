@@ -192,6 +192,8 @@ app.on("ready", async () => {
   await init();
 
   const ver = await VersionManager.verifyVersion();
+  console.log("ver : " + ver);
+  console.log("setupComplete : " + (await APLStorage.get("setupComplete")));  
   if ((await APLStorage.get("setupComplete")) && ver) {
     try {
       console.log("Trying to init socket client");

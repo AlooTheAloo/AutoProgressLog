@@ -1,4 +1,4 @@
-import { ipcMain } from "electron";
+import { clipboard, ipcMain, nativeImage, NativeImage } from "electron";
 import { isGenerating } from "../../../apl-backend/generate/generate";
 import { writeFileSync } from "fs";
 import { getConfig } from "../../../apl-backend/Helpers/getConfig";
@@ -41,7 +41,7 @@ export function reportsListeners() {
 
   ipcMain.handle("Open-Report", async (event, id: string) => {});
 
-  ipcMain.handle("Export-Image", async (event, Image: string, reportNo: number) => {
+  ipcMain.handle("Export-Image", async (event, Image: string, reportNo: number, toclipboard: boolean) => {
     try {
       const base64 = Image.replace(/^data:image\/\w+;base64,/, "");
       const buffer = Buffer.from(base64, "base64");
@@ -52,14 +52,24 @@ export function reportsListeners() {
         console.error("Output file configuration missing");
         return { success: false, error: "Configuration missing" };
       }
+
+      if(!toclipboard){
+        // Ensure path ends with separator or use path.join if f.path is a directory
+        const fileName = `${f.name} ${reportNo}${f.extension}`;
+        const filePath = path.join(f.path, fileName);
+        await writeFileSync(filePath, buffer);
+        console.log("Image saved to:", filePath);
+        return { success: true, path: filePath };
+      }
+      else {
+        let image:NativeImage = nativeImage.createFromBuffer(buffer);
+        clipboard.writeImage(image);
+        return { success: true };
+      }
+
+
       
-      // Ensure path ends with separator or use path.join if f.path is a directory
-      const fileName = `${f.name} ${reportNo}${f.extension}`;
-      const filePath = path.join(f.path, fileName);
       
-      await writeFileSync(filePath, buffer);
-      console.log("Image saved to:", filePath);
-      return { success: true, path: filePath };
     } catch (error) {
       console.error("Error saving image:", error);
       return { success: false, error: error };

@@ -12,11 +12,11 @@ import Toast from "primevue/toast";
 import { useToast } from "primevue/usetoast";
 import Dialog from "primevue/dialog";
 import { motion, AnimatePresence } from "motion-v";
-import { CopyReportToast } from "../../../electron/main/Electron-Backend/ReportsListeners";
 import pluralize from "pluralize";
 import ExportableReport from "../../components/Common/ExportableReport.vue";
 import { Layout, ReportData } from "../Report/src/types/report-data";
 import { ProgressSpinner } from "primevue";
+import { getGradientColors } from "../../utils/colormind";
 
 const rows = 6;
 const router = useRouter();
@@ -46,15 +46,6 @@ async function getReports() {
 
 let lastFrom = 0;
 
-function openImage(id: string) {
-  window.ipcRenderer.invoke("Get-Image", id).then((x) => {
-    imageViewerImage.value = {
-      image: x,
-      id: id,
-      shown: true,
-    };
-  });
-}
 
 onMounted(() => {
   window.ipcRenderer.invoke("loadReportsPage").then(() => {
@@ -103,12 +94,12 @@ const pageChanged = (event: PageState) => {
 
 const reportViewer = ref<{
   shown: boolean;
-  reportData?: ReportData;
-  layout?: Layout;
+  reportData?: ReportData | null;
+  layout?: Layout | null;
 }>({
   shown: false,
-  reportData: undefined,
-  layout: undefined,
+  reportData: null,
+  layout: null,
 });
 
 const exportableReportRef = ref<InstanceType<typeof ExportableReport> | null>(
@@ -130,17 +121,24 @@ async function openReport(id: string) {
   if (report) {
     reportViewer.value = {
       shown: true,
+      reportData: null,
+      layout: null,
+    };
+
+    const gradientColors = await getGradientColors();
+    reportViewer.value = {
+      shown: true,
       reportData: report,
       layout: {
-        layout: LAYOUT_ANKILESS,
-        gradient: ["#FF0000", "#D57AFF", "#74B4FF"],
+        layout: report.metadata.hasAnki ? LAYOUT_FULL : LAYOUT_ANKILESS,
+        gradient: gradientColors,
       }
     };
   }
 }
 
 async function saveReportToFile() {
-  const result = await exportableReportRef.value?.exportImage();
+  const result = await exportableReportRef.value?.exportImage(false);
   if (result?.success) {
     toast.add({
       severity: "success",
@@ -158,39 +156,33 @@ async function saveReportToFile() {
   }
 }
 
-function copyReportImage() {
-  // TODO: Implement copy to clipboard if needed, or reuse exportImage with a flag
-  // For now, let's just use the save to file as the primary export
-  saveReportToFile();
-}
-
 const toast = useToast();
-function copyReport(id: string) {
-  window.ipcRenderer.invoke("Copy-Report", id).then((ret: CopyReportToast) => {
-    if (!ret.worked) {
-      toast.add({
-        severity: "error",
-        summary: "Failed to copy report!",
-        detail: "We were unable to copy the report to your clipboard.",
-        life: 5000,
-      });
-    } else {
-      toast.add({
-        severity: "success",
-        summary: "Report copied!",
-        detail: `Report #${ret.reportNo} was copied to your clipboard.`,
-        life: 5000,
-      });
-    }
-  });
-}
+async function copyReport(id: string) {
+  const result = await exportableReportRef.value?.exportImage(true);
+  if (result?.success) {
+    toast.add({
+      severity: "success",
+      summary: "Report copied!",
+      detail: `Report #${id} was copied to your clipboard.`,
+      life: 5000,
+    });
+  } else {
+    toast.add({
+      severity: "error",
+      summary: "Failed to copy report!",
+      detail: "We were unable to copy the report to your clipboard.",
+      life: 5000,
+    });
+  }
+};
+
 
 const mockLayout: Layout = {
   layout: [
     ["mature", "ankidata", "ankistreak"],
     ["immersiondata", "immersionlog", "immersionstreak"],
   ],
-  gradient: ["#FF0000", "#D57AFF", "#74B4FF"],
+  gradient: ["#a855f7", "#ec4899", "#3b82f6"],
 };
 
 const mockReport: ReportData = {
@@ -248,6 +240,9 @@ const mockReport: ReportData = {
   AnkiScore: 0,
   TotalScore: 0,
   lastDaysPoints: [0, 0, 0, 0, 0, 0, 0, 0],
+  metadata: {
+    hasAnki: true,
+  },
 };
 
 const imageViewerImage = ref<{ image?: string; id?: string; shown: boolean }>({
@@ -269,24 +264,80 @@ function nf(num: number) {
     modal
     :dismissableMask="true"
     :draggable="false"
-    :header="`Report # ${reportViewer.reportData?.reportNo}`"
     :style="{ width: 'fit-content', maxWidth: '90vw' }"
+    :header="reportViewer.reportData?.reportNo == undefined ? 'Loading Report...' : `Report # ${reportViewer.reportData?.reportNo}`"
   >
-    <div class="flex flex-col items-center gap-4">
-      <ExportableReport
-        v-if="reportViewer.reportData && reportViewer.layout"
-        ref="exportableReportRef"
-        :reportData="reportViewer.reportData"
-        :layout="reportViewer.layout"
-        :reportScale="0.4"
-      />
-      <div class="flex gap-2">
-        <Button
-          label="Save to File"
-          icon="pi pi-download"
-          @click="saveReportToFile"
+    <div v-if="reportViewer.reportData && reportViewer.layout" class="flex gap-6">
+      <!-- Left Column: Report Preview -->
+      <div class="flex flex-col">
+        <ExportableReport
+          ref="exportableReportRef"
+          :reportData="reportViewer.reportData"
+          :layout="reportViewer.layout"
+          :reportScale="0.25"
+          :BASE_W="1586"
+          :BASE_H="reportViewer.reportData.metadata.hasAnki ? 1800 : 1400"
         />
       </div>
+      
+      <!-- Right Column: Info and Actions -->
+      <div class="flex flex-col gap-4" style="min-width: 280px; max-width: 320px;">
+        <!-- Report Information -->
+        <div class="flex flex-col gap-3">
+          <h3 class="text-lg font-semibold border-b pb-2">Details</h3>
+          
+          <div class="flex flex-col gap-2">
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-surface-600 dark:text-surface-400">Report Number:</span>
+              <span class="font-medium">#{{ reportViewer.reportData.reportNo }}</span>
+            </div>
+            
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-surface-600 dark:text-surface-400">Total Score:</span>
+              <div class="flex items-center gap-1">
+                <img :src="score" class="w-4 h-4" />
+                <span class="font-medium">{{ nf(reportViewer.reportData.TotalScore) }}</span>
+              </div>
+            </div>
+            
+            <div class="flex justify-between items-center" v-if="reportViewer.reportData.metadata.hasAnki">
+              <span class="text-sm text-surface-600 dark:text-surface-400">Anki Reviews:</span>
+              <span class="font-medium">{{ nf(reportViewer.reportData.totalReviews.current) }}</span>
+            </div>
+            
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-surface-600 dark:text-surface-400">Immersion Time:</span>
+              <span class="font-medium">{{ Math.floor(reportViewer.reportData.ImmersionTime.current / 3600) }}h {{ Math.floor(reportViewer.reportData.ImmersionTime.current / 60) % 60}}m</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Actions -->
+        <div class="flex flex-col gap-2 mt-auto">
+          <h3 class="text-lg font-semibold border-b pb-2">Actions</h3>
+          
+          <Button
+            label="Save to File"
+            icon="pi pi-download"
+            @click="saveReportToFile"
+            class="w-full"
+            severity="primary"
+          />
+          
+          <Button
+            label="Copy to Clipboard"
+            icon="pi pi-clipboard"
+            @click="copyReport(reportViewer.reportData.reportNo.toString())"
+            class="w-full"
+            outlined
+          />
+        </div>
+      </div>
+    </div>
+    
+    <!-- Loading State -->
+    <div v-else class="flex items-center justify-center p-8">
+      <ProgressSpinner />
     </div>
   </Dialog>
 
@@ -379,36 +430,10 @@ function nf(num: number) {
                       <div
                         class="w-full flex flex-col sm:flex-row sm:items-center gap-4 dark:bg-black bg-[#eeeeef] overflow-hidden rounded-md pr-5"
                       >
-                        <div class="w-3 h-full bg-[var(--primary-color)]"></div>
-                        <div class="w-14 py-4">
-                          <div class="h-14 flex items-center justify-center">
-                            <div
-                              role="button"
-                              @click="openImage(item.id)"
-                              class="z-10 text-neutral-100 opacity-0 hover:opacity-100 bg-black/20 w-full h-full flex justify-center items-center transition-all duration-200"
-                              v-if="(images ?? [])[index] != ''"
-                            >
-                              <i class="pi pi-search-plus"></i>
-                            </div>
-                            <img
-                              role="button"
-                              tabindex="0"
-                              @keydown.enter="openImage(item.id)"
-                              @keydown.space.prevent="openImage(item.id)"
-                              v-if="(images ?? [])[index] != ''"
-                              class="absolute mx-auto rounded-sm h-14 hover:opacity-80 transition-all duration-200"
-                              :src="
-                                'data:image/png;base64,' + (images ?? [])[index]
-                              "
-                              :alt="item.id"
-                            />
-                            <div v-else class="text-xs text-center">
-                              No image available
-                            </div>
-                          </div>
-                        </div>
+                        <div class=" py-4 w-3 h-full bg-[var(--primary-color)]"></div>
+
                         <div
-                          class="flex flex-col md:flex-row justify-between md:items-center flex-1 gap-6"
+                          class="flex py-3 flex-col md:flex-row justify-between md:items-center flex-1 gap-6"
                         >
                           <div
                             class="flex flex-row md:flex-col justify-between items-start"
@@ -425,7 +450,7 @@ function nf(num: number) {
                                   Today
                                 </span>
                                 <span
-                                  v-else-if="item.date.diff(dayjs(), 'd') == -1"
+                                  v-else-if="item.date.isSame(dayjs().subtract(1, 'day'), 'day')"
                                 >
                                   Yesterday
                                 </span>
@@ -473,32 +498,7 @@ function nf(num: number) {
                                 <i v-else class="pi pi-undo text-white" />
                               </Button>
 
-                              <Button
-                                v-on:click="copyReport(item.id)"
-                                icon="pi pi-clipboard"
-                                label=""
-                                :disabled="!item.fileExists"
-                                v-tooltip.top="{
-                                  value: item.fileExists
-                                    ? ''
-                                    : 'Report file could not be found',
-                                  pt: {
-                                    arrow: {
-                                      style: {
-                                        backgroundColor: '',
-                                      },
-                                    },
-                                    text: {
-                                      style: {
-                                        fontSize: '0.6rem',
-                                        textAlign: 'center',
-                                        color: 'white',
-                                      },
-                                    },
-                                  },
-                                }"
-                                class="flex-auto md:flex-initial whitespace-nowrap h-8"
-                              ></Button>
+                              
                               <Button
                                 v-on:click="openReport(item.id)"
                                 icon="pi pi-eye"

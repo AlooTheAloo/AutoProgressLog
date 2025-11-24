@@ -1,27 +1,23 @@
-import { dialog, ipcMain } from "electron";
-import {
-  configPath,
-  getConfig,
-  getFileInAPLData,
-  invalidateConfigCache,
-  setServerConfigAndInvalidate,
-  updateConfig,
-} from "../../../apl-backend/Helpers/getConfig";
-import { writeFileSync, rmdirSync } from "fs";
+import { dialog, ipcMain, app } from "electron";
+import { writeFileSync, rmdirSync, existsSync, readFileSync, rmSync } from "fs";
 import { Options } from "../../../apl-backend/types/options";
 import { EventEmitter } from "node:events";
 import { win } from "..";
-import { app } from "electron";
 import path from "node:path";
-import { cpSync, readFileSync, rmSync } from "node:fs";
-import { setConfig } from "../../../apl-backend/config/configManager";
-import { Logger } from "../../../apl-backend/Helpers/Log";
 import { EdenClient } from "./api/ApiManager";
 import { APLStorage } from "./util/auth";
 import { File } from "node:buffer";
-import FormData from "form-data";
 
 export const onConfigChange = new EventEmitter();
+
+const configPath = path.join(app.getPath("userData"), "config.json");
+
+function getConfig(): Options | null {
+  if (existsSync(configPath)) {
+    return JSON.parse(readFileSync(configPath).toString());
+  }
+  return null;
+}
 
 export function settingsListeners() {
   ipcMain.handle("GetConfig", async (event: any) => {
@@ -36,12 +32,16 @@ export function settingsListeners() {
       },
     };
 
-    const oldConfig = await getConfig();
+    const oldConfig = getConfig();
     writeFileSync(configPath, arg);
-    updateConfig();
+    
+    // updateConfig(); // Removed
+    
     const conf: Options = JSON.parse(arg);
     console.log("AGT is " + conf.serverOptions.userOptions.autoGenTime);
-    await setServerConfigAndInvalidate(async () => {
+    
+    // setServerConfigAndInvalidate wrapper removed, logic inline
+    try {
       APLStorage.set("localConfig", conf.localOptions);
       const res1 = await EdenClient.user.config.patch(
         conf.serverOptions.userOptions,
@@ -82,9 +82,14 @@ export function settingsListeners() {
         } catch (e) {
           console.log("Anki config patch failed : " + e);
         }
-    });
-    onConfigChange.emit("config-change", oldConfig, JSON.parse(arg));
-    return await getConfig();
+    } catch (e) {
+        console.error("Failed to sync config with server", e);
+    }
+    
+    if (oldConfig) {
+        onConfigChange.emit("config-change", oldConfig, JSON.parse(arg));
+    }
+    return getConfig();
   });
 
   onConfigChange.on(
@@ -95,7 +100,7 @@ export function settingsListeners() {
   );
 
   ipcMain.handle("reset-settings", async () => {
-    Logger.log("Reset settings handled in the electron process", "Settings");
+    console.log("Reset settings handled in the electron process");
     rmSync(path.resolve(configPath, "../"), {
       recursive: true,
       force: true,

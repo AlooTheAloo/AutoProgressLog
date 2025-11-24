@@ -39,6 +39,9 @@ export async function buildReport(userId: number) {
     const previousSyncReport = await client.syncData.findFirst({
         where: {
             userId: userId,
+            report: {
+                isNot: null
+            }   
         },
         orderBy: {
             generationTime: 'desc',
@@ -49,6 +52,8 @@ export async function buildReport(userId: number) {
         }
     });
 
+    console.log("Pregvious sync reports " + JSON.stringify(previousSyncReport));
+
     // Get 10 last reports
     const previousReports = await client.report.findMany({
         where: {
@@ -58,7 +63,7 @@ export async function buildReport(userId: number) {
             }
         },
         orderBy: {
-            reportNo: 'desc',
+            reportNo: "asc",
         },
         include: {
             syncData: true
@@ -67,13 +72,12 @@ export async function buildReport(userId: number) {
 
     console.log(previousReports);   
 
-    const times = previousReports.map((x, i) => {
-        return x.syncData.totalImmersionTime - previousReports[i + 1]?.syncData.totalImmersionTime;
+    let times = previousReports.map((x, i) => {
+        if(i == 0) return null;
+        return x.syncData.totalImmersionTime - previousReports[i - 1]?.syncData.totalImmersionTime;
     });
 
-    console.log(times);
 
-    // const averageImmersionTime = arithmeticWeightedMean(times);
 
 
     if (!previousSync) {
@@ -84,6 +88,16 @@ export async function buildReport(userId: number) {
         where: {userId},
         _sum: {seconds: true},
     });
+
+
+
+    times = times.slice(1).reverse();
+
+    console.log(times);
+    const averageImmersionTime = arithmeticWeightedMean(times as number[]);
+
+    const revCount = await AnkiStorage.getAnkiCardReviewCount(userId);
+
     await client.syncData.create({
         data: {
             userId,
@@ -92,17 +106,12 @@ export async function buildReport(userId: number) {
                 (ankiToken != undefined || url != undefined)
                     ? {
                         create: {
-                            totalCardsStudied: await AnkiStorage.getAnkiCardReviewCount(
-                                userId
-                            ).then((r) => r.totalCount ?? 0),
-                            cardsStudied: await AnkiStorage.getAnkiCardReviewCount(
-                                userId
-                            ).then((r) =>
-                                Math.abs(
-                                    (r.totalCount ?? 0) -
+                            totalCardsStudied: revCount.totalCount ?? 0,
+                            cardsStudied: Math.abs(
+                                (revCount.totalCount ?? 0) -
                                     (previousSync?.ankiData?.totalCardsStudied ?? 0)
                                 )
-                            ),
+                            ,
                             mature: (await AnkiStorage.getMatureCards(userId)) ?? 0,
                             retention: (await AnkiStorage.getRetention(userId)) ?? 0,
                         },
@@ -110,17 +119,17 @@ export async function buildReport(userId: number) {
                     : undefined,
             report: {
                 create: {
-                    reportNo: (await client.report.count() ?? 0) + 1,
+                    reportNo: (await client.report.count() ?? 0),
                     userId: userId,
                     score: 0,
                     streak: {
                         create: {
-                            immersionStreak: ((previousSyncReport?.totalImmersionTime ?? 0) < (totalImmersion._sum.seconds ?? 0))
+                            immersionStreak: ((totalImmersion._sum.seconds ?? 0) > (previousSyncReport?.totalImmersionTime ?? 0))
                                 ? (previousSyncReport?.report?.streak?.immersionStreak ?? 0) + 1
                                 : 0,
 
-                            ankiStreak: (ankiToken != undefined || url != undefined) ? ((previousSyncReport?.ankiData?.totalCardsStudied ?? 0 <
-                                (await AnkiStorage.getAnkiCardReviewCount(userId)).totalCount)
+                            ankiStreak: (ankiToken != undefined || url != undefined) ? (((previousSyncReport?.ankiData?.totalCardsStudied ?? 0) <
+                                (revCount.totalCount ?? 0))
                                 ? (previousSyncReport?.report?.streak?.ankiStreak ?? 0) + 1
                                 : 0) : 0,
                         }
@@ -130,8 +139,11 @@ export async function buildReport(userId: number) {
                             hasAnki: (ankiToken != null || url != null),
                         }
                     },
-                    averageImmersionTime: 0,
-                    bestImmersionTime: 0,
+                    averageImmersionTime: averageImmersionTime,
+                    bestImmersionTime: Math.max(
+                        (totalImmersion._sum.seconds ?? 0) - (previousReports.at(-1)?.syncData.totalImmersionTime ?? 0),
+                        (previousSyncReport?.report?.bestImmersionTime ?? 0)
+                    ),
                 }
             }
         },

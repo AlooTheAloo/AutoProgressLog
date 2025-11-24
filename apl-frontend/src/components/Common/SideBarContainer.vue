@@ -45,11 +45,11 @@ const routes: route[] = [
     image: Reports,
     name: "Reports",
   },
-  {
-    path: "/app/utilities",
-    image: Tools,
-    name: "Utilities",
-  },
+  // {
+  //   path: "/app/utilities",
+  //   image: Tools,
+  //   name: "Utilities",
+  // },
   {
     image: Competitions,
     name: "Competitions",
@@ -292,7 +292,7 @@ const toastValue = ref<UserDialog>();
           v-tooltip.right="route.path == null ? 'Coming soon!' : undefined"
           :key="route.path"
           class="rounded-[5px] px-4 py-1 flex items-center gap-2 w-full transition-all duration-200"
-          v-on:click="(e) => handleClick(route.path)"
+          v-on:click="(e: MouseEvent) => handleClick(route.path)"
           @click.stop
           :tabindex="route.path == null ? -1 : 0"
         >
@@ -343,7 +343,7 @@ const toastValue = ref<UserDialog>();
           }"
           :key="route.path"
           class="rounded-[5px] px-4 py-1 flex items-center gap-2 w-full transition-all duration-200"
-          v-on:click="(e) => handleClick(route.path)"
+          v-on:click="(e: MouseEvent) => handleClick(route.path)"
           @click.stop
         >
           <img :src="route.image" class="invert dark:invert-0 w-6 h-6" />

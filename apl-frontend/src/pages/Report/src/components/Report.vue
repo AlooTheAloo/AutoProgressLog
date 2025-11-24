@@ -3,6 +3,7 @@ import { Layout, ReportData } from "../types/report-data";
 import { onMounted, ref } from "vue";
 
 import Stats from "./Stats.vue";
+import dayjs from "dayjs";
 
 const reportdata = ref<ReportData | null>(null);
 const layoutdata = ref<Layout | null>(null);
@@ -10,6 +11,8 @@ const layoutdata = ref<Layout | null>(null);
 const props = defineProps<{
   reportData: ReportData;
   layout: Layout;
+  BASE_W: number;
+  BASE_H: number;
 }>();
 
 onMounted(() => {
@@ -23,6 +26,8 @@ onMounted(() => {
     <div
       :style="{
         'background-image': `linear-gradient(to bottom right, ${layoutdata.gradient})`,
+        'width' : props.BASE_W + 'px',
+        'height' : props.BASE_H + 'px'
       }"
       class="w-[1586px] h-[1800px] pt-[54px] pl-[52px]"
     >
@@ -46,7 +51,7 @@ onMounted(() => {
             </p>
           </h1>
           <h2 class="text-[#8E8E8E] text-lg -mt-4 mb-10">
-            {{ reportdata.time }}
+            {{ dayjs(reportdata.time).format("LLLL") }}
           </h2>
 
           <Stats
@@ -56,7 +61,7 @@ onMounted(() => {
           <div
             class="flex justify-center items-center h-full text-[#727272] py-5"
           >
-            www.aplapp.dev • Made with ♥ by AlooTheAloo and Retexc
+            www.aplapp.dev • Made with ♥ by the APL team
           </div>
         </div>
       </div>

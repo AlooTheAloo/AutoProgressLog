@@ -1,6 +1,8 @@
 export type ReportData = {
   reportNo: number;
   time: string;
+  
+  metadata: Metadata;
 
   matureCards: matureCardData[];
   retentionRate: TPlusDelta<number>;
@@ -22,6 +24,10 @@ export type ReportData = {
 
   lastDaysPoints: number[];
 };
+
+export type Metadata = {
+  hasAnki: boolean;
+} 
 
 export type Layout = {
   layout: string[][];

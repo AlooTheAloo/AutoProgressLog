@@ -116,14 +116,8 @@ export async function getReport(userId: number, reportNo: number) {
 
   return {
     reportNo: currentReport.reportNo,
-    time: until.format("D MMMM YYYY"), // "1st of January 2023 at 12:00" format in frontend, but let's send ISO or simple string first
-
-    matureCards: [
-      {
-        reportNo: currentReport.reportNo,
-        matureCardCount: currentAnki?.mature ?? 0,
-      },
-    ],
+    time: until.toISOString(),
+    matureCards: await getHistoricalMatureCardsData(userId, reportNo),
     retentionRate: {
       current: currentRetention,
       delta: currentRetention - previousRetention,
@@ -138,28 +132,18 @@ export async function getReport(userId: number, reportNo: number) {
         (currentReport.streak?.ankiStreak ?? 0) -
         (previousReport?.streak?.ankiStreak ?? 0),
     },
-    AnkiData: [
-      {
-        reportNo: currentReport.reportNo,
-        value: currentReviews - previousReviews,
-      },
-    ],
+    AnkiData: await getHistoricalAnkiData(userId, reportNo),
 
     ImmersionTime: {
       current: currentImmersionTime,
       delta: immersionDelta,
     },
     AverageImmersionTime: {
-      current: currentReport, // TODO: Calculate average
-      delta: 0,
+      current: currentReport.averageImmersionTime, 
+      delta: currentReport.averageImmersionTime - (previousReport?.averageImmersionTime ?? 0),
     },
     ImmersionLog: immersionLog,
-    ImmersionData: [
-      {
-        reportNo: currentReport.reportNo,
-        value: immersionDelta,
-      },
-    ],
+    ImmersionData: await getHistoricalImmersionData(userId, reportNo),
     ImmersionStreak: {
       current: currentReport.streak?.immersionStreak ?? 0,
       delta:
@@ -168,8 +152,8 @@ export async function getReport(userId: number, reportNo: number) {
     },
     MonthlyImmersion: monthlyImmersion._sum.seconds ?? 0,
     BestImmersion: {
-      current: 0, // TODO: Track best immersion
-      delta: 0,
+      current: currentReport.bestImmersionTime,
+      delta: currentReport.bestImmersionTime - (previousReport?.bestImmersionTime ?? 0),
     },
 
     ImmersionScore: 0, // TODO: Calculate score
@@ -177,5 +161,105 @@ export async function getReport(userId: number, reportNo: number) {
     TotalScore: currentReport.score,
 
     lastDaysPoints: lastDaysPoints,
+    metadata: {
+      hasAnki: currentAnki !== null,
+    },  
   };
+}
+
+async function getHistoricalImmersionData(userId: number, currentReportNo: number) {
+  const startReportNo = Math.max(0, currentReportNo - 23);
+  
+  const reports = await client.report.findMany({
+    where: {
+      userId: userId,
+      reportNo: {
+        gte: startReportNo,
+        lte: currentReportNo,
+        not: 0,
+      },
+    },
+    include: {
+      syncData: true,
+    },
+    orderBy: {
+      reportNo: 'asc',
+    },
+  });
+
+  return reports.map((report, index) => {
+    const previousTotal = index > 0 ? reports[index - 1].syncData.totalImmersionTime : 0;
+    const currentTotal = report.syncData.totalImmersionTime;
+    return {
+      reportNo: report.reportNo,
+      value: currentTotal - previousTotal,
+    };
+  });
+}
+
+async function getHistoricalAnkiData(userId: number, currentReportNo: number) {
+  const startReportNo = Math.max(0, currentReportNo - 23);
+  
+  const reports = await client.report.findMany({
+    where: {
+      userId: userId,
+      reportNo: {
+        gte: startReportNo,
+        lte: currentReportNo,
+        not: 0,
+      },
+    },
+    include: {
+      syncData: {
+        include: {
+          ankiData: true,
+        },
+      },
+    },
+    orderBy: {
+      reportNo: 'asc',
+    },
+  });
+
+  return reports.map((report, index) => {
+    const previousTotal = index > 0 ? (reports[index - 1].syncData.ankiData?.totalCardsStudied ?? 0) : 0;
+    const currentTotal = report.syncData.ankiData?.totalCardsStudied ?? 0;
+    return {
+      reportNo: report.reportNo,
+      value: currentTotal - previousTotal,
+    };
+  });
+}
+
+async function getHistoricalMatureCardsData(userId: number, currentReportNo: number) {
+  const startReportNo = Math.max(0, currentReportNo - 5);
+  
+  const reports = await client.report.findMany({
+    where: {
+      userId: userId,
+      reportNo: {
+        gte: startReportNo,
+        lte: currentReportNo,
+        not: 0,
+      },
+    },
+    include: {
+      syncData: {
+        include: {
+          ankiData: true,
+        },
+      },
+    },
+    orderBy: {
+      reportNo: 'asc',
+    },
+  });
+
+  // Only include reports that have Anki data (metadata.hasAnki = true)
+  return reports
+    .filter((report) => report.syncData.ankiData !== null)
+    .map((report) => ({
+      reportNo: report.reportNo,
+      matureCardCount: report.syncData.ankiData!.mature,
+    }));
 }

@@ -32,7 +32,7 @@ export class SocketClient {
             type: "auth",
             payload: authData,
           }),
-          (err) => {
+          () => {
             this.startHeartbeat();
           }
         );
@@ -41,12 +41,12 @@ export class SocketClient {
         resolve();
       });
 
-      this.socket.addEventListener("error", (err) => {
+      this.socket.addEventListener("error", (err:any) => {
         Logger.log("WebSocket error : " + (err as any).message, "Socket");
         reject(err);
       });
 
-      this.socket.addEventListener("close", (event) => {
+      this.socket.addEventListener("close", (event:any) => {
         Logger.log(`WebSocket closed: ${event.code} ${event.reason}`, "Socket");
         this.stopHeartbeat();
         if (!this.isReconnecting) {
@@ -55,7 +55,7 @@ export class SocketClient {
         }
       });
 
-      this.socket.addEventListener("message", (event) => {
+      this.socket.addEventListener("message", (event:any) => {
         try {
           const parsed = JSON.parse(event.data.toString());
           const { type, payload } = parsed;

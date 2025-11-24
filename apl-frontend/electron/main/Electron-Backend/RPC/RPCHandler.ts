@@ -81,6 +81,7 @@ async function createListeners() {
     console.log("seconds is " + seconds);
 
     if (!rpc?.isConnected) await rpc?.login();
+    console.log("rpc.setactivity");
     await rpc!.user?.setActivity({
       details: `Immersing | ${(seconds / 3600).toFixed(2)} hours`,
       state: padToMinLength(event.activity, 2),

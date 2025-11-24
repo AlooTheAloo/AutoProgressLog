@@ -109,36 +109,57 @@ export const togglWebhook = new Elysia({ name: "toggl-webhook" }).post(
         }
       }
 
-      if (
-        action === "updated" &&
-        current_Activities.get(event_user_id)?.id == payload.id
-      ) {
-        if (payload.stop != undefined) {
+      if (action === "updated") {
+        // If it's the currently running activity, stop it in the socket manager
+        if (
+          current_Activities.get(event_user_id)?.id == payload.id &&
+          payload.stop != undefined
+        ) {
           SocketManager.instance.send(event_user_id, "ActivityStop", {
             id: payload.id,
           });
           current_Activities.delete(event_user_id);
-          console.log("apl uis : ", aplUser);
-          if (aplUser) {
-            await client.immersionActivity.create({
-              data: {
-                userId: aplUser.id,
-                activityName: payload.description,
-                activityTogglId: payload.id.toString(),
-                createdAt: new Date(payload.start),
-                seconds: Math.floor(
-                  (new Date(payload.stop).getTime() -
-                    new Date(payload.start).getTime()) /
-                    1000
-                ),
-              },
-            });
-            const totalImmersion = await client.immersionActivity.aggregate({
-              where: { userId: aplUser.id },
-              _sum: { seconds: true },
-            });
-            console.log("total immersion", totalImmersion);
-          }
+        }
+
+        // Upsert the activity in the database if it has a stop time
+        if (payload.stop != undefined && aplUser) {
+          console.log("upserting activity" + payload.id);
+          await client.immersionActivity.upsert({
+            where: { activityTogglId: payload.id.toString() },
+            update: {
+              activityName: payload.description,
+              seconds: payload.duration
+            },
+            create: {
+              userId: aplUser.id,
+              activityName: payload.description,
+              activityTogglId: payload.id.toString(),
+              createdAt: new Date(payload.start),
+              seconds: Math.floor(
+                (new Date(payload.stop).getTime() -
+                  new Date(payload.start).getTime()) /
+                  1000
+              ),
+            },
+          });
+          const totalImmersion = await client.immersionActivity.aggregate({
+            where: { userId: aplUser.id },
+            _sum: { seconds: true },
+          });
+          console.log("total immersion", totalImmersion);
+        }
+      }
+
+      if (action === "deleted") {
+        try {
+          await client.immersionActivity.delete({
+            where: { activityTogglId: payload.id.toString() },
+          });
+          console.log(`Deleted activity with Toggl ID: ${payload.id}`);
+        } catch (e) {
+          console.log(
+            `Failed to delete activity with Toggl ID: ${payload.id}. It might not exist.`
+          );
         }
       }
 

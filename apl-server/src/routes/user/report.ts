@@ -44,13 +44,15 @@ export const reportRoute = new Elysia({name: 'report-route'}).use(authGuard)
                 }
             });
 
-            return reports.map(r => ({
-                id: r.report!.reportNo,
-                score: r.report!.score,
-                date: r.generationTime.toISOString(),
-                fileExists: true,
-                revertable: false
-            }));
+            return reports
+                .filter(r => r.report!.reportNo !== 0)
+                .map(r => ({
+                    id: r.report!.reportNo,
+                    score: r.report!.score,
+                    date: r.generationTime.toISOString(),
+                    fileExists: true,
+                    revertable: false
+                }));
         },
         {
             headers: authHeaders,
