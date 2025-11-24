@@ -327,7 +327,15 @@ export const importLegacyRoute = new Elysia({ name: "import-legacy" })
           },
           create: {
             reportNo,
-            score,
+            score: {
+                create: {
+                    immersionScore: 0,
+                    ankiScore: 0,
+                    totalScore: 0
+                }
+            },
+            averageImmersionTime: 0,
+            bestImmersionTime: item.bestSeconds ?? 0,
             userId,
             syncDataId,
             streak: {
@@ -338,7 +346,20 @@ export const importLegacyRoute = new Elysia({ name: "import-legacy" })
             },
           },
           update: {
-            score,
+            score: {
+                upsert: {
+                    create: {
+                        immersionScore: 0,
+                        ankiScore: 0,
+                        totalScore: 0
+                    },
+                    update: {
+                        immersionScore: 0,
+                        ankiScore: 0,
+                        totalScore: 0
+                    }
+                }
+            },
             syncDataId,
             streak: {
               upsert: {

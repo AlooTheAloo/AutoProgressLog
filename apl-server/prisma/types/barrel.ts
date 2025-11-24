@@ -6,6 +6,7 @@ export * from "./SyncData";
 export * from "./AnkiData";
 export * from "./ImmersionActivity";
 export * from "./Report";
+export * from "./Score";
 export * from "./ReportMetadata";
 export * from "./Streak";
 export * from "./UserConfig";

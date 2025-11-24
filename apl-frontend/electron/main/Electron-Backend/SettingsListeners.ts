@@ -7,17 +7,18 @@ import path from "node:path";
 import { EdenClient } from "./api/ApiManager";
 import { APLStorage } from "./util/auth";
 import { File } from "node:buffer";
+import { getConfig, invalidateConfigCache } from "../../../apl-backend/Helpers/getConfig";
 
 export const onConfigChange = new EventEmitter();
 
 const configPath = path.join(app.getPath("userData"), "config.json");
 
-function getConfig(): Options | null {
-  if (existsSync(configPath)) {
-    return JSON.parse(readFileSync(configPath).toString());
-  }
-  return null;
-}
+// function getConfig(): Options | null {
+//   if (existsSync(configPath)) {
+//     return JSON.parse(readFileSync(configPath).toString());
+//   }
+//   return null;
+// }
 
 export function settingsListeners() {
   ipcMain.handle("GetConfig", async (event: any) => {
@@ -32,7 +33,7 @@ export function settingsListeners() {
       },
     };
 
-    const oldConfig = getConfig();
+    const oldConfig = await getConfig();
     writeFileSync(configPath, arg);
     
     // updateConfig(); // Removed
@@ -87,8 +88,11 @@ export function settingsListeners() {
     }
     
     if (oldConfig) {
+        console.log("OLD : " + JSON.stringify(oldConfig));
+
         onConfigChange.emit("config-change", oldConfig, JSON.parse(arg));
     }
+    await invalidateConfigCache();
     return getConfig();
   });
 

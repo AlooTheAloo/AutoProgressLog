@@ -140,6 +140,7 @@ export async function setLegacyConfig(config: any) {
 export async function getConfig(
   opts: { forceRefresh?: boolean; ttlMs?: number } = {}
 ): Promise<Options | null> {
+
   const setupComplete = await APLStorage.get("setupComplete");
   if (!setupComplete) return null;
 

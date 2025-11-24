@@ -37,7 +37,11 @@ export const reportRoute = new Elysia({name: 'report-route'}).use(authGuard)
                     }
                 },
                 include: {
-                    report: true
+                    report: {
+                        include: {
+                            score: true
+                        }
+                    }
                 },
                 orderBy: {
                     generationTime: 'desc'
@@ -48,7 +52,11 @@ export const reportRoute = new Elysia({name: 'report-route'}).use(authGuard)
                 .filter(r => r.report!.reportNo !== 0)
                 .map(r => ({
                     id: r.report!.reportNo,
-                    score: r.report!.score,
+                    score: {
+                        immersionScore: r.report!.score?.immersionScore ?? 0,
+                        ankiScore: r.report!.score?.ankiScore ?? 0,
+                        totalScore: r.report!.score?.totalScore ?? 0,
+                    },
                     date: r.generationTime.toISOString(),
                     fileExists: true,
                     revertable: false
@@ -59,7 +67,11 @@ export const reportRoute = new Elysia({name: 'report-route'}).use(authGuard)
             response: {
                 200: t.Array(t.Object({
                     id: t.Number(),
-                    score: t.Number(),
+                    score: t.Object({
+                        immersionScore: t.Number(),
+                        ankiScore: t.Number(),
+                        totalScore: t.Number()
+                    }),
                     date: t.String(),
                     fileExists: t.Boolean(),
                     revertable: t.Optional(t.Boolean())

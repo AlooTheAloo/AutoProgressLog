@@ -15,7 +15,6 @@ export const ReportMetadataRelations = t.Object(
       {
         id: t.Integer(),
         reportNo: t.Integer(),
-        score: t.Integer(),
         userId: t.Integer(),
         syncDataId: t.Integer(),
         averageImmersionTime: t.Integer(),

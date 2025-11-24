@@ -23,7 +23,11 @@ const router = useRouter();
 
 type ListReport = {
   id: string;
-  score: number;
+  score: {
+    immersionScore: number;
+    ankiScore: number;
+    totalScore: number;
+  };
   date: Dayjs;
   fileExists: boolean;
   revertable?: boolean;
@@ -473,7 +477,7 @@ function nf(num: number) {
                                 <span
                                   class="ml-2 font-medium text-black text-sm"
                                   >{{
-                                    nf(item.score) + " " + pluralize("pt")
+                                    nf(item.score.totalScore) + " " + pluralize("pt")
                                   }}</span
                                 >
                               </div>

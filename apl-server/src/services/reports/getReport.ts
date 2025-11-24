@@ -17,6 +17,7 @@ export async function getReport(userId: number, reportNo: number) {
         },
       },
       streak: true,
+      score: true,
     },
   });
 
@@ -156,9 +157,9 @@ export async function getReport(userId: number, reportNo: number) {
       delta: currentReport.bestImmersionTime - (previousReport?.bestImmersionTime ?? 0),
     },
 
-    ImmersionScore: 0, // TODO: Calculate score
-    AnkiScore: 0, // TODO: Calculate score
-    TotalScore: currentReport.score,
+    ImmersionScore: currentReport.score?.immersionScore ?? 0, 
+    AnkiScore: currentReport.score?.ankiScore ?? 0, 
+    TotalScore: currentReport.score?.totalScore ?? 0,
 
     lastDaysPoints: lastDaysPoints,
     metadata: {

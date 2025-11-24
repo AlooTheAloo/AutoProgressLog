@@ -1,7 +1,7 @@
 import { createApp } from "vue";
 import { dialog } from "./util/DialogRenderer/dialog";
 import App from "./App.vue";
-import { createMemoryHistory, createRouter, RouteRecordRaw } from "vue-router";
+import { createMemoryHistory, createRouter } from "vue-router";
 import "./style.css";
 import PrimeVue from "primevue/config";
 import Aura from "@primevue/themes/aura";

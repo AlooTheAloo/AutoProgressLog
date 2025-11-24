@@ -84,7 +84,7 @@ model ImmersionActivity {
 model Report {
   id         Int      @id @default(autoincrement())
   reportNo   Int
-  score      Int
+  score      Score?
   streak     Streak?
   userId     Int
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -97,6 +97,15 @@ model Report {
   @@unique([reportNo, userId])
   @@index([userId])
   @@index([syncDataId])
+}
+
+model Score {
+  id             Int    @id @default(autoincrement())
+  immersionScore Int
+  ankiScore      Int
+  totalScore     Int
+  reportId       Int    @unique
+  report         Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
 }
 
 

@@ -8,7 +8,6 @@ export const ReportPlain = t.Object(
   {
     id: t.Integer(),
     reportNo: t.Integer(),
-    score: t.Integer(),
     userId: t.Integer(),
     syncDataId: t.Integer(),
     averageImmersionTime: t.Integer(),
@@ -19,6 +18,18 @@ export const ReportPlain = t.Object(
 
 export const ReportRelations = t.Object(
   {
+    score: __nullable__(
+      t.Object(
+        {
+          id: t.Integer(),
+          immersionScore: t.Integer(),
+          ankiScore: t.Integer(),
+          totalScore: t.Integer(),
+          reportId: t.Integer(),
+        },
+        { additionalProperties: false },
+      ),
+    ),
     streak: __nullable__(
       t.Object(
         {
@@ -61,7 +72,6 @@ export const ReportRelations = t.Object(
 export const ReportPlainInputCreate = t.Object(
   {
     reportNo: t.Integer(),
-    score: t.Integer(),
     averageImmersionTime: t.Integer(),
     bestImmersionTime: t.Integer(),
   },
@@ -71,7 +81,6 @@ export const ReportPlainInputCreate = t.Object(
 export const ReportPlainInputUpdate = t.Object(
   {
     reportNo: t.Optional(t.Integer()),
-    score: t.Optional(t.Integer()),
     averageImmersionTime: t.Optional(t.Integer()),
     bestImmersionTime: t.Optional(t.Integer()),
   },
@@ -80,6 +89,19 @@ export const ReportPlainInputUpdate = t.Object(
 
 export const ReportRelationsInputCreate = t.Object(
   {
+    score: t.Optional(
+      t.Object(
+        {
+          connect: t.Object(
+            {
+              id: t.Integer({ additionalProperties: false }),
+            },
+            { additionalProperties: false },
+          ),
+        },
+        { additionalProperties: false },
+      ),
+    ),
     streak: t.Optional(
       t.Object(
         {
@@ -135,6 +157,20 @@ export const ReportRelationsInputCreate = t.Object(
 export const ReportRelationsInputUpdate = t.Partial(
   t.Object(
     {
+      score: t.Partial(
+        t.Object(
+          {
+            connect: t.Object(
+              {
+                id: t.Integer({ additionalProperties: false }),
+              },
+              { additionalProperties: false },
+            ),
+            disconnect: t.Boolean(),
+          },
+          { additionalProperties: false },
+        ),
+      ),
       streak: t.Partial(
         t.Object(
           {
@@ -200,7 +236,6 @@ export const ReportWhere = t.Partial(
           OR: t.Array(Self, { additionalProperties: false }),
           id: t.Integer(),
           reportNo: t.Integer(),
-          score: t.Integer(),
           userId: t.Integer(),
           syncDataId: t.Integer(),
           averageImmersionTime: t.Integer(),
@@ -262,7 +297,6 @@ export const ReportWhereUnique = t.Recursive(
             {
               id: t.Integer(),
               reportNo: t.Integer(),
-              score: t.Integer(),
               userId: t.Integer(),
               syncDataId: t.Integer(),
               averageImmersionTime: t.Integer(),
@@ -300,6 +334,7 @@ export const ReportSelect = t.Partial(
 export const ReportInclude = t.Partial(
   t.Object(
     {
+      score: t.Boolean(),
       streak: t.Boolean(),
       user: t.Boolean(),
       syncData: t.Boolean(),
@@ -317,9 +352,6 @@ export const ReportOrderBy = t.Partial(
         additionalProperties: false,
       }),
       reportNo: t.Union([t.Literal("asc"), t.Literal("desc")], {
-        additionalProperties: false,
-      }),
-      score: t.Union([t.Literal("asc"), t.Literal("desc")], {
         additionalProperties: false,
       }),
       userId: t.Union([t.Literal("asc"), t.Literal("desc")], {

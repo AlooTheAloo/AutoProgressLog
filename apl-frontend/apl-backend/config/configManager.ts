@@ -10,6 +10,7 @@ export async function setConfig(config: Options) {
   APLStorage.set("localConfig", config.localOptions);
   writeFileSync(configPath, JSON.stringify(config, null, 2));
   updateConfig();
+  console.log("OLD : " + JSON.stringify(oldConfig));
   onConfigChange.emit("config-change", oldConfig, config);
   return getConfig();
 }

@@ -121,7 +121,13 @@ export async function buildReport(userId: number) {
                 create: {
                     reportNo: (await client.report.count() ?? 0),
                     userId: userId,
-                    score: 0,
+                    score: {
+                        create: {
+                            immersionScore: 0,
+                            ankiScore: 0,
+                            totalScore: 0
+                        }
+                    },
                     streak: {
                         create: {
                             immersionStreak: ((totalImmersion._sum.seconds ?? 0) > (previousSyncReport?.totalImmersionTime ?? 0))

@@ -4,17 +4,18 @@ import { __transformDate__ } from "./__transformDate__";
 
 import { __nullable__ } from "./__nullable__";
 
-export const StreakPlain = t.Object(
+export const ScorePlain = t.Object(
   {
     id: t.Integer(),
-    ankiStreak: t.Integer(),
-    immersionStreak: t.Integer(),
+    immersionScore: t.Integer(),
+    ankiScore: t.Integer(),
+    totalScore: t.Integer(),
     reportId: t.Integer(),
   },
   { additionalProperties: false },
 );
 
-export const StreakRelations = t.Object(
+export const ScoreRelations = t.Object(
   {
     report: t.Object(
       {
@@ -31,20 +32,25 @@ export const StreakRelations = t.Object(
   { additionalProperties: false },
 );
 
-export const StreakPlainInputCreate = t.Object(
-  { ankiStreak: t.Integer(), immersionStreak: t.Integer() },
-  { additionalProperties: false },
-);
-
-export const StreakPlainInputUpdate = t.Object(
+export const ScorePlainInputCreate = t.Object(
   {
-    ankiStreak: t.Optional(t.Integer()),
-    immersionStreak: t.Optional(t.Integer()),
+    immersionScore: t.Integer(),
+    ankiScore: t.Integer(),
+    totalScore: t.Integer(),
   },
   { additionalProperties: false },
 );
 
-export const StreakRelationsInputCreate = t.Object(
+export const ScorePlainInputUpdate = t.Object(
+  {
+    immersionScore: t.Optional(t.Integer()),
+    ankiScore: t.Optional(t.Integer()),
+    totalScore: t.Optional(t.Integer()),
+  },
+  { additionalProperties: false },
+);
+
+export const ScoreRelationsInputCreate = t.Object(
   {
     report: t.Object(
       {
@@ -61,7 +67,7 @@ export const StreakRelationsInputCreate = t.Object(
   { additionalProperties: false },
 );
 
-export const StreakRelationsInputUpdate = t.Partial(
+export const ScoreRelationsInputUpdate = t.Partial(
   t.Object(
     {
       report: t.Object(
@@ -80,7 +86,7 @@ export const StreakRelationsInputUpdate = t.Partial(
   ),
 );
 
-export const StreakWhere = t.Partial(
+export const ScoreWhere = t.Partial(
   t.Recursive(
     (Self) =>
       t.Object(
@@ -89,17 +95,18 @@ export const StreakWhere = t.Partial(
           NOT: t.Union([Self, t.Array(Self, { additionalProperties: false })]),
           OR: t.Array(Self, { additionalProperties: false }),
           id: t.Integer(),
-          ankiStreak: t.Integer(),
-          immersionStreak: t.Integer(),
+          immersionScore: t.Integer(),
+          ankiScore: t.Integer(),
+          totalScore: t.Integer(),
           reportId: t.Integer(),
         },
         { additionalProperties: false },
       ),
-    { $id: "Streak" },
+    { $id: "Score" },
   ),
 );
 
-export const StreakWhereUnique = t.Recursive(
+export const ScoreWhereUnique = t.Recursive(
   (Self) =>
     t.Intersect(
       [
@@ -132,8 +139,9 @@ export const StreakWhereUnique = t.Recursive(
           t.Object(
             {
               id: t.Integer(),
-              ankiStreak: t.Integer(),
-              immersionStreak: t.Integer(),
+              immersionScore: t.Integer(),
+              ankiScore: t.Integer(),
+              totalScore: t.Integer(),
               reportId: t.Integer(),
             },
             { additionalProperties: false },
@@ -142,15 +150,16 @@ export const StreakWhereUnique = t.Recursive(
       ],
       { additionalProperties: false },
     ),
-  { $id: "Streak" },
+  { $id: "Score" },
 );
 
-export const StreakSelect = t.Partial(
+export const ScoreSelect = t.Partial(
   t.Object(
     {
       id: t.Boolean(),
-      ankiStreak: t.Boolean(),
-      immersionStreak: t.Boolean(),
+      immersionScore: t.Boolean(),
+      ankiScore: t.Boolean(),
+      totalScore: t.Boolean(),
       reportId: t.Boolean(),
       report: t.Boolean(),
       _count: t.Boolean(),
@@ -159,23 +168,26 @@ export const StreakSelect = t.Partial(
   ),
 );
 
-export const StreakInclude = t.Partial(
+export const ScoreInclude = t.Partial(
   t.Object(
     { report: t.Boolean(), _count: t.Boolean() },
     { additionalProperties: false },
   ),
 );
 
-export const StreakOrderBy = t.Partial(
+export const ScoreOrderBy = t.Partial(
   t.Object(
     {
       id: t.Union([t.Literal("asc"), t.Literal("desc")], {
         additionalProperties: false,
       }),
-      ankiStreak: t.Union([t.Literal("asc"), t.Literal("desc")], {
+      immersionScore: t.Union([t.Literal("asc"), t.Literal("desc")], {
         additionalProperties: false,
       }),
-      immersionStreak: t.Union([t.Literal("asc"), t.Literal("desc")], {
+      ankiScore: t.Union([t.Literal("asc"), t.Literal("desc")], {
+        additionalProperties: false,
+      }),
+      totalScore: t.Union([t.Literal("asc"), t.Literal("desc")], {
         additionalProperties: false,
       }),
       reportId: t.Union([t.Literal("asc"), t.Literal("desc")], {
@@ -186,16 +198,16 @@ export const StreakOrderBy = t.Partial(
   ),
 );
 
-export const Streak = t.Composite([StreakPlain, StreakRelations], {
+export const Score = t.Composite([ScorePlain, ScoreRelations], {
   additionalProperties: false,
 });
 
-export const StreakInputCreate = t.Composite(
-  [StreakPlainInputCreate, StreakRelationsInputCreate],
+export const ScoreInputCreate = t.Composite(
+  [ScorePlainInputCreate, ScoreRelationsInputCreate],
   { additionalProperties: false },
 );
 
-export const StreakInputUpdate = t.Composite(
-  [StreakPlainInputUpdate, StreakRelationsInputUpdate],
+export const ScoreInputUpdate = t.Composite(
+  [ScorePlainInputUpdate, ScoreRelationsInputUpdate],
   { additionalProperties: false },
 );

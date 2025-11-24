@@ -311,7 +311,13 @@ export const syncRoute = new Elysia({name: "sync-route"}).use(authGuard).post(
                         create: {
                             reportNo: 0,
                             userId: userId,
-                            score: 0,
+                            score: {
+                                create: {
+                                    immersionScore: 0,
+                                    ankiScore: 0,
+                                    totalScore: 0
+                                }
+                            },
                             averageImmersionTime: 0,
                             bestImmersionTime: 0,
                             metadata: {
