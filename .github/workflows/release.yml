@@ -37,7 +37,7 @@ jobs:
         if: matrix.os == 'windows-latest'
         run: |
           cd apl-frontend
-          npm run build:windows
+          npm run build:win
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
