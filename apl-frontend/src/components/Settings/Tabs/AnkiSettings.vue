@@ -356,7 +356,6 @@ function updateAnki(value: boolean) {
       </Button>
     </div>
 
-    {{ props.config?.serverOptions.ankiOptions.enabled }}
     <SettingsToggle
       :value="props.config?.serverOptions.ankiOptions.enabled ?? false"
       label="Synchronize Anki"

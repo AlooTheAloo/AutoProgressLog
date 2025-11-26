@@ -3,6 +3,10 @@ import AnkiStorage from "../anki/AnkiStorage";
 import NormalSyncer from "../anki/NormalSyncer";
 import AnkiHTTPClient from "../anki/AnkiHTTPClient";
 
+const MATURE_WEIGHT = 100;
+const CARD_WEIGHT = 1;
+const SECOND_WEIGHT = 1;
+
 export async function buildReport(userId: number) {
     const {ankiToken, url} =
     (await client.userConfig
@@ -48,11 +52,10 @@ export async function buildReport(userId: number) {
         },
         include: {
             ankiData: true,
-            report: {include: {streak: true}},
+            report: {include: {streak: true, metadata: true}},
         }
     });
 
-    console.log("Pregvious sync reports " + JSON.stringify(previousSyncReport));
 
     // Get 10 last reports
     const previousReports = await client.report.findMany({
@@ -70,7 +73,6 @@ export async function buildReport(userId: number) {
         }
     });
 
-    console.log(previousReports);   
 
     let times = previousReports.map((x, i) => {
         if(i == 0) return null;
@@ -91,12 +93,40 @@ export async function buildReport(userId: number) {
 
 
 
-    times = times.slice(1).reverse();
+    times = times.reverse();
 
-    console.log(times);
+    console.log("Times : " + JSON.stringify(times));
     const averageImmersionTime = arithmeticWeightedMean(times as number[]);
 
-    const revCount = await AnkiStorage.getAnkiCardReviewCount(userId);
+    let revCount:{
+        count: {
+            did: number;
+            count: number;
+        }[];
+        totalCount: number;
+    } | null = null;
+    let matureCount:number|null = null;
+    let retention:number|null = null;
+
+    const immersionScore = (Math.max((totalImmersion._sum.seconds ?? 0) - (previousSyncReport?.totalImmersionTime ?? 0), 0)) * SECOND_WEIGHT;
+    let ankiScore = 0;
+    
+    if(ankiToken != undefined || url != undefined){
+        revCount = await AnkiStorage.getAnkiCardReviewCount(userId);
+        matureCount = await AnkiStorage.getMatureCards(userId);
+        retention = await AnkiStorage.getRetention(userId) ?? null;
+        if(!previousSyncReport?.report?.metadata?.hasAnki){
+            ankiScore = 0;
+        }
+        else {
+            const cardScore = Math.max(revCount?.totalCount - (previousSyncReport.ankiData?.totalCardsStudied ?? 0), 0) 
+            const matureScore = Math.max(matureCount ?? 0 - (previousSyncReport.ankiData?.mature ?? 0), 0)
+            ankiScore = cardScore * CARD_WEIGHT + matureScore * MATURE_WEIGHT;
+        }
+    }
+
+
+    let totalScore = immersionScore + ankiScore;
 
     await client.syncData.create({
         data: {
@@ -106,14 +136,14 @@ export async function buildReport(userId: number) {
                 (ankiToken != undefined || url != undefined)
                     ? {
                         create: {
-                            totalCardsStudied: revCount.totalCount ?? 0,
-                            cardsStudied: Math.abs(
-                                (revCount.totalCount ?? 0) -
+                            totalCardsStudied: revCount?.totalCount ?? 0,
+                            cardsStudied: Math.max(
+                                (revCount?.totalCount ?? 0) -
                                     (previousSync?.ankiData?.totalCardsStudied ?? 0)
-                                )
+                                , 0)
                             ,
-                            mature: (await AnkiStorage.getMatureCards(userId)) ?? 0,
-                            retention: (await AnkiStorage.getRetention(userId)) ?? 0,
+                            mature: matureCount ?? 0,
+                            retention: retention ?? 0,
                         },
                     }
                     : undefined,
@@ -123,9 +153,9 @@ export async function buildReport(userId: number) {
                     userId: userId,
                     score: {
                         create: {
-                            immersionScore: 0,
-                            ankiScore: 0,
-                            totalScore: 0
+                            immersionScore: immersionScore,
+                            ankiScore: ankiScore,
+                            totalScore: totalScore,
                         }
                     },
                     streak: {
@@ -135,7 +165,7 @@ export async function buildReport(userId: number) {
                                 : 0,
 
                             ankiStreak: (ankiToken != undefined || url != undefined) ? (((previousSyncReport?.ankiData?.totalCardsStudied ?? 0) <
-                                (revCount.totalCount ?? 0))
+                                (revCount?.totalCount ?? 0))
                                 ? (previousSyncReport?.report?.streak?.ankiStreak ?? 0) + 1
                                 : 0) : 0,
                         }

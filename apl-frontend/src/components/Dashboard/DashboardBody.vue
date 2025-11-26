@@ -165,7 +165,7 @@ const bottomText = computed(() => {
                 :transition="{
                   delay: 0.1,
                 }"
-                class="flex flex-col flex-grow h-36 bg-[#ebebec] dark:bg-black rounded-xl items-center justify-center text-center dark:text-white text-black border-2 border-transparent hover:border-[var(--primary-color)] transition-all duration-200"
+                class="flex flex-col flex-grow h-36 bg-[#ebebec] dark:bg-black rounded-xl items-center justify-center text-center dark:text-white text-black"
               >
                 <div class="font-semibold text-2xl ">Want more data?</div>
                 <div class="">

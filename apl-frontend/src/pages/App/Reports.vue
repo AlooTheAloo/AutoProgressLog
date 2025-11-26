@@ -213,7 +213,6 @@ function nf(num: number) {
     :header="reportViewer.reportData?.reportNo == undefined ? 'Loading Report...' : `Report # ${reportViewer.reportData?.reportNo}`"
   >
     <div v-if="reportViewer.reportData && reportViewer.layout" class="flex gap-6">
-      <!-- Left Column: Report Preview -->
       <div class="flex flex-col">
         <ExportableReport
           ref="exportableReportRef"
@@ -221,7 +220,7 @@ function nf(num: number) {
           :layout="reportViewer.layout"
           :reportScale="0.25"
           :BASE_W="1586"
-          :BASE_H="reportViewer.reportData.metadata.hasAnki ? 1800 : 1400"
+          :BASE_H="reportViewer.reportData.metadata.hasAnki ? 1800 : 1381"
         />
       </div>
       
@@ -309,12 +308,6 @@ function nf(num: number) {
     class="flex flex-col w-full h-full items-center justify-center"
   >
     <ProgressSpinner />
-
-    <!-- <ExportableReport
-      :report-scale="0.2"
-      :layout="mockLayout"
-      :reportData="mockReport"
-    ></ExportableReport> -->
   </div>
   <div
     v-else-if="reports.length == 0"
@@ -360,7 +353,7 @@ function nf(num: number) {
             :first="first"
           >
             <template #list="slotProps">
-              <div class="flex flex-col">
+              <div class="flex flex-col min-h-[600px]">
                 <AnimatePresence>
                   <template
                     v-for="(item, index) in slotProps.items as ListReport[]"

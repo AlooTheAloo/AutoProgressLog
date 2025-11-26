@@ -351,12 +351,12 @@ export const importLegacyRoute = new Elysia({ name: "import-legacy" })
                     create: {
                         immersionScore: 0,
                         ankiScore: 0,
-                        totalScore: 0
+                        totalScore: item.score
                     },
                     update: {
                         immersionScore: 0,
                         ankiScore: 0,
-                        totalScore: 0
+                        totalScore: item.score
                     }
                 }
             },
