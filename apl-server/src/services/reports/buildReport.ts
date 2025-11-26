@@ -120,7 +120,7 @@ export async function buildReport(userId: number) {
         }
         else {
             const cardScore = Math.max(revCount?.totalCount - (previousSyncReport.ankiData?.totalCardsStudied ?? 0), 0) 
-            const matureScore = Math.max(matureCount ?? 0 - (previousSyncReport.ankiData?.mature ?? 0), 0)
+            const matureScore = Math.max((matureCount ?? 0) - (previousSyncReport.ankiData?.mature ?? 0), 0)
             ankiScore = cardScore * CARD_WEIGHT + matureScore * MATURE_WEIGHT;
         }
     }

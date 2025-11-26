@@ -4,9 +4,10 @@ on:
   push:
     branches:
       - main # Adjust this to match your branch, usually 'main' or 'master'
+      - APL-Server/auth-system
 
 jobs:
-  release:
+  build:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -36,7 +37,7 @@ jobs:
         if: matrix.os == 'windows-latest'
         run: |
           cd apl-frontend
-          npm run release:windows
+          npm run build:windows
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
@@ -44,7 +45,7 @@ jobs:
         if: matrix.os == 'macos-latest'
         run: |
           cd apl-frontend
-          npm run release:mac
+          npm run build:mac
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
@@ -52,7 +53,7 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: |
           cd apl-frontend
-          npm run release:linux
+          npm run build:linux
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
