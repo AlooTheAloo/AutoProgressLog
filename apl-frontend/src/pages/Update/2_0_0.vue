@@ -38,14 +38,19 @@ onMounted(() => {
       "approve-email-token",
       email,
       token,
-      window.navigator.userAgent
+      window.navigator.userAgent,
+      true
     );
 
     if (!resp) {
       alert("Invalid email or token");
     } else if (resp == "signup" || resp == "login") {
+      console.log("Migrating...");
+      // Explicitly disable sidebar during migration
       migrating.value = true;
+      window.ipcRenderer.send("set-sidebar-state", false);
       window.ipcRenderer.invoke("legacy-migration").then((x) => {
+        window.ipcRenderer.send("set-sidebar-state", true);
         if (x) {
           window.ipcRenderer.invoke("update-2_0_0_done").then(() => {
             router.push("/update-app");
@@ -92,6 +97,7 @@ function SendEmail() {
 
 onUnmounted(() => {
   if (timerId !== null) clearInterval(timerId);
+  window.ipcRenderer.removeAllListeners("open-url");
 });
 </script>
 <template>

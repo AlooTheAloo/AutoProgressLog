@@ -146,15 +146,15 @@ function ankiTest(worked: boolean) {
               tabActiveBorderColor: 'var(--primary-color)',
             }"
           >
-            <div class="relative w-full">
+            <div class="relative w-full mb-10">
               <div
-                class="absolute bottom-0 left-0 w-full border-b border-[#e2e8f0] dark:border-gray-700 z-0"
+                class="absolute bottom-0 left-0 w-full border-b dark:border-0 z-0"
               ></div>
-              <div class="w-0 relative z-10">
+              <div class="absolute z-10 tablist">
                 <TabList
+                  class="tablist"
                   pt:activeBar="tablist-bar"
                   pt:tabList="tablist"
-                  class="w-0"
                 >
                   <Tab value="0">General</Tab>
                   <Tab value="1">Account</Tab>

@@ -54,7 +54,7 @@ async function killListeners() {
   SocketClient.instance.off("ClearActivity");
 }
 
-async function createListeners() {
+export async function createListeners() {
   const config = await getConfig();
   if (config == undefined || !config.localOptions.general.discordIntegration)
     return;

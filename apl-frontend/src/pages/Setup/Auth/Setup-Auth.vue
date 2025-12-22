@@ -63,7 +63,8 @@ onMounted(() => {
       "approve-email-token",
       email,
       token,
-      window.navigator.userAgent
+      window.navigator.userAgent,
+      false
     );
 
     if (!resp) {

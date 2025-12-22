@@ -54,13 +54,18 @@ export default class NormalSyncer {
       while (true) {
         console.log("Let's get a chunk from the server...");
         const chunk = await this.client.getChunk();
-        console.log("Chunk is:", chunk);
+        console.log("chnk : " + JSON.stringify(chunk));
         if (chunk == undefined) {
           console.log("Chunk was undefined...", "Anki");
           s(false);
           return;
         }
+        console.log("NOTES LEN : " + chunk?.notes?.length)
+        console.log("CARDS LEN : " + chunk?.cards?.length)
+        console.log("REVLOG LEN : " + chunk?.revlog?.length)
+        console.log("Applying chunk...");
         await AnkiStorage.applyChunk(chunk, this.userID);
+        console.log("DONE ! " + chunk.done);
         if (chunk.done) {
           s(true);
           break;

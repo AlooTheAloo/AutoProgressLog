@@ -12,6 +12,8 @@ import { ipcMain } from "electron";
 import path from "path";
 import { EdenClient } from "../../../electron/main/Electron-Backend/api/ApiManager";
 import { APLStorage } from "../../../electron/main/Electron-Backend/util/auth";
+import { SocketClient } from "../../../electron/main/Electron-Backend/Socket/SocketClient";
+import { createListeners } from "../../../electron/main/Electron-Backend/RPC/RPCHandler";
 import { APLLocalOptions, OutputOptions } from "../../types/options";
 export default async function upgrade_2_0_0() {
   console.log("Upgrading to 2.0.0");
@@ -27,6 +29,11 @@ export default async function upgrade_2_0_0() {
     ipcMain.handleOnce("update-2_0_0_done", async () => {
       await APLStorage.set("setupComplete", true);
       [cache_location, configPath, syncDataPath].forEach((x) => rmSync(x));
+      await new SocketClient().init({
+        token: (await APLStorage.get("token")) as string,
+      });
+      await createListeners();
+      win?.webContents.send("is-setup-complete", true);
       res();
     });
     ipcMain.handleOnce("legacy-migration", async () => {
@@ -39,7 +46,7 @@ export default async function upgrade_2_0_0() {
               type: "application/text",
             })
         );
-
+        
         // Call Eden treaty route
         const res = await EdenClient.user["import-legacy"].post(
           {

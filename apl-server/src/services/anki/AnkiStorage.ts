@@ -285,17 +285,54 @@ export default class AnkiStorage {
   private static async mergeRevlog(
     entries: RevlogEntry[],
     userID: number
-  ): Promise<void[]> {
-    return Promise.all(entries.map((e) => this.addRevlogEntry(e, userID)));
+  ): Promise<void> {
+    if (entries.length === 0) return;
+
+    const BATCH_SIZE = 200;
+    for (let i = 0; i < entries.length; i += BATCH_SIZE) {
+      const chunk = entries.slice(i, i + BATCH_SIZE);
+      const placeholders = chunk
+        .map(() => "(?, ?, ?, ?, ?, ?, ?, ?, ?)")
+        .join(", ");
+      const sql = `INSERT OR IGNORE INTO revlog (id, cid, usn, ease, ivl, lastIvl, factor, time, type) VALUES ${placeholders}`;
+      const params = chunk.flat();
+
+      const result = await this.executeModify(
+        this.storage_url,
+        userID,
+        sql,
+        params
+      );
+      if ("error" in result) throw new Error(result.error);
+    }
   }
 
   private static async mergeCards(
     entries: CardEntry[],
     userID: number
-  ): Promise<void[]> {
-    return Promise.all(
-      entries.map((e) => this.addOrUpdateCardIfNewer(e, userID))
-    );
+  ): Promise<void> {
+    if (entries.length === 0) return;
+
+    const BATCH_SIZE = 200;
+    for (let i = 0; i < entries.length; i += BATCH_SIZE) {
+      const chunk = entries.slice(i, i + BATCH_SIZE);
+      const placeholders = chunk.map(() => "(?, ?, ?, ?)").join(", ");
+      const sql = `INSERT OR REPLACE INTO cards (id, did, usn, ivl) VALUES ${placeholders}`;
+      const params = chunk.flatMap((entry) => [
+        entry[0],
+        entry[2],
+        entry[6],
+        entry[9],
+      ]);
+
+      const result = await this.executeModify(
+        this.storage_url,
+        userID,
+        sql,
+        params
+      );
+      if ("error" in result) throw new Error(result.error);
+    }
   }
 
   public static async getDecksCards(userID: number): Promise<DeckType[]> {
@@ -317,30 +354,7 @@ export default class AnkiStorage {
     else return res.response;
   }
 
-  private static async addRevlogEntry(entry: RevlogEntry, userID: number) {
-    const result = await this.executeModify(
-      this.storage_url,
-      userID,
-      `INSERT
-            OR IGNORE INTO revlog (id, cid, usn, ease, ivl, lastIvl, factor, time, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      entry
-    );
-    if ("error" in result) throw new Error(result.error);
-  }
 
-  private static async addOrUpdateCardIfNewer(
-    entry: CardEntry,
-    userID: number
-  ) {
-    const result = await this.executeModify(
-      this.storage_url,
-      userID,
-      `INSERT
-            OR REPLACE INTO cards (id, did, usn, ivl) VALUES (?, ?, ?, ?)`,
-      [entry[0], entry[2], entry[6], entry[9]]
-    );
-    if ("error" in result) throw new Error(result.error);
-  }
 
   private static async remove_card(cid: string, userID: number) {
     const result = await this.executeModify(
@@ -383,7 +397,6 @@ export default class AnkiStorage {
     sql: string,
     params: any[] = []
   ) {
-    console.log("Executing modify query for user:", userID + " with sql:", sql);
     return this.execute<
       { message: string; lastID: number } | { error: string }
     >("PATCH", `${url}/ankidb/modify`, userID, sql, params);
@@ -401,7 +414,6 @@ export default class AnkiStorage {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ userId: userID, query: sql, queryParams: params }),
     });
-    console.log("response is ", response);
     return response.json() as Promise<T>;
   }
 }

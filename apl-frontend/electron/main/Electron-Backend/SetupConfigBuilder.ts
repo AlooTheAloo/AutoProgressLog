@@ -16,6 +16,7 @@ import dayjs from "dayjs";
 import { loadDB } from "./AnkiListeners";
 import { SocketClient } from "./Socket/SocketClient";
 import { Options } from "../../../apl-backend/types/options";
+import { createListeners } from "./RPC/RPCHandler";
 
 export interface AnkiLogin {
   username: string;
@@ -98,7 +99,7 @@ export function setupListeners() {
 
   ipcMain.handle(
     "approve-email-token",
-    async (e: any, email: string, emailToken: string, userAgent: string) => {
+    async (e: any, email: string, emailToken: string, userAgent: string, isMigration: boolean) => {
       const retVal = await EdenClient.auth.validate.post({
         email,
         emailToken,
@@ -126,8 +127,10 @@ export function setupListeners() {
         if (isLogin) {
           await APLStorage.set("token", retVal.data.token);
           console.log("token has been set!");
-          await APLStorage.set("setupComplete", true);
-          win?.webContents.send("is-setup-complete", true);
+          if(!isMigration){
+            await APLStorage.set("setupComplete", true);
+            win?.webContents.send("is-setup-complete", true);
+          }
           return "login";
         } else return "signup";
       }
@@ -144,6 +147,7 @@ export function setupListeners() {
     await new SocketClient().init({
       token: (await APLStorage.get("token")) as string,
     });
+    await createListeners();
     win?.webContents.send("is-setup-complete", true);
   });
 

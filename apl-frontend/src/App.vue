@@ -18,9 +18,11 @@ onMounted(() => {
   }, 2000);
   if (window.ipcRenderer) {
     window.ipcRenderer.on("is-setup-complete", (_e, ok: boolean) => {
+      console.log("ISSETUPCOMPLETE " + ok);
       showSideBar.value = ok;
     });
     window.ipcRenderer.on("set-sidebar-state", (_e, value) => {
+      console.log("SETSIDEBARSTATE " + value);
       showSideBar.value = value;
     });
   }

@@ -58,7 +58,7 @@ watch(
   }
 );
 
-function updateTime(value: Date) {
+function updateTime(value: Date | null) {
   if (props.config == undefined) return;
   console.log("Autogentime : " + value);
   const valueAsConfig =
@@ -111,9 +111,9 @@ function ToggleAutogen(value: boolean) {
     />
 
     <SettingsDatePicker
-      :value="selectedTime"
+      :model-value="selectedTime"
       label="Time to Generate Reports"
-      @update:value="updateTime"
+      @update:model-value="updateTime"
       :disabled="config.serverOptions.userOptions.autoGenTime == null"
       help-text="The time at which reports will be generated every day"
     />

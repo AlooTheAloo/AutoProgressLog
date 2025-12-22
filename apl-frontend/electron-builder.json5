@@ -13,6 +13,7 @@
   ],
   files: [
     "dist*/**",
+    "out/**",
     "apl-backend/apl-visuals/visuals/**",
     "src/assets/**",
     ".env.production",

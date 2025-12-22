@@ -57,10 +57,17 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 initializeApiManager();
 registerEvents();
 
-process.env.APP_ROOT = path.join(__dirname, "../..");
+// In production (packaged), __dirname is inside app.asar at app.asar/dist/main/
+// In development, __dirname is at electron/main/ (after build) or out/ directory structure
+process.env.APP_ROOT = isProd
+  ? process.resourcesPath  // Points to app.asar and app.asar.unpacked parent
+  : path.join(__dirname, "../..");
 
 export const MAIN_DIST = path.join(process.env.APP_ROOT, "dist-electron");
-export const RENDERER_DIST = path.join(process.env.APP_ROOT, "dist");
+// Renderer files are built to out/renderer/ by electron-vite
+export const RENDERER_DIST = isProd
+  ? path.join(process.resourcesPath, "app.asar", "out", "renderer")
+  : path.join(process.env.APP_ROOT, "out/renderer");
 export const VITE_DEV_SERVER_URL = process.env.ELECTRON_RENDERER_URL;
 
 process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL
@@ -129,6 +136,24 @@ export async function createWindow() {
   buildContextMenu();
 }
 
+// Handle protocol URLs on macOS when app is already running or launched with URL
+app.on("open-url", async (event, url) => {
+  event.preventDefault();
+  
+  if (url.startsWith("apl://")) {
+    Logger.log(`Received deep link: ${url}`, "DeepLink");
+    
+    // If window doesn't exist yet, wait for it to be created
+    if (!win) {
+      await createWindow();
+    }
+    
+    // Focus the window and send the URL to renderer
+    await FocusApp();
+    win?.webContents.send("open-url", url);
+  }
+});
+
 app
   .whenReady()
   .then(async () => {
@@ -139,6 +164,13 @@ app
     ) {
       win?.destroy();
       return;
+    }
+    
+    // Check if app was launched with a protocol URL (e.g., from email link)
+    const protocolUrl = process.argv.find(arg => arg.startsWith("apl://"));
+    if (protocolUrl && win) {
+      Logger.log(`Launched with deep link: ${protocolUrl}`, "DeepLink");
+      win.webContents.send("open-url", protocolUrl);
     }
   })
   .then(createAppBackend);
@@ -180,6 +212,16 @@ app.on("activate", () => {
 });
 
 app.on("ready", async () => {
+  // Register as default protocol client for apl:// URLs
+  // This ensures that email links open AutoProgressLog instead of a generic Electron app
+  if (!app.isDefaultProtocolClient("apl")) {
+    const registered = app.setAsDefaultProtocolClient("apl");
+    Logger.log(
+      `Protocol registration for apl:// ${registered ? "successful" : "failed"}`,
+      "Protocol"
+    );
+  }
+
   if (await VersionManager.verifyVersion()) {
     await checkHealth(getConfig());
   }

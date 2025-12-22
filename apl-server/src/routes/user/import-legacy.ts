@@ -6,6 +6,8 @@ import { authGuard } from "../../middlewares/authGuard";
 import Toggl from "toggl-track";
 import AnkiStorage from "../../services/anki/AnkiStorage";
 import { DEFAULT_ANKI_URL } from "../../services/anki/AnkiHTTPClient";
+import { ManualSync } from "../../services/toggl/togglService";
+import createWebhook from "../../integrations/toggl/createWebhook";
 
 function fromEpochMaybeMs(x: number): Date {
   return new Date(x < 1_000_000_000_000 ? x * 1000 : x);
@@ -198,7 +200,10 @@ export const importLegacyRoute = new Elysia({ name: "import-legacy" })
               autoGenTime == undefined
                 ? undefined
                 : {
-                    create: autoGenTime,
+                    upsert: {
+                      create: autoGenTime,
+                      update: autoGenTime,
+                    },
                   },
             ankiConfig:
               ankiEnabled && ankiToken
@@ -262,25 +267,30 @@ export const importLegacyRoute = new Elysia({ name: "import-legacy" })
 
       // --- 6) Migrate ImmersionActivity ---
       let createdActivities = 0;
-      // Insert in manageable batches to reduce transaction size
-      const BATCH = 200;
+      let skippedDuplicates = 0;
 
-      for (let i = 0; i < activityRows.length; i += BATCH) {
-        const chunk = activityRows.slice(i, i + BATCH);
-        await prisma.$transaction(
-          chunk.map((a) =>
-            prisma.immersionActivity.create({
-              data: {
-                userId,
-                createdAt: fromEpochMaybeMs(a.time),
-                seconds: a.seconds,
-                activityName: a.activityName,
-                activityTogglId: a.id.toString(),
-              },
-            })
-          )
-        );
-        createdActivities += chunk.length;
+      for (const a of activityRows) {
+        try {
+          await prisma.immersionActivity.create({
+            data: {
+              userId,
+              createdAt: fromEpochMaybeMs(a.time),
+              seconds: a.seconds,
+              activityName: a.activityName,
+              activityTogglId: a.id.toString(),
+            },
+          });
+          createdActivities++;
+        } catch (error: any) {
+          // Skip duplicates (unique constraint violations)
+          if (error.code === 'P2002') {
+            console.log(`Skipping duplicate activityTogglId: ${a.id}`);
+            skippedDuplicates++;
+          } else {
+            // Re-throw other errors
+            throw error;
+          }
+        }
       }
 
       // --- 7) Migrate Reports (+Streak) from cache.json ---
@@ -320,7 +330,7 @@ export const importLegacyRoute = new Elysia({ name: "import-legacy" })
           });
           syncDataId = created.id;
         }
-
+        console.log("ITEM'S SCORE IS " + item.score);
         await prisma.report.upsert({
           where: {
             reportNo_userId: { reportNo, userId },
@@ -329,9 +339,9 @@ export const importLegacyRoute = new Elysia({ name: "import-legacy" })
             reportNo,
             score: {
                 create: {
-                    immersionScore: 0,
-                    ankiScore: 0,
-                    totalScore: 0
+                    immersionScore: item.seconds,
+                    ankiScore: item.score - item.seconds, // total = a + b <=> b = total - a
+                    totalScore: item.score
                 }
             },
             averageImmersionTime: 0,
@@ -349,13 +359,13 @@ export const importLegacyRoute = new Elysia({ name: "import-legacy" })
             score: {
                 upsert: {
                     create: {
-                        immersionScore: 0,
-                        ankiScore: 0,
+                        immersionScore: item.seconds,
+                        ankiScore: item.score - item.seconds,
                         totalScore: item.score
                     },
                     update: {
-                        immersionScore: 0,
-                        ankiScore: 0,
+                        immersionScore: item.seconds,
+                        ankiScore: item.score - item.seconds,
                         totalScore: item.score
                     }
                 }
@@ -373,7 +383,15 @@ export const importLegacyRoute = new Elysia({ name: "import-legacy" })
         upsertedReports++;
       }
 
-      // --- 8) Done ---
+      // --- 8) Backfill & Webhook ---
+      if (togglToken) {
+        console.log("Backfilling last 3 months data...");
+        await ManualSync(userId);
+        console.log("Creating webhook...");
+        await createWebhook(-1, togglToken);
+      }
+
+      // --- 9) Done ---
       return {
         ok: true,
         migrated: {

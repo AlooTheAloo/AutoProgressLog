@@ -11,6 +11,7 @@ import semver from "semver";
 import { version as v1 } from "../../../package.json";
 import { upgrade_schema } from "../../../apl-backend/apl-upgrade";
 import { VersionManager } from "../../../apl-backend/Helpers/VersionManager";
+import { APLStorage } from "./util/auth";
 
 const APP_URL = "https://github.com/AlooTheAloo/AutoProgressLog/";
 
@@ -30,6 +31,7 @@ export function globalListeners() {
   ipcMain.handle("Update-App-Schema", async (event, args) => {
     await upgrade_schema((await VersionManager.SemVer()).toString());
     win?.webContents.send("router-push", "/app/dashboard");
+    await APLStorage.set("setupComplete", true);
     win?.webContents.send("is-setup-complete", true);
   });
 

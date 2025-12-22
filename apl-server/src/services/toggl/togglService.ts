@@ -83,6 +83,7 @@ export async function ManualSync(userID: number) {
         ),
       };
     }),
+    skipDuplicates: true,
   });
 }
 

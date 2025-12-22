@@ -50,12 +50,14 @@ export default class Storage {
 
   async mergeRevlog(entries: RevlogEntry[]): Promise<void[]> {
     if (entries.length == 0) return [];
+    console.log("MERGING " + entries.length + "REVIEWS")
 
     return Promise.all(entries.map((x) => this.addRevlogEntry(x)));
   }
 
   async mergeCards(entries: CardEntry[], pendingUsn: number): Promise<void[]> {
     if (entries.length == 0) return [];
+    console.log("MERGING " + entries.length + "CARDS")
     return Promise.all(
       entries.map((x) => this.addOrUpdateCardIfNewer(x, pendingUsn))
     );
