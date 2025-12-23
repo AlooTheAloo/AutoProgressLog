@@ -27,7 +27,6 @@ export async function tokenToTogglData(token: string) {
       },
     });
 
-    console.log("user is " + user);
     return user?.config ?? null;
   } catch (e) {
     return null;

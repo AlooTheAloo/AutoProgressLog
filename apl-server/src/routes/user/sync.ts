@@ -5,6 +5,11 @@ import AnkiStorage from "../../services/anki/AnkiStorage";
 import NormalSyncer from "../../services/anki/NormalSyncer";
 import AnkiHTTPClient from "../../services/anki/AnkiHTTPClient";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 // -- SCHEMAS --
 const ImmersionDTOSchema = t.Object({
@@ -64,10 +69,17 @@ export const syncRoute = new Elysia({name: "sync-route"}).use(authGuard).post(
         console.log("=== SYNC START for user:", userId, "===");
 
         console.log("Step 1: Getting config data for user:", userId);
-        const {ankiToken, url} =
-        (await client.userConfig
-            .findUnique({where: {userId}})
-            .ankiConfig({select: {ankiToken: true, url: true}})) ?? {};
+        const config = await client.userConfig.findUnique({
+            where: { userId },
+            include: {
+                ankiConfig: { select: { ankiToken: true, url: true } },
+                autoGenTime: { select: { timezone: true } }
+            }
+        });
+
+        const ankiToken = config?.ankiConfig?.ankiToken;
+        const url = config?.ankiConfig?.url;
+        const timezone = config?.autoGenTime?.timezone ?? "UTC";
 
         console.log(
             "User config retrieved:",
@@ -196,24 +208,42 @@ export const syncRoute = new Elysia({name: "sync-route"}).use(authGuard).post(
         );
         console.log("Formatted immersion sources:", immersionSources);
 
-        const sevenDaysAgo = new Date();
-        sevenDaysAgo.setHours(0, 0, 0, 0);
-        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
-        console.log("Fetching weekly immersion since:", sevenDaysAgo);
+        const nowFormatted = dayjs().tz(timezone);
+        // We want 7 days: [Today-6, Today-5, ..., Today]
+        // Buckets: 0..6 where 6 is Today.
+        
+        // Start of "today" in user timezone
+        const startOfToday = nowFormatted.startOf('day');
+        
+        // Start of the 7-day window (6 days ago)
+        const startOfWindow = startOfToday.subtract(6, 'day');
+
+        console.log("Fetching weekly immersion since (User TZ):", startOfWindow.format());
 
         const weekly = await client.immersionActivity.findMany({
-            where: {userId, createdAt: {gte: sevenDaysAgo}},
+            where: {
+                userId, 
+                createdAt: {
+                    gte: startOfWindow.toDate() // DB stores as UTC, prisma handles conversion comparison? 
+                    // Actually, if we pass a JS Date, Prisma treats it as that timestamp.
+                    // dayjs.toDate() returns a JS Date object (which has absolute execution time).
+                    // So waiting for logs >= (Today-6 start of day). Correct.
+                }
+            },
             select: {createdAt: true, seconds: true},
         });
         console.log("Weekly immersion raw data:", weekly);
 
         const immersionStreak = Array(7).fill(0);
         weekly.forEach(({createdAt, seconds}) => {
-            const day = Math.floor(
-                (new Date(createdAt).setHours(0, 0, 0, 0) - sevenDaysAgo.getTime()) /
-                86400000
-            );
-            if (day >= 0 && day < 7) immersionStreak[day] += seconds ?? 0;
+             // Convert log time to user timezone
+             const logTime = dayjs(createdAt).tz(timezone);
+             // Calculate difference in days from startOfWindow
+             const diffDays = logTime.diff(startOfWindow, 'day');
+             
+             if (diffDays >= 0 && diffDays < 7) {
+                 immersionStreak[diffDays] += seconds ?? 0;
+             }
         });
         console.log("Weekly immersion streak array:", immersionStreak);
 
@@ -303,7 +333,6 @@ export const syncRoute = new Elysia({name: "sync-route"}).use(authGuard).post(
         if ((await client.syncData.count({
             where: {userId}
         })) == 2) {
-          console.log("caca.")
             await client.syncData.update({
                 where: {id: createdSync.id},
                 data: {

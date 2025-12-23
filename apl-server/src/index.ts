@@ -21,10 +21,7 @@ export const app = new Elysia()
   .onStart(async () => {
     AnkiStorage.init(Bun.env.STORAGE_URL ?? "");
     initTogglNotifications();
-    console.log("Initializing ZSTD...");
     await zstdinit();
-    console.log("ZSTD initialized successfully.");
-    console.log("Starting Ngrok tunnel...");
     await startTunnel();
   })
   .use(
