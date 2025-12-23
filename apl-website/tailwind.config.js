@@ -1,5 +1,4 @@
 import animate from "tailwindcss-animate";
-import { setupInspiraUI } from "@inspira-ui/plugins";
 
 export default {
   darkMode: ["selector", "class"],
@@ -59,5 +58,5 @@ export default {
     },
   },
 
-  plugins: [animate, setupInspiraUI, require("tailwindcss-animate")],
+  plugins: [animate],
 };

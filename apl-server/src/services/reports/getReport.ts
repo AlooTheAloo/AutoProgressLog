@@ -111,9 +111,8 @@ export async function getReport(userId: number, reportNo: number) {
     },
   });
 
-  // Last 7 days points (placeholder or actual calculation if we had a points system defined)
-  // For now returning 0s as in the mock
-  const lastDaysPoints = [0, 0, 0, 0, 0, 0, 0, 0];
+  // Last 10 reports scores
+  const lastDaysPoints = await getHistoricalScores(userId, reportNo);
 
   return {
     reportNo: currentReport.reportNo,
@@ -169,7 +168,7 @@ export async function getReport(userId: number, reportNo: number) {
 }
 
 async function getHistoricalImmersionData(userId: number, currentReportNo: number) {
-  const startReportNo = Math.max(0, currentReportNo - 23);
+  const startReportNo = Math.max(0, currentReportNo - 24);
   
   const reports = await client.report.findMany({
     where: {
@@ -195,11 +194,11 @@ async function getHistoricalImmersionData(userId: number, currentReportNo: numbe
       reportNo: report.reportNo,
       value: currentTotal - previousTotal,
     };
-  });
+  }).slice(1);
 }
 
 async function getHistoricalAnkiData(userId: number, currentReportNo: number) {
-  const startReportNo = Math.max(0, currentReportNo - 23);
+  const startReportNo = Math.max(0, currentReportNo - 24);
   
   const reports = await client.report.findMany({
     where: {
@@ -229,7 +228,7 @@ async function getHistoricalAnkiData(userId: number, currentReportNo: number) {
       reportNo: report.reportNo,
       value: currentTotal - previousTotal,
     };
-  });
+  }).slice(1);
 }
 
 async function getHistoricalMatureCardsData(userId: number, currentReportNo: number) {
@@ -258,9 +257,35 @@ async function getHistoricalMatureCardsData(userId: number, currentReportNo: num
 
   // Only include reports that have Anki data (metadata.hasAnki = true)
   return reports
-    .filter((report) => report.syncData.ankiData !== null)
     .map((report) => ({
       reportNo: report.reportNo,
       matureCardCount: report.syncData.ankiData!.mature,
     }));
+}
+
+async function getHistoricalScores(userId: number, currentReportNo: number) {
+  const startReportNo = Math.max(1, currentReportNo - 9);
+
+  const reports = await client.report.findMany({
+    where: {
+      userId: userId,
+      reportNo: {
+        gte: startReportNo,
+        lte: currentReportNo,
+      },
+    },
+    include: {
+      score: true,
+    },
+    orderBy: {
+      reportNo: "asc",
+    },
+  });
+  let sum = 0;
+  return reports.map((report, index) => report.score?.totalScore ?? 0).map((x) => {
+    sum /= 2;
+    sum += x * 2;
+    return sum;   
+  });
+
 }

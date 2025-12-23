@@ -13,10 +13,10 @@ interface TimeMapProps {
 }
 
 const props = defineProps<TimeMapProps>();
-const sortedDataByReport = ref(
+const sortedDataByReport = computed(() =>
   props.data.slice(0, 24).sort((a, b) => b.reportNo - a.reportNo)
 );
-const sortedDataByRelativeCount = ref(
+const sortedDataByRelativeCount = computed(() =>
   props.data.slice(0, 24).sort((a, b) => b.value - a.value)
 );
 

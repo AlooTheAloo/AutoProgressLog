@@ -12,5 +12,6 @@ export * from "./Streak";
 export * from "./UserConfig";
 export * from "./AutoGenConfig";
 export * from "./AnkiConfig";
+export * from "./SurveyAnswer";
 export * from "./__nullable__";
 export * from "./__transformDate__";

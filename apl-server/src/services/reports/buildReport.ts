@@ -149,7 +149,7 @@ export async function buildReport(userId: number) {
                     : undefined,
             report: {
                 create: {
-                    reportNo: (await client.report.count() ?? 0),
+                    reportNo: (previousSyncReport?.report?.reportNo ?? 0) + 1,
                     userId: userId,
                     score: {
                         create: {

@@ -5,10 +5,12 @@ import { Elysia } from "elysia";
 import { userRoutes } from "./user";
 import { storageRoutes } from "./storage";
 import { verifyProviderRoutes } from "./user/verifyProvider";
+import { surveyRoutes } from "./survey";
 
 export const registeredRoutes = new Elysia({ name: "registered-routes" })
   .use(authRoutes)
   .use(userRoutes)
   .use(storageRoutes)
   .use(downloadLinksRoute)
-  .use(rootRoute);
+  .use(rootRoute)
+  .use(surveyRoutes);

@@ -3,9 +3,8 @@ name: Release APL
 on:
   push:
     branches:
-      - main # Adjust this to match your branch, usually 'main' or 'master'
-      - APL-Server/auth-system
-
+      - main
+      
 jobs:
   build:
     runs-on: ${{ matrix.os }}

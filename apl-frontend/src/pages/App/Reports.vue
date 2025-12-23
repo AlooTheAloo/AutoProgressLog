@@ -132,6 +132,7 @@ const LAYOUT_ANKILESS = [
 
 async function openReport(id: string) {
   const report: ReportData = await window.ipcRenderer.invoke("Get-Report-Details", id);
+  console.log(report);
   if (report) {
     reportViewer.value = {
       shown: true,

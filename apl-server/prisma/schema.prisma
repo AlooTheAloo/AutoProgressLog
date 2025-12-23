@@ -169,3 +169,14 @@ enum AnkiRetentionMode {
   ANKI_DEFAULT
   TRUE_RETENTION
 }
+
+model SurveyAnswer {
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  track       String?
+  refoldKnows Boolean?
+  refoldStage String?
+  years       Int?
+  language    String?
+  appsUsing   String[]
+}

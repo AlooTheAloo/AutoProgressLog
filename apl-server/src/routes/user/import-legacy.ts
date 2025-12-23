@@ -8,6 +8,7 @@ import AnkiStorage from "../../services/anki/AnkiStorage";
 import { DEFAULT_ANKI_URL } from "../../services/anki/AnkiHTTPClient";
 import { ManualSync } from "../../services/toggl/togglService";
 import createWebhook from "../../integrations/toggl/createWebhook";
+import { arithmeticWeightedMean } from "../../services/reports/buildReport";
 
 function fromEpochMaybeMs(x: number): Date {
   return new Date(x < 1_000_000_000_000 ? x * 1000 : x);
@@ -301,6 +302,7 @@ export const importLegacyRoute = new Elysia({ name: "import-legacy" })
       let upsertedReports = 0;
 
       console.log("items is " + JSON.stringify(items));
+      let i = 0;
       for (const item of items) {
         const reportNo = Number(item.reportNo);
         const score = Number(item.score ?? 0);
@@ -330,6 +332,10 @@ export const importLegacyRoute = new Elysia({ name: "import-legacy" })
           });
           syncDataId = created.id;
         }
+
+        if(reportNo > 330){
+          console.log("FOR REPORT #" + reportNo + " WE GET " + items.slice(Math.max(0, i - 9), i + 1).map(x => x.seconds).reverse())
+        }
         console.log("ITEM'S SCORE IS " + item.score);
         await prisma.report.upsert({
           where: {
@@ -344,7 +350,7 @@ export const importLegacyRoute = new Elysia({ name: "import-legacy" })
                     totalScore: item.score
                 }
             },
-            averageImmersionTime: 0,
+            averageImmersionTime: arithmeticWeightedMean(items.slice(Math.max(0, i - 9), i + 1).map(x => x.seconds).reverse()),
             bestImmersionTime: item.bestSeconds ?? 0,
             userId,
             syncDataId,
@@ -379,7 +385,7 @@ export const importLegacyRoute = new Elysia({ name: "import-legacy" })
             },
           },
         });
-
+        i++;
         upsertedReports++;
       }
 

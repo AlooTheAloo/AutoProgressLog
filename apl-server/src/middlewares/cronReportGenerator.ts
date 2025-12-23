@@ -231,15 +231,5 @@ export function reportCronPlugin(opts: ReportCronOptions) {
         }
         registry.clear();
       })
-      // Optional debug route (remove in prod)
-      .get("/_report-cron/list", () => manager.list(), {
-        response: t.Array(
-          t.Object({
-            userId: t.Number(),
-            cronExpr: t.String(),
-            timezone: t.Optional(t.String()),
-          })
-        ),
-      })
   );
 }

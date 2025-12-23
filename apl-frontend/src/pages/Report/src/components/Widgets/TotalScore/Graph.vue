@@ -3,14 +3,16 @@ import ApexCharts from "vue3-apexcharts";
 import { ReportData } from "../../../types/report-data";
 import { chartOptions } from "./graphOptions";
 
+import { computed } from "vue";
+
 const props = defineProps<{ data: ReportData }>();
 
-const series: ApexAxisChartSeries[] = [
+const series = computed<ApexAxisChartSeries>(() => [
   {
     name: "series-1",
     data: props.data.lastDaysPoints,
   } as any, // workaround for ApexCharts
-];
+]);
 </script>
 
 <template>

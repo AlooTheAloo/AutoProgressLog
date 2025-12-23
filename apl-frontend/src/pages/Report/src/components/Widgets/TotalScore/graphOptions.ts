@@ -79,8 +79,9 @@ export const chartOptions = (data: ReportData) => {
     },
     yaxis: {
       labels: {
+        minWidth: 20,
         style: {
-          fontSize: "13px",
+          fontSize: "12px",
           colors: ["#fff"],
         },
         formatter: function (value) {

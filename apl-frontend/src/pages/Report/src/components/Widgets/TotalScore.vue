@@ -26,7 +26,7 @@ const props = defineProps<{ data: ReportData }>();
 
         <div class="h-[4.5rem]"></div>
       </div>
-      <div class="w-1/2 flex-col flex justify-center">
+      <div class="w-1/2 flex-col flex justify-center ml-5">
         <div class="w-full px-5 font-semibold" />
         <Graph :data="props.data"></Graph>
       </div>

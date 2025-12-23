@@ -1,16 +1,9 @@
 <template>
-  <div
-    class="-z-10 absolute flex h-screen w-screen flex-col items-center justify-center overflow-hidden rounded-lg lg:w-full md:w-full pointer-events-none"
-  >
-    <Ripple
-      :space-between-circle="200"
-      :wave-speed="100"
-      class="bg-white/5 [mask-image:linear-gradient(to_bottom,white,transparent)]"
-      circle-class="border-[hsl(var(--primary))] bg-[#0000]/25 dark:bg-[#fff]/25 rounded-full"
-    />
-  </div>
+  <div class="h-screen w-screen flex justify-center items-center overflow-hidden relative">
+     <div class="h-screen w-screen bg-gradient-to-l from-gray-200 via-fuchsia-200 to-stone-100 absolute">
 
-  <div class="h-screen w-screen flex justify-center items-center">
+     </div>
+
     <Motion
       as="div"
       :initial="{ opacity: 0, y: 40, filter: 'blur(10px)' }"
@@ -24,7 +17,7 @@
         duration: 1.5,
         ease: 'easeInOut',
       }"
-      class="flex justify-center items-center flex-col gap-10"
+      class="flex justify-center items-center flex-col gap-10 z-10"
     >
       <div
         class="w-screen max-w-[70rem] lg:px-10 flex lg:justify-between justify-center"
@@ -40,12 +33,12 @@
           >
             Get ready to start your journey with APL.
           </h2>
-          <RainbowButton
-            class="mt-5 w-52 p-0"
+          <Button
+            class="mt-5 w-52 p-6 text-base shadow-lg"
             v-if="platform !== 'other'"
             @click="externalOpen"
           >
-            Download for {{ nicerName }}</RainbowButton
+            Download for {{ nicerName }}</Button
           >
           <div
             v-else
@@ -81,6 +74,7 @@
       >
         <Motion
           v-for="(item, index) in items"
+          :key="item.name"
           as="div"
           :initial="{ opacity: 0, y: 40, filter: 'blur(10px)' }"
           :while-in-view="{
@@ -93,7 +87,7 @@
             duration: 1,
             ease: 'easeInOut',
           }"
-          class="transition-colors relative w-72 h-fit overflow-hidden rounded-xl border border-gray-950/[.1] bg-white p-7 hover:bg-gray-100 dark:border-gray-50/[.1] dark:bg-gray-50/[.10] dark:hover:bg-gray-50/[.15]"
+          class="transition-colors relative w-72 h-fit overflow-hidden rounded-xl border border-gray-950/[.1] bg-white p-7 hover:bg-gray-100 dark:border-gray-50/[.1] dark:bg-gray-50/[.10] dark:hover:bg-gray-50/[.15] shadow-sm"
         >
           <div class="flex flex-row items-center gap-2">
             <component :is="item.icon" class="w-[32px] h-[32px] text-black" />
@@ -103,43 +97,81 @@
               </span>
             </div>
           </div>
-          <blockquote class="mt-2 text-sm">
+          <blockquote class="mt-2 text-sm text-neutral-600 dark:text-neutral-400">
             {{ item.body }}
           </blockquote>
         </Motion>
       </div>
     </Motion>
   </div>
+
+
+  <Dialog :open="dialogOpen">
+    <form>
+      <DialogContent class="sm:max-w-[600px] w-[90%] rounded-xl [&>button:last-child]:hidden">
+        <DialogHeader>
+          <div class="mt-2"></div>
+          <DialogTitle class="text-left sm:text-center">Hey there! Thanks for downloading our app 🎉</DialogTitle>
+          <DialogDescription class="text-left  sm:max-w-[550px]">
+            We noticed you're on MacOS (great choice btw 😉). The app is currently unsigned. After dragging it into the Applications folder, you will need to tell your computer that it is safe to open it.
+            To do this, open the Terminal application on your mac and run the following command : 
+            <br />
+            <div class="mt-3 w-full min-w-0 flex">
+              <TerminalCommand
+              class="flex-grow w-0"
+                title="Terminal"
+                command="sudo xattr -cr /Applications/AutoProgressLog.app"
+              />
+            </div>
+          </DialogDescription>
+        </DialogHeader>
+        <DialogClose>
+          <div class="grid gap-4">
+            <Button @click="closeDialog">
+              Awesome!
+            </Button>
+          </div>
+        </DialogClose>
+      </DialogContent>
+    </form>
+  </Dialog>
+
+
 </template>
 
 <script setup lang="ts">
-import Ripple from "@/components/ui/ripple/Ripple.vue";
-import { BoxIcon, DownloadIcon, RocketIcon } from "lucide-vue-next";
+import { CubeIcon, ArrowDownTrayIcon, RocketLaunchIcon } from "@heroicons/vue/24/outline";
 import windows_apl from "../assets/APL_windows.png";
 import macos_apl from "../assets/APL_Macbook.png";
 import linux_apl from "../assets/APL_Linux.png";
 
 import { computed, onMounted, ref } from "vue";
-import RainbowButton from "@/components/ui/rainbow-button/RainbowButton.vue";
 import confetti from "canvas-confetti";
 import { Button } from "@/components/ui/button";
 import { Motion } from "motion-v";
 import { UAParser } from "ua-parser-js";
+import Dialog from "@/components/ui/dialog/Dialog.vue";
+import DialogContent from "@/components/ui/dialog/DialogContent.vue";
+import DialogHeader from "@/components/ui/dialog/DialogHeader.vue";
+import DialogTitle from "@/components/ui/dialog/DialogTitle.vue";
+import DialogDescription from "@/components/ui/dialog/DialogDescription.vue";
+import TerminalCommand from "@/components/download/TerminalCommand.vue";
+import DialogClose from "@/components/ui/dialog/DialogClose.vue";
 
 const items = [
   {
     name: "Download the app",
-    icon: DownloadIcon,
+    icon: ArrowDownTrayIcon,
     body: "Select your platform and download the executable.",
   },
   {
     name: "Install the program",
-    icon: BoxIcon,
+    icon: CubeIcon,
     body: "Open the downloaded file and follow the instructions.",
   },
   {
     name: "Launch APL",
-    icon: RocketIcon,
+    icon: RocketLaunchIcon,
     body: "Launch the program and start tracking your progress!",
   },
 ];
@@ -219,7 +251,16 @@ function externalOpen() {
   }
   frame();
   window.open(url.value, "_blank");
+  if(platform.value == "mac"){
+    dialogOpen.value = true;
+  }
 }
+
+function closeDialog() {
+  dialogOpen.value = false;
+} 
+
+const dialogOpen = ref(false);
 
 onMounted(() => {
   const BACKEND_URL = "https://apl.chromaserver.net/download-links";

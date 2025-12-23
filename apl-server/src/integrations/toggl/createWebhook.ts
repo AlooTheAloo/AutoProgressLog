@@ -40,11 +40,9 @@ export default async function createWebhook(
   let uid;
   if (workspaceID == -1) {
     const me = await toggl.me.get();
-    console.log("me is " + JSON.stringify(me));
     uid = me.id;
     workspaceID = me.default_workspace_id;
   }
-  console.log("Creating webhook for workspace " + workspaceID);
 
   const client = new TogglWebhookClient({
     apiToken: togglToken,

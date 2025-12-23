@@ -59,13 +59,11 @@
             class="lg:text-3xl text-2xl text-center font-extralight dark:text-neutral-200 md:text-left w-full"
           >
             The immersion tracking app that
-            <TextHighlight
-              :delay="500"
-              :duration="1000"
-              class="px-2 bg-gradient-to-r from-[#a1a4f8] to-[#1BFFFF] rounded-sm"
+            <span
+              class="text-blue-600 rounded-sm text-blue font-bold"
             >
               just works.
-            </TextHighlight>
+            </span>
           </div>
 
           <Motion
@@ -83,15 +81,16 @@
             }"
             class="py-4 w-full flex gap-2 justify-center md:justify-start"
           >
-            <RainbowButton
+            <Button
               @click="openDownloads"
-              class="text-xs sm:text-base relative bg-black px-4 py-2 text-white flex-col items-center justify-center overflow-hidden rounded-full border shadow-xl"
+              class="text-xs sm:text-base relative bg-black hover:bg-black/80 px-8 py-6 text-white flex-col items-center justify-center overflow-hidden rounded-full shadow-xl"
             >
               Download the app
-            </RainbowButton>
+            </Button>
             <Button
               disabled
-              class="text-xs sm:text-base flex relative bg-white text-black px-4 py-2 flex-12 h-[2.75rem] flex-col items-center justify-center overflow-hidden rounded-full border shadow-xl"
+              variant="outline"
+              class="text-xs sm:text-base flex relative bg-white text-black px-8 py-6 flex-12 flex-col items-center justify-center overflow-hidden rounded-full shadow-md"
             >
               Trailer coming soon
             </Button>
@@ -129,8 +128,6 @@ import apl_logo from "../../assets/APL_Black.svg";
 
 import macos_apl from "../../assets/APL_Macbook.png";
 
-import { RainbowButton } from "../ui/rainbow-button";
-import TextHighlight from "../ui/text-highlight/TextHighlight.vue";
 import { useRouter } from "vue-router";
 import Button from "../ui/button/Button.vue";
 

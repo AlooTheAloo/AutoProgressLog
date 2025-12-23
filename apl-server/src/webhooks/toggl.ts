@@ -79,8 +79,6 @@ const current_Activities: Map<string, MiniActivity> = new Map<
 export const togglWebhook = new Elysia({ name: "toggl-webhook" }).post(
   "/webhooks/toggl",
   async ({ body, status }) => {
-    console.log("GOT SOMETHING.");
-    console.log(body);
     if (body.payload === "ping") {
       return !body.validation_code
         ? status(200)

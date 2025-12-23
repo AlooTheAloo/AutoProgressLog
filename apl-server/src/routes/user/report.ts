@@ -17,6 +17,12 @@ export const reportRoute = new Elysia({name: 'report-route'}).use(authGuard)
             return {status: "Report successfully generated"};
         },
         {
+            detail: {
+                summary: "Generate report",
+                tags: ["User"],
+                description:
+                "This endpoint generates a new report for the specified user",
+            },
             headers: authHeaders,
             response: {
                 200: t.Object({
@@ -87,6 +93,12 @@ export const reportRoute = new Elysia({name: 'report-route'}).use(authGuard)
             };
         },
         {
+            detail: {
+                summary: "Get reports",
+                tags: ["User"],
+                description:
+                "This endpoint gets a list of reports for the specified user using pagination",
+            },
             headers: authHeaders,
             query: t.Object({
                 page: t.Optional(t.Numeric()),
@@ -126,6 +138,12 @@ export const reportRoute = new Elysia({name: 'report-route'}).use(authGuard)
             return await getReport(user.id, parseInt(id));
         },
         {
+            detail: {
+                summary: "Get a report's data",
+                tags: ["User"],
+                description:
+                "This endpoint gets a specific report for the specified user. It contains all the required information for the report's image to be displayed.",
+            },
             headers: authHeaders,
             params: t.Object({
                 id: t.String()
