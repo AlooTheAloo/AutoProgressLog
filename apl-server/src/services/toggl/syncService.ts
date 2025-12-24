@@ -39,14 +39,26 @@ export async function syncTogglData(userId: number) {
     });
 
     // Time window: Last 3 months
-    const sinceDate = dayjs().subtract(3, "month").startOf("day");
+    const sinceDate = dayjs().subtract(3, "month").add(1, "day");
     
     try {
         // 1. Fetch Toggl entries
         // Note: list() with since uses start time of entries.
-        const togglEntries: any[] = await toggl.timeEntry.list({
-            since: sinceDate.unix().toString()
-        });
+        let togglEntries: any[] | string | null = null;
+
+        try{
+            togglEntries = await toggl.timeEntry.list({
+                since: sinceDate.unix().toString()
+            });
+        } catch(e){
+            console.log(e);
+            return;
+        }
+
+        if(typeof(togglEntries) == "string" || togglEntries == null){
+            // lmfao get API call diffed
+            return;
+        }
 
         // Filter out ongoing entries and ignored ones
         const validTogglEntries = togglEntries.filter(e => 
