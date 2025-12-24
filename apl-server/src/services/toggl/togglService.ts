@@ -70,6 +70,7 @@ export async function ManualSync(userID: number) {
       x.stop != null
     );
   });
+  
 
   await client.immersionActivity.createMany({
     data: entries.map((e) => {

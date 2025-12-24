@@ -1,8 +1,8 @@
 import { electronAppUniversalProtocolClient } from "electron-app-universal-protocol-client";
-import { createWindow, win } from "..";
-import { app } from "electron";
+import { win } from "..";
 import { FocusApp } from "./appBackend";
-import { Logger } from "../Logger";
+import { Logger } from "../../../apl-backend/Helpers/Log";
+
 
 export async function initializeDeepLink() {
   const isDev = process.env.NODE_ENV === "development";
