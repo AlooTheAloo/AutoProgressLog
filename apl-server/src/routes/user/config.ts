@@ -10,7 +10,7 @@ import Toggl from "toggl-track";
 import { reportCronPlugin } from "../../middlewares/cronReportGenerator";
 import { buildReport } from "../../services/reports/buildReport";
 import { AutoGenConfigPlain } from "../../../prisma/types/AutoGenConfig";
-import { ManualSync } from "../../services/toggl/togglService";
+import { syncTogglData } from "../../services/toggl/syncService";
 
 const PublicAutoGenConfig = t.Object(
   {
@@ -275,7 +275,7 @@ export const configRoutes = new Elysia({ name: "config-routes" })
       });
 
       if (createdConfig.autoGenTime) reportCron.attach(user.id);
-      await ManualSync(user.id);
+      await syncTogglData(user.id);
       return {
         ...createdConfig,
         autoGenTime:

@@ -9,10 +9,48 @@ function openDownloads() {
   router.push("/downloads");
 }
 </script>
+
+<style>
+@keyframes scanner {
+  from {
+    -webkit-mask-position: 0% 0%;
+            mask-position: 0% 0%;
+  }
+  to {
+    -webkit-mask-position: 200% 100%;
+            mask-position: 200% 100%;
+  }
+}
+
+.animate-scanner {
+  animation: scanner 2s linear infinite;
+  will-change: mask-position, -webkit-mask-position;
+}
+</style>
+
+
 <template>
-  <section class="relative w-full py-24 bg-neutral-50 dark:bg-black overflow-hidden flex justify-center">
-      <!-- Dot Pattern Background -->
-        <div class="absolute inset-0 z-0 h-full w-full bg-white dark:bg-black bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] dark:bg-[radial-gradient(#ffffff33_1px,transparent_1px)] [background-size:16px_16px] [mask-image:radial-gradient(ellipse_at_center,black_70%,transparent_100%)]"></div>
+  <section class="relative w-full py-24  dark:bg-black flex justify-center">
+    <div
+      class="
+        absolute inset-0 z-0 h-full w-full
+        bg-white dark:bg-black
+        bg-[radial-gradient(#1f2937_1px,transparent_1px)]
+        dark:bg-[radial-gradient(#ffffff33_1px,transparent_1px)]
+        [background-size:16px_16px]
+
+        [mask-image:linear-gradient(90deg,transparent_0%,black_45%,black_55%,transparent_100%)]
+        [-webkit-mask-image:linear-gradient(90deg,transparent_0%,black_45%,black_55%,transparent_100%)]
+
+        [mask-size:200%_100%]
+        [-webkit-mask-size:200%_100%]
+
+        [mask-position:0%_0%]
+        [-webkit-mask-position:0%_0%]
+
+        animate-scanner
+      "
+    ></div>
     <Motion
       as="div"
       :initial="{ opacity: 0, filter: 'blur(10px)' }"

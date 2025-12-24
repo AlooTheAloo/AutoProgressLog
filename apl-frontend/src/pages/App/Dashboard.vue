@@ -75,6 +75,12 @@ onMounted(async () => {
   } catch (error) {
     console.error("Error fetching dashboard data:", error);
   }
+
+  // Every minute, update lastSyncTime text
+  setInterval(() => {
+    lastSyncTime.value = getLastSyncTime();
+  }, 60 * 1 * 1000);
+
 });
 
 window.ipcRenderer.on("ShowWelcomeMessage", () => {

@@ -1,17 +1,16 @@
 <template>
-  <div class="min-h-screen py-24 flex flex-col justify-center relative overflow-hidden">
-    <!-- Background Elements -->
+  <div class="min-h-screen py-24 flex flex-col justify-center relative  bg-black">
     <div
-      class="absolute top-0 -left-4 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"
+      class=" z-10 absolute top-0 -left-4 w-72 h-72 bg-purple-300 rounded-full filter blur-[150px] opacity-20 animate-blob"
     ></div>
     <div
-      class="absolute top-0 -right-4 w-72 h-72 bg-yellow-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"
+      class="absolute top-0 -right-4 w-72 h-72 bg-yellow-300 rounded-full filter blur-[150px] opacity-20 animate-blob animation-delay-2000"
     ></div>
     <div
-      class="absolute -bottom-8 left-20 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"
+      class="absolute -bottom-8 left-20 w-72 h-72 bg-pink-300 rounded-full filter blur-[150px] opacity-20 animate-blob animation-delay-4000"
     ></div>
 
-    <div class="container mx-auto px-4 md:px-6 relative z-10">
+    <div class="container mx-auto px-4 md:px-6 relative z-10 ">
       <Motion
         as="div"
         :initial="{ opacity: 0, x: -40, filter: 'blur(10px)' }"

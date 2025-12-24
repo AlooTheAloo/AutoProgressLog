@@ -1,8 +1,11 @@
 <template>
   <div class="h-screen w-screen flex justify-center items-center overflow-hidden relative">
-     <div class="h-screen w-screen bg-gradient-to-l from-gray-200 via-fuchsia-200 to-stone-100 absolute">
 
-     </div>
+    <img :src="linux_bg" class="w-screen h-screen absolute" v-if="platform == 'linux'">
+
+    <div v-else class="h-screen w-screen bg-gradient-to-br dark:from-[#1c0333] dark:via-[#000000] dark:to-[#000000] from-gray-200 via-fuchsia-200 to-stone-100 absolute">
+
+    </div>
 
     <Motion
       as="div"
@@ -22,7 +25,8 @@
       <div
         class="w-screen max-w-[70rem] lg:px-10 flex lg:justify-between justify-center"
       >
-        <div class="flex flex-col justify-center items-center lg:items-start">
+        <div class="flex flex-col justify-center items-center lg:items-start  ">
+          <div class=" flex flex-col justify-center items-start" :class="platform == 'linux' ? 'transition-colors relative h-fit overflow-hidden rounded-xl border border-gray-950/[.1] bg-white p-7 hover:bg-gray-100 dark:border-gray-50/[.1] dark:bg-gray-50/[.10] dark:hover:bg-gray-50/[.15] shadow-sm' : ''">
           <h1
             class="lg:text-start text-center text-3xl font-semibold dark:text-neutral-200 w-full"
           >
@@ -50,11 +54,13 @@
           <Button class="p-0 mt-2" variant="link" @click="openGithub">
             Other download options
           </Button>
+          </div>
+          
         </div>
 
         <div class="lg:block hidden">
           <div class="flex">
-            <img v-if="platform == 'mac'" :src="macos_apl" class="w-[50rem]" />
+            <img v-if="platform == 'mac'" :src="macos_apl" class="w-[35rem]" />
             <img
               v-else-if="platform == 'windows'"
               :src="windows_apl"
@@ -90,7 +96,7 @@
           class="transition-colors relative w-72 h-fit overflow-hidden rounded-xl border border-gray-950/[.1] bg-white p-7 hover:bg-gray-100 dark:border-gray-50/[.1] dark:bg-gray-50/[.10] dark:hover:bg-gray-50/[.15] shadow-sm"
         >
           <div class="flex flex-row items-center gap-2">
-            <component :is="item.icon" class="w-[32px] h-[32px] text-black" />
+            <component :is="item.icon" class="w-[32px] h-[32px] text-black dark:text-white" />
             <div class="flex flex-col">
               <span class="text-xl font-medium dark:text-white">
                 {{ item.name }}
@@ -144,6 +150,7 @@ import { CubeIcon, ArrowDownTrayIcon, RocketLaunchIcon } from "@heroicons/vue/24
 import windows_apl from "../assets/APL_windows.png";
 import macos_apl from "../assets/APL_Macbook.png";
 import linux_apl from "../assets/APL_Linux.png";
+import linux_bg from "../assets/linux_bg.png";
 
 import { computed, onMounted, ref } from "vue";
 import confetti from "canvas-confetti";

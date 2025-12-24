@@ -1,6 +1,7 @@
 import { ElysiaWS } from "elysia/dist/ws";
 import { addSocket, removeSocket, sockToID, tokenToTogglData } from "./auth";
 import createWebhook from "../integrations/toggl/createWebhook";
+import { syncTogglData } from "../services/toggl/syncService";
 
 export class SocketManager {
   private authListeners: ((ws: ElysiaWS) => void)[] = [];
@@ -35,6 +36,9 @@ export class SocketManager {
         addSocket(data.togglUserId, ws);
         SocketManager.clients.set(data.togglUserId, ws);
         this.authListeners.forEach((x) => x(ws));
+        
+        // Synchronize Toggl data for the last 3 months
+        syncTogglData(data.userId);
       }
       return;
     }

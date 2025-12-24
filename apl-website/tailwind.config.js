@@ -1,7 +1,7 @@
 import animate from "tailwindcss-animate";
 
 export default {
-  darkMode: ["selector", "class"],
+  darkMode: "class",
   safelist: ["dark"],
   prefix: "",
   content: ["./index.html", "./src/**/*.{vue,js,ts,jsx,tsx}"],

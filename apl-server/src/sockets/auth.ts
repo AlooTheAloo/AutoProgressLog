@@ -18,6 +18,7 @@ export async function tokenToTogglData(token: string) {
         },
       },
       select: {
+        id: true,
         config: {
           select: {
             togglToken: true,
@@ -27,7 +28,12 @@ export async function tokenToTogglData(token: string) {
       },
     });
 
-    return user?.config ?? null;
+    if (!user || !user.config) return null;
+
+    return {
+      userId: user.id,
+      ...user.config,
+    };
   } catch (e) {
     return null;
   }

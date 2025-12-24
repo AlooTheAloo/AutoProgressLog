@@ -6,7 +6,7 @@ import { authGuard } from "../../middlewares/authGuard";
 import Toggl from "toggl-track";
 import AnkiStorage from "../../services/anki/AnkiStorage";
 import { DEFAULT_ANKI_URL } from "../../services/anki/AnkiHTTPClient";
-import { ManualSync } from "../../services/toggl/togglService";
+import { syncTogglData } from "../../services/toggl/syncService";
 import createWebhook from "../../integrations/toggl/createWebhook";
 import { arithmeticWeightedMean } from "../../services/reports/buildReport";
 
@@ -392,7 +392,7 @@ export const importLegacyRoute = new Elysia({ name: "import-legacy" })
       // --- 8) Backfill & Webhook ---
       if (togglToken) {
         console.log("Backfilling last 3 months data...");
-        await ManualSync(userId);
+        await syncTogglData(userId);
         console.log("Creating webhook...");
         await createWebhook(-1, togglToken);
       }

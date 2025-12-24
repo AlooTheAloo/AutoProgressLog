@@ -30,9 +30,9 @@ import report from "../../assets/Report_example.jpg";
         :initial="{ opacity: 0, scale: 0.95, y: 40 }"
         :while-in-view="{ opacity: 1, scale: 1, y: 0 }"
         :transition="{ duration: 1, delay: 0.2, ease: 'easeOut' }"
-        class="mx-auto mt-8 max-w-xl relative rounded-xl  bg-white shadow-2xl overflow-hidden p-2 md:p-4"
+        class="mx-auto mt-8 max-w-xl relative rounded-xl bg-white dark:bg-zinc-950 shadow-2xl dark:shadow-none overflow-hidden p-2 md:p-4"
       >
-        <div class="relative rounded-lg overflow-hidden bg-white shadow-inner">
+        <div class="relative rounded-lg overflow-hidden bg-white dark:bg-zinc-950 shadow-inner">
           <img
             :src="report"
             alt="App Screenshot"

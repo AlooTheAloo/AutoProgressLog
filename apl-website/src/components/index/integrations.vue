@@ -35,7 +35,7 @@ import DiscordLogo from "../../assets/discord_logo.webp";
             <div class="w-12 h-12 flex items-center justify-center bg-neutral-100 rounded-lg p-2">
               <img :src="TogglLogo" alt="Toggl" class="w-full h-full object-contain" />
             </div>
-            <span class="font-semibold text-lg">Toggl Track</span>
+            <span class="font-semibold text-lg dark:text-white">Toggl Track</span>
           </Motion>
 
           <Motion
@@ -47,7 +47,7 @@ import DiscordLogo from "../../assets/discord_logo.webp";
             <div class="w-12 h-12 flex items-center justify-center bg-neutral-100 rounded-lg p-2">
               <img :src="AnkiLogo" alt="Anki" class="w-full h-full object-contain" />
             </div>
-            <span class="font-semibold text-lg">Anki</span>
+            <span class="font-semibold text-lg dark:text-white">Anki</span>
           </Motion>
           
            <Motion
@@ -59,7 +59,7 @@ import DiscordLogo from "../../assets/discord_logo.webp";
             <div class="w-12 h-12 flex items-center justify-center bg-neutral-100 rounded-lg p-2">
               <img :src="DiscordLogo" alt="Discord" class="w-full h-full object-contain" />
             </div>
-            <span class="font-semibold text-lg">Discord</span>
+            <span class="font-semibold text-lg dark:text-white">Discord</span>
           </Motion>
         </div>
 
