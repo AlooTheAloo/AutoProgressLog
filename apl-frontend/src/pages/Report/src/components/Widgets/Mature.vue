@@ -46,9 +46,8 @@ const lineData = computed(() => {
         lineNumber: lineNumber == 0 ? 1 : lineNumber,
       };
     }),
-    graphMinVal: min.matureCardCount - lineValue,
-    graphMaxVal:
-      min.matureCardCount - lineValue + bgGradient.length * lineValue,
+    graphMinVal: min.matureCardCount,
+    graphMaxVal: min.matureCardCount + bgGradient.length * lineValue,
     lineValue: lineValue,
   };
 });

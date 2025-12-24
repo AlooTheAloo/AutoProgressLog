@@ -275,7 +275,7 @@ async function getHistoricalMatureCardsData(
   // Only include reports that have Anki data (metadata.hasAnki = true)
   return reports.map((report) => ({
     reportNo: report.reportNo,
-    matureCardCount: report.syncData.ankiData?.mature ?? 0,
+    matureCardCount: report.syncData.ankiData?.mature,
   }));
 }
 
