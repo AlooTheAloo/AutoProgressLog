@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen py-24 flex flex-col justify-center relative  bg-black">
+  <div class="min-h-screen py-24 flex flex-col justify-center relative  dark:bg-black">
     <div
       class=" z-10 absolute top-0 -left-4 w-72 h-72 bg-purple-300 rounded-full filter blur-[150px] opacity-20 animate-blob"
     ></div>

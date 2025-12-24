@@ -13,6 +13,7 @@ export async function initializeDeepLink() {
     });
   }
   electronAppUniversalProtocolClient.on("request", async (requestUrl) => {
+    Logger.log(`Deep link request received: ${requestUrl}`, "DeepLink");
     if (requestUrl.startsWith("apl://")) {
       await FocusApp();
       win?.webContents.send("open-url", requestUrl);

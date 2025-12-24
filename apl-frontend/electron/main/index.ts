@@ -188,10 +188,23 @@ app.on("window-all-closed", () => {
 
 app.on("second-instance", async (evt, cmd, wd) => {
   if (VITE_DEV_SERVER_URL) return;
-  if (win) {
+  
+  // Find a protocol URL in the command-line arguments
+  // This is especially important for Linux and Windows where the second instance
+  // receives the URL via command-line arguments.
+  const protocolUrl = cmd.find(arg => arg.startsWith("apl://"));
+  if (protocolUrl) {
+    Logger.log(`Received deep link via second-instance: ${protocolUrl}`, "DeepLink");
+    if (!win) {
+      await createWindow();
+    }
+    await FocusApp();
+    win?.webContents.send("open-url", protocolUrl);
+  } else if (win) {
     FocusApp();
-    buildContextMenu();
   }
+  
+  buildContextMenu();
 });
 
 app.on("activate", () => {
