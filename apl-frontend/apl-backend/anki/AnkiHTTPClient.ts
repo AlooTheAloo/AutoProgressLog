@@ -13,14 +13,14 @@ export interface Graves {
 }
 
 export const DEFAULT_ANKI_URL = "https://sync.ankiweb.net";
-let anki_url = DEFAULT_ANKI_URL;
 
 export default class AnkiHTTPClient {
+  private anki_url = DEFAULT_ANKI_URL;
   public key: string = "";
   public simpleRandom = crypto.randomUUID();
 
   constructor(key: string = "", url: string = DEFAULT_ANKI_URL) {
-    if (url != DEFAULT_ANKI_URL) anki_url = url;
+    this.anki_url = url;
     this.key = key;
   }
 
@@ -36,15 +36,15 @@ export default class AnkiHTTPClient {
   }
 
   private async fetchWithRedirect(path: string, options: RequestInit = {}) {
-    const response = await fetch(anki_url + path, {
+    const response = await fetch(this.anki_url + path, {
       ...options,
       redirect: "manual",
     });
     if (response.headers.has("Location")) {
       const location = response.headers.get("Location");
       if (location) {
-        anki_url = location.slice(0, -1);
-        const newUrl = new URL(anki_url); // Ensure the new URL is absolute
+        this.anki_url = location.slice(0, -1);
+        const newUrl = new URL(this.anki_url); // Ensure the new URL is absolute
         newUrl.pathname = path; // Force the correct path
         return fetch(newUrl.toString(), options); // Make the correct request
       }
@@ -79,7 +79,7 @@ export default class AnkiHTTPClient {
         "Content-Type": "application/octet-stream",
         Accept: "*/*",
       },
-      body: compressedData,
+      body: compressedData as any,
     });
 
     if (response.status != 200) {

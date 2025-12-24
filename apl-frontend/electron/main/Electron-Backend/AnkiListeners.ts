@@ -58,6 +58,7 @@ export function ankiListeners() {
 }
 
 export const loadDB = async (login: AnkiLogin) => {
+  console.log("LOGINING WITH " + JSON.stringify(login));
   const no = {
     worked: false,
     decks: [],
@@ -86,7 +87,9 @@ export const loadDB = async (login: AnkiLogin) => {
       }
     );
     Logger.log("Response from Anki login:", "Anki");
+    Logger.log(JSON.stringify(response), "Anki");
     if (response.status == 200) {
+      console.log("data : " + response.data)
       if (response.data == null) return no;
       decksCards = response.data.cards;
       return {

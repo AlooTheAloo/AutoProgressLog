@@ -88,12 +88,16 @@ export const syncRoute = new Elysia({name: "sync-route"}).use(authGuard).post(
 
         console.log("Step 2: Running NormalSyncer().start() for user:", userId);
         if (ankiToken || url) {
-            console.log("Anki config found, initializing NormalSyncer...");
-            await new NormalSyncer(
-                new AnkiHTTPClient(ankiToken, url),
-                userId
-            ).start();
-            console.log("NormalSyncer finished successfully for user:", userId);
+            console.log("Anki config found, initializing NormalSyncer... with url " + url);
+            try{
+                await new NormalSyncer(
+                    new AnkiHTTPClient(ankiToken, url),
+                    userId
+                ).start();
+                console.log("NormalSyncer finished successfully for user:", userId);
+            } catch (e) {
+                throw new Error("Anki sync failed. " + e);
+            }
         } else {
             console.log(
                 "No Anki config found, skipping NormalSyncer for user:",

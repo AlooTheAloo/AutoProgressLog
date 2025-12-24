@@ -23,6 +23,11 @@ export async function runSync() {
       },
     });
     console.log("fetchedDTO is " + JSON.stringify(fetchedDTO));
+
+    if(fetchedDTO.error){
+      throw new Error(fetchedDTO.error.value as any ?? "Unknown error");
+    }
+
     if (fetchedDTO.data == null) return null;
     if (fetchedDTO.data.profile_picture == "")
       fetchedDTO.data.profile_picture = DEFAULT_PFP;

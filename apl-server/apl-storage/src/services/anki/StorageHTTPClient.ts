@@ -19,9 +19,9 @@ type CardEntry = string[];
 type NoteEntry = string[];
 
 export const DEFAULT_ANKI_URL = "https://sync.ankiweb.net";
-let anki_url = DEFAULT_ANKI_URL;
 
 export default class StorageHTTPClient {
+  private anki_url = DEFAULT_ANKI_URL;
   public key: string = "";
   public simpleRandom = crypto.randomUUID();
 
@@ -29,10 +29,10 @@ export default class StorageHTTPClient {
     console.log(
       "Created new AnkiHTTPClient with url " + url + " and key " + key
     );
-    if (url != DEFAULT_ANKI_URL) anki_url = url;
+    this.anki_url = url;
     this.key = key;
 
-    console.log("anki_url is " + anki_url);
+    console.log("anki_url is " + this.anki_url);
     console.log("key is " + this.key);
   }
 
@@ -48,18 +48,18 @@ export default class StorageHTTPClient {
   }
 
   private async fetchWithRedirect(path: string, options: RequestInit = {}) {
-    console.log("Pinging endpoint at " + anki_url + path);
-    console.log("anki_url is " + anki_url);
+    console.log("Pinging endpoint at " + this.anki_url + path);
+    console.log("anki_url is " + this.anki_url);
     console.log("key is " + this.key);
-    const response = await fetch(anki_url + path, {
+    const response = await fetch(this.anki_url + path, {
       ...options,
       redirect: "manual",
     });
     if (response.headers.has("Location")) {
       const location = response.headers.get("Location");
       if (location) {
-        anki_url = location.slice(0, -1);
-        const newUrl = new URL(anki_url); // Ensure the new URL is absolute
+        this.anki_url = location.slice(0, -1);
+        const newUrl = new URL(this.anki_url); // Ensure the new URL is absolute
         newUrl.pathname = path; // Force the correct path
         return fetch(newUrl.toString(), options); // Make the correct request
       }
@@ -95,7 +95,7 @@ export default class StorageHTTPClient {
         "Content-Type": "application/octet-stream",
         Accept: "*/*",
       },
-      body: compressedData,
+      body: compressedData as any,
     });
 
     if (response.status != 200) {

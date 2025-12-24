@@ -11,10 +11,10 @@ interface MatureProps {
 
 const props = defineProps<MatureProps>();
 const sortedDataByReport = ref(
-  props.data.toSorted((a, b) => b.reportNo - a.reportNo)
+  props.data.toSorted((a, b) => b.reportNo - a.reportNo).filter(x => x.matureCardCount != null)
 );
 const sortedDataByMature = ref(
-  props.data.toSorted((a, b) => b.matureCardCount - a.matureCardCount)
+  props.data.toSorted((a, b) => b.matureCardCount - a.matureCardCount).filter(x => x.matureCardCount != null)
 );
 
 const value: ComputedRef<TPlusDelta<number>> = computed(() => {
