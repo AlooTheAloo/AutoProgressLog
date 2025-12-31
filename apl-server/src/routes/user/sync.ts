@@ -7,6 +7,7 @@ import AnkiHTTPClient from "../../services/anki/AnkiHTTPClient";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
+import { syncTogglData } from "../../services/toggl/syncService";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -20,7 +21,7 @@ const ImmersionDTOSchema = t.Object({
     immersionSources: t.Array(
         t.Object({name: t.String(), relativeValue: t.Number()})
     ),
-    immersionStreak: t.Array(t.Number()),
+    immersionStreak: t.Array(t.Object({label: t.String(), seconds: t.Number()})),
 });
 
 const AnkiDTOSchema = t.Object({
@@ -39,6 +40,13 @@ const DashboardDTOSchema = t.Object({
     ankiDTO: t.Optional(AnkiDTOSchema),
     nextReport: t.Union([t.Number(), t.Null()]),
 });
+
+type User = {
+    userName: string | null;
+    id: number;
+    email: string;
+    profilePicture: string | null;
+}
 
 /**
  * ## POST /sync
@@ -64,9 +72,31 @@ const DashboardDTOSchema = t.Object({
 export const syncRoute = new Elysia({name: "sync-route"}).use(authGuard).post(
     "/sync",
     async ({user, set}) => {
-        const userId = user.id;
+        return runFullSync(user);
+    },
+    {
+        headers: authHeaders,
+        response: {
+            200: DashboardDTOSchema,
+            404: t.Object({
+                message: t.String(),
+                code: t.Literal("ConfigNotFound"),
+            }),
+            500: t.Null(),
+        },
+        detail: {
+            summary: "Sync user data (immersion + Anki)",
+            tags: ["User"],
+            description:
+                "Synchronizes immersion and Anki data, returning up-to-date metrics for dashboard rendering.",
+        },
+    }
+);
 
-        console.log("=== SYNC START for user:", userId, "===");
+
+export async function runFullSync(user: User){
+    const userId = user.id;
+        console.log("=== SYNC START for user: ", user.userName, " (", userId, ") ===");
 
         console.log("Step 1: Getting config data for user:", userId);
         const config = await client.userConfig.findUnique({
@@ -107,6 +137,9 @@ export const syncRoute = new Elysia({name: "sync-route"}).use(authGuard).post(
 
         console.log("Step 3: Aggregating immersion data for user:", userId);
         console.log("Aggregating immersion data for user:", userId);
+
+        await syncTogglData(userId);
+
         const totalImmersion = await client.immersionActivity.aggregate({
             where: {userId},
             _sum: {seconds: true},
@@ -238,7 +271,11 @@ export const syncRoute = new Elysia({name: "sync-route"}).use(authGuard).post(
         });
         console.log("Weekly immersion raw data:", weekly);
 
-        const immersionStreak = Array(7).fill(0);
+        const immersionStreak = Array(7).fill(0).map((_, i) => ({
+            label: startOfWindow.add(i, 'day').format("ddd"),
+            seconds: 0
+        }));
+
         weekly.forEach(({createdAt, seconds}) => {
              // Convert log time to user timezone
              const logTime = dayjs(createdAt).tz(timezone);
@@ -246,7 +283,7 @@ export const syncRoute = new Elysia({name: "sync-route"}).use(authGuard).post(
              const diffDays = logTime.diff(startOfWindow, 'day');
              
              if (diffDays >= 0 && diffDays < 7) {
-                 immersionStreak[diffDays] += seconds ?? 0;
+                 immersionStreak[diffDays].seconds += seconds ?? 0;
              }
         });
         console.log("Weekly immersion streak array:", immersionStreak);
@@ -310,14 +347,17 @@ export const syncRoute = new Elysia({name: "sync-route"}).use(authGuard).post(
                 `${dayjs().format("YYYY-MM-DD")} ${hours}:${minutes}:${seconds}`
             );
 
+            const userNow = dayjs().tz(autoGenTime.timezone);
             const candidate = dayjs
                 .tz(
-                    `${dayjs().format("YYYY-MM-DD")} ${hours}:${minutes}:${seconds}`,
+                    `${userNow.format("YYYY-MM-DD")} ${hours}:${minutes}:${seconds}`,
                     autoGenTime.timezone
                 )
                 .toDate();
 
-            if (candidate <= now) candidate.setDate(candidate.getDate() + 1);
+            if (candidate <= now) {
+                candidate.setDate(candidate.getDate() + 1);
+            }
             console.log("candidate is " + candidate);
 
             nextReport = candidate.getTime();
@@ -362,6 +402,8 @@ export const syncRoute = new Elysia({name: "sync-route"}).use(authGuard).post(
                     }
                 }
             });
+            console.log("resyncing...")
+            return runFullSync(user); // recursively call another sync, since this one (the "0" sync) is just baseline. if sègla or robitaille saw this they would kill themselves.
         }
 
         return {
@@ -373,22 +415,4 @@ export const syncRoute = new Elysia({name: "sync-route"}).use(authGuard).post(
             ankiDTO,
             nextReport,
         } as Static<typeof DashboardDTOSchema>;
-    },
-    {
-        headers: authHeaders,
-        response: {
-            200: DashboardDTOSchema,
-            404: t.Object({
-                message: t.String(),
-                code: t.Literal("ConfigNotFound"),
-            }),
-            500: t.Null(),
-        },
-        detail: {
-            summary: "Sync user data (immersion + Anki)",
-            tags: ["User"],
-            description:
-                "Synchronizes immersion and Anki data, returning up-to-date metrics for dashboard rendering.",
-        },
-    }
-);
+}

@@ -18,6 +18,7 @@ export async function getReport(userId: number, reportNo: number) {
       },
       streak: true,
       score: true,
+      immersionLog: true,
     },
   });
 
@@ -43,43 +44,49 @@ export async function getReport(userId: number, reportNo: number) {
     },
   });
 
-  // 3. Define time range
+  // 3. Define time range (for fallback)
   const until = dayjs(currentReport.syncData.generationTime);
   const since = previousReport
     ? dayjs(previousReport.syncData.generationTime)
     : dayjs(0); // Beginning of time if no previous report
 
-  // 4. Fetch Immersion Activities in range
-  const immersionLogs = await client.immersionActivity.findMany({
-    where: {
-      userId: userId,
-      createdAt: {
-        gt: since.toDate(),
-        lte: until.toDate(),
+  // 4. Immersion Data
+  let immersionLog: { name: string; relativeValue: number }[] = [];
+  const immersionDelta = currentReport.score?.immersionScore ?? 0;
+
+  if (currentReport.immersionLog && currentReport.immersionLog.length > 0) {
+    // Use persistent logs
+    immersionLog = currentReport.immersionLog.map((log) => ({
+      name: log.activityName,
+      relativeValue: log.seconds,
+    }));
+  } else {
+    // Fallback: Fetch Immersion Activities in range (for older reports)
+    const immersionLogs = await client.immersionActivity.findMany({
+      where: {
+        userId: userId,
+        createdAt: {
+          gt: since.toDate(),
+          lte: until.toDate(),
+        },
       },
-    },
-  });
+    });
 
-  // 5. Aggregate Immersion Data
+    const immersionLogMap = new Map<string, number>();
+    immersionLogs.forEach((log) => {
+      const current = immersionLogMap.get(log.activityName) || 0;
+      immersionLogMap.set(log.activityName, current + log.seconds);
+    });
+
+    immersionLog = Array.from(immersionLogMap.entries()).map(
+      ([name, relativeValue]) => ({
+        name,
+        relativeValue,
+      })
+    );
+  }
+
   const currentImmersionTime = currentReport.syncData.totalImmersionTime;
-  const previousImmersionTime = previousReport
-    ? previousReport.syncData.totalImmersionTime
-    : 0;
-  const immersionDelta = currentImmersionTime - previousImmersionTime;
-
-  // Group by activity name for ImmersionLog
-  const immersionLogMap = new Map<string, number>();
-  immersionLogs.forEach((log) => {
-    const current = immersionLogMap.get(log.activityName) || 0;
-    immersionLogMap.set(log.activityName, current + log.seconds);
-  });
-
-  const immersionLog = Array.from(immersionLogMap.entries()).map(
-    ([name, relativeValue]) => ({
-      name,
-      relativeValue,
-    })
-  );
 
   // 6. Anki Data
   const currentAnki = currentReport?.syncData?.ankiData ?? null; // Coalesce undefined and null -> null
@@ -193,7 +200,7 @@ async function getHistoricalImmersionData(
     },
   });
 
-  return reports
+  const historyReports = reports
     .map((report, index) => {
       const previousTotal =
         index > 0 ? reports[index - 1].syncData.totalImmersionTime : 0;
@@ -202,8 +209,14 @@ async function getHistoricalImmersionData(
         reportNo: report.reportNo,
         value: currentTotal - previousTotal,
       };
-    })
-    .slice(1);
+    })  
+    
+    if(historyReports.length > 24){
+      return historyReports.slice(1);
+    }
+
+
+  return historyReports;
 }
 
 async function getHistoricalAnkiData(userId: number, currentReportNo: number) {
@@ -230,7 +243,7 @@ async function getHistoricalAnkiData(userId: number, currentReportNo: number) {
     },
   });
 
-  return reports
+  const historyReports = reports
     .map((report, index) => {
       const previousTotal =
         index > 0
@@ -242,7 +255,12 @@ async function getHistoricalAnkiData(userId: number, currentReportNo: number) {
         value: currentTotal - previousTotal,
       };
     })
-    .slice(1);
+    
+    if(historyReports.length > 24){
+      return historyReports.slice(1);
+    }
+
+  return historyReports;
 }
 
 async function getHistoricalMatureCardsData(
@@ -302,7 +320,7 @@ async function getHistoricalScores(userId: number, currentReportNo: number) {
     .map((report, index) => report.score?.totalScore ?? 0)
     .map((x) => {
       sum /= 2;
-      sum += x * 2;
+      sum += x;
       return sum;
     });
 }

@@ -48,6 +48,10 @@ type Page = {
 async function getReports(page: number) {
   return new Promise<void>((res, rej) => {
     window.ipcRenderer.invoke("Get-Reports", page, 6).then((page: Page) => {
+      if(page.data.length == 0){
+        reports.value = [];
+        return;
+      }
       // Fill array with nulls
       reports.value = Array.from({ length: page.total }, () => undefined);
       for(let i = 0; i < page.data.length; i++) {

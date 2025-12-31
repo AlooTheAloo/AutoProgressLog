@@ -66,6 +66,7 @@ onMounted(() => {
   });
 });
 
+const sentEmail = ref("");
 const email = ref("");
 const countdown = ref(0);
 const migrating = ref(false);
@@ -91,6 +92,7 @@ const emailSent = ref(false);
 
 function SendEmail() {
   emailSent.value = true;
+  sentEmail.value = email.value;
   window.ipcRenderer.invoke("Send-Email", email.value);
   startTimer();
 }
@@ -149,6 +151,7 @@ onUnmounted(() => {
             APL is switching to an account-based model. Please enter your email
             to create one. All your data will be transfered to our new system
             automatically.
+            automatically.
           </div>
 
           <div class="w-full flex gap-2">
@@ -192,7 +195,7 @@ onUnmounted(() => {
           </div>
           <p class="text-center w-full">
             An email has been sent to
-            <span class="inline text-blue-200"> {{ email }} </span>. Please
+            <span class="inline text-blue-200"> {{ sentEmail }} </span>. Please
             check your inbox for a link to continue. This may take up to 30
             minutes (blame google and microsoft lol)
           </p>

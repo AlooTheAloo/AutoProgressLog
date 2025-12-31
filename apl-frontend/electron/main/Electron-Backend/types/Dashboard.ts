@@ -27,7 +27,10 @@ export type ImmersionDTO = {
     name: string;
     relativeValue: number;
   }[];
-  immersionStreak: number[];
+  immersionStreak: {
+    label: string;
+    seconds: number;
+  }[];
 };
 
 export type ImmersionSource = {

@@ -35,7 +35,7 @@ export const app = new Elysia()
         })
     )
     .use(registeredRoutes)
-    .listen(2727, (app) => {
+    .listen({ port: 2727, hostname: "0.0.0.0" }, (app) => {
         CreateIndexDB();
         zstdinit();
         console.log(`APL static server is running at ${app.hostname}:${app.port}`);

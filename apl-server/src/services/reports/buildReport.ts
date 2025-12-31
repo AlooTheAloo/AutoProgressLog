@@ -14,12 +14,16 @@ export async function buildReport(userId: number) {
         .ankiConfig({select: {ankiToken: true, url: true}})) ?? {};
 
     if (ankiToken || url) {
-        console.log("Anki config found, initializing NormalSyncer...");
-        await new NormalSyncer(
-            new AnkiHTTPClient(ankiToken, url),
-            userId
-        ).start();
-        console.log("NormalSyncer finished successfully for user:", userId);
+        try {
+            console.log("Anki config found, initializing NormalSyncer...");
+            await new NormalSyncer(
+                new AnkiHTTPClient(ankiToken, url),
+                userId
+            ).start();
+            console.log("NormalSyncer finished successfully for user:", userId);
+        } catch (error) {
+            console.error("NormalSyncer failed for user:", userId, error);
+        }
     } else {
         console.log(
             "No Anki config found, skipping NormalSyncer for user:",
@@ -69,33 +73,51 @@ export async function buildReport(userId: number) {
             reportNo: "asc",
         },
         include: {
-            syncData: true
+            syncData: true,
+            score: true,
         }
     });
 
 
-    let times = previousReports.map((x, i) => {
-        if(i == 0) return null;
-        return x.syncData.totalImmersionTime - previousReports[i - 1]?.syncData.totalImmersionTime;
-    });
-
-
-
+    let times = previousReports.map((x) => x.score?.immersionScore ?? 0);
 
     if (!previousSync) {
         console.log("No previous sync with report found for user " + userId);
     }
-    // Generate the new report
+    // Get current total immersion for snapshot (still useful for total time display)
     const totalImmersion = await client.immersionActivity.aggregate({
         where: {userId},
         _sum: {seconds: true},
     });
 
+    // Calculate delta from logs created since the last report
+    const lastReportTime = previousSyncReport?.generationTime ?? new Date(0);
+    const immersionLogsSinceLastReport = await client.immersionActivity.findMany({
+        where: {
+            userId: userId,
+            createdAt: {
+                gt: lastReportTime,
+            }
+        }
+    });
 
+    const secondsDelta = immersionLogsSinceLastReport.reduce((acc, log) => acc + log.seconds, 0);
+    
+    // Group logs for persistent storage
+    const immersionLogMap = new Map<string, number>();
+    immersionLogsSinceLastReport.forEach((log) => {
+        const current = immersionLogMap.get(log.activityName) || 0;
+        immersionLogMap.set(log.activityName, current + log.seconds);
+    });
 
+    const immersionLogData = Array.from(immersionLogMap.entries()).map(([name, seconds]) => ({
+        activityName: name,
+        seconds: seconds,
+    }));
+
+    times.push(secondsDelta);
     times = times.reverse();
 
-    console.log("Times : " + JSON.stringify(times));
     const averageImmersionTime = arithmeticWeightedMean(times as number[]);
 
     let revCount:{
@@ -108,20 +130,25 @@ export async function buildReport(userId: number) {
     let matureCount:number|null = null;
     let retention:number|null = null;
 
-    const immersionScore = (Math.max((totalImmersion._sum.seconds ?? 0) - (previousSyncReport?.totalImmersionTime ?? 0), 0)) * SECOND_WEIGHT;
+    const immersionScore = (Math.max(secondsDelta, 0)) * SECOND_WEIGHT;
     let ankiScore = 0;
     
     if(ankiToken != undefined || url != undefined){
-        revCount = await AnkiStorage.getAnkiCardReviewCount(userId);
-        matureCount = await AnkiStorage.getMatureCards(userId);
-        retention = await AnkiStorage.getRetention(userId) ?? null;
-        if(!previousSyncReport?.report?.metadata?.hasAnki){
+        try {
+            revCount = await AnkiStorage.getAnkiCardReviewCount(userId);
+            matureCount = await AnkiStorage.getMatureCards(userId);
+            retention = await AnkiStorage.getRetention(userId) ?? null;
+            if(!previousSyncReport?.report?.metadata?.hasAnki){
+                ankiScore = 0;
+            }
+            else {
+                const cardScore = Math.max(revCount?.totalCount - (previousSyncReport.ankiData?.totalCardsStudied ?? 0), 0) 
+                const matureScore = Math.max((matureCount ?? 0) - (previousSyncReport.ankiData?.mature ?? 0), 0)
+                ankiScore = cardScore * CARD_WEIGHT + matureScore * MATURE_WEIGHT;
+            }
+        } catch (error) {
+            console.error("Failed to fetch Anki data for scoring:", error);
             ankiScore = 0;
-        }
-        else {
-            const cardScore = Math.max(revCount?.totalCount - (previousSyncReport.ankiData?.totalCardsStudied ?? 0), 0) 
-            const matureScore = Math.max((matureCount ?? 0) - (previousSyncReport.ankiData?.mature ?? 0), 0)
-            ankiScore = cardScore * CARD_WEIGHT + matureScore * MATURE_WEIGHT;
         }
     }
 
@@ -158,9 +185,14 @@ export async function buildReport(userId: number) {
                             totalScore: totalScore,
                         }
                     },
+                    immersionLog: {
+                        createMany: {
+                            data: immersionLogData
+                        }
+                    },
                     streak: {
                         create: {
-                            immersionStreak: ((totalImmersion._sum.seconds ?? 0) > (previousSyncReport?.totalImmersionTime ?? 0))
+                            immersionStreak: (secondsDelta > 0)
                                 ? (previousSyncReport?.report?.streak?.immersionStreak ?? 0) + 1
                                 : 0,
 
@@ -177,7 +209,7 @@ export async function buildReport(userId: number) {
                     },
                     averageImmersionTime: averageImmersionTime,
                     bestImmersionTime: Math.max(
-                        (totalImmersion._sum.seconds ?? 0) - (previousReports.at(-1)?.syncData.totalImmersionTime ?? 0),
+                        secondsDelta,
                         (previousSyncReport?.report?.bestImmersionTime ?? 0)
                     ),
                 }

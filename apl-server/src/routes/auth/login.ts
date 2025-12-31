@@ -60,7 +60,7 @@ export const loginRoute = new Elysia({ name: "login" }).post(
   "/login",
   async ({ body, set }) => {
     const { email } = body;
-
+    console.log("Sending email to " + email, "API");
     // Check if a user exists with this email
     let user = await prisma.user.findUnique({ where: { email } });
 

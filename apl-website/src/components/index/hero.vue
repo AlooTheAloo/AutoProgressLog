@@ -4,7 +4,7 @@
   >
     <div class="animated-blob bg-fuchsia-400 dark:bg-fuchsia-800"></div>
   </div>
-  <Motion as="div" class="h-screen w-screen" :style="{ opacity: opacity }">
+  <Motion as="div" class="h-screen w-screen" :style="{ opacity: 1 }">
     <div
       class="flex h-screen w-screen items-center md:justify-start justify-center"
     >
@@ -22,6 +22,7 @@
             duration: 1,
             ease: 'easeInOut',
           }"
+          :inViewOptions="{ once: true }"
           class="flex justify-center md:justify-start"
         >
           <img
@@ -47,6 +48,7 @@
             duration: 1,
             ease: 'easeInOut',
           }"
+          :inViewOptions="{ once: true }"
           class="relative flex flex-col my-4 w-full md:px-20 px-10"
         >
           <div
@@ -83,6 +85,7 @@
               duration: 1,
               ease: 'easeInOut',
             }"
+            :inViewOptions="{ once: true }"
             class="py-4 w-full flex gap-2 justify-center md:justify-start"
           >
             <Button
@@ -115,6 +118,7 @@
         duration: 0.8,
         ease: 'easeInOut',
       }"
+      :inViewOptions="{ once: true }"
       class="absolute h-screen w-screen top-0 justify-end items-center pointer-events-none hidden md:flex overflow-hidden"
     >
       <div
@@ -127,7 +131,7 @@
 
   <Dialog :open="dialogOpen">
     <form>
-      <DialogContent class=" w-[90vw] max-w-[1000px] rounded-xl [&>button:last-child]:hidden">
+      <DialogContent class=" w-[90vw] max-w-[1000px] rounded-xl [&>button:last-child]:hidden bg-white dark:bg-black">
         <DialogHeader>
           <DialogDescription class="text-left">
             <iframe class="w-full aspect-video" :src="trailerSource" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
@@ -146,7 +150,7 @@
 </template>
 
 <script setup lang="ts">
-import { Motion, useScroll, useTransform } from "motion-v";
+import { Motion } from "motion-v";
 import apl_logo_black from "../../assets/APL_Black.svg";
 import apl_logo_white from "../../assets/Logo.png";
 
@@ -159,12 +163,12 @@ import Dialog from "../ui/dialog/Dialog.vue";
 import DialogContent from "../ui/dialog/DialogContent.vue";
 import DialogHeader from "../ui/dialog/DialogHeader.vue";
 import DialogDescription from "../ui/dialog/DialogDescription.vue";
+import DialogClose from "../ui/dialog/DialogClose.vue";
+
 
 const trailerSource = ref("");
 
-const { scrollYProgress } = useScroll();
 
-const opacity = useTransform(() => 1 - scrollYProgress.get());
 
 const router = useRouter();
 

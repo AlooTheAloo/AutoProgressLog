@@ -140,7 +140,7 @@ onUnmounted(() => {
               }"
               class="text-green-400 text-sm font-medium mt-1"
             >
-              ✅ Check your inbox.
+              ✅ Check your inbox. This may take up to 30 minutes (blame google and microsoft lol)
             </motion.p>
           </div>
         </motion.div>

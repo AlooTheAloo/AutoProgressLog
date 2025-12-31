@@ -1,6 +1,7 @@
 import Toggl from "toggl-track";
 import client from "../../db/client";
 import dayjs from "dayjs";
+import { writeFileSync } from "fs";
 
 interface TogglEntry {
     id: number;
@@ -42,8 +43,6 @@ export async function syncTogglData(userId: number) {
     const sinceDate = dayjs().subtract(3, "month").add(1, "day");
     
     try {
-        // 1. Fetch Toggl entries
-        // Note: list() with since uses start time of entries.
         let togglEntries: any[] | string | null = null;
 
         try{
@@ -55,16 +54,20 @@ export async function syncTogglData(userId: number) {
             return;
         }
 
+        writeFileSync("stuff.json", JSON.stringify(togglEntries));
+
         if(typeof(togglEntries) == "string" || togglEntries == null){
+            console.log("User is out of API calls for the hour. Skipping diff sync.")
             // lmfao get API call diffed
             return;
         }
 
         // Filter out ongoing entries and ignored ones
         const validTogglEntries = togglEntries.filter(e => 
-            e.stop && 
-            e.description &&
-            !ignore((e.tags || []).map((t: any) => t.toString().toLowerCase()))
+            e.stop && // completed
+            e.description && // not empty
+            e.server_deleted_at == null && // not deleted
+            !ignore((e.tags || []).map((t: any) => t.toString().toLowerCase())) // not ignored
         );
 
         const togglMap = new Map<string, any>();
@@ -77,6 +80,7 @@ export async function syncTogglData(userId: number) {
                 createdAt: { gte: sinceDate.toDate() }
             }
         });
+        console.log("len dbent : " + dbEntries.length);
 
         const dbMap = new Map<string, typeof dbEntries[0]>();
         dbEntries.forEach(e => dbMap.set(e.activityTogglId, e));
@@ -88,12 +92,11 @@ export async function syncTogglData(userId: number) {
         // Check for updates and new entries
         for (const [togglId, togglEntry] of togglMap) {
             const dbEntry = dbMap.get(togglId);
-            
             const togglDuration = Math.floor(
                 (new Date(togglEntry.stop).getTime() - new Date(togglEntry.start).getTime()) / 1000
             );
             const togglStart = new Date(togglEntry.start);
-
+            
             if (!dbEntry) {
                 // MISSING: Add
                 toCreate.push({
@@ -125,6 +128,7 @@ export async function syncTogglData(userId: number) {
 
         // Check for deletions (In DB but NOT in Toggl list)
         for (const [togglId, dbEntry] of dbMap) {
+            console.log("Checking if toggl knows about " + togglId);
             if (!togglMap.has(togglId)) {
                 toDelete.push(dbEntry.id);
             }

@@ -89,7 +89,7 @@ export const downloadLinksRoute = new Elysia({ name: 'download-links' }).get(
         }),
         detail: {
             summary: 'Get latest installer download URLs',
-            tags: ['Download Links'],
+            tags: ['Website'],
             description: 'Returns direct download links for Windows, macOS, and Linux installers from the latest GitHub release.',
         },
     }

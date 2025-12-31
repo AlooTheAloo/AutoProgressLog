@@ -65,6 +65,18 @@ export const ReportRelations = t.Object(
         { additionalProperties: false },
       ),
     ),
+    immersionLog: t.Array(
+      t.Object(
+        {
+          id: t.Integer(),
+          activityName: t.String(),
+          seconds: t.Integer(),
+          reportId: t.Integer(),
+        },
+        { additionalProperties: false },
+      ),
+      { additionalProperties: false },
+    ),
   },
   { additionalProperties: false },
 );
@@ -150,6 +162,22 @@ export const ReportRelationsInputCreate = t.Object(
         { additionalProperties: false },
       ),
     ),
+    immersionLog: t.Optional(
+      t.Object(
+        {
+          connect: t.Array(
+            t.Object(
+              {
+                id: t.Integer({ additionalProperties: false }),
+              },
+              { additionalProperties: false },
+            ),
+            { additionalProperties: false },
+          ),
+        },
+        { additionalProperties: false },
+      ),
+    ),
   },
   { additionalProperties: false },
 );
@@ -217,6 +245,31 @@ export const ReportRelationsInputUpdate = t.Partial(
               { additionalProperties: false },
             ),
             disconnect: t.Boolean(),
+          },
+          { additionalProperties: false },
+        ),
+      ),
+      immersionLog: t.Partial(
+        t.Object(
+          {
+            connect: t.Array(
+              t.Object(
+                {
+                  id: t.Integer({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+            disconnect: t.Array(
+              t.Object(
+                {
+                  id: t.Integer({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
           },
           { additionalProperties: false },
         ),
@@ -325,6 +378,7 @@ export const ReportSelect = t.Partial(
       averageImmersionTime: t.Boolean(),
       bestImmersionTime: t.Boolean(),
       metadata: t.Boolean(),
+      immersionLog: t.Boolean(),
       _count: t.Boolean(),
     },
     { additionalProperties: false },
@@ -339,6 +393,7 @@ export const ReportInclude = t.Partial(
       user: t.Boolean(),
       syncData: t.Boolean(),
       metadata: t.Boolean(),
+      immersionLog: t.Boolean(),
       _count: t.Boolean(),
     },
     { additionalProperties: false },

@@ -19,6 +19,7 @@ dayjs.extend(duration);
 const sm = new SocketManager();
 export const app = new Elysia()
   .onStart(async () => {
+    console.log("Starting server...");
     AnkiStorage.init(Bun.env.STORAGE_URL ?? "");
     initTogglNotifications();
     await zstdinit();
@@ -40,8 +41,8 @@ export const app = new Elysia()
         },
         tags: [
           {
-            name: "Download Links",
-            description: "Endpoints related to download links",
+            name: "Website",
+            description: "Endpoints related to website functionality",
           },
           {
             name: "Info",
@@ -82,11 +83,12 @@ export const app = new Elysia()
   })
   .onError(({ code, error }) => {
     if (code === "VALIDATION") {
+      const firstError = error.validator.Errors(error.value).First();
       console.log("validation error", error.validator.Errors(error.value));
-      return error.validator.Errors(error.value).First().message;
+      return firstError?.message ?? "Validation failed";
     }
   })
-  .listen(3000, (app) => {
+  .listen({ port: 3000, hostname: "0.0.0.0" }, (app) => {
     console.log(`APL Server is running on http://${app.hostname}:${app.port}/`);
   });
 

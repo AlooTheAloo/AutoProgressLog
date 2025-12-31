@@ -27,6 +27,7 @@ type DashboardImmersionSource = {
 const limit /* As x goes to infinity ∫sqrt(tan x) dx ??? */ = ref<number>(4);
 const props = defineProps<{
   sources: ImmersionSource[];
+  lastSyncTime?: string;
 }>();
 
 const totalHours = computed(() => {
@@ -52,9 +53,9 @@ watchEffect(() => {
 });
 
 const dateString = computed(() => {
-  const now = dayjs();
-  const start = now.subtract(30, "days");
-  const end = now;
+  const reference = props.lastSyncTime ? dayjs(props.lastSyncTime) : dayjs();
+  const start = reference.subtract(30, "days");
+  const end = reference;
 
   return `Data from ${start.format("D MMM YYYY")} - ${end.format(
     "D MMM YYYY"

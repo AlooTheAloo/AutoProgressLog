@@ -36,9 +36,6 @@ export class SocketManager {
         addSocket(data.togglUserId, ws);
         SocketManager.clients.set(data.togglUserId, ws);
         this.authListeners.forEach((x) => x(ws));
-        
-        // Synchronize Toggl data for the last 3 months
-        syncTogglData(data.userId);
       }
       return;
     }

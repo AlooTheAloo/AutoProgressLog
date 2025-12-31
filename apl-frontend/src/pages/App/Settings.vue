@@ -6,7 +6,7 @@ import Tab from "primevue/tab";
 import TabPanels from "primevue/tabpanels";
 import TabPanel from "primevue/tabpanel";
 import { Options } from "../../../apl-backend/types/options";
-import { onMounted, ref, watch, reactive } from "vue";
+import { onMounted, ref, watch, reactive, computed } from "vue";
 import Button from "primevue/button";
 import Dialog from "primevue/dialog";
 import { WarningProps } from "../../../types/Warning";
@@ -33,6 +33,10 @@ const toast = useToast();
 const settingsParent = ref();
 const rect = reactive(useElementBounding(settingsParent));
 const screen = useWindowSize();
+
+const isDirty = computed(() => {
+  return JSON.stringify(originalConfig.value) !== JSON.stringify(config.value);
+});
 
 onMounted(() => {
   window.ipcRenderer.invoke("GetConfig").then((data: Options) => {
@@ -234,16 +238,13 @@ function ankiTest(worked: boolean) {
   <div
     class="mx-2 flex justify-end transition-all duration-300 ease-in-out gap-5"
     :style="{
-      marginTop:
-        JSON.stringify(originalConfig) == JSON.stringify(config) ? '4rem' : '',
+      marginTop: !isDirty ? '4rem' : '',
     }"
   >
     <div class="flex gap-4">
       <Button
-        :aria-hidden="JSON.stringify(originalConfig) == JSON.stringify(config)"
-        :tabindex="
-          JSON.stringify(originalConfig) != JSON.stringify(config) ? '0' : '-1'
-        "
+        :aria-hidden="!isDirty"
+        :tabindex="isDirty ? '0' : '-1'"
         @click="save"
         class="w-48"
         >Save</Button
@@ -252,10 +253,8 @@ function ankiTest(worked: boolean) {
         @click="reset"
         class="w-72"
         severity="secondary"
-        :aria-hidden="JSON.stringify(originalConfig) == JSON.stringify(config)"
-        :tabindex="
-          JSON.stringify(originalConfig) != JSON.stringify(config) ? '0' : '-1'
-        "
+        :aria-hidden="!isDirty"
+        :tabindex="isDirty ? '0' : '-1'"
         >Cancel changes</Button
       >
     </div>

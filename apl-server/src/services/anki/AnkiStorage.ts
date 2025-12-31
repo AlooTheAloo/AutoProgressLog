@@ -158,6 +158,7 @@ export default class AnkiStorage {
    * Calculate retention percentage for a user.
    */
   public static async getRetention(userID: number) {
+    console.log("GETTING RETENTION.")
     const settings = await AnkiStorage.getUserAnkiSettings(userID);
     if (!settings) return undefined;
 
@@ -169,7 +170,7 @@ export default class AnkiStorage {
 
     const since =
       dayjs().startOf("day").subtract(daysAgo, "days").unix() * 1000;
-
+    console.log("retmomde : " + settings.retentionMode);
     if (settings.retentionMode === "ANKI_DEFAULT") {
       const totalReviews = await this.executeFetch<number, ReviewsRow[]>(
         this.storage_url,
@@ -215,7 +216,10 @@ export default class AnkiStorage {
                  FROM revlog ${this.JoinTrackedDecks(settings)} AND revlog.id > ?`,
         [since]
       );
-
+      console.log(`SELECT sum(case when ease = 1 and revlog.type == 1 then 1 else 0 end) as "FLUNKED",
+                        sum(case when ease > 1 and revlog.type == 1 then 1 else 0 end) as "PASSED"
+                 FROM revlog ${this.JoinTrackedDecks(settings)} AND revlog.id > ${since}`);
+      console.log("result", result);
       if ("error" in result) throw result.error;
       console.log("resp", result.response);
 

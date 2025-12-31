@@ -12,6 +12,7 @@ import report from "../../assets/Report_example.jpg";
         :initial="{ opacity: 0, y: 20 }"
         :while-in-view="{ opacity: 1, y: 0 }"
         :transition="{ duration: 0.8, ease: 'easeOut' }"
+        :inViewOptions="{ once: true }"
         class="flex flex-col items-center space-y-4 text-center mb-10"
       >
         <h2
@@ -30,6 +31,7 @@ import report from "../../assets/Report_example.jpg";
         :initial="{ opacity: 0, scale: 0.95, y: 40 }"
         :while-in-view="{ opacity: 1, scale: 1, y: 0 }"
         :transition="{ duration: 1, delay: 0.2, ease: 'easeOut' }"
+        :inViewOptions="{ once: true }"
         class="mx-auto mt-8 max-w-xl relative rounded-xl bg-white dark:bg-zinc-950 shadow-2xl dark:shadow-none overflow-hidden p-2 md:p-4"
       >
         <div class="relative rounded-lg overflow-hidden bg-white dark:bg-zinc-950 shadow-inner">

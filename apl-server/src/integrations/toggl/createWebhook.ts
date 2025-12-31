@@ -29,7 +29,8 @@ export default async function createWebhook(
   workspaceID = -1,
   togglToken: string
 ): Promise<{ uid: number; workspaceID: number } | undefined> {
-  console.log("Creating webhook for url " + wh_link);
+  try{
+console.log("Creating webhook for url " + wh_link);
   if (!togglToken) return;
   const toggl = new Toggl({
     auth: {
@@ -78,4 +79,10 @@ export default async function createWebhook(
   });
   console.log("webhook created successfully");
   return { uid, workspaceID };
+  }
+  catch(e){
+    // Usually caused by not having any API calls left for the hour. 
+    console.log(e);
+    return undefined;
+  }  
 }

@@ -193,7 +193,10 @@ const bottomText = computed(() => {
         }"
         class="flex-grow flex justify-start w-[45rem] h-[25rem] 1720:w-full gap-3"
       >
-        <ImmersionSources :sources="dto.immersionDTO.immersionSources" />
+        <ImmersionSources
+          :sources="dto.immersionDTO.immersionSources"
+          :lastSyncTime="dto.lastSyncTime"
+        />
         <ImmersionStreak :streak="dto.immersionDTO.immersionStreak" />
       </motion.div>
     </div>

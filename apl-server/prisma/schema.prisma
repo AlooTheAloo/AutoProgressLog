@@ -93,6 +93,7 @@ model Report {
   averageImmersionTime Int
   bestImmersionTime Int
   metadata   ReportMetadata?
+  immersionLog ReportImmersionLog[]
 
   @@unique([reportNo, userId])
   @@index([userId])
@@ -114,6 +115,16 @@ model ReportMetadata {
   reportId Int    @unique
   report   Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
   hasAnki  Boolean
+}
+
+model ReportImmersionLog {
+  id           Int    @id @default(autoincrement())
+  activityName String
+  seconds      Int
+  reportId     Int
+  report       Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  @@index([reportId])
 }
 
 model Streak {

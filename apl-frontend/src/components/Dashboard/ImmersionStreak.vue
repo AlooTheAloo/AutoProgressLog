@@ -53,9 +53,9 @@ const options = computed<ApexOptions>(() => {
           colors: theme.value == "dark" ? "#fff" : "#000",
         },
         formatter: (value: any) => {
-          return dayjs()
-            .subtract(7 - value, "day")
-            .format("ddd");
+          if (!props.streak || props.streak.length === 0) return "";
+          const index = Math.round(value);
+          return props.streak[index - 1]?.label || "";
         },
       },
     },
@@ -131,13 +131,13 @@ const options = computed<ApexOptions>(() => {
 const SECONDS_IN_HOUR = 3600;
 
 const props = defineProps<{
-  streak: number[];
+  streak: { label: string; seconds: number }[];
 }>();
 
 const series = computed(() => {
   return [
     {
-      data: props.streak.map((x) => x / SECONDS_IN_HOUR),
+      data: props.streak.map((x) => x.seconds / SECONDS_IN_HOUR),
     },
   ];
 });

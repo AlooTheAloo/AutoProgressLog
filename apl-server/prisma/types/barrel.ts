@@ -8,6 +8,7 @@ export * from "./ImmersionActivity";
 export * from "./Report";
 export * from "./Score";
 export * from "./ReportMetadata";
+export * from "./ReportImmersionLog";
 export * from "./Streak";
 export * from "./UserConfig";
 export * from "./AutoGenConfig";
