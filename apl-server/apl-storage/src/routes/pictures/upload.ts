@@ -1,7 +1,9 @@
-import { Elysia, t } from "elysia";
-import { rmSync } from "fs";
-import { mkdir, writeFile } from "fs/promises";
+import {Elysia, t} from "elysia";
+import {rmSync} from "fs";
+import {mkdir, writeFile} from "fs/promises";
 import path from "path";
+
+const MAX_FILE_SIZE = 6.7 * 1024 * 1024; // 6.7MB in bytes
 
 /**
  * @module uploadRoute (apl-storage)
@@ -43,56 +45,61 @@ import path from "path";
  * 2. Writes file contents as a PNG using the user’s id as filename
  * 3. Responds with a success message
  */
-export const uploadRoute = new Elysia({ name: "upload-picture" }).post(
-  "/upload/:userId",
-  async ({ params, body, set }) => {
-    const { userId } = params;
+export const uploadRoute = new Elysia({name: "upload-picture"}).post(
+    "/upload/:userId",
+    async ({params, body, set}) => {
+        const {userId} = params;
 
-    // Extract file from body
-    const file = body.file;
-    const buffer = new Uint8Array(await file.arrayBuffer());
+        // Extract file from body
+        const file = body.file;
 
-    const ext = path.extname(file.name).toLowerCase(); // e.g., ".jpeg"
+        if (file.size > MAX_FILE_SIZE) {
+            set.status = 413; // Payload Too Large
+            return {description: "File size exceeds the 6.7MB limit"};
+        }
+        const buffer = new Uint8Array(await file.arrayBuffer());
 
-    const dirPath = path.resolve("./public", "pictures");
+        const ext = path.extname(file.name).toLowerCase(); // e.g., ".jpeg"
 
-    const filePath = path.join(dirPath, `${userId}`);
+        const dirPath = path.resolve("./public", "pictures");
 
-    // Create the directory if it doesn't exist
-    await mkdir(dirPath, { recursive: true });
+        const filePath = path.join(dirPath, `${userId}`);
 
-    // Write the file to disk (overwrites if it already exists)
-    await writeFile(filePath, buffer);
+        // Create the directory if it doesn't exist
+        await mkdir(dirPath, {recursive: true});
 
-    set.status = 200;
-    return { message: "Picture uploaded successfully" };
-  },
-  {
-    body: t.Object({
-      file: t.File(),
-    }),
-    params: t.Object({
-      userId: t.Integer(),
-    }),
-    response: t.Object({
-      message: t.String(),
-    }),
-    detail: {
-      tags: ["Pictures"],
-      summary: "Upload a user picture",
-      description:
-        "Uploads a picture for the specified user ID. The picture is saved as a PNG file in the public/pictures directory.",
-      responses: {
-        200: {
-          description: "Picture uploaded successfully",
-        },
-        400: {
-          description: "Invalid request",
-        },
-        500: {
-          description: "Internal server error",
-        },
-      },
+        // Write the file to disk (overwrites if it already exists)
+        await writeFile(filePath, buffer);
+
+        set.status = 200;
+        return {message: "Picture uploaded successfully"};
     },
-  }
+    {
+        body: t.Object({
+            file: t.File(),
+        }),
+        params: t.Object({
+            userId: t.Integer(),
+        }),
+        response: {
+            200: t.Object({message: t.String()}),
+            413: t.Object({description: t.String()}),
+            415: t.Object({description: t.String()}),
+            400: t.Object({description: t.String()}),
+            500: t.Object({description: t.String()}),
+        },
+        detail: {
+            tags: ["Pictures"],
+            summary: "Upload a user picture",
+            description:
+                "Uploads a picture for the specified user ID. The picture is saved in the public/pictures directory.",
+            responses: {
+                200: {description: "Picture uploaded successfully"},
+                413: {description: "File too large (max 6.7MB)"},
+                415: {description: "Unsupported file type"},
+                400: {description: "Invalid request"},
+                500: {description: "Internal server error"},
+            },
+        },
+    }
 );

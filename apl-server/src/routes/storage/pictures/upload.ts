@@ -1,6 +1,8 @@
-import { Elysia, t } from "elysia";
-import { authGuard, authHeaders } from "../../../middlewares/authGuard";
+import {Elysia, t} from "elysia";
+import {authGuard, authHeaders} from "../../../middlewares/authGuard";
 import client from "../../../db/client";
+
+const MAX_FILE_SIZE = 6.7 * 1024 * 1024; // bytes
 
 /**
  * ## POST /storage/pictures/upload
@@ -46,68 +48,54 @@ import client from "../../../db/client";
  * Note: Eden automatically serializes `FormData` in supported routes.
  */
 
-export const uploadRoute = new Elysia({ name: "upload-route" })
-  .use(authGuard)
-  .post(
-    "/upload",
-    async ({ user, body, set }) => {
-      const form = new FormData();
-      console.log("USer id is " + user.id);
-      form.append("file", body.file);
-      console.log("Form data is ", form);
-      const res = await fetch(
-        `http://apl-storage:2727/pictures/upload/${user.id}`,
-        {
-          method: "POST",
-          body: form,
-        }
-      );
-      console.log("meow : " + res);
+export const uploadRoute = new Elysia({name: "upload-route"})
+    .use(authGuard)
+    .post(
+        "/upload",
+        async ({user, body, set}) => {
+            const file = body.file;
 
-      if (!res.ok) {
-        console.log("not ok");
-        console.log(res.statusText);
-        set.status = res.status;
-        return { error: "Failed to upload picture" };
-      }
-      console.log("Its ok !@!!");
-      console.log(res.statusText);
-      console.log("");
-      console.log("res is ", res);
-      // Update the user's profilePicture field in the DB
-      client.user
-        .update({
-          where: { id: user.id },
-          data: { profilePicture: `/storage/pictures/fetch/${user.id}` },
-        })
-        .catch((err) => {
-          console.error("Failed to update user picture URL:", err);
-        });
-      const json = await res.json();
-      console.log(json);
-      return json;
-    },
-    {
-      body: t.Object({
-        file: t.File(),
-      }),
-      headers: authHeaders,
-      response: {
-        200: t.Object({
-          message: t.String(), // You could rename to 'message' if more accurate
-        }),
-        400: t.Object({
-          description: t.String(),
-        }),
-        500: t.Object({
-          description: t.String(),
-        }),
-      },
-      detail: {
-        tags: ["Storage"],
-        summary: "Upload a picture",
-        description:
-          "Uploads a picture to the storage service and updates the user's profile picture URL in the database.",
-      },
-    }
-  );
+            if (file.size > MAX_FILE_SIZE) {
+                set.status = 413;
+                return {
+                    description: "File size exceeds the 6.7MB limit",
+                };
+            }
+
+            const form = new FormData();
+            form.append("file", file);
+
+            const res = await fetch(
+                `http://apl-storage:2727/pictures/upload/${user.id}`,
+                {
+                    method: "POST",
+                    body: form,
+                }
+            );
+
+            if (!res.ok) {
+                set.status = res.status;
+                return {description: "Failed to upload picture"};
+            }
+
+            await client.user.update({
+                where: {id: user.id},
+                data: {profilePicture: `/storage/pictures/fetch/${user.id}`},
+            });
+
+            return await res.json();
+        },
+        {
+            body: t.Object({
+                file: t.File(),
+            }),
+            headers: authHeaders,
+            response: {
+                200: t.Object({message: t.String()}),
+                413: t.Object({description: t.String()}),
+                400: t.Object({description: t.String()}),
+                500: t.Object({description: t.String()}),
+            },
+        }
+    );
+
