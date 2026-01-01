@@ -33,26 +33,6 @@ Open a terminal and enter the following command to get rid of it.
 sudo xattr -cr /Applications/AutoProgressLog.app
 ```
 
-### Linux guidelines
-
-> [!CAUTION]
-> Linux is malware. Please consider upgrading to MacOS for an optimal experience.
-
-You need the libvips library to use APL.
-
-**Debian**
-```
-sudo apt install libvips
-```
-**Arch**
-```
-sudo pacman -s libvips
-```
-**Fedora**
-```
-sudo dns install vips
-```
-
 ## Configuration
 
 #### Getting your toggl Track token
