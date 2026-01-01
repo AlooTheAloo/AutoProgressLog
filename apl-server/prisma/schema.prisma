@@ -8,17 +8,187 @@ generator client {
 }
 
 generator prismabox {
-  provider= "prismabox"
-  output   = "./types"
-  typeboxImportVariableName = "t"
+  provider                    = "prismabox"
+  output                      = "./types"
+  typeboxImportVariableName   = "t"
   typeboxImportDependencyName = "elysia"
-  additionalProperties = false
-  inputModel = true
+  additionalProperties        = false
+  inputModel                  = true
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  email     String   @unique
-  name      String?
+  id                  Int                 @id @default(autoincrement())
+  email               String              @unique
+  userName            String?
+  profilePicture      String?
+  config              UserConfig?
+  tokens              Token[]
+  immersionActivities ImmersionActivity[]
+  reports             Report[]
+  syncData            SyncData[]
+}
+
+model Token {
+  id         Int       @id @default(autoincrement())
+  token      String    @unique
+  type       TokenType
+  valid      Boolean   @default(true)
+  expiration DateTime?
+  createdAt  DateTime  @default(now())
+  lastUsedAt DateTime  @default(now())
+  deviceId   String?
+  deviceName String?
+  userAgent  String?
+  userId     Int
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token, userId])
+}
+
+model SyncData {
+  id                 Int       @id @default(autoincrement())
+  generationTime     DateTime  @default(now())
+  ankiData           AnkiData?
+  userId             Int
+  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  report             Report?
+  totalImmersionTime Int
+
+  @@index([userId])
+}
+
+model AnkiData {
+  id                Int      @id @default(autoincrement())
+  totalCardsStudied Int
+  cardsStudied      Int
+  mature            Int
+  retention         Float
+  syncDataId        Int      @unique
+  syncData          SyncData @relation(fields: [syncDataId], references: [id], onDelete: Cascade)
+
+  @@index([syncDataId])
+}
+
+model ImmersionActivity {
+  id              Int      @id @default(autoincrement())
+  createdAt       DateTime
+  updatedAt       DateTime @default(now()) @updatedAt
+  activityTogglId String?  @unique
+  seconds         Int
+  activityName    String
+  userId          Int
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Report {
+  id         Int      @id @default(autoincrement())
+  reportNo   Int
+  score      Score?
+  streak     Streak?
+  userId     Int
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  syncData   SyncData @relation(fields: [syncDataId], references: [id], onDelete: Cascade)
+  syncDataId Int      @unique
+  averageImmersionTime Int
+  bestImmersionTime Int
+  metadata   ReportMetadata?
+  immersionLog ReportImmersionLog[]
+
+  @@unique([reportNo, userId])
+  @@index([userId])
+  @@index([syncDataId])
+}
+
+model Score {
+  id             Int    @id @default(autoincrement())
+  immersionScore Int
+  ankiScore      Int
+  totalScore     Int
+  reportId       Int    @unique
+  report         Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
+}
+
+
+model ReportMetadata {
+  id       Int    @id @default(autoincrement())
+  reportId Int    @unique
+  report   Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  hasAnki  Boolean
+}
+
+model ReportImmersionLog {
+  id           Int    @id @default(autoincrement())
+  activityName String
+  seconds      Int
+  reportId     Int
+  report       Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  @@index([reportId])
+}
+
+model Streak {
+  id              Int    @id @default(autoincrement())
+  ankiStreak      Int
+  immersionStreak Int
+  reportId        Int    @unique
+  report          Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  @@index([reportId])
+}
+
+model UserConfig {
+  id          Int         @id @default(autoincrement())
+  togglToken  String
+  togglUserId String      @unique
+  ankiConfig  AnkiConfig?
+  autoGenTime AutoGenConfig?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  userId      Int         @unique
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model AutoGenConfig {
+  id          Int         @id @default(autoincrement())
+  secondsSinceMidnight    Int
+  timezone                String
+  userConfigId Int        @unique
+  userConfig  UserConfig  @relation(fields: [userConfigId], references: [id], onDelete: Cascade)
+}
+
+model AnkiConfig {
+  id            Int               @id @default(autoincrement())
+  url           String            @default("https://sync.ankiweb.net/")
+  ankiToken     String
+  retentionMode AnkiRetentionMode
+  trackedDecks  String[]
+  userConfigId  Int               @unique
+  userConfig    UserConfig        @relation(fields: [userConfigId], references: [id], onDelete: Cascade)
+
+  @@index([userConfigId])
+}
+
+enum TokenType {
+  EMAIL
+  SESSION
+}
+
+enum AnkiRetentionMode {
+  ANKI_DEFAULT
+  TRUE_RETENTION
+}
+
+model SurveyAnswer {
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  track       String?
+  refoldKnows Boolean?
+  refoldStage String?
+  years       Int?
+  language    String?
+  appsUsing   String[]
 }

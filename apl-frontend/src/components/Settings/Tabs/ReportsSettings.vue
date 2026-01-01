@@ -16,28 +16,15 @@ const props = defineProps<{
   config: Options | undefined;
 }>();
 
-const fileSizes = [
-  {
-    quality: 1,
-    size: "~170kB",
-  },
-  {
-    quality: 2,
-    size: "~450kB",
-  },
-  {
-    quality: 3,
-    size: "~800kB",
-  },
-  {
-    quality: 4,
-    size: "~1.3MB",
-  },
-  {
-    quality: 5,
-    size: "~1.8MB",
-  },
-];
+const fileSizes = new Map<number, string>(
+  [
+    { quality: 1, size: "~170kB" },
+    { quality: 2, size: "~450kB" },
+    { quality: 3, size: "~800kB" },
+    { quality: 4, size: "~1.3MB" },
+    { quality: 5, size: "~1.8MB" },
+  ].map(({ quality, size }) => [quality, size])
+);
 
 // type-based
 const emit = defineEmits<{
@@ -45,46 +32,67 @@ const emit = defineEmits<{
 }>();
 
 function updateFilename(value: string) {
-  if (props.config?.anki == undefined) return;
+  if (props.config?.localOptions?.outputOptions == undefined) return;
   emit("update:config", {
     ...props.config,
-    outputOptions: {
-      ...props.config.outputOptions,
-      outputFile: { ...props.config.outputOptions.outputFile, name: value },
+    localOptions: {
+      ...props.config.localOptions,
+      outputOptions: {
+        ...props.config.localOptions.outputOptions,
+        outputFile: {
+          ...props.config.localOptions.outputOptions.outputFile,
+          name: value,
+        },
+      },
     },
   });
 }
 
 function updateExtension(value: ReportExtension) {
-  if (props.config?.anki == undefined) return;
+  if (props.config?.localOptions?.outputOptions == undefined) return;
   emit("update:config", {
     ...props.config,
-    outputOptions: {
-      ...props.config.outputOptions,
-      outputFile: {
-        ...props.config.outputOptions.outputFile,
-        extension: value,
+    localOptions: {
+      ...props.config.localOptions,
+      outputOptions: {
+        ...props.config.localOptions.outputOptions,
+        outputFile: {
+          ...props.config.localOptions.outputOptions.outputFile,
+          extension: value,
+        },
       },
     },
   });
 }
 
 function updateFilepath(value: string) {
-  if (props.config?.anki == undefined) return;
+  if (props.config?.localOptions?.outputOptions == undefined) return;
   emit("update:config", {
     ...props.config,
-    outputOptions: {
-      ...props.config.outputOptions,
-      outputFile: { ...props.config.outputOptions.outputFile, path: value },
+    localOptions: {
+      ...props.config.localOptions,
+      outputOptions: {
+        ...props.config.localOptions.outputOptions,
+        outputFile: {
+          ...props.config.localOptions.outputOptions.outputFile,
+          path: value,
+        },
+      },
     },
   });
 }
 
 function updateQuality(value: number) {
-  if (props.config?.anki == undefined) return;
+  if (props.config?.localOptions?.outputOptions == undefined) return;
   emit("update:config", {
     ...props.config,
-    outputOptions: { ...props.config.outputOptions, outputQuality: value },
+    localOptions: {
+      ...props.config.localOptions,
+      outputOptions: {
+        ...props.config.localOptions.outputOptions,
+        outputQuality: value,
+      },
+    },
   });
 }
 </script>
@@ -92,7 +100,7 @@ function updateQuality(value: number) {
 <template>
   <div class="flex flex-col w-full gap-6 pt-6" v-if="config != undefined">
     <SettingsField
-      :value="config.outputOptions.outputFile.name"
+      :value="config.localOptions.outputOptions.outputFile.name"
       label="Filename"
       placeholder="(e.g., myreport)."
       @update:value="updateFilename"
@@ -100,7 +108,7 @@ function updateQuality(value: number) {
     />
 
     <SettingsList
-      :value="config.outputOptions.outputFile.extension"
+      :value="config.localOptions.outputOptions.outputFile.extension"
       label="File Extension"
       :options="reportExtensions"
       @update:value="updateExtension"
@@ -110,7 +118,7 @@ function updateQuality(value: number) {
     </SettingsList>
 
     <SettingsPathPicker
-      :value="config.outputOptions.outputFile.path"
+      :value="config.localOptions.outputOptions.outputFile.path"
       label="Filepath"
       @update:value="updateFilepath"
       help-text="The path to save the report to."
@@ -119,10 +127,10 @@ function updateQuality(value: number) {
     </SettingsPathPicker>
 
     <SettingsSlider
-      :value="config.outputOptions.outputQuality"
+      :value="config.localOptions.outputOptions.outputQuality"
       label="Output Quality"
       help-text="The quality of the output image. Lower values will result in a smaller file size."
-      :endText="fileSizes[config.outputOptions.outputQuality - 1].size"
+      :endText="fileSizes.get(config.localOptions.outputOptions.outputQuality)"
       :min="1"
       :max="5"
       @update:value="updateQuality"

@@ -1,11 +1,8 @@
-import { clipboard, ipcMain, ipcRenderer, nativeImage, shell } from "electron";
-import { CacheManager } from "../../../apl-backend/Helpers/cache";
-import dayjs from "dayjs";
-import { existsSync, rm } from "fs";
-import { promises as fsPromises } from "fs";
-import sharp from "sharp";
-import { deleteSyncs } from "../../../apl-backend/Helpers/DataBase/DeleteDB";
+import { clipboard, ipcMain, nativeImage, NativeImage } from "electron";
 import { isGenerating } from "../../../apl-backend/generate/generate";
+import { writeFileSync } from "fs";
+import { getConfig } from "../../../apl-backend/Helpers/getConfig";
+import path from "path";
 
 type ListReport = {
   id: number;
@@ -20,88 +17,71 @@ export type CopyReportToast = {
   reportNo?: string;
 };
 
+import { EdenClient } from "./api/ApiManager";
+import { APLStorage } from "./util/auth";
+import { ReportData } from "../../../apl-backend/types/reportdata";
+
 export function reportsListeners() {
   // Handle the Get-Reports IPC request
-  ipcMain.handle("Get-Reports", async (event, args) => {
+  ipcMain.handle("Get-Reports", async (event, page, pagesize) => {
+
+    const token = await APLStorage.get("token");
+    console.log("Getting reports...");
+
+    const { data, error } = await EdenClient.user.reports.get({
+        headers: { authorization: `Bearer ${token}` },
+        query: {
+          page: page,
+          pageSize: pagesize,
+        }
+    });
+    console.log("GOT " + JSON.stringify(data));
+    if (error) {
+      console.error("Error fetching reports:", error);
+      return [];
+    }
+    console.log("Reports fetched successfully");
+    return data;
+  });
+
+  ipcMain.handle("Get-Image", async (event, id: string) => {});
+
+  ipcMain.handle("Copy-Report", async (event, id: string) => {});
+
+  ipcMain.handle("Open-Report", async (event, id: string) => {});
+
+  ipcMain.handle("Export-Image", async (event, Image: string, reportNo: number, toclipboard: boolean) => {
     try {
-      const reports = await Promise.all(
-        CacheManager.get()
-          .list.filter((x) => x.reportNo != 0)
-          .reverse()
-          .map(async (x, i) => {
-            const fileExists = await fsPromises
-              .access(x.path)
-              .then(() => true)
-              .catch(() => false);
-
-            // Create the report object
-            const ret: ListReport = {
-              id: x.reportNo,
-              score: x.score,
-              date: x.generationTime,
-              fileExists: fileExists,
-              revertable: i === 0,
-            };
-            return ret;
-          })
-      );
-
-      return reports; // Return the list of reports with resized image data
-    } catch (error) {
-      console.error("Error in Get-Reports handler:", error);
-      throw error; // Optionally rethrow or handle the error as needed
-    }
-  });
-
-  ipcMain.handle("Get-Image", async (event, id: string) => {
-    const report = CacheManager.get().list.find(
-      (x) => x.reportNo.toString() == id
-    );
-    if (report) {
-      const fileExists = await fsPromises
-        .access(report.path)
-        .then(() => true)
-        .catch(() => false);
-      let resizedBase64: string = "";
-      if (fileExists) {
-        // Read the image file
-        const file = await fsPromises.readFile(report.path);
-        const sharpFile = await sharp(file);
-        // Resize the image using sharp and convert it to base64
-        resizedBase64 = await sharpFile
-          .toBuffer()
-          .then((buffer) => buffer.toString("base64")) // Convert buffer to base64
-          .catch((err) => {
-            throw new Error("Error resizing image");
-          });
+      const base64 = Image.replace(/^data:image\/\w+;base64,/, "");
+      const buffer = Buffer.from(base64, "base64");
+      const config = await getConfig();
+      const f = config?.localOptions.outputOptions.outputFile;
+      
+      if (!f) {
+        console.error("Output file configuration missing");
+        return { success: false, error: "Configuration missing" };
       }
-      return resizedBase64;
-    }
-  });
 
-  ipcMain.handle("Open-Report", async (event, id: string) => {
-    const report = CacheManager.get().list.find(
-      (x) => x.reportNo.toString() == id
-    );
-    if (report) {
-      shell.showItemInFolder(report.path);
-    }
-  });
+      if(!toclipboard){
+        // Ensure path ends with separator or use path.join if f.path is a directory
+        const fileName = `${f.name} ${reportNo}${f.extension}`;
+        const filePath = path.join(f.path, fileName);
+        await writeFileSync(filePath, buffer);
+        console.log("Image saved to:", filePath);
+        return { success: true, path: filePath };
+      }
+      else {
+        let image:NativeImage = nativeImage.createFromBuffer(buffer);
+        clipboard.writeImage(image);
+        return { success: true };
+      }
 
-  ipcMain.handle("Copy-Report", async (event, id: string) => {
-    const report = CacheManager.get().list.find(
-      (x) => x.reportNo.toString() == id
-    );
-    if (report) {
-      clipboard.writeImage(nativeImage.createFromPath(report.path));
-      return {
-        worked: true,
-        reportNo: report.reportNo.toString(),
-      };
-    } else {
-      return {
-        worked: false,
-      };
+
+      
+      
+    } catch (error) {
+      console.error("Error saving image:", error);
+      return { success: false, error: error };
     }
   });
 
@@ -112,53 +92,22 @@ export function reportsListeners() {
     return true;
   });
 
-  ipcMain.handle("Reverse-Report", async (event) => {
-    const report = CacheManager.pop();
-    if (report == undefined) return;
-    if (existsSync(report.path)) rm(report.path, () => {});
-    deleteSyncs(report.syncID);
+  ipcMain.handle("Get-Report-Details", async (event, id: string) => {
+    const token = await APLStorage.get("token");
+    const { data, error } = await EdenClient.user.report({ id }).get({
+      headers: { authorization: `Bearer ${token}` },
+    });
+    if (error) {
+      console.error("Error fetching report details:", error);
+      return null;
+    }
+
+    console.log("Report : " + JSON.stringify(data));
+    
+    return data as ReportData;
   });
 
-  ipcMain.handle("Get-Images", async (event, start, end) => {
-    const startTime = dayjs();
-    const scaleFactor = 0.05;
-    const images = await Promise.all(
-      CacheManager.get()
-        .list.filter((x) => x.reportNo != 0)
-        .reverse()
-        .slice(start, end)
-        .map(async (x, i) => {
-          const fileExists = await fsPromises
-            .access(x.path)
-            .then(() => true)
-            .catch(() => false);
-          let resizedBase64: string = "";
-          if (fileExists) {
-            // Read the image file
-            const file = await fsPromises.readFile(x.path);
-            const sharpFile = await sharp(file);
-            const metadata = await sharpFile.metadata();
+  ipcMain.handle("Reverse-Report", async (event) => {});
 
-            const height = Math.round((metadata.height ?? 0) * scaleFactor);
-            const width = Math.round((metadata.width ?? 0) * scaleFactor);
-
-            // Resize the image using sharp and convert it to base64
-            resizedBase64 = await sharpFile
-              .resize({ width: width, height: height }) // Resize
-              .toBuffer()
-              .then((buffer) => buffer.toString("base64")) // Convert buffer to base64
-              .catch((err) => {
-                throw new Error("Error resizing image");
-              });
-          }
-          return resizedBase64;
-        })
-    );
-    const endTime = dayjs();
-    console.log("Images took " + (endTime.diff(startTime, "ms") + " ms"));
-    return {
-      start: start,
-      images: images,
-    }; // Return the list of reports with resized image data
-  });
+  ipcMain.handle("Get-Images", async (event, start, end) => {});
 }

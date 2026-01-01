@@ -1,6 +1,7 @@
 import Elysia, { t } from "elysia";
-import { SocketManager } from "../socket/socketManager";
-import { sockToID } from "../socket/socketAuth";
+import { SocketManager } from "../sockets/manager";
+import { sockToID } from "../sockets/auth";
+import client from "../db/client";
 
 const metadataPingSchema = t.Object({
   request_type: t.Literal("POST"),
@@ -78,15 +79,21 @@ const current_Activities: Map<string, MiniActivity> = new Map<
 export const togglWebhook = new Elysia({ name: "toggl-webhook" }).post(
   "/webhooks/toggl",
   async ({ body, status }) => {
-    console.log(body);
     if (body.payload === "ping") {
       return !body.validation_code
         ? status(200)
         : { validation_code: body.validation_code };
     } else {
       const { action, event_user_id, model, workspace_id } = body.metadata;
+      const aplUser = await client.userConfig
+        .findFirst({
+          where: { togglUserId: event_user_id },
+          select: { user: true },
+        })
+        .user({ select: { id: true } });
       const payload = body.payload;
       if (action === "created") {
+        console.log("created activity", payload);
         if (payload.stop == undefined) {
           SocketManager.instance.send(event_user_id, "ActivityStart", {
             activity: payload.description,
@@ -101,15 +108,77 @@ export const togglWebhook = new Elysia({ name: "toggl-webhook" }).post(
         }
       }
 
-      if (
-        action === "updated" &&
-        current_Activities.get(event_user_id)?.id == payload.id
-      ) {
-        if (payload.stop != undefined) {
+      if (action === "updated") {
+        console.log("updated activity", payload);
+
+        // If it's the currently running activity, stop it in the socket manager
+        if (
+          current_Activities.get(event_user_id)?.id == payload.id &&
+          payload.stop != undefined
+        ) {
           SocketManager.instance.send(event_user_id, "ActivityStop", {
             id: payload.id,
           });
           current_Activities.delete(event_user_id);
+        }
+
+        // Upsert the activity in the database if it has a stop time
+        if (payload.stop != undefined && aplUser) {
+          const activity = await client.immersionActivity.findFirst({
+            where: { activityTogglId: payload.id.toString() },
+          });
+
+          if(activity){
+            await client.immersionActivity.update({
+              where: { id: activity.id },
+              data: {
+                activityName: payload.description,
+                seconds: payload.duration
+              },
+            }); 
+          }
+          else{
+            await client.immersionActivity.create({
+              data: {
+                userId: aplUser.id,
+                activityName: payload.description,
+                activityTogglId: payload.id.toString(),
+                createdAt: new Date(payload.start),
+                seconds: Math.floor(
+                  (new Date(payload.stop).getTime() -
+                    new Date(payload.start).getTime()) /
+                    1000
+                ),
+              },
+            });
+          }
+
+          const totalImmersion = await client.immersionActivity.aggregate({
+            where: { userId: aplUser.id },
+            _sum: { seconds: true },
+          });
+          console.log("total immersion", totalImmersion);
+        }
+      }
+
+      if (action === "deleted") {
+        try {
+          console.log("deleted activity", payload);
+
+          const activity = await client.immersionActivity.findFirst({
+            where: { activityTogglId: payload.id.toString() },
+          });
+
+          if (!activity) return; // Too old or happened while server was down and we didnt sync up yet (edge case of an edge case)
+
+          await client.immersionActivity.delete({
+            where: { id: activity.id },
+          });
+          console.log(`Deleted activity with Toggl ID: ${payload.id}`);
+        } catch (e) {
+          console.log(
+            `Failed to delete activity with Toggl ID: ${payload.id}. It might not exist.`
+          );
         }
       }
 
@@ -136,6 +205,8 @@ export function initTogglNotifications() {
         "ActivityStart",
         current_Activities.get(id)
       );
+    } else {
+      SocketManager.instance.send(id, "ClearActivity", {});
     }
   });
 }

@@ -1,26 +1,25 @@
-import { app, BrowserWindow, shell } from "electron";
+import { app, BrowserWindow, dialog, ipcMain, shell } from "electron";
 import { fileURLToPath } from "node:url";
 import registerEvents from "./Electron-Backend/";
 import path from "node:path";
 import os from "node:os";
 import { buildMenu } from "./Electron-App/MenuBuilder";
-import electronUpdater, { type AppUpdater } from "electron-updater";
+import electronUpdater from "electron-updater";
 import {
   buildContextMenu,
   createAppBackend,
+  FocusApp,
 } from "./Electron-Backend/appBackend";
-import { createAutoReport } from "./Electron-Backend/Reports/AutoReportGenerator";
 import { createAutoRPC } from "./Electron-Backend/RPC/RPCHandler";
+import { checkForUpdates } from "./Electron-Backend/globalListeners";
 import {
   getConfig,
   getFileInAPLData,
 } from "../../apl-backend/Helpers/getConfig";
 import fs from "fs";
-import { CacheManager } from "../../apl-backend/Helpers/cache";
 import checkHealth from "./Electron-App/HealthCheck";
-import { init } from "@bokuweb/zstd-wasm";
 import { SocketClient } from "./Electron-Backend/Socket/SocketClient";
-import { dialog } from "electron";
+
 import {
   Browser,
   detectBrowserPlatform,
@@ -28,26 +27,49 @@ import {
   install,
   resolveBuildId,
 } from "@puppeteer/browsers";
+import { initializeDeepLink } from "./Electron-Backend/DeepLink";
+import { config as dotenvConfig } from "dotenv";
+import { initializeApiManager } from "./Electron-Backend/api/ApiManager";
+import { Logger } from "../../apl-backend/Helpers/Log";
+import { init } from "@bokuweb/zstd-wasm";
+import { APLStorage } from "./Electron-Backend/util/auth";
+import { VersionManager } from "../../apl-backend/Helpers/VersionManager";
+
+const isProd = app.isPackaged;
+
+// When packaged, use the correct path relative to the `.asar`
+const envPath = isProd
+  ? path.join(process.resourcesPath, "app.asar.unpacked", ".env.production")
+  : path.resolve(".env");
+
+Logger.log(`Loading ${envPath}`, "ENV");
+if (fs.existsSync(envPath)) {
+  dotenvConfig({ path: envPath });
+  Logger.log(`SERVER_URL = ${process.env.SERVER_URL}`, "ENV");
+  (async () => {
+    Logger.log("AUTHORIZATION = " + (await APLStorage.get("token")), "ENV");
+  })();
+} else {
+  Logger.log(`Missing .env file at ${envPath}`, "ENV");
+}
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+initializeApiManager();
 registerEvents();
 
-// The built directory structure
-//
-// ├─┬ dist-electron
-// │ ├─┬ main
-// │ │ └── index.js    > Electron-Main
-// │ └─┬ preload
-// │   └── index.mjs   > Preload-Scripts
-// ├─┬ dist
-// │ └── index.html    > Electron-Renderer
-//
-process.env.APP_ROOT = path.join(__dirname, "../..");
+// In production (packaged), __dirname is inside app.asar at app.asar/dist/main/
+// In development, __dirname is at electron/main/ (after build) or out/ directory structure
+process.env.APP_ROOT = isProd
+  ? process.resourcesPath  // Points to app.asar and app.asar.unpacked parent
+  : path.join(__dirname, "../..");
 
 export const MAIN_DIST = path.join(process.env.APP_ROOT, "dist-electron");
-export const RENDERER_DIST = path.join(process.env.APP_ROOT, "dist");
-export const VITE_DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL;
+// Renderer files are built to out/renderer/ by electron-vite
+export const RENDERER_DIST = isProd
+  ? path.join(process.resourcesPath, "app.asar", "out", "renderer")
+  : path.join(process.env.APP_ROOT, "out/renderer");
+export const VITE_DEV_SERVER_URL = process.env.ELECTRON_RENDERER_URL;
 
 process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL
   ? path.join(process.env.APP_ROOT, "public")
@@ -59,19 +81,16 @@ if (os.release().startsWith("6.1")) app.disableHardwareAcceleration();
 // Set application name for Windows 10+ notifications
 if (process.platform === "win32") app.setAppUserModelId(app.getName());
 
-if (!VITE_DEV_SERVER_URL) {
-  if (!app.requestSingleInstanceLock()) {
-    console.log("dead");
-    app.quit();
-    process.exit(0);
-  }
+if (!app.requestSingleInstanceLock()) {
+  Logger.log("App already running");
+  app.quit();
+  process.exit(0);
 }
 
 export let win: BrowserWindow | null = null;
-const preload = path.join(__dirname, "../preload/index.mjs");
+const preload = path.join(__dirname, "../preload/index.js");
 export const indexHtml = path.join(RENDERER_DIST, "index.html");
 export async function createWindow() {
-  console.log("creating window");
   win = new BrowserWindow({
     show: true,
     minHeight: 600,
@@ -90,8 +109,8 @@ export async function createWindow() {
     if (process.env.NODE_ENV !== "development") {
       win?.show();
     } else {
-      win?.showInactive();
-      win?.blur();
+      // win?.showInactive();
+      // win?.blur();
     }
   });
   win.setMenuBarVisibility(false);
@@ -99,7 +118,6 @@ export async function createWindow() {
     // #298
     win.loadURL(VITE_DEV_SERVER_URL);
     // Open devTool if the app is not packaged
-    console.log("opening devt");
     win.webContents.openDevTools();
   } else {
     win.loadFile(indexHtml);
@@ -119,6 +137,24 @@ export async function createWindow() {
   buildContextMenu();
 }
 
+// Handle protocol URLs on macOS when app is already running or launched with URL
+app.on("open-url", async (event, url) => {
+  event.preventDefault();
+  
+  if (url.startsWith("apl://")) {
+    Logger.log(`Received deep link: ${url}`, "DeepLink");
+    
+    // If window doesn't exist yet, wait for it to be created
+    if (!win) {
+      await createWindow();
+    }
+    
+    // Focus the window and send the URL to renderer
+    await FocusApp();
+    win?.webContents.send("open-url", url);
+  }
+});
+
 app
   .whenReady()
   .then(async () => {
@@ -128,8 +164,14 @@ app
       process.argv.includes("was-opened-at-login")
     ) {
       win?.destroy();
-      console.log("App opened at login but window not created");
       return;
+    }
+    
+    // Check if app was launched with a protocol URL (e.g., from email link)
+    const protocolUrl = process.argv.find(arg => arg.startsWith("apl://"));
+    if (protocolUrl && win) {
+      Logger.log(`Launched with deep link: ${protocolUrl}`, "DeepLink");
+      win.webContents.send("open-url", protocolUrl);
     }
   })
   .then(createAppBackend);
@@ -147,20 +189,24 @@ app.on("window-all-closed", () => {
 
 app.on("second-instance", async (evt, cmd, wd) => {
   if (VITE_DEV_SERVER_URL) return;
-  if (win) {
-    if (process.platform == "darwin") {
-      app.dock?.show();
-    } else if (process.platform == "win32" && !win?.isDestroyed) {
-      win?.setSkipTaskbar(false);
+  
+  // Find a protocol URL in the command-line arguments
+  // This is especially important for Linux and Windows where the second instance
+  // receives the URL via command-line arguments.
+  const protocolUrl = cmd.find(arg => arg.startsWith("apl://"));
+  if (protocolUrl) {
+    Logger.log(`Received deep link via second-instance: ${protocolUrl}`, "DeepLink");
+    if (!win) {
+      await createWindow();
     }
-    if (win?.isDestroyed()) await createWindow();
-    if (win?.isMinimized()) win.restore();
-    win?.focus();
-    buildContextMenu();
+    await FocusApp();
+    win?.webContents.send("open-url", protocolUrl);
+  } else if (win) {
+    FocusApp();
   }
+  
+  buildContextMenu();
 });
-
-app.on("open-url", (event, url) => {});
 
 app.on("activate", () => {
   const allWindows = BrowserWindow.getAllWindows();
@@ -172,7 +218,7 @@ app.on("activate", () => {
       app.getLoginItemSettings().wasOpenedAtLogin ||
       process.argv.includes("was-opened-at-login")
     ) {
-      console.log("App opened at login but window not created");
+      Logger.log("App opened at login but window not created");
       win?.destroy();
       return;
     }
@@ -180,33 +226,50 @@ app.on("activate", () => {
 });
 
 app.on("ready", async () => {
-  if (CacheManager.verifyVersion()) {
+  // Register as default protocol client for apl:// URLs
+  // This ensures that email links open AutoProgressLog instead of a generic Electron app
+  if (!app.isDefaultProtocolClient("apl")) {
+    const registered = app.setAsDefaultProtocolClient("apl");
+    Logger.log(
+      `Protocol registration for apl:// ${registered ? "successful" : "failed"}`,
+      "Protocol"
+    );
+  }
+
+  if (await VersionManager.verifyVersion()) {
     await checkHealth(getConfig());
   }
 
+  if (!VersionManager.exists()) {
+    await VersionManager.init();
+    
+  }
+
+  // ZFSTD
   await init();
 
-  if (CacheManager.exists) {
+  const ver = await VersionManager.verifyVersion();
+  console.log("ver : " + ver);
+  console.log("setupComplete : " + (await APLStorage.get("setupComplete")));  
+  if ((await APLStorage.get("setupComplete")) && ver) {
     try {
+      console.log("Trying to init socket client");
       // TODO : Add an API call to create the webhook
-
-      // Create the socket client, accessible through the singleton
-      console.log("Waiting for init...");
       await new SocketClient().init({
-        token: getConfig()?.toggl.togglToken ?? "",
+        token: (await APLStorage.get("token")) as string,
       });
-      console.log("Init done");
     } catch (e) {
-      console.log("Failed to init socket client");
-      console.log(e);
+      Logger.log("Failed to init socket client", "Socket");
+      Logger.log(e, "Socket");
     }
   }
 
   buildMenu(app);
-  createAutoReport();
   createAutoRPC();
   electronUpdater.autoUpdater.forceDevUpdateConfig = true;
   electronUpdater.autoUpdater.autoDownload = false;
+
+  checkForUpdates();
 
   const logFile = getFileInAPLData("app.log");
   const logStream = fs.createWriteStream(logFile, { flags: "a" });
@@ -222,27 +285,14 @@ app.on("ready", async () => {
     );
     process.stderr.write(args.join(" ") + "\n");
   };
-
   const isDev = process.env.NODE_ENV === "development";
-
-  // TODO : Make this into a setting
   if (!app.getLoginItemSettings().openAtLogin && !isDev) {
     app.setLoginItemSettings({
       openAtLogin: !isDev,
       args: ["was-opened-at-login"],
     });
   }
-
-  // Register the APL protocol
-  if (process.defaultApp && !isDev) {
-    if (process.argv.length >= 2) {
-      app.setAsDefaultProtocolClient("apl", process.execPath, [
-        path.resolve(process.argv[1]),
-      ]);
-    }
-  } else {
-    app.setAsDefaultProtocolClient("apl");
-  }
+  await initializeDeepLink();
 });
 
 (async () => {

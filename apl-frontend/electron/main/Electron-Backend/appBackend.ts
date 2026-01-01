@@ -2,14 +2,28 @@ import { app, Menu, nativeImage, Notification, shell, Tray } from "electron";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { runChecks } from "./DashboardListeners";
+import { checkForUpdates } from "./globalListeners";
 import { runGeneration } from "../../../apl-backend/generate/generate";
 import { createWindow, win } from "..";
 import { setSyncing } from "../../../apl-backend/generate/sync";
 import { getConfig } from "../../../apl-backend/Helpers/getConfig";
+import { upgrading } from "../../../apl-backend/apl-upgrade";
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 let tray: Tray;
+
+export async function FocusApp() {
+  if (process.platform == "darwin") {
+    app.dock?.show();
+  } else if (process.platform == "win32" && !win?.isDestroyed) {
+    win?.setSkipTaskbar(false);
+  }
+  if (win?.isDestroyed()) await createWindow();
+  if (win?.isMinimized()) win.restore();
+  win?.focus();
+}
 
 export async function buildContextMenu() {
   const contextMenu = Menu.buildFromTemplate([
@@ -18,19 +32,12 @@ export async function buildContextMenu() {
       enabled: true,
       type: "normal",
       click: async () => {
-        if (process.platform == "darwin") {
-          app.dock?.show();
-        } else if (process.platform == "win32" && !win?.isDestroyed) {
-          win?.setSkipTaskbar(false);
-        }
-        if (win?.isDestroyed()) await createWindow();
-        if (win?.isMinimized()) win.restore();
-        win?.focus();
+        await FocusApp();
       },
     },
     {
       label: "Generate report",
-      enabled: getConfig() != undefined,
+      enabled: getConfig() != undefined && !upgrading,
       type: "normal",
       click: async () => {
         if (await runChecks()) {
@@ -44,6 +51,14 @@ export async function buildContextMenu() {
       enabled: !win?.isDestroyed(),
       click: () => {
         win?.destroy();
+      },
+    },
+    {
+      label: "Check for updates",
+      type: "normal",
+      enabled: true,
+      click: () => {
+        checkForUpdates();
       },
     },
     {

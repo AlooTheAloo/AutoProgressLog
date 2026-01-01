@@ -8,6 +8,7 @@ import Calendar from "../../assets/Icons/calendar.png";
 
 import AppSmallWidget from "./AppSmallWidget.vue";
 import { computed } from "vue";
+//@ts-ignore
 import pluralize from "pluralize";
 import ImmersionSources from "./ImmersionSources.vue";
 import Skeleton from "primevue/skeleton";
@@ -124,7 +125,8 @@ const bottomText = computed(() => {
               units="%"
               :value="{
                 current: dto.ankiDTO.retentionRate.toFixed(2),
-                delta: dto.ankiDTO.retentionRateDelta.toString(),
+                delta:
+                  dto.ankiDTO.retentionRateDelta.toFixed(2).toString() + '%',
               }"
               :image="Brain"
               :direction="dto.ankiDTO.retentionRateDelta"
@@ -163,9 +165,9 @@ const bottomText = computed(() => {
                 :transition="{
                   delay: 0.1,
                 }"
-                class="flex flex-col flex-grow h-36 bg-black rounded-xl items-center justify-center text-white text-center"
+                class="flex flex-col flex-grow h-36 bg-[#ebebec] dark:bg-black rounded-xl items-center justify-center text-center dark:text-white text-black"
               >
-                <div class="font-semibold text-2xl">Want more data?</div>
+                <div class="font-semibold text-2xl ">Want more data?</div>
                 <div class="">
                   Enable anki integration in the settings page to see your
                   statistics.
@@ -191,7 +193,10 @@ const bottomText = computed(() => {
         }"
         class="flex-grow flex justify-start w-[45rem] h-[25rem] 1720:w-full gap-3"
       >
-        <ImmersionSources :sources="dto.immersionDTO.immersionSources" />
+        <ImmersionSources
+          :sources="dto.immersionDTO.immersionSources"
+          :lastSyncTime="dto.lastSyncTime"
+        />
         <ImmersionStreak :streak="dto.immersionDTO.immersionStreak" />
       </motion.div>
     </div>

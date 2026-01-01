@@ -1,51 +1,43 @@
 <script setup lang="ts">
-import { ref } from "vue";
 import help from "../../../assets/Icons/help.png";
 import DatePicker from "primevue/datepicker";
 
 const props = defineProps<{
   label: string;
-  value?: Date;
-  password?: boolean;
-  options?: any;
+  modelValue?: Date;
   disabled?: boolean;
   placeholder?: string;
   helpText?: string;
 }>();
 
-const emit = defineEmits(["update:value"]);
-
-function updateValue(value: any) {
-  emit("update:value", value);
-}
-
-const value = ref<Date>(props.value ?? new Date());
+const emit = defineEmits<{
+  (e: "update:modelValue", value: Date | null): void;
+}>();
 </script>
 
 <template>
   <div class="flex items-center gap-10 w-full h-12">
     <div class="flex h-full items-center gap-2 w-64">
-      <p>
-        {{ label }}
-      </p>
+      <p>{{ label }}</p>
       <div class="h-full w-4">
         <img
-          v-if="props.helpText != undefined"
-          v-tooltip.top="props.helpText"
-          place
+          v-if="helpText != undefined"
+          v-tooltip.top="helpText"
           :src="help"
           class="h-4 w-4 mt-2"
         />
       </div>
     </div>
+
     <DatePicker
       :disabled="disabled"
-      @update:model-value="updateValue"
+      :model-value="modelValue"
+      @update:model-value="emit('update:modelValue', $event as Date | null)"
       hour-format="12"
       class="h-12"
       id="datepicker-timeonly"
-      :default-value="props.value"
       timeOnly
+      :placeholder="placeholder"
     />
   </div>
 </template>

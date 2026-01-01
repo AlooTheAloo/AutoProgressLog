@@ -1,7 +1,7 @@
 import { createApp } from "vue";
 import { dialog } from "./util/DialogRenderer/dialog";
 import App from "./App.vue";
-import { createMemoryHistory, createRouter, RouteRecordRaw } from "vue-router";
+import { createMemoryHistory, createRouter } from "vue-router";
 import "./style.css";
 import PrimeVue from "primevue/config";
 import Aura from "@primevue/themes/aura";
@@ -18,6 +18,7 @@ import ToastService from "primevue/toastservice";
 import ConfirmationService from "primevue/confirmationservice";
 import VueWriter from "vue-writer";
 import VueApexCharts from "vue3-apexcharts";
+import localizedFormat from "dayjs/plugin/localizedFormat";
 
 const router = createRouter({
   history: createMemoryHistory(),
@@ -75,6 +76,8 @@ const Noir = definePreset(Aura, {
 dayjs.extend(duration);
 dayjs.extend(relativeTime);
 dayjs.extend(advancedFormat);
+dayjs.extend(localizedFormat);
+
 
 const app = createApp(App);
 

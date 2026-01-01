@@ -4,15 +4,15 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { ReportData, TPlusDelta } from "../types/reportdata.js";
 import dayjs from "dayjs";
-import { outputOptions, ReportExtension } from "../types/options.js";
+import { OutputOptions, ReportExtension } from "../types/options.js";
 import { arithmeticWeightedMean } from "./util.js";
 import { getConfig } from "./getConfig.js";
-import color from "color";
-import { Layout } from "../apl-visuals/src/types/report-data.js";
 import { app } from "electron";
 import playwright, { Page } from "playwright";
 import { Browser, getInstalledBrowsers } from "@puppeteer/browsers";
-
+import { Logger } from "./Log.js";
+import { Layout } from "../../src/pages/Report/src/types/report-data.js";
+import color from "color";
 declare global {
   interface Window {
     apl_ReportData: ReportData;
@@ -41,7 +41,7 @@ export async function getChromiumExecPath() {
 }
 
 export async function buildImage(
-  options: outputOptions,
+  options: OutputOptions,
   height: number = 1775,
   reportData: ReportData,
   reportLayout: Layout
@@ -61,30 +61,33 @@ export async function buildImage(
     executablePath: execpath,
   });
 
-  console.log(11.2);
   const page = await browser.newPage();
-  console.log(11.3);
 
   // 1) Log browser console messages:
   page.on("console", (msg) => {
-    console.log(`⮞ console.${msg.type()}: ${msg.text()}`);
+    Logger.log(`${msg.type()}: ${msg.text()}`, "Playwright");
   });
 
   // 2) Log unhandled exceptions in the page context:
   page.on("pageerror", (error) => {
-    console.error("⮞ pageerror:", error);
+    Logger.log(`${error}`, "Playwright");
   });
 
   // 3) Log any failed network requests:
   page.on("requestfailed", (request) => {
-    console.warn(
-      `⮞ requestfailed: ${request.url()} — ${request.failure()?.errorText}`
+    Logger.log(
+      `Request failed : ${request.url()} — ${request.failure()?.errorText}`,
+      "Playwright"
     );
   });
 
   // 4) (Optional) Log all network requests/responses
-  page.on("request", (r) => console.log("⮞ request:", r.method(), r.url()));
-  page.on("response", (r) => console.log("⮞ response:", r.status(), r.url()));
+  page.on("request", (r) =>
+    Logger.log(`Request: ${r.method()} ${r.url()}`, "Playwright")
+  );
+  page.on("response", (r) =>
+    Logger.log(`Response: ${r.status()} ${r.url()})`, "Playwright")
+  );
 
   await page.addInitScript(
     ([data, layout]) => {
@@ -94,14 +97,10 @@ export async function buildImage(
     [reportData, reportLayout]
   );
 
-  console.log(11.4);
-
   await page.setViewportSize({
     width: Math.round((2000 * options.outputQuality) / 2),
     height, // ← use the same `height` you’ll pass to tryScreenshot
   });
-
-  console.log(11.5);
 
   const isDev = process.env.NODE_ENV === "development";
 
@@ -124,24 +123,17 @@ export async function buildImage(
         "index.html"
       );
 
-  console.log(`file:${visualsPath}`);
   await page.goto(`file:${visualsPath}`, { waitUntil: "networkidle" });
-  console.log(11.7);
 
   await tryScreenshot(
     page,
     outputPath as any,
     { width: 1586, height, x: 0, y: 0 },
     extensionToType(options.outputFile.extension),
-    3, // maxRetries
-    30_000 // timeoutMs (30 s — Puppeteer default is 30 s anyway)
+    3,
+    30_000
   );
-
-  console.log(11.8);
-
   await browser.close();
-  console.log(11.9);
-
   return outputPath;
 }
 
@@ -192,151 +184,148 @@ interface builderDTO {
   bestSeconds: TPlusDelta<number>;
 }
 
-export function buildJSON(
-  ankiData: ankiData,
-  allEvents: relativeActivity[],
-  lastCaches: cache[],
-  builderDTO: builderDTO
-): ReportData {
-  const options = getConfig();
-  if (options == undefined) throw new Error("No config found");
+// export async function buildJSON(
+//   ankiData: ankiData,
+//   allEvents: relativeActivity[],
+//   lastCaches: cache[],
+//   builderDTO: builderDTO
+// ): Promise<ReportData> {
+//   const options = await getConfig();
+//   if (options == undefined) throw new Error("No config found");
 
-  const date = dayjs();
-  const lastCache = lastCaches[0];
-  const reportNo = lastCache.reportNo + 1;
+//   const date = dayjs();
+//   const lastCache = lastCaches[0];
+//   const reportNo = lastCache.reportNo + 1;
 
-  let ankiDelta = 0;
-  let ankiStreak = 0;
-  let ankiScore = 0;
+//   let ankiDelta = 0;
+//   let ankiStreak = 0;
+//   let ankiScore = 0;
 
-  if (options.anki.enabled) {
-    ankiDelta = ankiData.reviewCount - lastCache.totalCardsStudied;
-    ankiStreak =
-      lastCache.ankiStreak + (ankiDelta == 0 ? -lastCache.ankiStreak : 1);
-    ankiScore =
-      ankiDelta +
-      (lastCache.mature == 0 || reportNo == 1
-        ? 0
-        : Math.max(ankiData.matureCount - (lastCache.mature ?? 0), 0) * 100);
-  }
+//   if (options.serverOptions.ankiOptions.enabled) {
+//     ankiDelta = ankiData.reviewCount - lastCache.totalCardsStudied;
+//     ankiStreak =
+//       lastCache.ankiStreak + (ankiDelta == 0 ? -lastCache.ankiStreak : 1);
+//     ankiScore =
+//       ankiDelta +
+//       (lastCache.mature == 0 || reportNo == 1
+//         ? 0
+//         : Math.max(ankiData.matureCount - (lastCache.mature ?? 0), 0) * 100);
+//   }
 
-  const immersionStreak =
-    lastCache.immersionStreak +
-    (builderDTO.timeToAdd == 0 ? -lastCache.immersionStreak : 1);
+//   const immersionStreak =
+//     lastCache.immersionStreak +
+//     (builderDTO.timeToAdd == 0 ? -lastCache.immersionStreak : 1);
 
-  let lastnElements = lastCaches
-    .filter((x) => x.reportNo != 0)
-    .slice(0, MOVING_AVERAGE_SIZE)
-    .map((x) => x.seconds);
-  const oldAverage = arithmeticWeightedMean(lastnElements);
-  console.log("LastnElements are " + JSON.stringify(lastnElements));
-  const newnElements = [
-    builderDTO.timeToAdd,
-    ...lastnElements.slice(0, MOVING_AVERAGE_SIZE - 1),
-  ];
-  console.log("NewnElements are " + JSON.stringify(newnElements));
+//   let lastnElements = lastCaches
+//     .filter((x) => x.reportNo != 0)
+//     .slice(0, MOVING_AVERAGE_SIZE)
+//     .map((x) => x.seconds);
+//   const oldAverage = arithmeticWeightedMean(lastnElements);
+//   const newnElements = [
+//     builderDTO.timeToAdd,
+//     ...lastnElements.slice(0, MOVING_AVERAGE_SIZE - 1),
+//   ];
+//   const newAverage = arithmeticWeightedMean(newnElements);
 
-  const newAverage = arithmeticWeightedMean(newnElements);
+//   const ImmersionScore = builderDTO.timeToAdd;
+//   const TotalScore = ImmersionScore + (ankiScore ?? 0);
 
-  const ImmersionScore = builderDTO.timeToAdd;
-  const TotalScore = ImmersionScore + (ankiScore ?? 0);
-
-  const reportData: ReportData = {
-    reportNo: reportNo,
-    time: `Generated on the ${date.format("Do")} of ${date
-      .format("MMMM")
-      .toLowerCase()} ${date.format("YYYY")} at ${date.format("HH:mm")}`,
-    matureCards: [
-      {
-        reportNo: reportNo,
-        matureCardCount: ankiData.matureCount,
-      },
-      ...lastCaches
-        .slice(0, MATURE_HISTORY - 1)
-        .filter((x) => x.reportNo != 0)
-        .map((x) => {
-          return {
-            reportNo: x.reportNo,
-            matureCardCount: x.mature ?? 0,
-          };
-        }),
-    ],
-    retentionRate: {
-      current: ankiData.retention,
-      delta: ankiData.retention - (lastCache.retention ?? 0),
-    },
-    totalReviews: {
-      current: ankiData.reviewCount,
-      delta: ankiDelta,
-    },
-    AnkiStreak: {
-      current: ankiStreak,
-      delta: ankiStreak - lastCache.ankiStreak,
-    },
-    AnkiData: [
-      {
-        reportNo: reportNo,
-        value: ankiDelta,
-      },
-      ...lastCaches
-        .slice(0, 24)
-        .filter((x) => x.reportNo != 0)
-        .map((x) => {
-          return {
-            reportNo: x.reportNo,
-            value: x.cardsStudied ?? 0,
-          };
-        }),
-    ],
-    ImmersionTime: {
-      current: Math.floor(
-        (builderDTO.timeToAdd + lastCache.totalSeconds) / 3600
-      ),
-      delta:
-        Math.floor((builderDTO.timeToAdd + lastCache.totalSeconds) / 3600) -
-        Math.floor(lastCache.totalSeconds / 3600),
-    },
-    AverageImmersionTime: {
-      current: newAverage,
-      delta: newAverage - oldAverage,
-    },
-    MonthlyImmersion: builderDTO.monthTime,
-    BestImmersion: builderDTO.bestSeconds,
-    ImmersionLog: allEvents,
-    ImmersionData: [
-      {
-        reportNo: reportNo,
-        value: builderDTO.timeToAdd,
-      },
-      ...lastCaches
-        .slice(0, 24)
-        .filter((x) => x.reportNo != 0)
-        .map((x) => {
-          return {
-            reportNo: x.reportNo,
-            value: x.seconds ?? 0,
-          };
-        }),
-    ],
-    ImmersionStreak: {
-      current: immersionStreak,
-      delta: immersionStreak - lastCache.immersionStreak,
-    },
-    ImmersionScore: ImmersionScore,
-    AnkiScore: ankiScore,
-    TotalScore: TotalScore,
-    lastDaysPoints: cumulativeSum(
-      [
-        TotalScore,
-        ...lastCaches
-          .slice(0, 9)
-          .filter((x) => x.reportNo != 0)
-          .map((x) => x.score),
-      ].reverse()
-    ),
-  };
-  return reportData;
-}
+//   const reportData: ReportData = {
+//     reportNo: reportNo,
+//     time: `Generated on the ${date.format("Do")} of ${date
+//       .format("MMMM")
+//       .toLowerCase()} ${date.format("YYYY")} at ${date.format("HH:mm")}`,
+//     matureCards: [
+//       {
+//         reportNo: reportNo,
+//         matureCardCount: ankiData.matureCount,
+//       },
+//       ...lastCaches
+//         .slice(0, MATURE_HISTORY - 1)
+//         .filter((x) => x.reportNo != 0)
+//         .map((x) => {
+//           return {
+//             reportNo: x.reportNo,
+//             matureCardCount: x.mature ?? 0,
+//           };
+//         }),
+//     ],
+//     retentionRate: {
+//       current: ankiData.retention,
+//       delta: ankiData.retention - (lastCache.retention ?? 0),
+//     },
+//     totalReviews: {
+//       current: ankiData.reviewCount,
+//       delta: ankiDelta,
+//     },
+//     AnkiStreak: {
+//       current: ankiStreak,
+//       delta: ankiStreak - lastCache.ankiStreak,
+//     },
+//     AnkiData: [
+//       {
+//         reportNo: reportNo,
+//         value: ankiDelta,
+//       },
+//       ...lastCaches
+//         .slice(0, 24)
+//         .filter((x) => x.reportNo != 0)
+//         .map((x) => {
+//           return {
+//             reportNo: x.reportNo,
+//             value: x.cardsStudied ?? 0,
+//           };
+//         }),
+//     ],
+//     ImmersionTime: {
+//       current: Math.floor(
+//         (builderDTO.timeToAdd + lastCache.totalSeconds) / 3600
+//       ),
+//       delta:
+//         Math.floor((builderDTO.timeToAdd + lastCache.totalSeconds) / 3600) -
+//         Math.floor(lastCache.totalSeconds / 3600),
+//     },
+//     AverageImmersionTime: {
+//       current: newAverage,
+//       delta: newAverage - oldAverage,
+//     },
+//     MonthlyImmersion: builderDTO.monthTime,
+//     BestImmersion: builderDTO.bestSeconds,
+//     ImmersionLog: allEvents,
+//     ImmersionData: [
+//       {
+//         reportNo: reportNo,
+//         value: builderDTO.timeToAdd,
+//       },
+//       ...lastCaches
+//         .slice(0, 24)
+//         .filter((x) => x.reportNo != 0)
+//         .map((x) => {
+//           return {
+//             reportNo: x.reportNo,
+//             value: x.seconds ?? 0,
+//           };
+//         }),
+//     ],
+//     ImmersionStreak: {
+//       current: immersionStreak,
+//       delta: immersionStreak - lastCache.immersionStreak,
+//     },
+//     ImmersionScore: ImmersionScore,
+//     AnkiScore: ankiScore,
+//     TotalScore: TotalScore,
+//     lastDaysPoints: cumulativeSum(
+//       [
+//         TotalScore,
+//         ...lastCaches
+//           .slice(0, 9)
+//           .filter((x) => x.reportNo != 0)
+//           .map((x) => x.score),
+//       ].reverse()
+//     ),
+//   };
+//   return reportData;
+// }
 
 const LAYOUT_FULL = [
   ["mature", "ankidata", "ankistreak"],
@@ -354,7 +343,7 @@ export type layout = {
 };
 
 export async function buildLayout(): Promise<layout | undefined> {
-  const config = getConfig();
+  const config = await getConfig();
   if (config == undefined) return;
 
   let gradient: string[] = [];
@@ -386,7 +375,7 @@ export async function buildLayout(): Promise<layout | undefined> {
     gradient = ["#FF0000", "#D57AFF", "#74B4FF"];
   }
 
-  if (config.anki.enabled) {
+  if (config.serverOptions.ankiOptions.enabled) {
     return {
       layout: LAYOUT_FULL,
       gradient: gradient,

@@ -20,6 +20,14 @@ export const setupRoutes = [
     component: () => import("../Setup/Other/SetupIndex.vue"),
   },
   {
+    path: "/setup/auth",
+    component: () => import("../Setup/Auth/Setup-Auth.vue"),
+  },
+  {
+    path: "/setup/auth-success",
+    component: () => import("../Setup/Auth/Auth-Success.vue"),
+  },
+  {
     path: "/setup/client-server-selection",
     component: () => import("../Setup/Other/Setup-client-server-selection.vue"),
   },
@@ -58,10 +66,6 @@ export const setupRoutes = [
   {
     path: "/setup/anki-decks",
     component: () => import("../Setup/Anki/AnkiDeckSelect.vue"),
-  },
-  {
-    path: "/setup/anki-reading",
-    component: () => import("../Setup/Anki/AnkiReading.vue"),
   },
   {
     path: "/setup/pick-filename",

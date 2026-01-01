@@ -2,7 +2,6 @@
 import { useRouter } from "vue-router";
 import Logo from "../../assets/Logo.png";
 import LogoDark from "../../assets/Logo-Dark.png";
-import Tooltip from "primevue/tooltip";
 import { appPath as AppPath } from "../../pages/routes/appRoutes";
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import Dialog from "primevue/dialog";
@@ -13,6 +12,7 @@ import {
   Statistics,
   Settings,
   Help,
+  Tools,
 } from "../../assets/Icons/Sidebar/Icons";
 import UserDialog from "../../../types/UserDialog";
 import { UpdateInfo } from "electron-updater";
@@ -45,6 +45,11 @@ const routes: route[] = [
     image: Reports,
     name: "Reports",
   },
+  // {
+  //   path: "/app/utilities",
+  //   image: Tools,
+  //   name: "Utilities",
+  // },
   {
     image: Competitions,
     name: "Competitions",
@@ -87,6 +92,7 @@ const handleClick = (path: string | undefined) => {
 
 const props = defineProps<{
   currentRoute: AppPath;
+  showSidebar: boolean | null;
 }>();
 
 const updateInfo = ref<UpdateInfo | null>(null);
@@ -94,11 +100,11 @@ const glow = ref<boolean>(false);
 
 onMounted(() => {
   window.ipcRenderer.invoke("GetConfig").then((data: Options) => {
-    console.log(data);
-    glow.value = data.appearance.glow;
+    if (data == null) return;
+    glow.value = data.localOptions.appearance.glow;
   });
   window.ipcRenderer.on("config-change", (e, args: Options) => {
-    glow.value = args.appearance.glow;
+    glow.value = args.localOptions.appearance.glow;
   });
 
   window.ipcRenderer.on("ShowDialog", (evt, args: UserDialog) => {
@@ -227,6 +233,7 @@ const toastValue = ref<UserDialog>();
         'w-20': !sidebarState,
         'w-48': sidebarState,
       }"
+      v-if="props.showSidebar ?? false"
     >
       <motion.div
         layoutRoot
@@ -285,7 +292,7 @@ const toastValue = ref<UserDialog>();
           v-tooltip.right="route.path == null ? 'Coming soon!' : undefined"
           :key="route.path"
           class="rounded-[5px] px-4 py-1 flex items-center gap-2 w-full transition-all duration-200"
-          v-on:click="(e) => handleClick(route.path)"
+          v-on:click="(e: MouseEvent) => handleClick(route.path)"
           @click.stop
           :tabindex="route.path == null ? -1 : 0"
         >
@@ -336,7 +343,7 @@ const toastValue = ref<UserDialog>();
           }"
           :key="route.path"
           class="rounded-[5px] px-4 py-1 flex items-center gap-2 w-full transition-all duration-200"
-          v-on:click="(e) => handleClick(route.path)"
+          v-on:click="(e: MouseEvent) => handleClick(route.path)"
           @click.stop
         >
           <img :src="route.image" class="invert dark:invert-0 w-6 h-6" />

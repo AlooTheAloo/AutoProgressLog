@@ -27,6 +27,7 @@ type DashboardImmersionSource = {
 const limit /* As x goes to infinity ∫sqrt(tan x) dx ??? */ = ref<number>(4);
 const props = defineProps<{
   sources: ImmersionSource[];
+  lastSyncTime?: string;
 }>();
 
 const totalHours = computed(() => {
@@ -52,9 +53,9 @@ watchEffect(() => {
 });
 
 const dateString = computed(() => {
-  const now = dayjs();
-  const start = now.subtract(30, "days");
-  const end = now;
+  const reference = props.lastSyncTime ? dayjs(props.lastSyncTime) : dayjs();
+  const start = reference.subtract(30, "days");
+  const end = reference;
 
   return `Data from ${start.format("D MMM YYYY")} - ${end.format(
     "D MMM YYYY"
@@ -62,7 +63,6 @@ const dateString = computed(() => {
 });
 
 const sortedSources = computed(() => {
-  console.log("time to sort" + computedSources.value);
   const sort = computedSources.value.sort(
     (a, b) => b.relativeValue - a.relativeValue
   );
@@ -80,7 +80,6 @@ const sortedSources = computed(() => {
       colorIndex: 727,
     });
   }
-  console.log("We're done !!" + arr);
   return arr
     .filter((x) => x.enabled)
     .map((x) => {
@@ -104,7 +103,7 @@ const colors = computed(() => {
 });
 
 let gradient = new NWayInterpol(
-  "var(--primary-color)",
+  "#8B61D0",
   "#73D562",
   "#D57AFF",
   "#F74E8F",
@@ -230,6 +229,7 @@ let series /* Literally a calculus reference */ = computed(() => {
 
       <!-- List Section -->
       <ul
+        style=""
         class="min-w-[21.5rem] 1720:flex hidden divide-black/60 dark:divide-white/60 w-fit mr-4 divide-y divide-dashed dark:text-white text-black flex-col justify-center"
       >
         <li

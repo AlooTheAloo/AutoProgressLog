@@ -25,7 +25,6 @@ const props = defineProps<{
 const emit = defineEmits(["update:value"]);
 
 function updateValue(value: any) {
-  console.log("Updating " + value);
   emit("update:value", value);
 }
 

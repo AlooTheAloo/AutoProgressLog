@@ -1,10 +1,14 @@
 import { SemVer } from "semver";
-import { win } from "../../../electron/main";
-import { DEFAULT_ANKI_URL } from "../../entry/AnkiHTTPClient";
+import { win } from "../../../../apl-frontend/electron/main";
 import { CacheManager } from "../../Helpers/cache";
-import { getConfig } from "../../Helpers/getConfig";
+import {
+  getConfig,
+  getLegacyConfig,
+  setLegacyConfig,
+} from "../../Helpers/getConfig";
 import { Options } from "../../types/options";
 import { setConfig } from "../../config/configManager";
+import { DEFAULT_ANKI_URL } from "../../anki/AnkiHTTPClient";
 
 interface previous_config {
   general: {
@@ -111,13 +115,13 @@ export default async function upgrade_1_0_1() {
   if (new SemVer(CacheManager.get().version).compare("1.0.1") > -1) {
     return;
   }
-  const config: previous_config = getConfig() as previous_config;
+  const config: previous_config = (await getLegacyConfig()) as previous_config;
   if (config == undefined) return;
 
   const hadIntegration = config.anki.ankiIntegration != undefined;
   delete config.anki.ankiIntegration;
 
-  const new_config: new_config = getConfig() as any as new_config;
+  const new_config: new_config = getLegacyConfig() as any as new_config;
   if (hadIntegration) {
     new_config.anki.ankiIntegration = {
       url: DEFAULT_ANKI_URL,
@@ -128,6 +132,6 @@ export default async function upgrade_1_0_1() {
     glow: true,
   };
 
-  setConfig(new_config);
+  setLegacyConfig(new_config);
   return;
 }

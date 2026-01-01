@@ -1,0 +1,441 @@
+import { t } from "elysia";
+
+import { __transformDate__ } from "./__transformDate__";
+
+import { __nullable__ } from "./__nullable__";
+
+export const ReportPlain = t.Object(
+  {
+    id: t.Integer(),
+    reportNo: t.Integer(),
+    userId: t.Integer(),
+    syncDataId: t.Integer(),
+    averageImmersionTime: t.Integer(),
+    bestImmersionTime: t.Integer(),
+  },
+  { additionalProperties: false },
+);
+
+export const ReportRelations = t.Object(
+  {
+    score: __nullable__(
+      t.Object(
+        {
+          id: t.Integer(),
+          immersionScore: t.Integer(),
+          ankiScore: t.Integer(),
+          totalScore: t.Integer(),
+          reportId: t.Integer(),
+        },
+        { additionalProperties: false },
+      ),
+    ),
+    streak: __nullable__(
+      t.Object(
+        {
+          id: t.Integer(),
+          ankiStreak: t.Integer(),
+          immersionStreak: t.Integer(),
+          reportId: t.Integer(),
+        },
+        { additionalProperties: false },
+      ),
+    ),
+    user: t.Object(
+      {
+        id: t.Integer(),
+        email: t.String(),
+        userName: __nullable__(t.String()),
+        profilePicture: __nullable__(t.String()),
+      },
+      { additionalProperties: false },
+    ),
+    syncData: t.Object(
+      {
+        id: t.Integer(),
+        generationTime: t.Date(),
+        userId: t.Integer(),
+        totalImmersionTime: t.Integer(),
+      },
+      { additionalProperties: false },
+    ),
+    metadata: __nullable__(
+      t.Object(
+        { id: t.Integer(), reportId: t.Integer(), hasAnki: t.Boolean() },
+        { additionalProperties: false },
+      ),
+    ),
+    immersionLog: t.Array(
+      t.Object(
+        {
+          id: t.Integer(),
+          activityName: t.String(),
+          seconds: t.Integer(),
+          reportId: t.Integer(),
+        },
+        { additionalProperties: false },
+      ),
+      { additionalProperties: false },
+    ),
+  },
+  { additionalProperties: false },
+);
+
+export const ReportPlainInputCreate = t.Object(
+  {
+    reportNo: t.Integer(),
+    averageImmersionTime: t.Integer(),
+    bestImmersionTime: t.Integer(),
+  },
+  { additionalProperties: false },
+);
+
+export const ReportPlainInputUpdate = t.Object(
+  {
+    reportNo: t.Optional(t.Integer()),
+    averageImmersionTime: t.Optional(t.Integer()),
+    bestImmersionTime: t.Optional(t.Integer()),
+  },
+  { additionalProperties: false },
+);
+
+export const ReportRelationsInputCreate = t.Object(
+  {
+    score: t.Optional(
+      t.Object(
+        {
+          connect: t.Object(
+            {
+              id: t.Integer({ additionalProperties: false }),
+            },
+            { additionalProperties: false },
+          ),
+        },
+        { additionalProperties: false },
+      ),
+    ),
+    streak: t.Optional(
+      t.Object(
+        {
+          connect: t.Object(
+            {
+              id: t.Integer({ additionalProperties: false }),
+            },
+            { additionalProperties: false },
+          ),
+        },
+        { additionalProperties: false },
+      ),
+    ),
+    user: t.Object(
+      {
+        connect: t.Object(
+          {
+            id: t.Integer({ additionalProperties: false }),
+          },
+          { additionalProperties: false },
+        ),
+      },
+      { additionalProperties: false },
+    ),
+    syncData: t.Object(
+      {
+        connect: t.Object(
+          {
+            id: t.Integer({ additionalProperties: false }),
+          },
+          { additionalProperties: false },
+        ),
+      },
+      { additionalProperties: false },
+    ),
+    metadata: t.Optional(
+      t.Object(
+        {
+          connect: t.Object(
+            {
+              id: t.Integer({ additionalProperties: false }),
+            },
+            { additionalProperties: false },
+          ),
+        },
+        { additionalProperties: false },
+      ),
+    ),
+    immersionLog: t.Optional(
+      t.Object(
+        {
+          connect: t.Array(
+            t.Object(
+              {
+                id: t.Integer({ additionalProperties: false }),
+              },
+              { additionalProperties: false },
+            ),
+            { additionalProperties: false },
+          ),
+        },
+        { additionalProperties: false },
+      ),
+    ),
+  },
+  { additionalProperties: false },
+);
+
+export const ReportRelationsInputUpdate = t.Partial(
+  t.Object(
+    {
+      score: t.Partial(
+        t.Object(
+          {
+            connect: t.Object(
+              {
+                id: t.Integer({ additionalProperties: false }),
+              },
+              { additionalProperties: false },
+            ),
+            disconnect: t.Boolean(),
+          },
+          { additionalProperties: false },
+        ),
+      ),
+      streak: t.Partial(
+        t.Object(
+          {
+            connect: t.Object(
+              {
+                id: t.Integer({ additionalProperties: false }),
+              },
+              { additionalProperties: false },
+            ),
+            disconnect: t.Boolean(),
+          },
+          { additionalProperties: false },
+        ),
+      ),
+      user: t.Object(
+        {
+          connect: t.Object(
+            {
+              id: t.Integer({ additionalProperties: false }),
+            },
+            { additionalProperties: false },
+          ),
+        },
+        { additionalProperties: false },
+      ),
+      syncData: t.Object(
+        {
+          connect: t.Object(
+            {
+              id: t.Integer({ additionalProperties: false }),
+            },
+            { additionalProperties: false },
+          ),
+        },
+        { additionalProperties: false },
+      ),
+      metadata: t.Partial(
+        t.Object(
+          {
+            connect: t.Object(
+              {
+                id: t.Integer({ additionalProperties: false }),
+              },
+              { additionalProperties: false },
+            ),
+            disconnect: t.Boolean(),
+          },
+          { additionalProperties: false },
+        ),
+      ),
+      immersionLog: t.Partial(
+        t.Object(
+          {
+            connect: t.Array(
+              t.Object(
+                {
+                  id: t.Integer({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+            disconnect: t.Array(
+              t.Object(
+                {
+                  id: t.Integer({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+          },
+          { additionalProperties: false },
+        ),
+      ),
+    },
+    { additionalProperties: false },
+  ),
+);
+
+export const ReportWhere = t.Partial(
+  t.Recursive(
+    (Self) =>
+      t.Object(
+        {
+          AND: t.Union([Self, t.Array(Self, { additionalProperties: false })]),
+          NOT: t.Union([Self, t.Array(Self, { additionalProperties: false })]),
+          OR: t.Array(Self, { additionalProperties: false }),
+          id: t.Integer(),
+          reportNo: t.Integer(),
+          userId: t.Integer(),
+          syncDataId: t.Integer(),
+          averageImmersionTime: t.Integer(),
+          bestImmersionTime: t.Integer(),
+        },
+        { additionalProperties: false },
+      ),
+    { $id: "Report" },
+  ),
+);
+
+export const ReportWhereUnique = t.Recursive(
+  (Self) =>
+    t.Intersect(
+      [
+        t.Partial(
+          t.Object(
+            {
+              id: t.Integer(),
+              syncDataId: t.Integer(),
+              reportNo_userId: t.Object(
+                { reportNo: t.Integer(), userId: t.Integer() },
+                { additionalProperties: false },
+              ),
+            },
+            { additionalProperties: false },
+          ),
+          { additionalProperties: false },
+        ),
+        t.Union(
+          [
+            t.Object({ id: t.Integer() }),
+            t.Object({ syncDataId: t.Integer() }),
+            t.Object({
+              reportNo_userId: t.Object(
+                { reportNo: t.Integer(), userId: t.Integer() },
+                { additionalProperties: false },
+              ),
+            }),
+          ],
+          { additionalProperties: false },
+        ),
+        t.Partial(
+          t.Object({
+            AND: t.Union([
+              Self,
+              t.Array(Self, { additionalProperties: false }),
+            ]),
+            NOT: t.Union([
+              Self,
+              t.Array(Self, { additionalProperties: false }),
+            ]),
+            OR: t.Array(Self, { additionalProperties: false }),
+          }),
+          { additionalProperties: false },
+        ),
+        t.Partial(
+          t.Object(
+            {
+              id: t.Integer(),
+              reportNo: t.Integer(),
+              userId: t.Integer(),
+              syncDataId: t.Integer(),
+              averageImmersionTime: t.Integer(),
+              bestImmersionTime: t.Integer(),
+            },
+            { additionalProperties: false },
+          ),
+        ),
+      ],
+      { additionalProperties: false },
+    ),
+  { $id: "Report" },
+);
+
+export const ReportSelect = t.Partial(
+  t.Object(
+    {
+      id: t.Boolean(),
+      reportNo: t.Boolean(),
+      score: t.Boolean(),
+      streak: t.Boolean(),
+      userId: t.Boolean(),
+      user: t.Boolean(),
+      syncData: t.Boolean(),
+      syncDataId: t.Boolean(),
+      averageImmersionTime: t.Boolean(),
+      bestImmersionTime: t.Boolean(),
+      metadata: t.Boolean(),
+      immersionLog: t.Boolean(),
+      _count: t.Boolean(),
+    },
+    { additionalProperties: false },
+  ),
+);
+
+export const ReportInclude = t.Partial(
+  t.Object(
+    {
+      score: t.Boolean(),
+      streak: t.Boolean(),
+      user: t.Boolean(),
+      syncData: t.Boolean(),
+      metadata: t.Boolean(),
+      immersionLog: t.Boolean(),
+      _count: t.Boolean(),
+    },
+    { additionalProperties: false },
+  ),
+);
+
+export const ReportOrderBy = t.Partial(
+  t.Object(
+    {
+      id: t.Union([t.Literal("asc"), t.Literal("desc")], {
+        additionalProperties: false,
+      }),
+      reportNo: t.Union([t.Literal("asc"), t.Literal("desc")], {
+        additionalProperties: false,
+      }),
+      userId: t.Union([t.Literal("asc"), t.Literal("desc")], {
+        additionalProperties: false,
+      }),
+      syncDataId: t.Union([t.Literal("asc"), t.Literal("desc")], {
+        additionalProperties: false,
+      }),
+      averageImmersionTime: t.Union([t.Literal("asc"), t.Literal("desc")], {
+        additionalProperties: false,
+      }),
+      bestImmersionTime: t.Union([t.Literal("asc"), t.Literal("desc")], {
+        additionalProperties: false,
+      }),
+    },
+    { additionalProperties: false },
+  ),
+);
+
+export const Report = t.Composite([ReportPlain, ReportRelations], {
+  additionalProperties: false,
+});
+
+export const ReportInputCreate = t.Composite(
+  [ReportPlainInputCreate, ReportRelationsInputCreate],
+  { additionalProperties: false },
+);
+
+export const ReportInputUpdate = t.Composite(
+  [ReportPlainInputUpdate, ReportRelationsInputUpdate],
+  { additionalProperties: false },
+);

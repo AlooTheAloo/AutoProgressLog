@@ -1,20 +1,23 @@
 import { ipcMain } from "electron";
-import { getConfig } from "../../../apl-backend/Helpers/getConfig";
-import { CacheManager } from "../../../apl-backend/Helpers/cache";
 import { win } from "..";
+import { APLStorage } from "./util/auth";
+import { VersionManager } from "../../../apl-backend/Helpers/VersionManager";
 
 export function routeListeners() {
-  ipcMain.handle("PageSelect", (event, args) => {
-    if (getConfig() === null) {
-      win?.webContents.send("is-setup-complete", false);
-      return "/setup/index";
-    } else {
-      const ver = CacheManager.verifyVersion();
-      if (!ver) {
-        return "/update-app";
-      }
-      win?.webContents.send("is-setup-complete", true);
-      return "/app/dashboard";
+  ipcMain.handle("PageSelect", async (event, args) => {
+    const ver = await VersionManager.verifyVersion();
+
+    const setupComplete = await APLStorage.get("setupComplete");
+    console.log("Setup Complete", setupComplete == true);
+    if (ver == false) {
+      console.log("Version is not verified");
+      return "/update-app";
     }
+    win?.webContents.send("is-setup-complete", setupComplete);
+    console.log(
+      "Returning ",
+      setupComplete == true ? "/app/dashboard" : "/setup/index"
+    );
+    return setupComplete == true ? "/app/dashboard" : "/setup/index";
   });
 }

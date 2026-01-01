@@ -1,10 +1,10 @@
 import { SemVer } from "semver";
-import { win } from "../../../electron/main";
-import { DEFAULT_ANKI_URL } from "../../entry/AnkiHTTPClient";
 import { CacheManager } from "../../Helpers/cache";
-import { getConfig } from "../../Helpers/getConfig";
-import { Options } from "../../types/options";
-import { setConfig } from "../../config/configManager";
+import {
+  getConfig,
+  getLegacyConfig,
+  setLegacyConfig,
+} from "../../Helpers/getConfig";
 import upgrade_1_0_1 from "./1.0.1";
 
 interface previous_config {
@@ -88,18 +88,12 @@ const defaultProfilePicture =
   "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR4aJxpLDs-i-t-xiNj4uNHz1mhNpCJpR21DQ&s";
 
 export default async function upgrade_1_0_2() {
-  console.log("Checking");
-  console.log("version is " + CacheManager.get().version);
-  console.log(
-    "Compare is " + new SemVer(CacheManager.get().version).compare("1.0.2")
-  );
-
   if (new SemVer(CacheManager.get().version).compare("1.0.2") > -1) {
     return;
   }
   upgrade_1_0_1();
 
-  const config: previous_config = getConfig() as any as previous_config;
+  const config: previous_config = (await getLegacyConfig()) as previous_config;
   if (config == undefined) return;
 
   const newConfig: new_config = {
@@ -109,6 +103,6 @@ export default async function upgrade_1_0_2() {
   };
   delete (newConfig as any).appreance;
 
-  setConfig(newConfig);
+  setLegacyConfig(newConfig);
   return;
 }

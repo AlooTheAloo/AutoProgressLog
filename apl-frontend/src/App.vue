@@ -1,45 +1,61 @@
 <script setup lang="ts">
+import { ref, onMounted } from "vue";
 import { RouterView, useRouter } from "vue-router";
 import SideBarContainer from "./components/Common/SideBarContainer.vue";
-import { appPath } from "./pages/routes/appRoutes";
-import { onMounted, ref } from "vue";
-import { ThemeManager } from "./util/theme-manager";
 import GlobalDialogRenderer from "./util/DialogRenderer/GlobalDialogRenderer.vue";
+import LoadingScreen from "./components/LoadingScreen.vue";
+import { appPath } from "./pages/routes/appRoutes";
+import { ThemeManager } from "./util/theme-manager";
+
 const router = useRouter();
-const showSideBar = ref<boolean>(false);
+const showSideBar = ref<boolean | null>(false);
 
-if (window.ipcRenderer) {
-  window.ipcRenderer.invoke("check-for-update");
-
-  window.ipcRenderer.on("router-push", (e, args: string) => {
-    router.push(args);
-  });
-
-  window.ipcRenderer.on("is-setup-complete", (e, args: boolean) => {
-    console.log("showsidebar is " + args);
-    showSideBar.value = args;
-  });
-}
-
-const updateOnlineStatus = () => {
-  if (!window.ipcRenderer) return;
-  window.ipcRenderer.invoke("SetInternetConnection", navigator.onLine);
-};
-
-window.addEventListener("online", updateOnlineStatus);
-window.addEventListener("offline", updateOnlineStatus);
-
-updateOnlineStatus();
-
-ThemeManager.init();
+const isLoading = ref(true);
+onMounted(() => {
+  ThemeManager.init();
+  setTimeout(() => {
+    isLoading.value = false;
+  }, 2000);
+  if (window.ipcRenderer) {
+    window.ipcRenderer.on("is-setup-complete", (_e, ok: boolean) => {
+      console.log("ISSETUPCOMPLETE " + ok);
+      showSideBar.value = ok;
+    });
+    window.ipcRenderer.on("set-sidebar-state", (_e, value) => {
+      console.log("SETSIDEBARSTATE " + value);
+      showSideBar.value = value;
+    });
+  }
+});
 </script>
 
 <template>
-  <div class="dark:bg-[#18181880] bg-[#fbfbfb]" v-if="showSideBar">
-    <SideBarContainer :currentRoute="router.currentRoute.value.path as appPath">
-      <RouterView />
-    </SideBarContainer>
-  </div>
-  <RouterView v-else />
-  <GlobalDialogRenderer />
+  <Transition name="fade" mode="out-in" appear>
+    <LoadingScreen v-if="isLoading" key="splash" />
+
+    <div v-else key="app">
+      <SideBarContainer
+        :showSidebar="showSideBar"
+        :currentRoute="router.currentRoute.value.path as appPath"
+      >
+        <RouterView />
+      </SideBarContainer>
+      <GlobalDialogRenderer />
+    </div>
+  </Transition>
 </template>
+
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 1s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+.fade-enter-to,
+.fade-leave-from {
+  opacity: 1;
+}
+</style>

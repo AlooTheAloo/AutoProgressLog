@@ -6,6 +6,10 @@ import { getConfig } from "../../../../apl-backend/Helpers/getConfig";
 import { onConfigChange } from "../SettingsListeners";
 import { Options } from "../../../../apl-backend/types/options";
 import { SocketClient } from "../Socket/SocketClient";
+import { Socket } from "dgram";
+import { Logger } from "../../../../apl-backend/Helpers/Log";
+import { APLStorage } from "../util/auth";
+import { DashboardDTO } from "../types/Dashboard";
 
 type miniEvent = {
   activity: string;
@@ -14,7 +18,6 @@ type miniEvent = {
 };
 
 const clientId = "1330290329261445221";
-let ready = false;
 let currentActivity: miniEvent | null = null;
 let rpc: RPC.Client | null = null;
 
@@ -24,11 +27,12 @@ export function createAutoRPC() {
   onConfigChange.on(
     "config-change",
     async (oldConfig: Options, newConfig: Options) => {
+      console.log("config-change", JSON.stringify(oldConfig), JSON.stringify(newConfig));
       if (
-        oldConfig.general.discordIntegration !=
-        newConfig.general.discordIntegration
+        oldConfig.localOptions.general.discordIntegration !=
+        newConfig.localOptions.general.discordIntegration
       ) {
-        if (newConfig.general.discordIntegration) {
+        if (newConfig.localOptions.general.discordIntegration) {
           await createListeners();
         } else {
           killListeners();
@@ -47,44 +51,37 @@ export function createAutoRPC() {
 async function killListeners() {
   SocketClient.instance.off("ActivityStart");
   SocketClient.instance.off("ActivityStop");
+  SocketClient.instance.off("ClearActivity");
 }
 
-async function createListeners() {
-  const config = getConfig();
-  if (config == undefined || !config.general.discordIntegration) return;
+export async function createListeners() {
+  const config = await getConfig();
+  if (config == undefined || !config.localOptions.general.discordIntegration)
+    return;
 
   rpc = new RPC.Client({
     clientId: clientId,
   });
 
-  await tryLoginWithRetries(clientId);
-
-  ready = true;
-  console.log("Discord RPC ready");
-
   rpc.on("error", (err) => {
     console.error("RPC Error:", err);
   });
 
-  rpc.on("disconnected", async () => {
-    console.warn("RPC disconnected. Reinitializing client...");
-
-    ready = false;
-    try {
-      rpc?.destroy(); // Optional, just in case
-    } catch (e) {
-      console.warn("Failed to destroy old RPC client:", e);
-    }
-    killListeners();
-    createListeners();
-  });
-
   SocketClient.instance.on("ActivityStart", async (event) => {
-    const lastEntry = await GetLastEntry();
+    Logger.log("Start Activity", "Socket");
+
+    const lastEntry = (await APLStorage.get<DashboardDTO>(
+      "Cached_DTO"
+    )) as DashboardDTO;
+
     const seconds =
-      (lastEntry?.toggl?.totalSeconds ?? 0) +
+      (lastEntry?.immersionDTO.totalImmersion ?? 0) +
       Math.abs(dayjs(event.start).diff(dayjs(), "seconds"));
 
+    console.log("seconds is " + seconds);
+
+    if (!rpc?.isConnected) await rpc?.login();
+    console.log("rpc.setactivity");
     await rpc!.user?.setActivity({
       details: `Immersing | ${(seconds / 3600).toFixed(2)} hours`,
       state: padToMinLength(event.activity, 2),
@@ -95,39 +92,19 @@ async function createListeners() {
     currentActivity = event;
   });
 
-  SocketClient.instance.on("ActivityStop", (event) => {
-    if (event.id != currentActivity?.id) return;
+  SocketClient.instance.on("ClearActivity", async (event) => {
+    if (!rpc?.isConnected) await rpc?.login();
     currentActivity = null;
     rpc?.user?.clearActivity();
   });
-}
 
-async function tryLoginWithRetries(clientId: string) {
-  rpc = new RPC.Client({
-    clientId: clientId,
-    transport: {
-      type: "ipc",
-    },
+  SocketClient.instance.on("ActivityStop", async (event) => {
+    if (event.id != currentActivity?.id) return;
+    if (!rpc?.isConnected) await rpc?.login();
+
+    currentActivity = null;
+    rpc?.user?.clearActivity();
   });
-
-  let attempt = 0;
-  while (true) {
-    try {
-      await rpc.login();
-      console.log("Logged in to Discord RPC");
-      return;
-    } catch (err) {
-      attempt++;
-      let waitTime = Math.pow(2, Math.min(attempt, 5)) * 1000;
-      console.warn(
-        `RPC login failed (attempt ${attempt}). Retrying in ${
-          waitTime / 1000
-        }s...`
-      );
-      console.log("failed due to ", err);
-      await new Promise((resolve) => setTimeout(resolve, waitTime));
-    }
-  }
 }
 
 function padToMinLength(str: string, len: number) {

@@ -11,10 +11,10 @@ import refold from "../../assets/AppLogos/Refold-logo.png";
 import clockify from "../../assets/AppLogos/Clockify-logo.png";
 import mokuro from "../../assets/AppLogos/Mokuro-logo.png";
 import ttsu from "../../assets/AppLogos/Ttsu-logo.png";
-import { motion } from 'motion-v';
-
+import { motion } from "motion-v";
+import PlexusEffect from "../../components/Common/PlexusEffect.vue";
 const selectedApps = defineModel<{ label: string; value: any }[] | undefined>(
-  "language",
+  "language"
 );
 const { width, height } = useWindowSize();
 
@@ -40,7 +40,7 @@ const buttonLabel = computed(() => {
 const router = useRouter();
 function NextPage() {
   const sanitizedData = JSON.parse(JSON.stringify(selectedApps.value)).map(
-    (x: any) => x.value,
+    (x: any) => x.value
   );
   window.ipcRenderer
     .invoke("answer-survey-apps", sanitizedData)
@@ -51,38 +51,52 @@ function NextPage() {
 </script>
 
 <template>
-  <SetupBackground/>
+  <SetupBackground />
+  <div
+    :style="{
+      backgroundImage: `linear-gradient(to bottom right, #add8ff, #d8b4fe)`,
+    }"
+    class="relative flex items-center justify-start h-screen pl-12"
+  >
+    <PlexusEffect class="absolute inset-0 z-0" />
 
-  <div class="flex w-screen">
+    <!-- Card -->
     <div
-      class="p-4 sm:p-12 flex flex-col justify-between h-screen w-full max-w-[60rem] bg-black"
+      class="relative z-10 bg-black rounded-3xl p-12 flex flex-col justify-between items-start h-[90vh] max-h-[946px] w-full max-w-[899px] min-w-[600px]"
     >
       <div class="flex w-full items-center justify-between mb-6">
-        <img :src="Logo" alt="APL Logo" class="w-16 h-16 sm:w-20 sm:h-20"/>
-        <AccountDisplay/>
+        <img :src="Logo" alt="APL Logo" class="w-16 h-16 sm:w-20 sm:h-20" />
+        <AccountDisplay />
       </div>
       <motion.div
         :initial="{ opacity: 0, y: 20, filter: 'blur(10px)' }"
-        :animate="{ opacity: 1, y: 0, filter: 'blur(0px)', transition:{ duration: 0.6 } }"
+        :animate="{
+          opacity: 1,
+          y: 0,
+          filter: 'blur(0px)',
+          transition: { duration: 0.6 },
+        }"
         class="flex flex-col flex-1 space-y-6"
       >
         <h1
-          class="text-xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl
-                 font-semibold text-white leading-tight"
+          class="text-xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-semibold text-white leading-tight"
         >
           Tell us about the tools you use.
         </h1>
 
-        <p class="text-xs sm:text-sm lg:text-base text-[#C0C0C0] leading-relaxed">
-          Select any of the following tools you use to learn your target language.
-          We use this to decide which apps to support next. You can pick as many as you like.
+        <p
+          class="text-xs sm:text-sm lg:text-base text-[#C0C0C0] leading-relaxed"
+        >
+          Select any of the following tools you use to learn your target
+          language. We use this to decide which apps to support next. You can
+          pick as many as you like.
         </p>
 
         <Listbox
           v-model="selectedApps"
           :options="appList"
           multiple
-          :scroll-height="height > 800 ? '700px' : height / 2 + 'px'"
+          :scroll-height="height > 800 ? '400px' : height / 2 + 'px'"
           class="w-full p-2 bg-[#18181B] rounded-lg"
         >
           <template #option="{ option }">
@@ -95,11 +109,11 @@ function NextPage() {
           </template>
         </Listbox>
       </motion.div>
-      <div class="flex justify-end">
+      <div class="w-full flex justify-end">
         <Button
           :label="buttonLabel"
           @click="NextPage"
-          class="w-[300px] p-3 !rounded-full"
+          class="w-[300px] p-3 rounded-full"
         />
       </div>
     </div>

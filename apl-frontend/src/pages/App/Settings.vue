@@ -6,7 +6,7 @@ import Tab from "primevue/tab";
 import TabPanels from "primevue/tabpanels";
 import TabPanel from "primevue/tabpanel";
 import { Options } from "../../../apl-backend/types/options";
-import { onMounted, ref, watch, reactive } from "vue";
+import { onMounted, ref, watch, reactive, computed } from "vue";
 import Button from "primevue/button";
 import Dialog from "primevue/dialog";
 import { WarningProps } from "../../../types/Warning";
@@ -14,11 +14,12 @@ import { useToast } from "primevue/usetoast";
 import Toast from "primevue/toast";
 import GeneralSettings from "../../components/Settings/Tabs/GeneralSettings.vue";
 import AccountSettings from "../../components/Settings/Tabs/AccountSettings.vue";
+import { useElementBounding, useWindowSize } from "@vueuse/core";
+import AppearanceSettings from "../../components/Settings/Tabs/AppearanceSettings.vue";
+import { ProgressSpinner, Skeleton } from "primevue";
 import AnkiSettings from "../../components/Settings/Tabs/AnkiSettings.vue";
 import TimeSettings from "../../components/Settings/Tabs/TimeSettings.vue";
 import ReportsSettings from "../../components/Settings/Tabs/ReportsSettings.vue";
-import { useElementBounding, useWindowSize } from "@vueuse/core";
-import AppearanceSettings from "../../components/Settings/Tabs/AppearanceSettings.vue";
 
 const router = useRouter();
 
@@ -33,8 +34,13 @@ const settingsParent = ref();
 const rect = reactive(useElementBounding(settingsParent));
 const screen = useWindowSize();
 
+const isDirty = computed(() => {
+  return JSON.stringify(originalConfig.value) !== JSON.stringify(config.value);
+});
+
 onMounted(() => {
   window.ipcRenderer.invoke("GetConfig").then((data: Options) => {
+    console.log("GetConfig", data);
     config.value = data;
     originalConfig.value = data;
   });
@@ -44,12 +50,24 @@ function save() {
   window.ipcRenderer
     .invoke("SetConfig", JSON.stringify(config.value))
     .then((data: Options) => {
+      console.log("new config dropped in : " + JSON.stringify(data));
+
       config.value = data;
       originalConfig.value = data;
       toast.add({
         severity: "success",
         summary: "Changes saved!",
         detail: "The changes were saved successfully.",
+        life: 5000,
+      });
+    })
+    .catch((e) => {
+      console.error("Failed to save config:", e);
+      toast.add({
+        severity: "error",
+        summary: "Failed to save changes!",
+        detail:
+          "Failed to save changes. Make sure all fields are valid and try again.",
         life: 5000,
       });
     });
@@ -60,6 +78,7 @@ function reset() {
 
 function setConfig(newconfig: Options) {
   config.value = newconfig;
+  console.log("new config dropped in : " + JSON.stringify(newconfig));
 }
 
 function createWarning(warningProps: WarningProps | undefined) {
@@ -131,15 +150,15 @@ function ankiTest(worked: boolean) {
               tabActiveBorderColor: 'var(--primary-color)',
             }"
           >
-            <div class="relative w-full">
+            <div class="relative w-full mb-10">
               <div
-                class="absolute bottom-0 left-0 w-full border-b border-[#e2e8f0] dark:border-gray-700 z-0"
+                class="absolute bottom-0 left-0 w-full border-b dark:border-0 z-0"
               ></div>
-              <div class="w-0 relative z-10">
+              <div class="absolute z-10 tablist">
                 <TabList
-                  pt:activeBar="my-class"
-                  pt:tabList="my-class-2"
-                  class="w-0"
+                  class="tablist"
+                  pt:activeBar="tablist-bar"
+                  pt:tabList="tablist"
                 >
                   <Tab value="0">General</Tab>
                   <Tab value="1">Account</Tab>
@@ -152,6 +171,7 @@ function ankiTest(worked: boolean) {
               </div>
             </div>
             <div
+              v-if="config != undefined"
               class="overflow-y-auto"
               ref="settingsParent"
               :style="{
@@ -196,6 +216,19 @@ function ankiTest(worked: boolean) {
                 </TabPanel>
               </TabPanels>
             </div>
+            <div
+              v-else
+              :style="{
+                height: screen.height.value - 200 + 'px',
+              }"
+              class="flex flex-col w-full gap-6 pt-6"
+            >
+              <Skeleton
+                v-for="index in 10"
+                :key="index"
+                style="height: 48px"
+              ></Skeleton>
+            </div>
           </Tabs>
         </div>
       </div>
@@ -205,16 +238,13 @@ function ankiTest(worked: boolean) {
   <div
     class="mx-2 flex justify-end transition-all duration-300 ease-in-out gap-5"
     :style="{
-      marginTop:
-        JSON.stringify(originalConfig) == JSON.stringify(config) ? '4rem' : '',
+      marginTop: !isDirty ? '4rem' : '',
     }"
   >
     <div class="flex gap-4">
       <Button
-        :aria-hidden="JSON.stringify(originalConfig) == JSON.stringify(config)"
-        :tabindex="
-          JSON.stringify(originalConfig) != JSON.stringify(config) ? '0' : '-1'
-        "
+        :aria-hidden="!isDirty"
+        :tabindex="isDirty ? '0' : '-1'"
         @click="save"
         class="w-48"
         >Save</Button
@@ -223,10 +253,8 @@ function ankiTest(worked: boolean) {
         @click="reset"
         class="w-72"
         severity="secondary"
-        :aria-hidden="JSON.stringify(originalConfig) == JSON.stringify(config)"
-        :tabindex="
-          JSON.stringify(originalConfig) != JSON.stringify(config) ? '0' : '-1'
-        "
+        :aria-hidden="!isDirty"
+        :tabindex="isDirty ? '0' : '-1'"
         >Cancel changes</Button
       >
     </div>
@@ -234,12 +262,17 @@ function ankiTest(worked: boolean) {
 </template>
 
 <style>
-.my-class {
+.tablist-bar {
   height: 4px !important;
   border-radius: 1rem;
 }
 
-.my-class-2 {
+.tablist {
   background-color: transparent !important;
+}
+
+
+.p-tabs * {
+ border-color: transparent;
 }
 </style>

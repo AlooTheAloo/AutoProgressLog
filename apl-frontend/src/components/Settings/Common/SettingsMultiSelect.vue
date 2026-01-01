@@ -30,7 +30,6 @@ function openLink() {
 }
 
 watch(props, () => {
-  console.log(props.value);
   value.value = props.value ?? [];
 });
 
@@ -56,7 +55,7 @@ const value = ref<any[]>([]);
     </div>
     <div class="flex-grow lg:gap-10">
       <MultiSelect
-        :options="options"
+        :options="options?.map((x) => ({ id: x.id.toString(), name: x.name }))"
         :model-value="value"
         @update:model-value="updateValue"
         option-label="name"

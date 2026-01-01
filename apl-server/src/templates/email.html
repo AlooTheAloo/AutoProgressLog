@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Login to AutoProgressLog</title>
+    <style>
+      /* Reset-ish */
+      * {
+        box-sizing: border-box;
+      }
+
+      /* Layout */
+      .wrap {
+        height: 100%;
+
+        min-height: 100%;
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+        margin: 0;
+        background: #0f1115;
+        color: #e6e8ee;
+        font:
+          16px/1.5 system-ui,
+          -apple-system,
+          Segoe UI,
+          Roboto,
+          Ubuntu,
+          Cantarell,
+          Noto Sans,
+          Helvetica,
+          Arial,
+          "Apple Color Emoji",
+          "Segoe UI Emoji";
+      }
+
+      .appbar {
+        background: linear-gradient(180deg, #0d111a 0%, #0a0d14 100%);
+        border-bottom: 1px solid #1f2633;
+        padding: 14px 18px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .logo {
+        width: 25px;
+        height: 25px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .brand-name {
+        font-weight: 600;
+        letter-spacing: 0.2px;
+        color: #e6e8ee;
+      }
+
+      .loginToText {
+        font-size: clamp(24px, 3.6vw, 40px);
+        color: white;
+      }
+
+      .hero {
+        position: relative;
+        padding: clamp(28px, 6vw, 56px) 18px;
+        background:
+          radial-gradient(
+            1200px 400px at 85% 10%,
+            rgba(42, 160, 255, 0.22),
+            transparent 60%
+          ),
+          radial-gradient(
+            800px 300px at 95% 0%,
+            rgba(12, 123, 230, 0.22),
+            transparent 60%
+          ),
+          linear-gradient(180deg, #0a0e16 0%, #0b1019 100%);
+        border-bottom: 1px solid #162033;
+      }
+
+      .card {
+        max-width: 720px;
+        margin: 0 auto;
+        background: linear-gradient(180deg, #151922 0%, #0f141d 100%);
+        border: 1px solid #1e2635;
+        border-radius: 16px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+        padding: clamp(20px, 4vw, 36px);
+        text-align: center;
+      }
+
+      .icon-circle {
+        width: 64px;
+        height: 64px;
+        margin: 6px auto 18px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        background: radial-gradient(
+          100% 100% at 30% 20%,
+          #3fb1ff 0%,
+          #1a8ef3 40%,
+          #0f6ec7 100%
+        );
+        box-shadow:
+          inset 0 0 0 6px rgba(255, 255, 255, 0.05),
+          0 8px 28px rgba(22, 122, 240, 0.35);
+      }
+      .icon-circle span {
+        display: block;
+        width: 26px;
+        height: 26px;
+        background: #fff;
+        -webkit-mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="%23000" viewBox="0 0 24 24"><path d="M12 4l1.41 1.41L8.83 10H20v2H8.83l4.58 4.59L12 18l-8-8 8-8z"/></svg>')
+          center/contain no-repeat;
+        mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="%23000" viewBox="0 0 24 24"><path d="M12 4l1.41 1.41L8.83 10H20v2H8.83l4.58 4.59L12 18l-8-8 8-8z"/></svg>')
+          center/contain no-repeat;
+      }
+
+      h1 {
+        margin: 4px 0 0;
+        font-size: clamp(24px, 3.6vw, 40px);
+        line-height: 1.2;
+        font-weight: 800;
+        letter-spacing: 0.2px;
+      }
+      .subtitle {
+        margin: 10px auto 22px;
+        max-width: 46ch;
+        color: #a9afbf;
+      }
+
+      .cta {
+        appearance: none;
+        border: none;
+        cursor: pointer;
+        display: inline-block;
+        padding: 14px 22px;
+        font-weight: 700;
+        border-radius: 12px;
+        background: linear-gradient(180deg, #2aa0ff 0%, #09497c 100%);
+        color: #ffffff;
+        outline: none;
+        transition:
+          transform 0.08s ease,
+          filter 0.2s ease;
+        box-shadow: 0 8px 24px rgba(33, 139, 255, 0.35);
+        text-decoration: none;
+      }
+      .cta:focus-visible {
+        outline: 2px solid #76c2ff;
+        outline-offset: 3px;
+      }
+      .cta:hover {
+        filter: brightness(1.06);
+        transform: translateY(-1px);
+      }
+      .cta:active {
+        transform: translateY(0);
+      }
+
+      .fine {
+        margin: 16px auto 6px;
+        color: #a9afbf;
+        max-width: 60ch;
+        font-size: 0.95rem;
+      }
+
+      .alt {
+        margin-top: 18px;
+        font-weight: 600;
+      }
+
+      .codewrap {
+        margin-top: 10px;
+        background: #121826;
+        border: 1px solid #202a3d;
+        border-radius: 12px;
+        padding: 10px 12px;
+        /* Important: long link handling */
+        overflow: hidden; /* keeps the pill shape nice vertically */
+      }
+      .inline-scroll {
+        display: block;
+        width: 100%;
+        scrollbar-width: thin;
+      }
+      .inline-scroll::-webkit-scrollbar {
+        height: 10px;
+      }
+      .inline-scroll::-webkit-scrollbar-thumb {
+        background: #273248;
+        border-radius: 8px;
+      }
+      .kbd {
+        font-family:
+          ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono",
+          monospace;
+        font-size: 0.95rem;
+        color: #b9c3d9;
+        user-select: all;
+      }
+
+      .footer {
+        text-align: center;
+        color: #9aa3b8;
+        font-size: 0.95rem;
+        padding: 16px 18px 40px;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .cta {
+          transition: none;
+        }
+        .icon-circle {
+          box-shadow: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <!-- App bar -->
+      <header class="appbar" role="banner">
+        <div class="logo" aria-hidden="true">
+          <img
+            src="https://i.ibb.co/RGXgy0GG/Logo-Tiny.png"
+            alt="Logo-Tiny"
+            border="0"
+            width="24"
+          />
+        </div>
+        <div class="brand-name">AutoProgressLog</div>
+      </header>
+
+      <!-- Main / hero -->
+      <main class="hero">
+        <section class="card" aria-labelledby="title">
+          <!-- 64x64 circle -->
+          <img
+            src="https://i.ibb.co/1Y4vyzRN/icons8-login-1.png"
+            alt="icons8-login-1"
+            border="0"
+            width="64"
+          />
+
+          <h1 id="title" class="loginToText">Login to<br />AutoProgressLog</h1>
+
+          <p class="subtitle">
+            You requested to sign in to your account. Click the button below to
+            continue:
+          </p>
+
+          <a style="color: white;" class="cta" href="{{MAGIC_LINK}}" rel>Approve sign-in</a>
+
+          <p class="fine">
+            This link will expire in 15 minutes for your security.<br />If you
+            didn’t request this, you can safely ignore this email.
+          </p>
+
+          <p class="alt">If the button doesn’t work, copy this link:</p>
+          <div class="codewrap" role="region" aria-label="One-time sign-in URL">
+            <span class="inline-scroll">
+              <span class="kbd">{{MAGIC_LINK}}</span>
+            </span>
+          </div>
+        </section>
+      </main>
+
+      <!-- Footer -->
+      <footer class="footer">— The APL team</footer>
+    </div>
+  </body>
+</html>

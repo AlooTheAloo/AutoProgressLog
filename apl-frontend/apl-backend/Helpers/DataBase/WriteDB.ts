@@ -3,6 +3,7 @@ import sqlite3 from "sqlite3";
 import { syncDataPath } from "../getConfig";
 import dayjs from "dayjs";
 import { SyncData } from "../../types/sync";
+import { Logger } from "../Log";
 
 export async function WriteEntries(entries: entry[], syncDataId: number = -1) {
   if (entries.length == 0) return;
@@ -16,7 +17,7 @@ export async function WriteEntries(entries: entry[], syncDataId: number = -1) {
   });
 
   stmt.finalize();
-  console.log("New entries have been added!");
+  Logger.log("New entries have been added!", "Toggl");
   db.close();
 }
 
@@ -40,7 +41,7 @@ export async function WriteSyncData(
             `,
       async (err, rows: { id: number }[]) => {
         if (err) {
-          console.log(err);
+          Logger.log(err, "DB");
         }
         await WriteEntries(entries, rows[0].id);
         res();
@@ -85,7 +86,7 @@ export async function DeleteActivity(id: number) {
             `,
       async (err, rows: { id: number }[]) => {
         if (err) {
-          console.log(err);
+          Logger.log(err, "DB");
         }
         res();
       }

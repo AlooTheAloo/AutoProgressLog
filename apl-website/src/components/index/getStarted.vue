@@ -1,12 +1,6 @@
 <script setup lang="ts">
 import { Motion } from "motion-v";
-import {
-  PATTERN_BACKGROUND_DIRECTION,
-  PATTERN_BACKGROUND_SPEED,
-  PATTERN_BACKGROUND_VARIANT,
-} from "../ui/pattern-background";
-import PatternBackground from "../ui/pattern-background/PatternBackground.vue";
-import RainbowButton from "../ui/rainbow-button/RainbowButton.vue";
+import { Button } from "../ui/button";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
@@ -15,68 +9,100 @@ function openDownloads() {
   router.push("/downloads");
 }
 </script>
+
+<style>
+@keyframes scanner {
+  from {
+    -webkit-mask-position: 0% 0%;
+            mask-position: 0% 0%;
+  }
+  to {
+    -webkit-mask-position: 200% 100%;
+            mask-position: 200% 100%;
+  }
+}
+
+.animate-scanner {
+  animation: scanner 2s linear infinite;
+  will-change: mask-position, -webkit-mask-position;
+}
+</style>
+
+
 <template>
-  <div></div>
-  <PatternBackground
-    :animate="true"
-    :direction="PATTERN_BACKGROUND_DIRECTION.TopRight"
-    :variant="PATTERN_BACKGROUND_VARIANT.Dot"
-    :speed="PATTERN_BACKGROUND_SPEED.Slow"
-    class="flex gap-5 h-[20rem] w-full items-center justify-center [mask-image:radial-gradient(800px_circle_at_center,white,transparent)] absolute"
-    size="sm"
-  >
-  </PatternBackground>
+  <section class="relative w-full py-24  dark:bg-black flex justify-center">
+    <div
+      class="
+        absolute inset-0 z-0 h-full w-full
+        bg-white dark:bg-black
+        bg-[radial-gradient(#1f2937_1px,transparent_1px)]
+        dark:bg-[radial-gradient(#ffffff33_1px,transparent_1px)]
+        [background-size:16px_16px]
 
-  <Motion
-    as="div"
-    :initial="{ opacity: 0, filter: 'blur(10px)' }"
-    :while-in-view="{
-      opacity: 1,
-      filter: 'blur(0px)',
-    }"
-    :transition="{
-      delay: 0,
-      duration: 1,
-      ease: 'easeInOut',
-    }"
-    class="w-full h-[20rem] flex items-center justify-center px-10"
-  >
-    <div class="flex flex-col sm:flex-row gap-2 sm:gap-0">
-      <div class="flex flex-col w-full max-w-[40rem] px-10]">
-        <p
-          class="relative z-20 bg-gradient-to-l from-neutral-500 to-neutral-800 bg-clip-text text-4xl font-bold text-transparent sm:text-5xl"
+        [mask-image:linear-gradient(90deg,transparent_0%,black_45%,black_55%,transparent_100%)]
+        [-webkit-mask-image:linear-gradient(90deg,transparent_0%,black_45%,black_55%,transparent_100%)]
+
+        [mask-size:200%_100%]
+        [-webkit-mask-size:200%_100%]
+
+        [mask-position:0%_0%]
+        [-webkit-mask-position:0%_0%]
+
+        animate-scanner
+      "
+    ></div>
+    <Motion
+      as="div"
+      :initial="{ opacity: 0, filter: 'blur(10px)' }"
+      :while-in-view="{
+        opacity: 1,
+        filter: 'blur(0px)',
+      }"
+      :transition="{
+        delay: 0,
+        duration: 1,
+        ease: 'easeInOut',
+      }"
+      class="w-full relative z-10 flex items-center justify-center px-4"
+    >
+      <div class="flex flex-col sm:flex-row gap-8 items-center justify-between w-full max-w-4xl">
+        <div class="flex flex-col text-center sm:text-left gap-2">
+          <p
+            class="bg-gradient-to-br from-neutral-900 to-neutral-500 bg-clip-text text-4xl font-bold text-transparent sm:text-5xl dark:from-white dark:to-neutral-400"
+          >
+            Make every minute count.
+          </p>
+          <p
+            class="text-xl font-medium text-neutral-600 dark:text-neutral-300 sm:text-2xl"
+          >
+            Start today, it's free!
+          </p>
+        </div>
+
+        <Motion
+          as="div"
+          :initial="{ opacity: 0, y: 20, filter: 'blur(10px)' }"
+          :while-in-view="{
+            opacity: 1,
+            y: 0,
+            filter: 'blur(0px)',
+          }"
+          :transition="{
+            delay: 0.2,
+            duration: 0.8,
+            ease: 'easeOut',
+          }"
+          class="flex-shrink-0"
         >
-          Make every minute count.
-        </p>
-        <p
-          class="relative z-20 to-neutral-800 bg-clip-text text-xl font-semibold text-black sm:text-2xl"
-        >
-          Start today, it's free!
-        </p>
+          <Button
+            class="text-base px-8 py-6 rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
+            @click="openDownloads"
+            size="lg"
+          >
+            Download the app
+          </Button>
+        </Motion>
       </div>
-
-      <Motion
-        as="div"
-        :initial="{ opacity: 0, y: 40, filter: 'blur(10px)' }"
-        :while-in-view="{
-          opacity: 1,
-          y: 0,
-          filter: 'blur(0px)',
-        }"
-        :transition="{
-          delay: 0.5,
-          duration: 1,
-          ease: 'easeInOut',
-        }"
-        class="flex flex-grow items-end sm:w-[16rem]"
-      >
-        <RainbowButton
-          class="text-xs sm:text-base relative bg-black px-4 py-2 text-white flexw-12 flex-col items-center justify-center overflow-hidden rounded-full border shadow-xl"
-          @click="openDownloads"
-        >
-          Download the app
-        </RainbowButton>
-      </Motion>
-    </div>
-  </Motion>
+    </Motion>
+  </section>
 </template>

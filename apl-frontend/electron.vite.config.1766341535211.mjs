@@ -1,0 +1,172 @@
+// electron.vite.config.ts
+import { resolve } from "path";
+import { defineConfig, externalizeDepsPlugin } from "electron-vite";
+import vue from "@vitejs/plugin-vue";
+
+// package.json
+var package_default = {
+  name: "autoprogresslog",
+  version: "2.0.0",
+  author: "AlooTheAloo",
+  repository: "https://github.com/AlooTheAloo/AutoProgressLog",
+  main: "dist/main/index.js",
+  homepage: "https://aplapp.dev",
+  scripts: {
+    format: "prettier --write .",
+    lint: "eslint --cache .",
+    "typecheck:node": "tsc --noEmit -p tsconfig.node.json --composite false",
+    "typecheck:web": "vue-tsc --noEmit -p tsconfig.json --composite false",
+    typecheck: "npm run typecheck:node && npm run typecheck:web",
+    start: "electron-vite preview",
+    dev: "electron-vite dev",
+    build: "electron-vite build",
+    postinstall: "electron-builder install-app-deps",
+    "build:unpack": "npm run build && electron-builder --dir",
+    "build:win": "npm run build && electron-builder --win",
+    "build:mac": "npm run build && electron-builder --mac",
+    "build:linux": "npm run build && electron-builder --linux"
+  },
+  dependencies: {
+    "@bokuweb/zstd-wasm": "^0.0.27",
+    "@electron-toolkit/preload": "^3.0.1",
+    "@electron-toolkit/utils": "^4.0.0",
+    "@elysiajs/eden": "^1.3.2",
+    "@primevue/themes": "^4.3.5",
+    "@puppeteer/browsers": "^2.10.5",
+    "@types/d3-interpolate": "^3.0.4",
+    "@types/dom-to-image": "^2.6.7",
+    "@types/electron-json-storage": "^4.5.4",
+    "@types/pluralize": "^0.0.33",
+    "@types/semver": "^7.7.0",
+    "@types/vue-writer": "^1.2.0",
+    "@vueuse/core": "^13.4.0",
+    "@xhayper/discord-rpc": "^1.2.2",
+    ajv: "^8.17.1",
+    apexcharts: "^4.7.0",
+    axios: "^1.10.0",
+    "chromium-bidi": "^7.0.0",
+    color: "^5.0.3",
+    "country-flag-icons": "^1.5.19",
+    "d3-interpolate": "^3.0.1",
+    dayjs: "^1.11.13",
+    "dom-to-image": "^2.6.0",
+    "electron-app-universal-protocol-client": "^2.1.1",
+    "electron-json-storage": "^4.6.0",
+    "electron-store": "^10.1.0",
+    "electron-updater": "^6.3.9",
+    "form-data": "^4.0.4",
+    fzstd: "^0.1.1",
+    "github-markdown-css": "^5.8.1",
+    "html-to-image": "^1.11.13",
+    i: "^0.3.7",
+    "js-abbreviation-number": "^1.4.0",
+    marked: "^16.0.0",
+    "motion-v": "^1.3.1",
+    "node-machine-id": "^1.1.12",
+    "node-schedule": "^2.1.1",
+    npm: "^11.6.1",
+    playwright: "^1.53.2",
+    pluralize: "^8.0.0",
+    primeicons: "^7.0.0",
+    primevue: "^4.3.5",
+    "round-to": "^6.0.0",
+    semver: "^7.7.2",
+    sharp: "^0.34.2",
+    sqlite3: "^5.1.7",
+    "toggl-track": "^0.8.0",
+    "vue-router": "^4.6.3",
+    "vue-writer": "^2.0.2",
+    "vue3-apexcharts": "^1.8.0",
+    ws: "^8.18.3",
+    zod: "^3.25.67"
+  },
+  devDependencies: {
+    "@electron-toolkit/eslint-config-prettier": "3.0.0",
+    "@electron-toolkit/eslint-config-ts": "^3.0.0",
+    "@electron-toolkit/tsconfig": "^1.0.1",
+    "@types/bun": "^1.3.3",
+    "@types/node": "^22.14.1",
+    "@types/ws": "^8.18.1",
+    "@vitejs/plugin-vue": "^5.2.3",
+    autoprefixer: "^10.4.21",
+    electron: "^35.1.5",
+    "electron-builder": "^25.1.8",
+    "electron-vite": "^3.1.0",
+    eslint: "^9.24.0",
+    "eslint-plugin-vue": "^10.0.0",
+    postcss: "^8.5.6",
+    prettier: "^3.5.3",
+    tailwindcss: "3.4.3",
+    typescript: "^5.8.3",
+    vite: "^6.2.6",
+    vue: "^3.5.13",
+    "vue-eslint-parser": "^10.1.3",
+    "vue-tsc": "^2.2.8"
+  }
+};
+
+// electron.vite.config.ts
+var __electron_vite_injected_dirname = "/Users/philipanthony-davis/Desktop/Development/AutoProgressLog/apl-frontend";
+var electron_vite_config_default = defineConfig({
+  main: {
+    optimizeDeps: {
+      exclude: ["electron-app-universal-protocol-client"]
+    },
+    build: {
+      watch: {},
+      outDir: "dist/main",
+      rollupOptions: {
+        external: [
+          ...package_default.dependencies ? Object.keys(package_default.dependencies) : [],
+          "@bokuweb/zstd-wasm",
+          "electron-app-universal-protocol-client",
+          /\.node$/
+        ]
+      },
+      lib: {
+        entry: "electron/main/index.ts"
+      }
+    },
+    plugins: [externalizeDepsPlugin()]
+  },
+  preload: {
+    optimizeDeps: {
+      exclude: ["electron-app-universal-protocol-client"]
+    },
+    build: {
+      watch: {},
+      outDir: "dist/preload",
+      rollupOptions: {
+        external: [
+          ...package_default.dependencies ? Object.keys(package_default.dependencies) : [],
+          "@bokuweb/zstd-wasm",
+          "electron-app-universal-protocol-client"
+        ]
+      },
+      lib: {
+        entry: "electron/preload/index.ts"
+      }
+    },
+    plugins: [externalizeDepsPlugin()]
+  },
+  renderer: {
+    optimizeDeps: {
+      exclude: ["electron-app-universal-protocol-client"]
+    },
+    build: {
+      rollupOptions: {
+        input: resolve(__electron_vite_injected_dirname, "src/index.html")
+      }
+    },
+    root: "./src",
+    resolve: {
+      alias: {
+        "@renderer": resolve("src")
+      }
+    },
+    plugins: [vue()]
+  }
+});
+export {
+  electron_vite_config_default as default
+};
