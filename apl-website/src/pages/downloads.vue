@@ -117,7 +117,8 @@
       <DialogContent class="sm:max-w-[600px] w-[90%] rounded-xl [&>button:last-child]:hidden">
         <DialogHeader>
           <div class="mt-2"></div>
-          <DialogTitle class="text-left sm:text-center">Hey there! Thanks for downloading our app 🎉</DialogTitle>
+          <DialogTitle class="text-left sm:text-center dark:text-white">
+            Hey there! Thanks for downloading our app 🎉</DialogTitle>
           <DialogDescription class="text-left  sm:max-w-[550px]">
             We noticed you're on MacOS (great choice btw 😉). The app is currently unsigned. After dragging it into the Applications folder, you will need to tell your computer that it is safe to open it.
             To do this, open the Terminal application on your mac and run the following command : 
