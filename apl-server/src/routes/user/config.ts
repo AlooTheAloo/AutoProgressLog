@@ -10,7 +10,10 @@ import Toggl from "toggl-track";
 import { reportCronPlugin } from "../../middlewares/cronReportGenerator";
 import { buildReport } from "../../services/reports/buildReport";
 import { AutoGenConfigPlain } from "../../../prisma/types/AutoGenConfig";
-import { fullSyncTogglData, syncTogglData } from "../../services/toggl/syncService";
+import {
+  fullSyncTogglData,
+  syncTogglData,
+} from "../../services/toggl/syncService";
 
 const PublicAutoGenConfig = t.Object(
   {
@@ -255,38 +258,43 @@ export const configRoutes = new Elysia({ name: "config-routes" })
   .post(
     "/config",
     async ({ body, user, reportCron }) => {
-      await createWebhook(-1, body.togglToken);
-      const createdConfig = await client.userConfig.create({
-        data: {
-          togglToken: body.togglToken,
-          togglUserId: body.togglUserId,
-          autoGenTime: {
-            create: body.autoGenTime,
+      try {
+        await createWebhook(-1, body.togglToken);
+        const createdConfig = await client.userConfig.create({
+          data: {
+            togglToken: body.togglToken,
+            togglUserId: body.togglUserId,
+            autoGenTime: {
+              create: body.autoGenTime,
+            },
+            userId: user.id,
           },
-          userId: user.id,
-        },
-        select: {
-          togglToken: true,
-          togglUserId: true,
-          autoGenTime: true,
-          createdAt: true,
-          updatedAt: true,
-        },
-      });
+          select: {
+            togglToken: true,
+            togglUserId: true,
+            autoGenTime: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        });
 
-      if (createdConfig.autoGenTime) reportCron.attach(user.id);
-      await fullSyncTogglData(user.id, true);
-      return {
-        ...createdConfig,
-        autoGenTime:
-          createdConfig.autoGenTime == null
-            ? null
-            : {
-                secondsSinceMidnight:
-                  createdConfig.autoGenTime?.secondsSinceMidnight,
-                timezone: createdConfig.autoGenTime?.timezone,
-              },
-      };
+        if (createdConfig.autoGenTime) reportCron.attach(user.id);
+        await fullSyncTogglData(user.id, true);
+        return {
+          ...createdConfig,
+          autoGenTime:
+            createdConfig.autoGenTime == null
+              ? null
+              : {
+                  secondsSinceMidnight:
+                    createdConfig.autoGenTime?.secondsSinceMidnight,
+                  timezone: createdConfig.autoGenTime?.timezone,
+                },
+        };
+      } catch (e) {
+        console.log("Error creating config.");
+        throw e;
+      }
     },
     {
       headers: authHeaders,

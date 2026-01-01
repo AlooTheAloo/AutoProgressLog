@@ -128,6 +128,7 @@ export function setupListeners() {
           await APLStorage.set("token", retVal.data.token);
           console.log("token has been set!");
           if(!isMigration){
+                  console.log("Setup complete true 3");
             await APLStorage.set("setupComplete", true);
             win?.webContents.send("is-setup-complete", true);
           }
@@ -204,6 +205,7 @@ export function setupListeners() {
 
     if (resp.status == 200) {
       console.log("setup complete !!!");
+            console.log("Setup complete true 4");
       await APLStorage.set("setupComplete", true);
     }
 

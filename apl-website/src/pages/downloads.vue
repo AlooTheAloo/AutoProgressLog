@@ -270,7 +270,7 @@ function closeDialog() {
 const dialogOpen = ref(false);
 
 onMounted(() => {
-  const BACKEND_URL = "https://apl.chromaserver.net/download-links";
+  const BACKEND_URL = "https://api.aplapp.dev/download-links";
   fetch(BACKEND_URL).then(async (x) => {
     const data: {
       windowsUrl: string;

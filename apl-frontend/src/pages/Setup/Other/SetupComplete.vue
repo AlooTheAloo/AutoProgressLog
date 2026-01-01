@@ -21,7 +21,10 @@ onBeforeMount(() => {
     if (worked) {
       savingDone.value = true;
     } else {
-      alert("Failed to save config.");
+      alert(
+        "Failed to save config. Make sure no other user account uses the same toggl token."
+      );
+      router.push("/setup/toggl-manual-connect");
     }
   });
 });

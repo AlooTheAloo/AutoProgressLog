@@ -31,6 +31,7 @@ export function globalListeners() {
   ipcMain.handle("Update-App-Schema", async (event, args) => {
     await upgrade_schema((await VersionManager.SemVer()).toString());
     win?.webContents.send("router-push", "/app/dashboard");
+    console.log("Setup complete true 2");
     await APLStorage.set("setupComplete", true);
     win?.webContents.send("is-setup-complete", true);
   });
@@ -52,7 +53,6 @@ export function globalListeners() {
 
 export async function checkForUpdates() {
   console.log("Checking for updates");
-  console.log(await VersionManager.exists())
   if (!(await VersionManager.exists())) return;
   const result = await electronUpdater.autoUpdater.checkForUpdates();
   console.log(result)
