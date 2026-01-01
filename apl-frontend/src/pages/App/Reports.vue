@@ -322,7 +322,11 @@ function nf(num: number) {
       <div
         class="flex w-full h-full items-center px-10 my-5 justify-center flex-col"
       >
-        <div class="flex flex-col">
+        <motion.div class="flex flex-col"
+          :initial="{ y: 10, opacity: 0, filter: 'blur(10px)' }"
+          :animate="{ y: 0, opacity: 1, filter: 'blur(0px)' }"
+          :transition="{ duration: 0.5 }"
+        >
           <h1
             class="bg-gradient-to-r bg-clip-text text-4xl font-extrabold text-transparent from-[#89BDFF] to-[#40ffff]"
           >
@@ -331,7 +335,7 @@ function nf(num: number) {
           <h2 class="text-xl text-center w-full my-2">
             Create a report and come back to see your progress!
           </h2>
-        </div>
+        </motion.div>
       </div>
     </div>
   </div>

@@ -46,21 +46,29 @@ export function globalListeners() {
   });
 
   ipcMain.handle("check-for-update", async (event, args) => {
-    if (!(await VersionManager.exists())) return;
-    const result = await electronUpdater.autoUpdater.checkForUpdates();
-    const f = getFileInAPLData("skip.txt");
-    const skipped = existsSync(f)
-      ? (readFileSync(f).toString() ?? "0.0.0")
-      : "0.0.0";
-
-    if (
-      semver.gt(
-        result?.updateInfo.version ?? "0.0.0",
-        semver.gt(v1, skipped) ? v1 : skipped
-      ) &&
-      result?.updateInfo != null
-    ) {
-      win?.webContents.send("update-available", result?.updateInfo);
-    }
+    await checkForUpdates();
   });
 }
+
+export async function checkForUpdates() {
+  console.log("Checking for updates");
+  console.log(await VersionManager.exists())
+  if (!(await VersionManager.exists())) return;
+  const result = await electronUpdater.autoUpdater.checkForUpdates();
+  console.log(result)
+  const f = getFileInAPLData("skip.txt");
+  const skipped = existsSync(f)
+    ? (readFileSync(f).toString() ?? "0.0.0")
+    : "0.0.0";
+
+  if (
+    semver.gt(
+      result?.updateInfo.version ?? "0.0.0",
+      semver.gt(v1, skipped) ? v1 : skipped
+    ) &&
+    result?.updateInfo != null
+  ) {
+    win?.webContents.send("update-available", result?.updateInfo);
+  }
+}
+

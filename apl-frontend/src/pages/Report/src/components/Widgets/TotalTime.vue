@@ -14,8 +14,8 @@ const props = defineProps<TotalTimeProps>();
     units="hours"
     :image="Time"
     :value="{
-      current: Math.round(props.time.current / 3600),
-      delta: Math.round(props.time.delta / 3600),
+      current: (props.time.current / 3600).toFixed(1),
+      delta: (props.time.delta / 3600).toFixed(1),
     }"
   ></SmallWidget>
 </template>

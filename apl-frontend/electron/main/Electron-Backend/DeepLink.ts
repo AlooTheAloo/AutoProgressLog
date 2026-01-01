@@ -10,7 +10,7 @@ export async function initializeDeepLink() {
   if (process.argv.length >= 2) {
     await electronAppUniversalProtocolClient.initialize({
       protocol: "apl",
-      mode: isDev ? "development" : "production", // Make sure to use 'production' when script is executed in bundled app
+      mode: isDev ? "development" : "production",
     });
   }
   electronAppUniversalProtocolClient.on("request", async (requestUrl) => {

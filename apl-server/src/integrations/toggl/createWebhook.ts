@@ -3,7 +3,7 @@ import { EventAction, TogglWebhookClient } from "toggl-webhook";
 
 const wh_name = "APL_Toggl_Webhook";
 let wh_link =
-  (process.env.url ?? "https://apl.chromaserver.net") + "/webhooks/toggl";
+  (process.env.url ?? "https://api.aplapp.dev") + "/webhooks/toggl";
 
 export function getWebhookLink() {
   return wh_link;

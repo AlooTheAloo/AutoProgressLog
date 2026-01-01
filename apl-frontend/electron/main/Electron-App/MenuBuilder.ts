@@ -3,6 +3,7 @@ import { indexHtml, VITE_DEV_SERVER_URL, win } from "..";
 import { getConfig } from "../../../apl-backend/Helpers/getConfig";
 import { shell } from "electron";
 import { APLStorage } from "../Electron-Backend/util/auth";
+import { checkForUpdates } from "../Electron-Backend/globalListeners";
 
 export async function buildMenu(app: App) {
   const template: Electron.MenuItemConstructorOptions[] = [
@@ -37,8 +38,8 @@ export async function buildMenu(app: App) {
         { type: "separator" },
         {
           label: "Check for Updates",
-          click: () => {
-            ipcMain.emit("check-for-update");
+          click: async () => { // Make async
+            await checkForUpdates();
           },
         },
         {

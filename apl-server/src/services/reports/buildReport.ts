@@ -12,6 +12,20 @@ export async function buildReport(userId: number, skipSync: boolean = false) {
     if (!skipSync) {
         await syncTogglData(userId, true);
     }
+    
+    // Check for recent report generation (Concurrency/Debounce)
+    const lastRecentReport = await client.report.findFirst({
+        where: { userId: userId },
+        orderBy: { reportNo: 'desc' },
+        include: { syncData: true }
+    });
+
+    if (lastRecentReport && lastRecentReport.syncData && 
+        (new Date().getTime() - lastRecentReport.syncData.generationTime.getTime() < 10000)) {
+        console.log("Report generated too recently, skipping build for user:", userId);
+        throw new Error("RATE_LIMIT"); 
+    }
+
     const {ankiToken, url} =
     (await client.userConfig
         .findUnique({where: {userId}})

@@ -14,7 +14,6 @@ export async function startTunnel(port = 3000) {
       region: "us", // Change region if needed
     });
     console.log(`Ngrok tunnel started at: ${listener.url()}`);
-    fullSyncTogglData(4);
     setWebhookLink(listener.url() + "/webhooks/toggl");
     return listener;
   } catch (error) {

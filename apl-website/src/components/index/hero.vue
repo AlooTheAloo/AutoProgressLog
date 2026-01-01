@@ -180,13 +180,12 @@ function openDialog() {
     trailerSource.value = "https://youtube.com/embed/qLt7HWdLydo?si=7uzEyXAjT2_yCyng&t=0&autoplay=1&rel=0";
   }
   else {
-    trailerSource.value = "https://youtube.com/embed/P6JWVVT3DK0?autoplay=1&rel=0";
+    trailerSource.value = "https://youtube.com/embed/QBVXpKHH5cs?autoplay=1&rel=0";
   }
 }
 
 onMounted(() => {
   if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-    console.log("wow caca")
   } 
 })
 

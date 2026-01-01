@@ -7,14 +7,19 @@ import {getReport} from "../../services/reports/getReport";
 export const reportRoute = new Elysia({name: 'report-route'}).use(authGuard)
     .post(
         "/report",
-        async ({user}) => {
+        async ({user, set}) => {
             try {
                 await buildReport(user.id)
-            } catch (e) {
+                return {status: "Report successfully generated"};
+            } catch (e: any) {
                 console.log("ERROR!!! " + e)
+                if (e.message === "RATE_LIMIT") {
+                    set.status = 429;
+                    return { error: "RATE_LIMIT", message: "You are creating reports too fast" };
+                }
+                set.status = 500;
+                return { error: "INTERNAL_SERVER_ERROR", message: "Failed to generate report" };
             }
-            console.log("It just works.")
-            return {status: "Report successfully generated"};
         },
         {
             detail: {
@@ -27,6 +32,14 @@ export const reportRoute = new Elysia({name: 'report-route'}).use(authGuard)
             response: {
                 200: t.Object({
                     status: t.String()
+                }),
+                429: t.Object({
+                    error: t.String(),
+                    message: t.String()
+                }),
+                500: t.Object({
+                    error: t.String(),
+                    message: t.String()
                 })
             }
         }

@@ -12,6 +12,8 @@ import Report from "../../assets/Report.png";
 import Hey from "../../assets/Hey !.gif";
 import { Options } from "../../../apl-backend/types/options";
 import { DashboardDTO } from "../../../electron/main/Electron-Backend/types/Dashboard";
+import { useToast } from "primevue/usetoast";
+import Toast from "primevue/toast";
 
 const generating_report = ref<boolean>(false);
 const syncing = ref<boolean>(false);
@@ -19,6 +21,7 @@ const syncing = ref<boolean>(false);
 const dto = ref<DashboardDTO>();
 const lastSyncTime = ref<string>("");
 const config = ref<Options>();
+const toast = useToast();
 
 const disableActionButtons = computed(
   () => generating_report.value || syncing.value
@@ -31,9 +34,24 @@ async function generateReport() {
       await window.ipcRenderer.invoke("GenerateReport");
     if (!("error" in maybe)) {
       dto.value = maybe;
+    } else {
+      if (maybe.error === "RATE_LIMIT" || maybe.message === "You are creating reports too fast") {
+        toast.add({
+          severity: "error",
+          summary: "Woah, slow down!",
+          detail: "You are creating reports too fast. Please wait a moment.",
+          life: 3000,
+        });
+      }
     }
   } catch (error) {
     console.error("Error generating report:", error);
+    toast.add({
+        severity: "error",
+        summary: "An error has occured",
+        detail: "An error has occured while generating your report. More information : " + error,
+        life: 3000,
+      });
   } finally {
     generating_report.value = false;
   }
@@ -102,6 +120,7 @@ const closeFirstDialog = () => {
 </script>
 
 <template>
+  <Toast />
   <Dialog
     v-model:visible="firstDialog"
     modal

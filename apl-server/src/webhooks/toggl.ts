@@ -169,7 +169,7 @@ export const togglWebhook = new Elysia({ name: "toggl-webhook" }).post(
             where: { activityTogglId: payload.id.toString() },
           });
 
-          if (!activity) return;
+          if (!activity) return; // Too old or happened while server was down and we didnt sync up yet (edge case of an edge case)
 
           await client.immersionActivity.delete({
             where: { id: activity.id },

@@ -52,7 +52,7 @@ export async function getReport(userId: number, reportNo: number) {
 
   // 4. Immersion Data
   let immersionLog: { name: string; relativeValue: number }[] = [];
-  const immersionDelta = currentReport.score?.immersionScore ?? 0;
+  const immersionDelta = currentReport.syncData.totalImmersionTime - (previousReport?.syncData.totalImmersionTime ?? 0);
 
   if (currentReport.immersionLog && currentReport.immersionLog.length > 0) {
     // Use persistent logs
@@ -207,7 +207,7 @@ async function getHistoricalImmersionData(
       const delta = currentTotal - previousTotal;
       return {
         reportNo: report.reportNo,
-        value: delta <= 0 ? 0 : delta,
+        value: delta,
       };
     })  
     
@@ -223,7 +223,6 @@ async function getHistoricalAnkiData(userId: number, currentReportNo: number) {
       reportNo: {
         gte: startReportNo,
         lte: currentReportNo,
-        not: 0,
       },
     },
     include: {
@@ -251,11 +250,7 @@ async function getHistoricalAnkiData(userId: number, currentReportNo: number) {
       };
     })
     
-    if(historyReports.length > 24){
-      return historyReports.slice(1);
-    }
-
-  return historyReports;
+  return historyReports.slice(1);
 }
 
 async function getHistoricalMatureCardsData(

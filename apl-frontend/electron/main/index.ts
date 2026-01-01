@@ -11,6 +11,7 @@ import {
   FocusApp,
 } from "./Electron-Backend/appBackend";
 import { createAutoRPC } from "./Electron-Backend/RPC/RPCHandler";
+import { checkForUpdates } from "./Electron-Backend/globalListeners";
 import {
   getConfig,
   getFileInAPLData,
@@ -241,6 +242,7 @@ app.on("ready", async () => {
 
   if (!VersionManager.exists()) {
     await VersionManager.init();
+    
   }
 
   // ZFSTD
@@ -266,6 +268,8 @@ app.on("ready", async () => {
   createAutoRPC();
   electronUpdater.autoUpdater.forceDevUpdateConfig = true;
   electronUpdater.autoUpdater.autoDownload = false;
+
+  checkForUpdates();
 
   const logFile = getFileInAPLData("app.log");
   const logStream = fs.createWriteStream(logFile, { flags: "a" });

@@ -26,6 +26,11 @@ export async function runGeneration() {
     });
     if (error) {
       console.error("Error generating report:", error);
+      // @ts-ignore
+      if(error.value && error.value.error) {
+        // @ts-ignore
+        return { error: error.value.error, message: error.value.message };
+      }
       return { error: "Failed to generate report" };
     }
     const res = await runSync();

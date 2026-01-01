@@ -18,7 +18,7 @@ export class VersionManager {
     return (await this.SemVer()).compare(appVersion) == 0;
   };
 
-  static exists = () => fs.existsSync(cache_location);
+  static exists = () => APLStorage.get("version") != null;
 
   static init = () => {
     this.setVersion(appVersion);

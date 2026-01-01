@@ -2,11 +2,13 @@ import { app, Menu, nativeImage, Notification, shell, Tray } from "electron";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { runChecks } from "./DashboardListeners";
+import { checkForUpdates } from "./globalListeners";
 import { runGeneration } from "../../../apl-backend/generate/generate";
 import { createWindow, win } from "..";
 import { setSyncing } from "../../../apl-backend/generate/sync";
 import { getConfig } from "../../../apl-backend/Helpers/getConfig";
 import { upgrading } from "../../../apl-backend/apl-upgrade";
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -49,6 +51,14 @@ export async function buildContextMenu() {
       enabled: !win?.isDestroyed(),
       click: () => {
         win?.destroy();
+      },
+    },
+    {
+      label: "Check for updates",
+      type: "normal",
+      enabled: true,
+      click: () => {
+        checkForUpdates();
       },
     },
     {
