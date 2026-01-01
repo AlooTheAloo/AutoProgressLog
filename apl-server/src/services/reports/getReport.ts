@@ -189,7 +189,6 @@ async function getHistoricalImmersionData(
       reportNo: {
         gte: startReportNo,
         lte: currentReportNo,
-        not: 0,
       },
     },
     include: {
@@ -205,18 +204,14 @@ async function getHistoricalImmersionData(
       const previousTotal =
         index > 0 ? reports[index - 1].syncData.totalImmersionTime : 0;
       const currentTotal = report.syncData.totalImmersionTime;
+      const delta = currentTotal - previousTotal;
       return {
         reportNo: report.reportNo,
-        value: currentTotal - previousTotal,
+        value: delta <= 0 ? 0 : delta,
       };
     })  
     
-    if(historyReports.length > 24){
-      return historyReports.slice(1);
-    }
-
-
-  return historyReports;
+  return historyReports.slice(1);
 }
 
 async function getHistoricalAnkiData(userId: number, currentReportNo: number) {

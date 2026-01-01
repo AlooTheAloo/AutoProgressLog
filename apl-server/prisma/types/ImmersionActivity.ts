@@ -8,7 +8,8 @@ export const ImmersionActivityPlain = t.Object(
   {
     id: t.Integer(),
     createdAt: t.Date(),
-    activityTogglId: t.String(),
+    updatedAt: t.Date(),
+    activityTogglId: __nullable__(t.String()),
     seconds: t.Integer(),
     activityName: t.String(),
     userId: t.Integer(),
@@ -91,6 +92,7 @@ export const ImmersionActivityWhere = t.Partial(
           OR: t.Array(Self, { additionalProperties: false }),
           id: t.Integer(),
           createdAt: t.Date(),
+          updatedAt: t.Date(),
           activityTogglId: t.String(),
           seconds: t.Integer(),
           activityName: t.String(),
@@ -139,6 +141,7 @@ export const ImmersionActivityWhereUnique = t.Recursive(
             {
               id: t.Integer(),
               createdAt: t.Date(),
+              updatedAt: t.Date(),
               activityTogglId: t.String(),
               seconds: t.Integer(),
               activityName: t.String(),
@@ -158,6 +161,7 @@ export const ImmersionActivitySelect = t.Partial(
     {
       id: t.Boolean(),
       createdAt: t.Boolean(),
+      updatedAt: t.Boolean(),
       activityTogglId: t.Boolean(),
       seconds: t.Boolean(),
       activityName: t.Boolean(),
@@ -183,6 +187,9 @@ export const ImmersionActivityOrderBy = t.Partial(
         additionalProperties: false,
       }),
       createdAt: t.Union([t.Literal("asc"), t.Literal("desc")], {
+        additionalProperties: false,
+      }),
+      updatedAt: t.Union([t.Literal("asc"), t.Literal("desc")], {
         additionalProperties: false,
       }),
       activityTogglId: t.Union([t.Literal("asc"), t.Literal("desc")], {

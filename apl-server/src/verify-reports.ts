@@ -21,7 +21,7 @@ async function verify() {
 
     // 2. Build a report
     console.log("Building report...");
-    await buildReport(userId);
+    await buildReport(userId, true);
 
     // 3. Get the report
     const lastReport = await client.report.findFirst({
@@ -53,7 +53,7 @@ async function verify() {
 
     // 6. Build another report to verify delta logic
     console.log("Building second report to verify delta logic...");
-    await buildReport(userId);
+    await buildReport(userId, true);
     const secondReport = await client.report.findFirst({
         where: { userId },
         orderBy: { reportNo: 'desc' }

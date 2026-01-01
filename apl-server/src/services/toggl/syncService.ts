@@ -3,6 +3,22 @@ import client from "../../db/client";
 import dayjs from "dayjs";
 import { writeFileSync } from "fs";
 
+const lastSyncMap = new Map<number, number>();
+const SYNC_THRESHOLD_MS = 5 * 60 * 1000; // 5 minutes
+
+function isRateLimited(userId: number): boolean {
+  const lastSync = lastSyncMap.get(userId);
+  if (!lastSync) return false;
+  
+  const now = Date.now();
+  if (now - lastSync < SYNC_THRESHOLD_MS) {
+    const remaining = Math.ceil((SYNC_THRESHOLD_MS - (now - lastSync)) / 1000 / 60);
+    console.log(`User ${userId} is Toggl sync rate limited. Remaining: ~${remaining} mins`);
+    return true;
+  }
+  return false;
+}
+
 interface TogglEntry {
     id: number;
     description: string;
@@ -13,16 +29,104 @@ interface TogglEntry {
     server_deleted_at: string | null;
 }
 
+
+
 const ignore = (tags: string[]) =>
   ["aplignore", "ignore", "autoprogresslogignore"].some((x) =>
     tags.map((t) => t.toLowerCase()).includes(x)
   );
 
+type item = {
+  title: {
+    time_entry: string;
+  };
+  time: number;
+  cur: string;
+  sum: number;
+  rate: number;
+  local_start: string;
+}
+
+/**
+ * Runs a full dirty toggl sync (9 months of dirty data + 3 months of clean data)
+ * @param userID The user to sync for
+ * @returns True if the sync was successful, false otherwise
+ */
+export async function fullSyncTogglData(userID: number, force: boolean = false) {
+  if (!force && isRateLimited(userID)) return false;
+  console.log("--- FULL SYNC START ---");
+
+  const cfg = await client.userConfig.findUnique({
+    where: { userId: userID },
+    select: { togglToken: true, togglUserId: true },
+  });
+
+  if(cfg == null) return false;
+
+  const apiToken = cfg.togglToken;
+
+  const toggl = new Toggl({
+    auth: {
+      token: apiToken,
+    },
+  });
+  const me = await toggl.me.get();
+  
+  const auth = Buffer.from(`${apiToken}:api_token`).toString("base64");
+
+  const url = new URL("https://api.track.toggl.com/reports/api/v2/summary");
+  url.searchParams.set("workspace_id", me.default_workspace_id.toString());
+  url.searchParams.set("user_agent", "AutoProgressLog/1.0");
+
+
+  url.searchParams.set("since", dayjs().subtract(1, "year").add(1, "minute").format("YYYY-MM-DD"));
+  url.searchParams.set("until", dayjs().subtract(90, "days").add(1, "minute").format("YYYY-MM-DD"));
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      "User-Agent": "AutoProgressLog | aplapp.dev",
+      "Authorization": `Basic ${auth}`,
+    },
+  });
+
+  
+  
+  const json: {data: {items: item[]}[]} = await response.json();
+
+  try{
+    const prout = await client.immersionActivity.createMany({
+        data: json.data.flatMap((x:any) => x.items).map((e: item) => {
+        return {
+            userId: userID,
+            activityName: e.title.time_entry,
+            activityTogglId: null,
+            createdAt: new Date(e.local_start),
+            seconds: e.time / 1000 // ms -> s
+        };
+        }),
+        skipDuplicates: true,
+    });
+    console.log("worked ??" + JSON.stringify(prout));
+  } catch(e){
+    console.log("ERRORED !OUUT")
+    console.error(e);
+    return false;
+  }
+  console.log("No error :3")
+  
+  await syncTogglData(userID, force)
+
+  return true;
+}
+
+
+
 /**
  * Synchronizes Toggl data for the last 3 months.
  * Adds missing entries, updates changed ones, and deletes removed ones.
  */
-export async function syncTogglData(userId: number) {
+export async function syncTogglData(userId: number, force: boolean = false) {
+    if (!force && isRateLimited(userId)) return;
     console.log(`--- TOGGL SYNC START for User ${userId} ---`);
     
     const config = await client.userConfig.findUnique({
@@ -40,7 +144,7 @@ export async function syncTogglData(userId: number) {
     });
 
     // Time window: Last 3 months
-    const sinceDate = dayjs().subtract(3, "month").add(1, "day");
+    const sinceDate = dayjs().subtract(90, "day").add(1, "minute");
     
     try {
         let togglEntries: any[] | string | null = null;
@@ -61,6 +165,9 @@ export async function syncTogglData(userId: number) {
             // lmfao get API call diffed
             return;
         }
+
+        // Update last sync time
+        lastSyncMap.set(userId, Date.now());
 
         // Filter out ongoing entries and ignored ones
         const validTogglEntries = togglEntries.filter(e => 
@@ -83,7 +190,7 @@ export async function syncTogglData(userId: number) {
         console.log("len dbent : " + dbEntries.length);
 
         const dbMap = new Map<string, typeof dbEntries[0]>();
-        dbEntries.forEach(e => dbMap.set(e.activityTogglId, e));
+        dbEntries.forEach(e => dbMap.set(e.activityTogglId ?? "null", e));
 
         const toCreate: any[] = [];
         const toUpdate: { id: number, data: any }[] = [];

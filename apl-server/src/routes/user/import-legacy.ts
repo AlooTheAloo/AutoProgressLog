@@ -392,7 +392,7 @@ export const importLegacyRoute = new Elysia({ name: "import-legacy" })
       // --- 8) Backfill & Webhook ---
       if (togglToken) {
         console.log("Backfilling last 3 months data...");
-        await syncTogglData(userId);
+        await syncTogglData(userId, true);
         console.log("Creating webhook...");
         await createWebhook(-1, togglToken);
       }

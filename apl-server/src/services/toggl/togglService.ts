@@ -33,17 +33,84 @@ const ignore = (tags: string[]) =>
     tags.map((x) => x.toLowerCase()).includes(x)
   );
 
+type item = {
+  title: {
+    time_entry: string;
+  };
+  time: number;
+  cur: string;
+  sum: number;
+  rate: number;
+  local_start: string;
+}
+
+export async function fullSync(userID: number) {
+  console.log("--- FULL SYNC START ---");
+
+  const cfg = await client.userConfig.findUnique({
+    where: { userId: userID },
+    select: { togglToken: true, togglUserId: true },
+  });
+
+  if(cfg == null) return false;
+
+  const apiToken = cfg.togglToken;
+
+  const toggl = new Toggl({
+    auth: {
+      token: apiToken,
+    },
+  });
+  const me = await toggl.me.get();
+  
+  const auth = Buffer.from(`${apiToken}:api_token`).toString("base64");
+
+  const url = new URL("https://api.track.toggl.com/reports/api/v2/summary");
+  url.searchParams.set("workspace_id", me.default_workspace_id.toString());
+  url.searchParams.set("user_agent", "AutoProgressLog/1.0");
+
+
+  url.searchParams.set("since", dayjs().subtract(90, "days").add(1, "minute").format("YYYY-MM-DD"));
+
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      "User-Agent": "AutoProgressLog | aplapp.dev",
+      "Authorization": `Basic ${auth}`,
+    },
+  });
+
+  
+  const json = await response.json();
+
+  await client.immersionActivity.createMany({
+    data: json.data.items.map((e: item) => {
+      return {
+        userId: userID,
+        activityName: e.title,
+        activityTogglId: null,
+        createdAt: new Date(e.local_start),
+        seconds: e.time / 1000 // ms -> s
+      };
+    }),
+    skipDuplicates: true,
+  });
+
+  ManualSync(userID)
+
+}
+
+
 export async function ManualSync(userID: number) {
   console.log("--- MANUAL SYNC START ---");
   const cfg = await client.userConfig.findUnique({
     where: { userId: userID },
     select: { togglToken: true, togglUserId: true },
   });
-  console.log("CONFIG IS " + JSON.stringify(cfg));
 
   if (cfg == undefined) return false;
 
-  const since = dayjs().subtract(3, "month").add(1, "day");
+  const since = dayjs().subtract(90, "day").add(1, "minute");
 
   const t = new Toggl({
     auth: {

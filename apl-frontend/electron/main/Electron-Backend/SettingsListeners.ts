@@ -138,6 +138,11 @@ export function settingsListeners() {
         },
       }
     );
+
+    if(res.error){
+      console.log("Upload failed", res.error);
+      return false;
+    }
     console.log("Uploaded", JSON.stringify(res));
     return res.data;
   });

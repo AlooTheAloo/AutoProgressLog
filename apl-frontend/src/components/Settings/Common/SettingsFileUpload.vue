@@ -69,7 +69,12 @@ function openLink() {
         chooseLabel="Browse"
         :auto="true"
       >
-        <i class="pi pi-plus"></i> Upload profile picture
+      <div>
+<i class="pi pi-plus"></i> Upload profile picture
+<p class="text-gray-400 dark:text-gray-600 text-xs -mt-1" >(max 670 KB)</p>
+      </div>
+        
+
       </Button>
     </div>
   </div>

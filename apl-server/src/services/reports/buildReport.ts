@@ -2,12 +2,16 @@ import client from "../../db/client";
 import AnkiStorage from "../anki/AnkiStorage";
 import NormalSyncer from "../anki/NormalSyncer";
 import AnkiHTTPClient from "../anki/AnkiHTTPClient";
+import { syncTogglData } from "../toggl/syncService";
 
 const MATURE_WEIGHT = 100;
 const CARD_WEIGHT = 1;
 const SECOND_WEIGHT = 1;
 
-export async function buildReport(userId: number) {
+export async function buildReport(userId: number, skipSync: boolean = false) {
+    if (!skipSync) {
+        await syncTogglData(userId, true);
+    }
     const {ankiToken, url} =
     (await client.userConfig
         .findUnique({where: {userId}})
@@ -95,13 +99,13 @@ export async function buildReport(userId: number) {
     const immersionLogsSinceLastReport = await client.immersionActivity.findMany({
         where: {
             userId: userId,
-            createdAt: {
+            updatedAt: {
                 gt: lastReportTime,
             }
         }
     });
 
-    const secondsDelta = immersionLogsSinceLastReport.reduce((acc, log) => acc + log.seconds, 0);
+    const secondsDelta = (totalImmersion._sum.seconds ?? 0) - (previousSyncReport?.totalImmersionTime ?? 0);
     
     // Group logs for persistent storage
     const immersionLogMap = new Map<string, number>();

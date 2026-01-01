@@ -2,7 +2,7 @@ import {Elysia, t} from "elysia";
 import {authGuard, authHeaders} from "../../../middlewares/authGuard";
 import client from "../../../db/client";
 
-const MAX_FILE_SIZE = 6.7 * 1024 * 1024; // bytes
+const MAX_FILE_SIZE = 670 * 1024; // bytes
 
 /**
  * ## POST /storage/pictures/upload
@@ -58,7 +58,7 @@ export const uploadRoute = new Elysia({name: "upload-route"})
             if (file.size > MAX_FILE_SIZE) {
                 set.status = 413;
                 return {
-                    description: "File size exceeds the 6.7MB limit",
+                    description: "File size exceeds the 670KB limit",
                 };
             }
 

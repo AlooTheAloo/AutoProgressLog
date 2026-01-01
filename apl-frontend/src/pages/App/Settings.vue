@@ -270,4 +270,9 @@ function ankiTest(worked: boolean) {
 .tablist {
   background-color: transparent !important;
 }
+
+
+.p-tabs * {
+ border-color: transparent;
+}
 </style>

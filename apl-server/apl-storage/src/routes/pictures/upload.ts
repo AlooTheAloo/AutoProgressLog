@@ -95,7 +95,7 @@ export const uploadRoute = new Elysia({name: "upload-picture"}).post(
                 "Uploads a picture for the specified user ID. The picture is saved in the public/pictures directory.",
             responses: {
                 200: {description: "Picture uploaded successfully"},
-                413: {description: "File too large (max 6.7MB)"},
+                413: {description: "File too large (max 670 kb)"},
                 415: {description: "Unsupported file type"},
                 400: {description: "Invalid request"},
                 500: {description: "Internal server error"},

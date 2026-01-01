@@ -72,7 +72,8 @@ model AnkiData {
 model ImmersionActivity {
   id              Int      @id @default(autoincrement())
   createdAt       DateTime
-  activityTogglId String   @unique
+  updatedAt       DateTime @default(now()) @updatedAt
+  activityTogglId String?  @unique
   seconds         Int
   activityName    String
   userId          Int
