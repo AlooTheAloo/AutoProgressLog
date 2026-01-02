@@ -33,8 +33,10 @@ const toggle = (index: number) => {
 </script>
 
 <template>
-  <section class="mx-auto py-24 px-4 dark:bg-black flex flex-col items-center ">
-    <div class="max-w-4xl ">
+  <section
+    class="mx-auto py-24 px-4 dark:bg-black bg-white flex flex-col items-center"
+  >
+    <div class="max-w-4xl">
       <div class="text-center mb-16">
         <h2
           class="text-3xl font-bold tracking-tight text-black dark:text-white sm:text-4xl"
@@ -68,7 +70,9 @@ const toggle = (index: number) => {
           <div
             class="overflow-hidden transition-[max-height,opacity] duration-500 ease-in-out"
             :class="[
-              openIndex === index ? 'max-h-48 opacity-100' : 'max-h-0 opacity-0',
+              openIndex === index
+                ? 'max-h-48 opacity-100'
+                : 'max-h-0 opacity-0',
             ]"
           >
             <div

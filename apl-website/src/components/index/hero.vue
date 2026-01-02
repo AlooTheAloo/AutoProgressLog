@@ -1,12 +1,12 @@
 <template>
   <div
-    class="absolute inset-0 -z-10 w-screen bg-white dark:bg-black bg-[linear-gradient(to_right,#8080802f_1px,transparent_1px),linear-gradient(to_bottom,#8080801f_2px,transparent_1px)] bg-[size:24px_24px]"
+    class="absolute inset-0 -z-10 w-full overflow-hidden bg-white dark:bg-black bg-[linear-gradient(to_right,#8080802f_1px,transparent_1px),linear-gradient(to_bottom,#8080801f_2px,transparent_1px)] bg-[size:24px_24px]"
   >
     <div class="animated-blob bg-fuchsia-400 dark:bg-fuchsia-800"></div>
   </div>
-  <Motion as="div" class="h-screen w-screen" :style="{ opacity: 1 }">
+  <Motion as="div" class="h-screen w-full overflow-hidden relative" :style="{ opacity: 1 }">
     <div
-      class="flex h-screen w-screen items-center md:justify-start justify-center"
+      class="flex h-screen w-full items-center md:justify-start justify-center"
     >
       <div>
         <Motion
@@ -119,7 +119,7 @@
         ease: 'easeInOut',
       }"
       :inViewOptions="{ once: true }"
-      class="absolute h-screen w-screen top-0 justify-end items-center pointer-events-none hidden md:flex overflow-hidden"
+      class="absolute h-screen w-full top-0 justify-end items-center pointer-events-none hidden md:flex overflow-hidden"
     >
       <div
         class="top-0 right-0 w-[40rem] translate-x-1/2 lg:translate-x-1/3 transition-all duration-20"
