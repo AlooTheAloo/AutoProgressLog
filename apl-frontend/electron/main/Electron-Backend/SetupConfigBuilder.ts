@@ -128,9 +128,9 @@ export function setupListeners() {
           await APLStorage.set("token", retVal.data.token);
           console.log("token has been set!");
           if(!isMigration){
-                  console.log("Setup complete true 3");
             await APLStorage.set("setupComplete", true);
             win?.webContents.send("is-setup-complete", true);
+            win?.webContents.send("set-sidebar-state", true);
           }
           return "login";
         } else return "signup";
@@ -150,6 +150,7 @@ export function setupListeners() {
     });
     await createListeners();
     win?.webContents.send("is-setup-complete", true);
+    win?.webContents.send("set-sidebar-state", true);
   });
 
   ipcMain.handle("SaveConfig", async (event: any, arg: any) => {

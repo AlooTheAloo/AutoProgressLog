@@ -21,7 +21,8 @@ const emit = defineEmits<{
     <SettingsField
       :value="config.serverOptions.userProfile.userName ?? undefined"
       label="Username"
-      placeholder="Enter your username"
+      placeholder="Enter your username (max 100 characters)"
+      :max-length="100"
       @update:value="
         $emit('update:config', {
           ...config,
