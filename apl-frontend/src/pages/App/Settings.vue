@@ -39,18 +39,23 @@ const isDirty = computed(() => {
 });
 
 onMounted(() => {
-  window.ipcRenderer.invoke("GetConfig").then((data: Options) => {
-    console.log("GetConfig", data);
-    config.value = data;
-    originalConfig.value = data;
-  });
+  window.ipcRenderer
+    .invoke("GetConfig")
+    .then((data: Options) => {
+      console.log("GetConfig", data);
+      config.value = data;
+      originalConfig.value = data;
+    })
+    .catch((err) => {
+      console.log("GetConfig error", err);
+    });
 });
 
 function save() {
   window.ipcRenderer
     .invoke("SetConfig", JSON.stringify(config.value))
     .then((data: Options) => {
-      console.log("new config dropped in : " + JSON.stringify(data));
+      console.log("new config dropped : " + JSON.stringify(data));
 
       config.value = data;
       originalConfig.value = data;
