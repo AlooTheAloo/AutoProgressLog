@@ -62,6 +62,7 @@ function save() {
       });
     })
     .catch((e) => {
+      router.push("/home");
       console.error("Failed to save config:", e);
       toast.add({
         severity: "error",
@@ -271,8 +272,7 @@ function ankiTest(worked: boolean) {
   background-color: transparent !important;
 }
 
-
 .p-tabs * {
- border-color: transparent;
+  border-color: transparent;
 }
 </style>

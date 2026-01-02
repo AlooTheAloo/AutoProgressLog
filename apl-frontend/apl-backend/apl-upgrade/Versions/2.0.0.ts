@@ -15,6 +15,9 @@ import { APLStorage } from "../../../electron/main/Electron-Backend/util/auth";
 import { SocketClient } from "../../../electron/main/Electron-Backend/Socket/SocketClient";
 import { createListeners } from "../../../electron/main/Electron-Backend/RPC/RPCHandler";
 import { APLLocalOptions, OutputOptions } from "../../types/options";
+
+let migrated = false;
+
 export default async function upgrade_2_0_0() {
   console.log("Upgrading to 2.0.0");
   if (
@@ -27,6 +30,8 @@ export default async function upgrade_2_0_0() {
     console.log("Sending 2_0_0_upgrade");
     win?.webContents.send("2_0_0_upgrade");
     ipcMain.handleOnce("update-2_0_0_done", async () => {
+      
+      console.log("Setup complete true 1");
       await APLStorage.set("setupComplete", true);
       [cache_location, configPath, syncDataPath].forEach((x) => rmSync(x));
       await new SocketClient().init({
@@ -36,7 +41,11 @@ export default async function upgrade_2_0_0() {
       win?.webContents.send("is-setup-complete", true);
       res();
     });
-    ipcMain.handleOnce("legacy-migration", async () => {
+    ipcMain.handle("legacy-migration", async () => {
+      console.log("migrated is " + migrated);
+      if(migrated) return -1;
+      migrated = true;
+      console.log("migrating...");
       try {
         const paths = [cache_location, configPath, syncDataPath];
         const bufs = paths.map((x) => readFileSync(x));
@@ -71,6 +80,8 @@ export default async function upgrade_2_0_0() {
           outputOptions: OutputOptions;
         } = JSON.parse(readFileSync(configPath).toString());
 
+        console.log(JSON.stringify(oldConfig));
+
         const localConfig: APLLocalOptions = {
           general: {
             discordIntegration: oldConfig.general.discordIntegration,
@@ -87,14 +98,17 @@ export default async function upgrade_2_0_0() {
             outputQuality: oldConfig.outputOptions.outputQuality,
           },
         };
-
+        
         APLStorage.set("localConfig", {
           ...localConfig,
         });
 
         console.log("res : " + JSON.stringify(res));
+        migrated = false;
+
         return res.status == 200;
       } catch (e) {
+        migrated = false;
         console.log(e);
         return false;
       }

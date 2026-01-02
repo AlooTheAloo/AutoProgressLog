@@ -6,7 +6,8 @@ import { APLStorage } from "../../electron/main/Electron-Backend/util/auth.js";
 import { existsSync } from "fs";
 export class VersionManager {
   static setVersion = async (version: string) => {
-    await APLStorage.set("version", version);
+    console.log("Setting version to " + version);
+    // await APLStorage.set("version", version);
   };
 
   static SemVer = async () => {
@@ -14,13 +15,18 @@ export class VersionManager {
   };
 
   static verifyVersion = async () => {
+    console.log("Does this exist yet? " + (await this.exists()));
     if (existsSync(cache_location)) return false; // Before v2
+    if(!(await this.exists())) return true; // newly installed
     return (await this.SemVer()).compare(appVersion) == 0;
   };
 
-  static exists = () => APLStorage.get("version") != null;
+  static exists = async () => {
+    return (await APLStorage.get("version")) != null;
+  }
 
   static init = () => {
+    console.log("Initializing version manager");
     this.setVersion(appVersion);
   };
 

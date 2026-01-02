@@ -333,18 +333,6 @@ export const importLegacyRoute = new Elysia({ name: "import-legacy" })
           syncDataId = created.id;
         }
 
-        if (reportNo > 330) {
-          console.log(
-            "FOR REPORT #" +
-              reportNo +
-              " WE GET " +
-              items
-                .slice(Math.max(0, i - 9), i + 1)
-                .map((x) => x.seconds)
-                .reverse()
-          );
-        }
-        console.log("ITEM'S SCORE IS " + item.score);
         await prisma.report.upsert({
           where: {
             reportNo_userId: { reportNo, userId },
@@ -353,9 +341,9 @@ export const importLegacyRoute = new Elysia({ name: "import-legacy" })
             reportNo,
             score: {
               create: {
-                immersionScore: item.seconds,
-                ankiScore: item.score - item.seconds, // total = a + b <=> b = total - a
-                totalScore: item.score,
+                immersionScore: item.seconds ?? 0,
+                ankiScore: (item.score ?? 0) - (item.seconds ?? 0), // total = a + b <=> b = total - a
+                totalScore: item.score ?? 0,
               },
             },
             averageImmersionTime: arithmeticWeightedMean(
@@ -378,14 +366,14 @@ export const importLegacyRoute = new Elysia({ name: "import-legacy" })
             score: {
               upsert: {
                 create: {
-                  immersionScore: item.seconds,
-                  ankiScore: item.score - item.seconds,
-                  totalScore: item.score,
+                  immersionScore: item.seconds ?? 0,
+                  ankiScore: (item.score ?? 0) - (item.seconds ?? 0),
+                  totalScore: item.score ?? 0,
                 },
                 update: {
-                  immersionScore: item.seconds,
-                  ankiScore: item.score - item.seconds,
-                  totalScore: item.score,
+                  immersionScore: item.seconds ?? 0,
+                  ankiScore: (item.score ?? 0) - (item.seconds ?? 0),
+                  totalScore: item.score ?? 0,
                 },
               },
             },

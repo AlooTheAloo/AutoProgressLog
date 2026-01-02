@@ -166,8 +166,6 @@ export async function syncTogglData(userId: number, force: boolean = false) {
       return;
     }
 
-    writeFileSync("stuff.json", JSON.stringify(togglEntries));
-
     if (typeof togglEntries == "string" || togglEntries == null) {
       console.log("User is out of API calls for the hour. Skipping diff sync.");
       // lmfao get API call diffed
