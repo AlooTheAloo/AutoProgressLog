@@ -18,7 +18,7 @@ export class SocketClient {
   }
 
   async init(authData: { token: string }): Promise<void> {
-    const URL = `ws://${SERVER_URL}/ws`;
+    const URL = `wss://${SERVER_URL}/ws`;
     this.authData = authData; // store for reconnect
 
     return new Promise<void>((resolve, reject) => {
@@ -41,12 +41,12 @@ export class SocketClient {
         resolve();
       });
 
-      this.socket.addEventListener("error", (err:any) => {
+      this.socket.addEventListener("error", (err: any) => {
         Logger.log("WebSocket error : " + (err as any).message, "Socket");
         reject(err);
       });
 
-      this.socket.addEventListener("close", (event:any) => {
+      this.socket.addEventListener("close", (event: any) => {
         Logger.log(`WebSocket closed: ${event.code} ${event.reason}`, "Socket");
         this.stopHeartbeat();
         if (!this.isReconnecting) {
@@ -55,7 +55,7 @@ export class SocketClient {
         }
       });
 
-      this.socket.addEventListener("message", (event:any) => {
+      this.socket.addEventListener("message", (event: any) => {
         try {
           const parsed = JSON.parse(event.data.toString());
           const { type, payload } = parsed;
