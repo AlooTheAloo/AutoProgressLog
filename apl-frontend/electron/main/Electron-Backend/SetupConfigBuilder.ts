@@ -130,6 +130,7 @@ export function setupListeners() {
           if(!isMigration){
             await APLStorage.set("setupComplete", true);
             win?.webContents.send("is-setup-complete", true);
+            win?.webContents.send("set-sidebar-state", true);
           }
           return "login";
         } else return "signup";
@@ -149,6 +150,7 @@ export function setupListeners() {
     });
     await createListeners();
     win?.webContents.send("is-setup-complete", true);
+    win?.webContents.send("set-sidebar-state", true);
   });
 
   ipcMain.handle("SaveConfig", async (event: any, arg: any) => {

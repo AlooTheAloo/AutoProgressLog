@@ -15,6 +15,7 @@ const props = defineProps<{
   placeholder?: string;
   helpText?: string;
   link?: string;
+  maxLength?: number;
 }>();
 
 const emit = defineEmits(["update:value"]);
@@ -52,6 +53,7 @@ const value = ref<string>(props.value ?? "");
     </div>
     <div class="w-96">
       <InputText
+        :maxlength="maxLength"
         v-if="!password"
         :disabled="disabled"
         @update:model-value="updateValue"
