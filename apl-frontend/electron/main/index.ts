@@ -240,10 +240,7 @@ app.on("ready", async () => {
     await checkHealth(getConfig());
   }
 
-  if (!VersionManager.exists()) {
-    await VersionManager.init();
-    
-  }
+
 
   // ZFSTD
   await init();

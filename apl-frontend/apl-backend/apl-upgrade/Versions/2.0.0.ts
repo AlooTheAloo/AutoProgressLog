@@ -27,6 +27,7 @@ export default async function upgrade_2_0_0() {
     console.log("Sending 2_0_0_upgrade");
     win?.webContents.send("2_0_0_upgrade");
     ipcMain.handleOnce("update-2_0_0_done", async () => {
+      console.log("Setup complete true 1");
       await APLStorage.set("setupComplete", true);
       [cache_location, configPath, syncDataPath].forEach((x) => rmSync(x));
       await new SocketClient().init({
