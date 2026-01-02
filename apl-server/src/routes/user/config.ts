@@ -274,7 +274,7 @@ export const configRoutes = new Elysia({name: "config-routes"})
                     update: {
                         togglToken: body.togglToken,
                         togglUserId: body.togglUserId,
-                        
+
                         autoGenTime: body.autoGenTime
                             ? {
                                 upsert: {
@@ -473,19 +473,29 @@ export const configRoutes = new Elysia({name: "config-routes"})
         async ({body, user}) => {
             const associatedConfig = await client.userConfig.findUnique({
                 where: {userId: user.id},
+                select: {id: true},
             });
+
             if (!associatedConfig) {
                 throw new Error(
                     "User configuration not found. Please create a user config first."
                 );
             }
-            return client.ankiConfig.create({
-                data: {
+
+            return client.ankiConfig.upsert({
+                where: {userConfigId: associatedConfig.id}, // requires userConfigId UNIQUE on AnkiConfig
+                create: {
                     url: body.url,
                     ankiToken: body.ankiToken,
                     retentionMode: body.retentionMode,
                     trackedDecks: body.trackedDecks,
-                    userConfigId: associatedConfig?.id,
+                    userConfigId: associatedConfig.id,
+                },
+                update: {
+                    url: body.url,
+                    ankiToken: body.ankiToken,
+                    retentionMode: body.retentionMode,
+                    trackedDecks: body.trackedDecks,
                 },
                 select: {
                     url: true,
@@ -500,10 +510,10 @@ export const configRoutes = new Elysia({name: "config-routes"})
             body: PublicAnkiConfig,
             response: PublicAnkiConfig,
             detail: {
-                summary: "Create Anki configuration",
+                summary: "Upsert Anki configuration",
                 tags: ["User"],
                 description:
-                    "Creates a new Anki configuration record for the authenticated user.",
+                    "Creates or updates the Anki configuration record for the authenticated user.",
             },
         }
     )
