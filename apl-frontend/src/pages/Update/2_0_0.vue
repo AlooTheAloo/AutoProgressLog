@@ -50,14 +50,15 @@ onMounted(() => {
       migrating.value = true;
       window.ipcRenderer.send("set-sidebar-state", false);
       window.ipcRenderer.invoke("legacy-migration").then((x) => {
-        window.ipcRenderer.send("set-sidebar-state", true);
+        if(x == -1) return; // bruh
         if (x) {
+           window.ipcRenderer.send("set-sidebar-state", true);
           window.ipcRenderer.invoke("update-2_0_0_done").then(() => {
             router.push("/update-app");
           });
         } else {
           alert(
-            "Migration failed. Please try again later or open an issue on github."
+            "Migration failed. Make sure this email is not already associated with an account. Please try again later or open an issue on github."
           );
           migrating.value = false;
         }
