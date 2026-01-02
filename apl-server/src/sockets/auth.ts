@@ -1,5 +1,5 @@
 import { ElysiaWS } from "elysia/dist/ws";
-import Toggl from "toggl-track";
+import { Toggl } from "toggl-track";
 import client from "../db/client";
 
 /**
