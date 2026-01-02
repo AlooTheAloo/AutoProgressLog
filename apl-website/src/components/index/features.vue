@@ -1,16 +1,18 @@
 <template>
-  <div class="min-h-screen py-24 flex flex-col justify-center relative  dark:bg-black">
+  <div
+    class="min-h-screen py-24 flex flex-col justify-center relative bg-white dark:bg-black"
+  >
     <div
-      class=" z-10 absolute top-0 -left-4 w-72 h-72 bg-purple-300 rounded-full filter blur-[150px] opacity-20 animate-blob"
+      class="z-10 absolute top-0 -left-4 w-72 h-72 bg-purple-300 rounded-full filter blur-[150px] opacity-60 dark:opacity-20 animate-blob"
     ></div>
     <div
-      class="absolute top-0 -right-4 w-72 h-72 bg-yellow-300 rounded-full filter blur-[150px] opacity-20 animate-blob animation-delay-2000"
+      class="z-10 absolute top-0 -right-4 w-72 h-72 bg-yellow-300 rounded-full filter blur-[150px] opacity-20 dark:opacity-20 animate-blob animation-delay-2000"
     ></div>
     <div
-      class="absolute -bottom-8 left-20 w-72 h-72 bg-pink-300 rounded-full filter blur-[150px] opacity-20 animate-blob animation-delay-4000"
+      class="z-10 absolute -bottom-8 left-20 w-72 h-72 bg-pink-300 rounded-full filter blur-[150px] opacity-60 dark:opacity-20 animate-blob animation-delay-4000"
     ></div>
 
-    <div class="container mx-auto px-4 md:px-6 relative z-10 ">
+    <div class="container mx-auto px-4 md:px-6 relative z-10">
       <Motion
         as="div"
         :initial="{ opacity: 0, x: -40, filter: 'blur(10px)' }"
@@ -40,7 +42,9 @@
         </p>
       </Motion>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-5xl mx-auto">
+      <div
+        class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-5xl mx-auto"
+      >
         <Motion
           as="div"
           v-for="(item, index) in gridItems"
@@ -65,14 +69,16 @@
             <div
               class="absolute inset-0 bg-gradient-to-br from-neutral-50 to-transparent dark:from-neutral-800/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
             ></div>
-            
-            <div class="relative z-10 flex flex-col h-full justify-between gap-4">
+
+            <div
+              class="relative z-10 flex flex-col h-full justify-between gap-4"
+            >
               <div
                 class="w-12 h-12 rounded-2xl bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-900 dark:text-white group-hover:scale-110 transition-transform duration-300"
               >
                 <component :is="item.icon" class="w-6 h-6" />
               </div>
-              
+
               <div class="space-y-2">
                 <h3
                   class="text-xl font-bold text-neutral-900 dark:text-white leading-tight"
@@ -93,7 +99,12 @@
 
 <script setup lang="ts">
 import { Motion } from "motion-v";
-import { DocumentTextIcon, Cog8ToothIcon, ArrowPathIcon, CodeBracketSquareIcon } from "@heroicons/vue/24/outline";
+import {
+  DocumentTextIcon,
+  Cog8ToothIcon,
+  ArrowPathIcon,
+  CodeBracketSquareIcon,
+} from "@heroicons/vue/24/outline";
 
 const gridItems = [
   {

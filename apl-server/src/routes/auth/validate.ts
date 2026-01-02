@@ -53,7 +53,8 @@ import {exchangeEmailTokenForSession} from '../../services/auth/token';
 export const validateRoute = new Elysia({name: 'validate-token'}).post(
     '/validate',
     async ({body, set}) => {
-        const {email, emailToken, deviceId, deviceName, userAgent} = body;
+        const {emailToken, deviceId, deviceName, userAgent} = body;
+        const email = body.email.toLowerCase();
 
         try {
             const dbToken = await exchangeEmailTokenForSession(email, emailToken, {

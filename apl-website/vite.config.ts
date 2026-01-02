@@ -17,6 +17,6 @@ export default defineConfig({
     },
   },
   server: {
-    allowedHosts: ["eleven-sheep-trade.loca.lt"],
+    host: true,
   },
 });

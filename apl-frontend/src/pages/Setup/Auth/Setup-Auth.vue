@@ -48,6 +48,36 @@ const protocolSchema = z.object({
   token: z.string(),
 });
 
+const urlRef = ref("");
+
+async function tryURL(){
+  const url = new URL(urlRef.value);
+  if (url.hostname !== "auth") return;
+  const parsed = Object.fromEntries(url.searchParams);
+  const result = protocolSchema.safeParse(parsed);
+  if (!result.success) {
+    alert("Invalid data received from url. Please try again.");
+    return;
+  }
+  const { email, token } = result.data;
+  const resp = await window.ipcRenderer.invoke(
+    "approve-email-token",
+    email,
+    token,
+    window.navigator.userAgent,
+    false
+  );
+
+  if (!resp) {
+    alert("Invalid email or token");
+  } else if (resp == "signup") {
+    router.push("/setup/auth-success");
+  } else if (resp == "login") {
+    router.push("/app/dashboard");
+  }
+}
+
+
 onMounted(() => {
   window.ipcRenderer.on("open-url", async (evt, data: string) => {
     const url = new URL(data);
@@ -142,6 +172,33 @@ onUnmounted(() => {
             >
               ✅ Check your inbox. This may take up to 30 minutes (blame google and microsoft lol)
             </motion.p>
+
+
+            <motion.div
+              v-if="emailSent"
+              :initial="{ opacity: 0, y: 20, filter: 'blur(10px)' }"
+              :animate="{
+                opacity: 1,
+                y: 0,
+                filter: 'blur(0px)',
+                transition: { duration: 1, delay: 1 },
+              }"
+              class="text-white text-sm font-medium mt-10"
+            >
+              If the button in the email doesn't work, you can input the URL at the bottom of the email here
+              <div class="flex items-center space-x-2">
+               <InputText
+                v-model="urlRef"
+                placeholder="apl://auth?email=john.doe@example.com&token=123456"
+                class="w-full"
+              />
+              <Button @click="tryURL">
+                Done
+              </Button>
+              </div>
+             
+            </motion.div>
+
           </div>
         </motion.div>
       </div>

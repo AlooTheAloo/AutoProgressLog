@@ -108,7 +108,7 @@ export async function fullSyncTogglData(
         .map((e: item) => {
           return {
             userId: userID,
-            activityName: e.title.time_entry,
+            activityName: e.title.time_entry || "(No Description)",
             activityTogglId: null,
             createdAt: new Date(e.local_start),
             seconds: e.time / 1000, // ms -> s
@@ -179,7 +179,6 @@ export async function syncTogglData(userId: number, force: boolean = false) {
     const validTogglEntries = togglEntries.filter(
       (e) =>
         e.stop && // completed
-        e.description && // not empty
         e.server_deleted_at == null && // not deleted
         !ignore((e.tags || []).map((t: any) => t.toString().toLowerCase())) // not ignored
     );
@@ -217,7 +216,7 @@ export async function syncTogglData(userId: number, force: boolean = false) {
         // MISSING: Add
         toCreate.push({
           userId,
-          activityName: togglEntry.description,
+          activityName: togglEntry.description || "(No Description)",
           activityTogglId: togglId,
           createdAt: togglStart,
           seconds: togglDuration,
@@ -234,7 +233,7 @@ export async function syncTogglData(userId: number, force: boolean = false) {
           toUpdate.push({
             id: dbEntry.id,
             data: {
-              activityName: togglEntry.description,
+              activityName: togglEntry.description || "(No Description)",
               seconds: togglDuration,
               createdAt: togglStart,
             },
