@@ -61,12 +61,12 @@ const openExplanation = () => {
                 <em>since your last report</em> and compile it into a new
                 report.
               </li>
-              <li>
+              <!-- <li>
                 Any entries you add <strong>before</strong> the report is
                 generated won't be included retroactively.
-              </li>
+              </li> -->
             </ol>
-            <div class="questionButton">
+            <!-- <div class="questionButton">
               <Button
                 class="h-2"
                 text
@@ -76,7 +76,7 @@ const openExplanation = () => {
               >
                 What the heck does that mean?
               </Button>
-            </div>
+            </div> -->
           </div>
         </AccordionContent>
       </AccordionPanel>
@@ -96,15 +96,11 @@ const openExplanation = () => {
                 Choose the exact time you'd like APL to generate your report
                 each day.
               </li>
-              <li>
-                Note: If your computer is turned off, suspended, or offline at
-                that time, APL won't be able to run the report.
-              </li>
             </ul>
           </div>
         </AccordionContent>
       </AccordionPanel>
-      <AccordionPanel value="2">
+      <!-- <AccordionPanel value="2">
         <AccordionHeader> Reverting a report </AccordionHeader>
         <AccordionContent>
           <div
@@ -147,7 +143,7 @@ const openExplanation = () => {
             </p>
           </div>
         </AccordionContent>
-      </AccordionPanel>
+      </AccordionPanel> -->
     </Accordion>
   </div>
 </template>
