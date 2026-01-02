@@ -96,12 +96,12 @@ export const togglWebhook = new Elysia({ name: "toggl-webhook" }).post(
         console.log("created activity", payload);
         if (payload.stop == undefined) {
           SocketManager.instance.send(event_user_id, "ActivityStart", {
-            activity: payload.description,
+            activity: payload.description || "(No Description)",
             start: payload.start,
             id: payload.id,
           });
           current_Activities.set(event_user_id, {
-            activity: payload.description,
+            activity: payload.description || "(No Description)",
             start: payload.start,
             id: payload.id,
           });
@@ -132,7 +132,7 @@ export const togglWebhook = new Elysia({ name: "toggl-webhook" }).post(
             await client.immersionActivity.update({
               where: { id: activity.id },
               data: {
-                activityName: payload.description,
+                activityName: payload.description || "(No Description)",
                 seconds: payload.duration
               },
             }); 
@@ -141,7 +141,7 @@ export const togglWebhook = new Elysia({ name: "toggl-webhook" }).post(
             await client.immersionActivity.create({
               data: {
                 userId: aplUser.id,
-                activityName: payload.description,
+                activityName: payload.description || "(No Description)",
                 activityTogglId: payload.id.toString(),
                 createdAt: new Date(payload.start),
                 seconds: Math.floor(
