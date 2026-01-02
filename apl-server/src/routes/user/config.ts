@@ -6,7 +6,7 @@ import { UserConfig, UserConfigPlain } from "../../../prisma/types/UserConfig";
 import { AnkiConfigPlain } from "../../../prisma/types/AnkiConfig";
 import createWebhook from "../../integrations/toggl/createWebhook";
 import deleteWebhook from "../../integrations/toggl/deleteWebhook";
-import Toggl from "toggl-track";
+import { Toggl } from "toggl-track";
 import { reportCronPlugin } from "../../middlewares/cronReportGenerator";
 import { buildReport } from "../../services/reports/buildReport";
 import { AutoGenConfigPlain } from "../../../prisma/types/AutoGenConfig";
