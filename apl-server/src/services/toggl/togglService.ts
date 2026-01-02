@@ -1,4 +1,4 @@
-import Toggl from "toggl-track";
+import { Toggl } from "toggl-track";
 import client from "../../db/client";
 import dayjs from "dayjs";
 
@@ -42,7 +42,7 @@ type item = {
   sum: number;
   rate: number;
   local_start: string;
-}
+};
 
 export async function fullSync(userID: number) {
   console.log("--- FULL SYNC START ---");
@@ -52,7 +52,7 @@ export async function fullSync(userID: number) {
     select: { togglToken: true, togglUserId: true },
   });
 
-  if(cfg == null) return false;
+  if (cfg == null) return false;
 
   const apiToken = cfg.togglToken;
 
@@ -62,25 +62,26 @@ export async function fullSync(userID: number) {
     },
   });
   const me = await toggl.me.get();
-  
+
   const auth = Buffer.from(`${apiToken}:api_token`).toString("base64");
 
   const url = new URL("https://api.track.toggl.com/reports/api/v2/summary");
   url.searchParams.set("workspace_id", me.default_workspace_id.toString());
   url.searchParams.set("user_agent", "AutoProgressLog/1.0");
 
-
-  url.searchParams.set("since", dayjs().subtract(90, "days").add(1, "minute").format("YYYY-MM-DD"));
+  url.searchParams.set(
+    "since",
+    dayjs().subtract(90, "days").add(1, "minute").format("YYYY-MM-DD")
+  );
 
   const response = await fetch(url, {
     method: "GET",
     headers: {
       "User-Agent": "AutoProgressLog | aplapp.dev",
-      "Authorization": `Basic ${auth}`,
+      Authorization: `Basic ${auth}`,
     },
   });
 
-  
   const json = await response.json();
 
   await client.immersionActivity.createMany({
@@ -90,16 +91,14 @@ export async function fullSync(userID: number) {
         activityName: e.title,
         activityTogglId: null,
         createdAt: new Date(e.local_start),
-        seconds: e.time / 1000 // ms -> s
+        seconds: e.time / 1000, // ms -> s
       };
     }),
     skipDuplicates: true,
   });
 
-  ManualSync(userID)
-
+  ManualSync(userID);
 }
-
 
 export async function ManualSync(userID: number) {
   console.log("--- MANUAL SYNC START ---");
@@ -137,7 +136,6 @@ export async function ManualSync(userID: number) {
       x.stop != null
     );
   });
-  
 
   await client.immersionActivity.createMany({
     data: entries.map((e) => {
