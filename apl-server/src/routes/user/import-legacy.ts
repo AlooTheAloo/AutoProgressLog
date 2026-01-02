@@ -284,7 +284,7 @@ export const importLegacyRoute = new Elysia({ name: "import-legacy" })
           createdActivities++;
         } catch (error: any) {
           // Skip duplicates (unique constraint violations)
-          if (error.code === 'P2002') {
+          if (error.code === "P2002") {
             console.log(`Skipping duplicate activityTogglId: ${a.id}`);
             skippedDuplicates++;
           } else {
@@ -333,10 +333,6 @@ export const importLegacyRoute = new Elysia({ name: "import-legacy" })
           syncDataId = created.id;
         }
 
-        if(reportNo > 330){
-          console.log("FOR REPORT #" + reportNo + " WE GET " + items.slice(Math.max(0, i - 9), i + 1).map(x => x.seconds).reverse())
-        }
-        console.log("ITEM'S SCORE IS " + item.score);
         await prisma.report.upsert({
           where: {
             reportNo_userId: { reportNo, userId },
@@ -344,13 +340,18 @@ export const importLegacyRoute = new Elysia({ name: "import-legacy" })
           create: {
             reportNo,
             score: {
-                create: {
-                    immersionScore: item.seconds,
-                    ankiScore: item.score - item.seconds, // total = a + b <=> b = total - a
-                    totalScore: item.score
-                }
+              create: {
+                immersionScore: item.seconds ?? 0,
+                ankiScore: (item.score ?? 0) - (item.seconds ?? 0), // total = a + b <=> b = total - a
+                totalScore: item.score ?? 0,
+              },
             },
-            averageImmersionTime: arithmeticWeightedMean(items.slice(Math.max(0, i - 9), i + 1).map(x => x.seconds).reverse()),
+            averageImmersionTime: arithmeticWeightedMean(
+              items
+                .slice(Math.max(0, i - 9), i + 1)
+                .map((x) => x.seconds)
+                .reverse()
+            ),
             bestImmersionTime: item.bestSeconds ?? 0,
             userId,
             syncDataId,
@@ -363,18 +364,18 @@ export const importLegacyRoute = new Elysia({ name: "import-legacy" })
           },
           update: {
             score: {
-                upsert: {
-                    create: {
-                        immersionScore: item.seconds,
-                        ankiScore: item.score - item.seconds,
-                        totalScore: item.score
-                    },
-                    update: {
-                        immersionScore: item.seconds,
-                        ankiScore: item.score - item.seconds,
-                        totalScore: item.score
-                    }
-                }
+              upsert: {
+                create: {
+                  immersionScore: item.seconds ?? 0,
+                  ankiScore: (item.score ?? 0) - (item.seconds ?? 0),
+                  totalScore: item.score ?? 0,
+                },
+                update: {
+                  immersionScore: item.seconds ?? 0,
+                  ankiScore: (item.score ?? 0) - (item.seconds ?? 0),
+                  totalScore: item.score ?? 0,
+                },
+              },
             },
             syncDataId,
             streak: {
