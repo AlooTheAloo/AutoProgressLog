@@ -3,7 +3,7 @@ import { TokenType, AnkiRetentionMode, AutoGenConfig } from "@prisma/client";
 import { Database } from "bun:sqlite";
 import prisma from "../../db/client";
 import { authGuard } from "../../middlewares/authGuard";
-import Toggl from "toggl-track";
+import { Toggl } from "toggl-track";
 import AnkiStorage from "../../services/anki/AnkiStorage";
 import { DEFAULT_ANKI_URL } from "../../services/anki/AnkiHTTPClient";
 import { syncTogglData } from "../../services/toggl/syncService";

@@ -1,4 +1,4 @@
-import Toggl from "toggl-track";
+import { Toggl } from "toggl-track";
 import { TogglWebhookClient } from "toggl-webhook";
 
 export default async function deleteWebhook(
