@@ -1,7 +1,6 @@
 import { Elysia, t } from "elysia";
 import client from "../../db/client";
 import { authGuard, authHeaders } from "../../middlewares/authGuard";
-import { __nullable__ } from "../../../prisma/types/__nullable__";
 import { UserPlain } from "../../../prisma/types/User";
 
 const PublicUser = t.Omit(UserPlain, ["id"]);
@@ -27,7 +26,15 @@ export const meRoutes = new Elysia({ name: "me-routes" })
   )
   .patch(
     "/me",
-    async ({ user, body }) => {
+    async ({ user, body, set }) => {
+      if (body.userName) {
+        if (body.userName.length > 100) {
+          set.status = 400;
+          return {
+            description: "Username cannot exceed 100 characters",
+          };
+        }
+      }
       const updatedUser = await client.user.update({
         where: { id: user.id },
         data: body,
@@ -41,7 +48,10 @@ export const meRoutes = new Elysia({ name: "me-routes" })
     {
       headers: authHeaders,
       body: PublicMutateUser,
-      response: t.Nullable(PublicUser),
+      response: {
+        200: t.Nullable(PublicUser),
+        400: t.Object({ description: t.String() }),
+      },
       detail: {
         description: "Update the current authenticated user",
         tags: ["User"],

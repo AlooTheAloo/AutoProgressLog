@@ -258,48 +258,69 @@ export const configRoutes = new Elysia({ name: "config-routes" })
   .post(
     "/config",
     async ({ body, user, reportCron }) => {
-      await createWebhook(-1, body.togglToken);
-      const createdConfig = await client.userConfig.create({
-        data: {
-          togglToken: body.togglToken,
-          togglUserId: body.togglUserId,
-          autoGenTime: {
-            create: body.autoGenTime,
-          },
-          userId: user.id,
-        },
-        select: {
-          togglToken: true,
-          togglUserId: true,
-          autoGenTime: true,
-          createdAt: true,
-          updatedAt: true,
-        },
-      });
+      try {
+        await createWebhook(-1, body.togglToken);
 
-      if (createdConfig.autoGenTime) reportCron.attach(user.id);
-      await fullSyncTogglData(user.id, true);
-      return {
-        ...createdConfig,
-        autoGenTime:
-          createdConfig.autoGenTime == null
-            ? null
-            : {
-                secondsSinceMidnight:
-                  createdConfig.autoGenTime?.secondsSinceMidnight,
-                timezone: createdConfig.autoGenTime?.timezone,
-              },
-      };
+        const upsertedConfig = await client.userConfig.upsert({
+          where: { userId: user.id },
+          create: {
+            togglToken: body.togglToken,
+            togglUserId: body.togglUserId,
+            autoGenTime: body.autoGenTime
+              ? { create: body.autoGenTime }
+              : undefined,
+            userId: user.id,
+          },
+          update: {
+            togglToken: body.togglToken,
+            togglUserId: body.togglUserId,
+
+            autoGenTime: body.autoGenTime
+              ? {
+                  upsert: {
+                    create: body.autoGenTime,
+                    update: body.autoGenTime,
+                  },
+                }
+              : undefined,
+          },
+          select: {
+            togglToken: true,
+            togglUserId: true,
+            autoGenTime: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        });
+
+        if (upsertedConfig.autoGenTime) reportCron.attach(user.id);
+        await fullSyncTogglData(user.id, true);
+
+        return {
+          ...upsertedConfig,
+          autoGenTime:
+            upsertedConfig.autoGenTime == null
+              ? null
+              : {
+                  secondsSinceMidnight:
+                    upsertedConfig.autoGenTime?.secondsSinceMidnight,
+                  timezone: upsertedConfig.autoGenTime?.timezone,
+                },
+        };
+      } catch (e) {
+        console.log("Error upserting config.");
+        throw e;
+      }
     },
     {
       headers: authHeaders,
       body: UserConfigCreateBody,
       response: PublicUserConfig,
       detail: {
-        summary: "Create user configuration",
+        summary: "Upsert user configuration",
         tags: ["User"],
         description:
-          "Creates a new configuration record for the authenticated user.",
+          "Creates or updates the configuration record for the authenticated user.",
       },
     }
   )
@@ -452,19 +473,29 @@ export const configRoutes = new Elysia({ name: "config-routes" })
     async ({ body, user }) => {
       const associatedConfig = await client.userConfig.findUnique({
         where: { userId: user.id },
+        select: { id: true },
       });
+
       if (!associatedConfig) {
         throw new Error(
           "User configuration not found. Please create a user config first."
         );
       }
-      return client.ankiConfig.create({
-        data: {
+
+      return client.ankiConfig.upsert({
+        where: { userConfigId: associatedConfig.id }, // requires userConfigId UNIQUE on AnkiConfig
+        create: {
           url: body.url,
           ankiToken: body.ankiToken,
           retentionMode: body.retentionMode,
           trackedDecks: body.trackedDecks,
-          userConfigId: associatedConfig?.id,
+          userConfigId: associatedConfig.id,
+        },
+        update: {
+          url: body.url,
+          ankiToken: body.ankiToken,
+          retentionMode: body.retentionMode,
+          trackedDecks: body.trackedDecks,
         },
         select: {
           url: true,
@@ -479,10 +510,10 @@ export const configRoutes = new Elysia({ name: "config-routes" })
       body: PublicAnkiConfig,
       response: PublicAnkiConfig,
       detail: {
-        summary: "Create Anki configuration",
+        summary: "Upsert Anki configuration",
         tags: ["User"],
         description:
-          "Creates a new Anki configuration record for the authenticated user.",
+          "Creates or updates the Anki configuration record for the authenticated user.",
       },
     }
   )
