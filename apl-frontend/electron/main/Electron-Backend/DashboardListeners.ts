@@ -52,6 +52,7 @@ export async function CreateDTO(): Promise<Partial<DashboardDTO> | null> {
   if (dto) return dto;
   else {
     win?.webContents.send("ShowWelcomeMessage");
+    win?.webContents.send("set-sidebar-state", true);
     await runSync();
     return CreateDTO();
   }

@@ -6,10 +6,12 @@ import { syncTogglData } from "../services/toggl/syncService";
 export class SocketManager {
   private authListeners: ((ws: ElysiaWS) => void)[] = [];
   static instance: SocketManager;
-  private static clients: Map<string, ElysiaWS>;
+  private static clients: Map<string, Set<ElysiaWS>>;
+  private static socketToId: Map<string, string>;
 
   constructor() {
-    SocketManager.clients = new Map<string, ElysiaWS>();
+    SocketManager.clients = new Map<string, Set<ElysiaWS>>();
+    SocketManager.socketToId = new Map<string, string>();
     SocketManager.instance = this;
   }
 
@@ -34,7 +36,11 @@ export class SocketManager {
         console.log("Authenticated " + data.togglUserId);
         createWebhook(-1, data.togglToken);
         addSocket(data.togglUserId, ws);
-        SocketManager.clients.set(data.togglUserId, ws);
+        if (!SocketManager.clients.has(data.togglUserId)) {
+          SocketManager.clients.set(data.togglUserId, new Set());
+        }
+        SocketManager.clients.get(data.togglUserId)!.add(ws);
+        SocketManager.socketToId.set(ws.id, data.togglUserId);
         this.authListeners.forEach((x) => x(ws));
       }
       return;
@@ -50,39 +56,53 @@ export class SocketManager {
         return;
       }
 
-      SocketManager.clients.set(id, ws);
+      if (!SocketManager.clients.has(id)) {
+        SocketManager.clients.set(id, new Set());
+      }
+      SocketManager.clients.get(id)!.add(ws);
+      SocketManager.socketToId.set(ws.id, id);
       ws.send(JSON.stringify({ type: "pong", payload: {} }));
       return;
     }
   }
 
   public close(ws: ElysiaWS) {
-    const id = sockToID(ws);
+    const id = SocketManager.socketToId.get(ws.id);
     if (id == undefined) return;
     removeSocket(ws);
-    if (SocketManager.clients.has(id)) {
-      SocketManager.clients.delete(id);
+    const clientSet = SocketManager.clients.get(id);
+    if (clientSet) {
+      clientSet.delete(ws);
+      if (clientSet.size === 0) {
+        SocketManager.clients.delete(id);
+      }
     }
+    SocketManager.socketToId.delete(ws.id);
   }
 
   public send<T>(to: string, message: string, data: T) {
     console.log("Attempting to send message to " + to);
-    const ws = SocketManager.clients.get(to);
-    console.log("The websocket is state " + ws?.readyState);
+    const clientSet = SocketManager.clients.get(to);
 
-    if (!ws) {
-      console.warn("No socket found for " + to);
+    if (!clientSet || clientSet.size === 0) {
+      console.warn("No sockets found for " + to);
       return;
     }
 
-    if (ws.readyState == 3) {
-      console.warn("Socket for " + to + " is closed. Removing...");
+    clientSet.forEach((ws) => {
+      console.log("The websocket is state " + ws.readyState);
+      if (ws.readyState == 3) {
+        console.warn("Socket for " + to + " is closed. Removing...");
+        clientSet.delete(ws);
+        return;
+      }
+      console.log("Sending message to " + to);
+      ws.send(JSON.stringify({ type: message, payload: data }));
+    });
+
+    if (clientSet.size === 0) {
       SocketManager.clients.delete(to);
-      return;
     }
-
-    console.log("Sending message to " + to);
-    ws.send(JSON.stringify({ type: message, payload: data }));
   }
 
   public addAuthListener(callback: (ws: ElysiaWS) => void) {

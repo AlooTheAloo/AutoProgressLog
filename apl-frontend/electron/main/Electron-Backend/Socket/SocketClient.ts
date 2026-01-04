@@ -18,7 +18,9 @@ export class SocketClient {
   }
 
   async init(authData: { token: string }): Promise<void> {
-    const URL = `wss://${SERVER_URL}/ws`;
+    const isDev = process.env.NODE_ENV === "development";
+
+    const URL = `${isDev ? "ws" : "wss"}://${SERVER_URL}/ws`;
     this.authData = authData; // store for reconnect
 
     return new Promise<void>((resolve, reject) => {

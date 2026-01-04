@@ -19,14 +19,6 @@ import {
 import fs from "fs";
 import checkHealth from "./Electron-App/HealthCheck";
 import { SocketClient } from "./Electron-Backend/Socket/SocketClient";
-
-import {
-  Browser,
-  detectBrowserPlatform,
-  getInstalledBrowsers,
-  install,
-  resolveBuildId,
-} from "@puppeteer/browsers";
 import { initializeDeepLink } from "./Electron-Backend/DeepLink";
 import { config as dotenvConfig } from "dotenv";
 import { initializeApiManager } from "./Electron-Backend/api/ApiManager";
@@ -291,23 +283,3 @@ app.on("ready", async () => {
   }
   await initializeDeepLink();
 });
-
-(async () => {
-  const cachedir = path.join(app.getPath("home"), ".cache", "puppeteer");
-  const browsers = await getInstalledBrowsers({
-    cacheDir: cachedir,
-  });
-
-  const plat = await detectBrowserPlatform();
-  if (plat == undefined) return;
-  const buildId = await resolveBuildId(Browser.CHROME, plat, "latest");
-
-  if (browsers.filter((x) => x.browser == Browser.CHROME).length == 0) {
-    await install({
-      browser: Browser.CHROME,
-      cacheDir: cachedir,
-      buildId: buildId,
-      unpack: true,
-    });
-  }
-})();

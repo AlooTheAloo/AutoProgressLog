@@ -152,7 +152,6 @@ onUnmounted(() => {
             APL is switching to an account-based model. Please enter your email
             to create one. All your data will be transfered to our new system
             automatically.
-            automatically.
           </div>
 
           <div class="w-full flex gap-2">

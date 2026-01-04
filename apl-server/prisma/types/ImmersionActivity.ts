@@ -110,7 +110,13 @@ export const ImmersionActivityWhereUnique = t.Recursive(
       [
         t.Partial(
           t.Object(
-            { id: t.Integer(), activityTogglId: t.String() },
+            {
+              id: t.Integer(),
+              activityTogglId_userId: t.Object(
+                { activityTogglId: t.String(), userId: t.Integer() },
+                { additionalProperties: false },
+              ),
+            },
             { additionalProperties: false },
           ),
           { additionalProperties: false },
@@ -118,7 +124,12 @@ export const ImmersionActivityWhereUnique = t.Recursive(
         t.Union(
           [
             t.Object({ id: t.Integer() }),
-            t.Object({ activityTogglId: t.String() }),
+            t.Object({
+              activityTogglId_userId: t.Object(
+                { activityTogglId: t.String(), userId: t.Integer() },
+                { additionalProperties: false },
+              ),
+            }),
           ],
           { additionalProperties: false },
         ),

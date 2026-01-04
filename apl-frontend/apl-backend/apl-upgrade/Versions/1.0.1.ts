@@ -8,7 +8,6 @@ import {
 } from "../../Helpers/getConfig";
 import { Options } from "../../types/options";
 import { setConfig } from "../../config/configManager";
-import { DEFAULT_ANKI_URL } from "../../anki/AnkiHTTPClient";
 
 interface previous_config {
   general: {
@@ -124,7 +123,7 @@ export default async function upgrade_1_0_1() {
   const new_config: new_config = getLegacyConfig() as any as new_config;
   if (hadIntegration) {
     new_config.anki.ankiIntegration = {
-      url: DEFAULT_ANKI_URL,
+      url: "https://sync.ankiweb.net/",
       key: "",
     };
   }
