@@ -28,6 +28,9 @@ import { APLStorage } from "./Electron-Backend/util/auth";
 import { VersionManager } from "../../apl-backend/Helpers/VersionManager";
 
 const isProd = app.isPackaged;
+if (isProd) {
+  app.setName("AutoProgressLog");
+}
 
 // When packaged, use the correct path relative to the `.asar`
 const envPath = isProd
@@ -71,7 +74,8 @@ process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL
 if (os.release().startsWith("6.1")) app.disableHardwareAcceleration();
 
 // Set application name for Windows 10+ notifications
-if (process.platform === "win32") app.setAppUserModelId(app.getName());
+// Set application name for Windows 10+ notifications
+if (process.platform === "win32") app.setAppUserModelId("727.AlooTheAloo.727");
 
 if (!app.requestSingleInstanceLock()) {
   Logger.log("App already running");

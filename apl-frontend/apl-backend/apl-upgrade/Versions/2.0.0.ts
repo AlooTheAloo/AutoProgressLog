@@ -74,7 +74,10 @@ export default async function upgrade_2_0_0() {
           general: {
             discordIntegration: boolean;
           };
-          appearance: {
+          appearance?: {
+            glow: boolean;
+          };
+          appreance?: {
             glow: boolean;
           };
           outputOptions: OutputOptions;
@@ -87,7 +90,7 @@ export default async function upgrade_2_0_0() {
             discordIntegration: oldConfig.general.discordIntegration,
           },
           appearance: {
-            glow: oldConfig.appearance.glow,
+            glow: oldConfig.appearance?.glow ?? oldConfig.appreance?.glow ?? true,
           },
           outputOptions: {
             outputFile: {
