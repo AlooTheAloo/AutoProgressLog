@@ -168,18 +168,23 @@ export const togglWebhook = new Elysia({ name: "toggl-webhook" }).post(
       }
 
       if (action === "deleted") {
-        try {
-          console.log("deleted activity", payload);
-
-          await client.immersionActivity.deleteMany({
-            where: { activityTogglId: payload.id.toString() },
-          });
-          console.log(`Deleted activities with Toggl ID: ${payload.id}`);
-        } catch (e) {
-          console.log(
-            `Failed to delete activity with Toggl ID: ${payload.id}. It might not exist.`
-          );
+        const aplUsers = await client.userConfig.findMany({
+          where: { togglUserId: event_user_id },
+          select: { user: { select: { id: true } } },
+        });
+        for (const config of aplUsers) {
+          try {
+            await client.immersionActivity.deleteMany({
+              where: { activityTogglId: payload.id.toString(), AND: { userId: config.user.id } },
+            });
+            console.log(`Deleted activities with Toggl ID: ${payload.id}`);
+          } catch (e) {
+            console.log(
+              `Failed to delete activity with Toggl ID: ${payload.id}. It might not exist.`
+            );
+          }
         }
+        
       }
 
       return new Response("ok");

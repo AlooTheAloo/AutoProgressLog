@@ -177,10 +177,10 @@ const dialogOpen = ref(false);
 function openDialog() {
   dialogOpen.value = true;
   if(Math.random() > 0.02){
-    trailerSource.value = "https://www.youtube.com/embed/Zj5t_eAcgx4?si=TOw6pKs_D-lUNFCy&amp;controls=0&autoplay=1";
+    trailerSource.value = "https://www.youtube.com/embed/Zj5t_eAcgx4?si=TOw6pKs_D-lUNFCy&controls=0&autoplay=1";
   }
   else {
-    trailerSource.value = "https://www.youtube-nocookie.com/embed/QBVXpKHH5cs?si=QIhts81DoTWpDFxK&amp;controls=0&autoplay=1";
+    trailerSource.value = "https://www.youtube-nocookie.com/embed/QBVXpKHH5cs?si=QIhts81DoTWpDFxK&controls=0&autoplay=1";
   }
 }
 

@@ -94,6 +94,7 @@ export class SocketManager {
       if (ws.readyState == 3) {
         console.warn("Socket for " + to + " is closed. Removing...");
         clientSet.delete(ws);
+        SocketManager.socketToId.delete(ws.id);
         return;
       }
       console.log("Sending message to " + to);
