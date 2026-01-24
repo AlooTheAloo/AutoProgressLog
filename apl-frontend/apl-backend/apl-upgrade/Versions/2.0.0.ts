@@ -20,6 +20,11 @@ let migrated = false;
 
 export default async function upgrade_2_0_0() {
   console.log("Upgrading to 2.0.0");
+  
+  // Run previous upgrade steps to migrate older configs (v1.0.0, v1.0.1)
+  // This ensures the config has the required `appearance` property
+  await upgrade_1_0_2();
+  
   if (
     new SemVer(CacheManager.get().version).compare("2.0.0") > -1 &&
     !existsSync(cache_location)
