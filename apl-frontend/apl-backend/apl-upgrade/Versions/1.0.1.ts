@@ -111,7 +111,7 @@ const defaultProfilePicture =
   "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR4aJxpLDs-i-t-xiNj4uNHz1mhNpCJpR21DQ&s";
 
 export default async function upgrade_1_0_1() {
-  if (new SemVer(CacheManager.get().version).compare("1.0.1") > -1) {
+  if (new SemVer(CacheManager.get().version ?? "0.0.0").compare("1.0.1") > -1) {
     return;
   }
   const config: previous_config = (await getLegacyConfig()) as previous_config;

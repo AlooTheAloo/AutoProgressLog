@@ -26,7 +26,7 @@ export default async function upgrade_2_0_0() {
   await upgrade_1_0_2();
   
   if (
-    new SemVer(CacheManager.get().version).compare("2.0.0") > -1 &&
+    new SemVer(CacheManager.get().version ?? "0.0.0").compare("2.0.0") > -1 &&
     !existsSync(cache_location)
   ) {
     return;
