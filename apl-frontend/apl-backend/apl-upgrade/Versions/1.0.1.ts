@@ -117,20 +117,18 @@ export default async function upgrade_1_0_1() {
   const config: previous_config = (await getLegacyConfig()) as previous_config;
   if (config == undefined) return;
 
-  const hadIntegration = config.anki.ankiIntegration != undefined;
-  delete config.anki.ankiIntegration;
-
-  const new_config: new_config = getLegacyConfig() as any as new_config;
-  if (hadIntegration) {
-    new_config.anki.ankiIntegration = {
-      url: "https://sync.ankiweb.net/",
-      key: "",
-    };
-  }
+  // 1.0.0 anki integration was fully local with no key, so we need to disable it
+  // The server can't use the old local-only config, so nuke it
+  const new_config: new_config = (await getLegacyConfig()) as any as new_config;
+  
+  // Disable anki integration since old local-only config won't work with the server
+  new_config.anki = { enabled: false };
+  
   new_config.appreance = {
     glow: true,
   };
 
   setLegacyConfig(new_config);
+  CacheManager.setVersion("1.0.1");
   return;
 }

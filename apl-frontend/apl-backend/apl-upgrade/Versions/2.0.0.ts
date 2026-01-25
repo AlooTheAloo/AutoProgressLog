@@ -25,15 +25,22 @@ export default async function upgrade_2_0_0() {
   // This ensures the config has the required `appearance` property
   await upgrade_1_0_2();
   
-  if (
-    new SemVer(CacheManager.get().version ?? "0.0.0").compare("2.0.0") > -1 &&
-    !existsSync(cache_location)
-  ) {
+  // If cache file doesn't exist, there's nothing to migrate - skip this upgrade
+  if (!existsSync(cache_location)) {
+    return;
+  }
+
+  // If already at version 2.0.0+, skip this upgrade
+  if (new SemVer(CacheManager.get().version ?? "0.0.0").compare("2.0.0") > -1) {
     return;
   }
   await new Promise<void>((res, req) => {
     console.log("Sending 2_0_0_upgrade");
-    win?.webContents.send("2_0_0_upgrade");
+    // Add a small delay to ensure the frontend event listener is ready
+    // This fixes a timing issue where 1.0.0 users get stuck on the update screen
+    setTimeout(() => {
+      win?.webContents.send("2_0_0_upgrade");
+    }, 100);
     ipcMain.handleOnce("update-2_0_0_done", async () => {
       
       console.log("Setup complete true 1");
