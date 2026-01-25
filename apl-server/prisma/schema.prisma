@@ -73,12 +73,13 @@ model ImmersionActivity {
   id              Int      @id @default(autoincrement())
   createdAt       DateTime
   updatedAt       DateTime @default(now()) @updatedAt
-  activityTogglId String?  @unique
+  activityTogglId String?
   seconds         Int
   activityName    String
   userId          Int
   user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@unique([activityTogglId, userId])
   @@index([userId])
 }
 
@@ -141,7 +142,7 @@ model Streak {
 model UserConfig {
   id          Int         @id @default(autoincrement())
   togglToken  String
-  togglUserId String      @unique
+  togglUserId String
   ankiConfig  AnkiConfig?
   autoGenTime AutoGenConfig?
   createdAt   DateTime    @default(now())

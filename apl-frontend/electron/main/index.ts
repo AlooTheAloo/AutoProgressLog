@@ -19,14 +19,6 @@ import {
 import fs from "fs";
 import checkHealth from "./Electron-App/HealthCheck";
 import { SocketClient } from "./Electron-Backend/Socket/SocketClient";
-
-import {
-  Browser,
-  detectBrowserPlatform,
-  getInstalledBrowsers,
-  install,
-  resolveBuildId,
-} from "@puppeteer/browsers";
 import { initializeDeepLink } from "./Electron-Backend/DeepLink";
 import { config as dotenvConfig } from "dotenv";
 import { initializeApiManager } from "./Electron-Backend/api/ApiManager";
@@ -36,6 +28,9 @@ import { APLStorage } from "./Electron-Backend/util/auth";
 import { VersionManager } from "../../apl-backend/Helpers/VersionManager";
 
 const isProd = app.isPackaged;
+if (isProd) {
+  app.setName("AutoProgressLog");
+}
 
 // When packaged, use the correct path relative to the `.asar`
 const envPath = isProd
@@ -79,7 +74,8 @@ process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL
 if (os.release().startsWith("6.1")) app.disableHardwareAcceleration();
 
 // Set application name for Windows 10+ notifications
-if (process.platform === "win32") app.setAppUserModelId(app.getName());
+// Set application name for Windows 10+ notifications
+if (process.platform === "win32") app.setAppUserModelId("727.AlooTheAloo.727");
 
 if (!app.requestSingleInstanceLock()) {
   Logger.log("App already running");
@@ -291,23 +287,3 @@ app.on("ready", async () => {
   }
   await initializeDeepLink();
 });
-
-(async () => {
-  const cachedir = path.join(app.getPath("home"), ".cache", "puppeteer");
-  const browsers = await getInstalledBrowsers({
-    cacheDir: cachedir,
-  });
-
-  const plat = await detectBrowserPlatform();
-  if (plat == undefined) return;
-  const buildId = await resolveBuildId(Browser.CHROME, plat, "latest");
-
-  if (browsers.filter((x) => x.browser == Browser.CHROME).length == 0) {
-    await install({
-      browser: Browser.CHROME,
-      cacheDir: cachedir,
-      buildId: buildId,
-      unpack: true,
-    });
-  }
-})();

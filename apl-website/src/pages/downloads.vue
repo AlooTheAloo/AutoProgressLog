@@ -31,9 +31,9 @@
       <div
         class="w-screen max-w-[70rem] lg:px-10 flex lg:justify-between justify-center"
       >
-        <div class="flex flex-col justify-center items-center lg:items-start">
+        <div class="flex flex-col justify-center">
           <div
-            class="flex flex-col justify-center items-start"
+            class="flex flex-col justify-center items-center lg:items-start"
             :class="
               platform == 'linux'
                 ? 'transition-colors relative h-fit overflow-hidden rounded-xl border border-gray-950/[.1] bg-white p-7 hover:bg-gray-100 dark:border-gray-50/[.1] dark:bg-gray-50/[.10] dark:hover:bg-gray-50/[.15] shadow-sm'

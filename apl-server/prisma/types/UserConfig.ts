@@ -185,17 +185,13 @@ export const UserConfigWhereUnique = t.Recursive(
       [
         t.Partial(
           t.Object(
-            { id: t.Integer(), togglUserId: t.String(), userId: t.Integer() },
+            { id: t.Integer(), userId: t.Integer() },
             { additionalProperties: false },
           ),
           { additionalProperties: false },
         ),
         t.Union(
-          [
-            t.Object({ id: t.Integer() }),
-            t.Object({ togglUserId: t.String() }),
-            t.Object({ userId: t.Integer() }),
-          ],
+          [t.Object({ id: t.Integer() }), t.Object({ userId: t.Integer() })],
           { additionalProperties: false },
         ),
         t.Partial(

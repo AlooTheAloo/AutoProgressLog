@@ -22,7 +22,7 @@ export const globalDataRoute = new Elysia({ name: "global-data-routes" })
     .get("globalData", async () => {
 
         if(globalDataCache != null){
-            if(dayjs(globalDataCache.lastUpdated).diff(dayjs(), "seconds") < CACHE_TTL){
+            if(dayjs().diff(globalDataCache.lastUpdated, "seconds") < CACHE_TTL){
                 console.log("USED CACHE for global data :3")
                 return globalDataCache.object;
             }

@@ -85,12 +85,10 @@ export const togglWebhook = new Elysia({ name: "toggl-webhook" }).post(
         : { validation_code: body.validation_code };
     } else {
       const { action, event_user_id, model, workspace_id } = body.metadata;
-      const aplUser = await client.userConfig
-        .findFirst({
-          where: { togglUserId: event_user_id },
-          select: { user: true },
-        })
-        .user({ select: { id: true } });
+      const aplUsers = await client.userConfig.findMany({
+        where: { togglUserId: event_user_id },
+        select: { user: { select: { id: true } } },
+      });
       const payload = body.payload;
       if (action === "created") {
         console.log("created activity", payload);
@@ -123,63 +121,70 @@ export const togglWebhook = new Elysia({ name: "toggl-webhook" }).post(
         }
 
         // Upsert the activity in the database if it has a stop time
-        if (payload.stop != undefined && aplUser) {
-          const activity = await client.immersionActivity.findFirst({
-            where: { activityTogglId: payload.id.toString() },
-          });
-
-          if(activity){
-            await client.immersionActivity.update({
-              where: { id: activity.id },
-              data: {
-                activityName: payload.description || "(No Description)",
-                seconds: payload.duration
-              },
-            }); 
-          }
-          else{
-            await client.immersionActivity.create({
-              data: {
-                userId: aplUser.id,
-                activityName: payload.description || "(No Description)",
+        if (payload.stop != undefined && aplUsers.length > 0) {
+          for (const config of aplUsers) {
+            const aplUser = config.user;
+            const activity = await client.immersionActivity.findFirst({
+              where: {
                 activityTogglId: payload.id.toString(),
-                createdAt: new Date(payload.start),
-                seconds: Math.floor(
-                  (new Date(payload.stop).getTime() -
-                    new Date(payload.start).getTime()) /
-                    1000
-                ),
+                userId: aplUser.id,
               },
             });
-          }
 
-          const totalImmersion = await client.immersionActivity.aggregate({
-            where: { userId: aplUser.id },
-            _sum: { seconds: true },
-          });
-          console.log("total immersion", totalImmersion);
+            if (activity) {
+              await client.immersionActivity.update({
+                where: { id: activity.id },
+                data: {
+                  activityName: payload.description || "(No Description)",
+                  seconds: payload.duration,
+                },
+              });
+            } else {
+              await client.immersionActivity.create({
+                data: {
+                  userId: aplUser.id,
+                  activityName: payload.description || "(No Description)",
+                  activityTogglId: payload.id.toString(),
+                  createdAt: new Date(payload.start),
+                  seconds: Math.floor(
+                    (new Date(payload.stop).getTime() -
+                      new Date(payload.start).getTime()) /
+                      1000
+                  ),
+                },
+              });
+            }
+
+            const totalImmersion = await client.immersionActivity.aggregate({
+              where: { userId: aplUser.id },
+              _sum: { seconds: true },
+            });
+            console.log(
+              `total immersion for user ${aplUser.id}:`,
+              totalImmersion
+            );
+          }
         }
       }
 
       if (action === "deleted") {
-        try {
-          console.log("deleted activity", payload);
-
-          const activity = await client.immersionActivity.findFirst({
-            where: { activityTogglId: payload.id.toString() },
-          });
-
-          if (!activity) return; // Too old or happened while server was down and we didnt sync up yet (edge case of an edge case)
-
-          await client.immersionActivity.delete({
-            where: { id: activity.id },
-          });
-          console.log(`Deleted activity with Toggl ID: ${payload.id}`);
-        } catch (e) {
-          console.log(
-            `Failed to delete activity with Toggl ID: ${payload.id}. It might not exist.`
-          );
+        const aplUsers = await client.userConfig.findMany({
+          where: { togglUserId: event_user_id },
+          select: { user: { select: { id: true } } },
+        });
+        for (const config of aplUsers) {
+          try {
+            await client.immersionActivity.deleteMany({
+              where: { activityTogglId: payload.id.toString(), AND: { userId: config.user.id } },
+            });
+            console.log(`Deleted activities with Toggl ID: ${payload.id}`);
+          } catch (e) {
+            console.log(
+              `Failed to delete activity with Toggl ID: ${payload.id}. It might not exist.`
+            );
+          }
         }
+        
       }
 
       return new Response("ok");
