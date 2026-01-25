@@ -124,36 +124,29 @@ export const togglWebhook = new Elysia({ name: "toggl-webhook" }).post(
         if (payload.stop != undefined && aplUsers.length > 0) {
           for (const config of aplUsers) {
             const aplUser = config.user;
-            const activity = await client.immersionActivity.findFirst({
+            const calculatedSeconds = Math.floor(
+              (new Date(payload.stop).getTime() - new Date(payload.start).getTime()) / 1000
+            );
+            
+            await client.immersionActivity.upsert({
               where: {
-                activityTogglId: payload.id.toString(),
+                activityTogglId_userId: {
+                  activityTogglId: payload.id.toString(),
+                  userId: aplUser.id,
+                },
+              },
+              update: {
+                activityName: payload.description || "(No Description)",
+                seconds: payload.duration ?? calculatedSeconds,
+              },
+              create: {
                 userId: aplUser.id,
+                activityName: payload.description || "(No Description)",
+                activityTogglId: payload.id.toString(),
+                createdAt: new Date(payload.start),
+                seconds: payload.duration ?? calculatedSeconds,
               },
             });
-
-            if (activity) {
-              await client.immersionActivity.update({
-                where: { id: activity.id },
-                data: {
-                  activityName: payload.description || "(No Description)",
-                  seconds: payload.duration,
-                },
-              });
-            } else {
-              await client.immersionActivity.create({
-                data: {
-                  userId: aplUser.id,
-                  activityName: payload.description || "(No Description)",
-                  activityTogglId: payload.id.toString(),
-                  createdAt: new Date(payload.start),
-                  seconds: Math.floor(
-                    (new Date(payload.stop).getTime() -
-                      new Date(payload.start).getTime()) /
-                      1000
-                  ),
-                },
-              });
-            }
 
             const totalImmersion = await client.immersionActivity.aggregate({
               where: { userId: aplUser.id },
@@ -177,14 +170,13 @@ export const togglWebhook = new Elysia({ name: "toggl-webhook" }).post(
             await client.immersionActivity.deleteMany({
               where: { activityTogglId: payload.id.toString(), AND: { userId: config.user.id } },
             });
-            console.log(`Deleted activities with Toggl ID: ${payload.id}`);
           } catch (e) {
             console.log(
               `Failed to delete activity with Toggl ID: ${payload.id}. It might not exist.`
             );
           }
         }
-        
+        console.log(`Deleted activities with Toggl ID: ${payload.id}`);
       }
 
       return new Response("ok");
@@ -204,14 +196,15 @@ export function initTogglNotifications() {
   SocketManager.instance.addAuthListener((ws) => {
     const id = sockToID(ws);
     if (id == undefined) return;
+    
+    // Send only to the newly connected socket, not to all sockets for this user
     if (current_Activities.has(id)) {
-      SocketManager.instance.send(
-        id,
-        "ActivityStart",
-        current_Activities.get(id)
-      );
+      ws.send(JSON.stringify({
+        type: "ActivityStart",
+        payload: current_Activities.get(id)
+      }));
     } else {
-      SocketManager.instance.send(id, "ClearActivity", {});
+      ws.send(JSON.stringify({ type: "ClearActivity", payload: {} }));
     }
   });
 }
