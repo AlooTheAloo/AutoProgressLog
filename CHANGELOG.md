@@ -1,3 +1,6 @@
-# AutoProgressLog Version 2.0.1
+# AutoProgressLog Version 2.0.2
 
-Minor bug fixes, UI tweaks, and ~5% lighter package size.
+- Added immersion pill with timer and encouragement messages
+- Fixed legacy import issues for users coming from v1.0.0
+- Fixed race condition in socket initialization
+- Various bug fixes and improvements

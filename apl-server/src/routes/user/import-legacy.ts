@@ -193,11 +193,15 @@ export const importLegacyRoute = new Elysia({ name: "import-legacy" })
             }
 
             if (ankiEnabled) {
-              await AnkiStorage.requestAnkiDBDownload(
-                user.id,
-                ankiToken,
-                ankiUrl ?? DEFAULT_ANKI_URL
-              );
+              if (ankiToken) {
+                await AnkiStorage.requestAnkiDBDownload(
+                  user.id,
+                  ankiToken,
+                  ankiUrl ?? DEFAULT_ANKI_URL
+                );
+              } else {
+                 console.log("Anki enabled but no token provided, skipping download");
+              }
             }
 
             // --- 8) Backfill & Webhook ---
@@ -339,12 +343,17 @@ export const importLegacyRoute = new Elysia({ name: "import-legacy" })
 
           if(cacheJson) {
             // --- 7) Migrate Reports (+Streak) from cache.json ---
-            console.log("Cachejson : " + JSON.stringify(cacheJson));
-            console.log("Cachejson.list : " + JSON.stringify(cacheJson.list));
+            const keys = Object.keys(cacheJson || {});
+            console.log("Cachejson keys: " + keys.join(", "));
+            
+            const listLen = Array.isArray(cacheJson?.list) ? cacheJson.list.length : 0;
+            console.log("Cachejson.list length: " + listLen);
 
             const items: any[] = Array.isArray(cacheJson?.list) ? cacheJson.list : [];
-
-            console.log("items is " + JSON.stringify(items));
+            
+            // Log a small sample or summary instead of full dump
+            const summary = items.length > 0 ? JSON.stringify(items[0]).slice(0, 100) + "..." : "empty";
+            console.log(`items summary (count ${items.length}, first item preview): ${summary}`);
             let i = 0;
             for (const item of items) {
                 const reportNo = Number(item.reportNo);

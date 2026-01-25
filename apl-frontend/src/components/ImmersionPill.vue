@@ -46,6 +46,10 @@ const updateTimer = () => {
 
 const closePill = () => {
   isVisible.value = false;
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
 };
 
 const handleSocketEvent = (_event: any, data: SocketEvent) => {
