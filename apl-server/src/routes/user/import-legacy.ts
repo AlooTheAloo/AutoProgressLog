@@ -81,7 +81,7 @@ export const importLegacyRoute = new Elysia({ name: "import-legacy" })
             ? toAutoGenTime(genH, genM)
             : undefined;
 
-          const togglToken = cfg?.toggl?.togglToken ?? null;
+          let togglToken = cfg?.toggl?.togglToken ?? null;
           const userName = cfg?.account?.userName ?? null;
 
           const ankiEnabled = !!cfg?.anki?.enabled;
@@ -95,103 +95,122 @@ export const importLegacyRoute = new Elysia({ name: "import-legacy" })
           const retentionMode = toRetentionMode(cfg?.anki?.options?.retentionMode);
 
           console.log("togglToken is " + togglToken);
-          try { 
-             if(togglToken) {
-                const me = await new Toggl({
-                    auth: {
-                    token: togglToken,
-                    },
-                }).me.get();
-                const TOGGL_UID = me.id.toString();
-                console.log("TOGGL_UID is " + TOGGL_UID);
-                
-                const existingCfg = await prisma.userConfig.findUnique({
-                    where: { userId },
-                });
+          let TOGGL_UID: string | undefined;
 
-                if (!existingCfg) {
-                    await prisma.userConfig.create({
-                    data: {
-                        userId,
-                        togglToken: togglToken ?? "", // must be non-null per schema
-                        togglUserId: TOGGL_UID,
-                        autoGenTime:
-                        autoGenTime == undefined
-                            ? undefined
-                            : {
-                                create: autoGenTime,
-                            },
-                        ankiConfig:
-                        ankiEnabled && ankiToken
-                            ? {
-                                create: {
-                                    url: ankiUrl,
-                                    ankiToken,
-                                    retentionMode,
-                                    trackedDecks,
-                                },
-                            }
-                            : undefined,
-                    },
-                    });
-                } else {
-                    await prisma.userConfig.update({
-                    where: { userId },
-                    data: {
-                        togglToken: togglToken ?? existingCfg.togglToken,
-                        // keep existing togglUserId if present; otherwise fill default
-                        togglUserId: existingCfg.togglUserId || TOGGL_UID,
-                        autoGenTime:
-                        autoGenTime == undefined
-                            ? undefined
-                            : {
-                                upsert: {
-                                create: autoGenTime,
-                                update: autoGenTime,
-                                },
-                            },
-                        ankiConfig:
-                        ankiEnabled && ankiToken
-                            ? {
-                                upsert: {
-                                create: {
-                                    url: ankiUrl,
-                                    ankiToken,
-                                    retentionMode,
-                                    trackedDecks,
-                                },
-                                update: {
-                                    url: ankiUrl,
-                                    ankiToken,
-                                    retentionMode,
-                                    trackedDecks,
-                                },
-                                },
-                            }
-                            : undefined,
-                    },
-                    });
-                }
+          if (togglToken) {
+            try {
+              const me = await new Toggl({
+                auth: {
+                  token: togglToken,
+                },
+              }).me.get();
+              TOGGL_UID = me.id.toString();
+              console.log("TOGGL_UID is " + TOGGL_UID);
+            } catch (e) {
+              console.log("Failed to fetch Toggl UID", e);
+              // reset to null so we don't try to use invalid token
+              togglToken = null;
+            }
+          }
 
-                if (ankiEnabled) {
-                     await AnkiStorage.requestAnkiDBDownload(
-                        user.id,
+          try {
+            const existingCfg = await prisma.userConfig.findUnique({
+              where: { userId },
+            });
+
+            const ankiConfigCreate =
+              ankiEnabled && ankiToken
+                ? {
+                    create: {
+                      url: ankiUrl,
+                      ankiToken,
+                      retentionMode,
+                      trackedDecks,
+                    },
+                  }
+                : undefined;
+
+            const ankiConfigUpsert =
+              ankiEnabled && ankiToken
+                ? {
+                    upsert: {
+                      create: {
+                        url: ankiUrl,
                         ankiToken,
-                        ankiUrl ?? DEFAULT_ANKI_URL
-                    );
-                }
+                        retentionMode,
+                        trackedDecks,
+                      },
+                      update: {
+                        url: ankiUrl,
+                        ankiToken,
+                        retentionMode,
+                        trackedDecks,
+                      },
+                    },
+                  }
+                : undefined;
 
-                 // --- 8) Backfill & Webhook ---
-                 // If we have a toggl token, backfill and hook
-                 console.log("Backfilling last 3 months data...");
-                 await syncTogglData(userId, true);
-                 console.log("Creating webhook...");
-                 await createWebhook(-1, togglToken);
+            if (!existingCfg) {
+              await prisma.userConfig.create({
+                data: {
+                  userId,
+                  togglToken: togglToken ?? "", // must be non-null per schema
+                  togglUserId: TOGGL_UID ?? "",
+                  autoGenTime:
+                    autoGenTime == undefined
+                      ? undefined
+                      : {
+                          create: autoGenTime,
+                        },
+                  ankiConfig: ankiConfigCreate,
+                },
+              });
+            } else {
+              const togglUpdate =
+                togglToken && TOGGL_UID
+                  ? {
+                      togglToken,
+                      togglUserId: TOGGL_UID,
+                    }
+                  : {};
 
-             }
-          } catch(e) {
-              console.log("Error during config migration: ", e);
-              // don't fail the whole request
+              await prisma.userConfig.update({
+                where: { userId },
+                data: {
+                  ...togglUpdate,
+                  autoGenTime:
+                    autoGenTime == undefined
+                      ? undefined
+                      : {
+                          upsert: {
+                            create: autoGenTime,
+                            update: autoGenTime,
+                          },
+                        },
+                  ankiConfig: ankiConfigUpsert,
+                },
+              });
+            }
+
+            if (ankiEnabled) {
+              await AnkiStorage.requestAnkiDBDownload(
+                user.id,
+                ankiToken,
+                ankiUrl ?? DEFAULT_ANKI_URL
+              );
+            }
+
+            // --- 8) Backfill & Webhook ---
+            // If we have a toggl token, backfill and hook
+            if (togglToken) {
+              console.log("Backfilling last 3 months data...");
+              await syncTogglData(userId, true);
+              console.log("Creating webhook...");
+              await createWebhook(-1, togglToken);
+            }
+          } catch (e) {
+            console.log("Error during config migration: ", e);
+            // don't fail the whole request
           }
 
           // Upsert user profile fields
@@ -211,15 +230,17 @@ export const importLegacyRoute = new Elysia({ name: "import-legacy" })
       if (syncdbFile) {
         // Persist SQLite file to a temp path Bun can open
         const tmpPath = `/tmp/apl-sync-${crypto.randomUUID()}.db`;
-        const syncBuf = new Uint8Array(await syncdbFile.arrayBuffer());
-        await Bun.write(tmpPath, syncBuf);
+        try {
+          const syncBuf = new Uint8Array(await syncdbFile.arrayBuffer());
+          await Bun.write(tmpPath, syncBuf);
 
-        // --- 3) Read legacy SQLite ---
-        const sqlite = new Database(tmpPath, { readonly: true });
+          // --- 3) Read legacy SQLite ---
+          const sqlite = new Database(tmpPath, { readonly: true });
 
-        const syncRows = sqlite
-            .query(
-            `SELECT id,
+          try {
+            const syncRows = sqlite
+              .query(
+                `SELECT id,
                     generationTime,
                     totalSeconds,
                     totalCardsStudied,
@@ -227,75 +248,81 @@ export const importLegacyRoute = new Elysia({ name: "import-legacy" })
                     mature,
                     retention
             FROM syncData`
-            )
-            .all() as Array<{
-            id: number;
-            generationTime: number;
-            totalSeconds: number;
-            totalCardsStudied: number;
-            cardsStudied: number;
-            mature: number;
-            retention: number;
-        }>;
+              )
+              .all() as Array<{
+              id: number;
+              generationTime: number;
+              totalSeconds: number;
+              totalCardsStudied: number;
+              cardsStudied: number;
+              mature: number;
+              retention: number;
+            }>;
 
-        const activityRows = sqlite
-            .query(
-            `SELECT id, time, seconds, activityName
+            const activityRows = sqlite
+              .query(
+                `SELECT id, time, seconds, activityName
             FROM immersionActivity`
-            )
-            .all() as Array<{
-            id: number;
-            time: number;
-            seconds: number;
-            activityName: string;
-        }>;
+              )
+              .all() as Array<{
+              id: number;
+              time: number;
+              seconds: number;
+              activityName: string;
+            }>;
 
-         // --- 5) Migrate SyncData (+AnkiData) ---
-        for (const row of syncRows) {
-            const created = await prisma.syncData.create({
-            data: {
-                userId,
-                generationTime: fromEpochMaybeMs(row.generationTime),
-                totalImmersionTime: row.totalSeconds,
-                ankiData: {
-                create: {
-                    totalCardsStudied: row.totalCardsStudied,
-                    cardsStudied: row.cardsStudied,
-                    mature: row.mature,
-                    retention: row.retention,
-                },
-                },
-            },
-            });
-            legacyIdToNewSyncId.set(row.id, created.id);
-            createdSync++;
-        }
-
-        // --- 6) Migrate ImmersionActivity ---
-        let skippedDuplicates = 0;
-
-        for (const a of activityRows) {
-            try {
-            await prisma.immersionActivity.create({
+            // --- 5) Migrate SyncData (+AnkiData) ---
+            for (const row of syncRows) {
+              const created = await prisma.syncData.create({
                 data: {
-                userId,
-                createdAt: fromEpochMaybeMs(a.time),
-                seconds: a.seconds,
-                activityName: a.activityName,
-                activityTogglId: a.id.toString(),
+                  userId,
+                  generationTime: fromEpochMaybeMs(row.generationTime),
+                  totalImmersionTime: row.totalSeconds,
+                  ankiData: {
+                    create: {
+                      totalCardsStudied: row.totalCardsStudied,
+                      cardsStudied: row.cardsStudied,
+                      mature: row.mature,
+                      retention: row.retention,
+                    },
+                  },
                 },
-            });
-            createdActivities++;
-            } catch (error: any) {
-            // Skip duplicates (unique constraint violations)
-            if (error.code === "P2002") {
-                console.log(`Skipping duplicate activityTogglId: ${a.id}`);
-                skippedDuplicates++;
-            } else {
-                // Re-throw other errors
-                throw error;
+              });
+              legacyIdToNewSyncId.set(row.id, created.id);
+              createdSync++;
             }
+
+            // --- 6) Migrate ImmersionActivity ---
+            let skippedDuplicates = 0;
+
+            for (const a of activityRows) {
+              try {
+                await prisma.immersionActivity.create({
+                  data: {
+                    userId,
+                    createdAt: fromEpochMaybeMs(a.time),
+                    seconds: a.seconds,
+                    activityName: a.activityName,
+                    activityTogglId: a.id.toString(),
+                  },
+                });
+                createdActivities++;
+              } catch (error: any) {
+                // Skip duplicates (unique constraint violations)
+                if (error.code === "P2002") {
+                  console.log(`Skipping duplicate activityTogglId: ${a.id}`);
+                  skippedDuplicates++;
+                } else {
+                  // Re-throw other errors
+                  throw error;
+                }
+              }
             }
+          } finally {
+            sqlite.close();
+          }
+        } finally {
+            Bun.file(tmpPath).unlink().catch(()=>{});
         }
       }
 

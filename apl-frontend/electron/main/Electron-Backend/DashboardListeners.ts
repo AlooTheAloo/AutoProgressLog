@@ -48,7 +48,6 @@ export async function CreateDTO(): Promise<Partial<DashboardDTO> | null> {
     "Cached_DTO"
   )) as DashboardDTO;
 
-  console.log("dto is " + JSON.stringify(dto));
   if (dto) return dto;
   else {
     win?.webContents.send("ShowWelcomeMessage");

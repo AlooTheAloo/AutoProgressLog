@@ -22,7 +22,6 @@ export async function runSync() {
         authorization: `Bearer ${await APLStorage.get("token")}`,
       },
     });
-    console.log("fetchedDTO is " + JSON.stringify(fetchedDTO));
 
     if(fetchedDTO.error){
       throw new Error(fetchedDTO.error.value as any ?? "Unknown error");
@@ -35,7 +34,6 @@ export async function runSync() {
       fetchedDTO.data.profile_picture = `http://${SERVER_URL}${fetchedDTO.data.profile_picture}`;
 
     await APLStorage.set("Cached_DTO", fetchedDTO.data);
-    console.log("fetchedDTO.data is " + JSON.stringify(fetchedDTO.data));
     return fetchedDTO.data;
   } catch (e) {
     NotificationManager.notify({

@@ -24,6 +24,7 @@ import "github-markdown-css/github-markdown-dark.css";
 import { Options } from "../../../apl-backend/types/options";
 import { useWindowSize } from "@vueuse/core";
 import { AnimatePresence, motion } from "motion-v";
+import ImmersionPill from "../ImmersionPill.vue";
 
 const HELP_PAGE_URL = "https://www.aplapp.dev/#/";
 const router = useRouter();
@@ -377,6 +378,7 @@ const toastValue = ref<UserDialog>();
         </button>
       </div>
     </div>
+    <ImmersionPill/>
     <div class="flex-1">
       <slot />
     </div>
