@@ -94,7 +94,7 @@ export const importLegacyRoute = new Elysia({ name: "import-legacy" })
             : [];
           const retentionMode = toRetentionMode(cfg?.anki?.options?.retentionMode);
 
-          console.log("togglToken is " + togglToken);
+          console.log("togglToken present? " + !!togglToken);
           let TOGGL_UID: string | undefined;
 
           if (togglToken) {
