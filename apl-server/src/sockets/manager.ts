@@ -36,10 +36,24 @@ export class SocketManager {
         console.log("Authenticated " + data.togglUserId);
         createWebhook(-1, data.togglToken);
         addSocket(data.togglUserId, ws);
+        
+        // Initialize the client set if needed
         if (!SocketManager.clients.has(data.togglUserId)) {
           SocketManager.clients.set(data.togglUserId, new Set());
         }
-        SocketManager.clients.get(data.togglUserId)!.add(ws);
+        
+        // Clean up any stale/closed sockets before adding the new one
+        const clientSet = SocketManager.clients.get(data.togglUserId)!;
+        for (const existingWs of clientSet) {
+          if (existingWs.readyState === 2 || existingWs.readyState === 3) {
+            // CLOSING or CLOSED - remove it
+            clientSet.delete(existingWs);
+            SocketManager.socketToId.delete(existingWs.id);
+            removeSocket(existingWs); // Also clear auth mapping
+          }
+        }
+        
+        clientSet.add(ws);
         SocketManager.socketToId.set(ws.id, data.togglUserId);
         this.authListeners.forEach((x) => x(ws));
       }
@@ -56,11 +70,14 @@ export class SocketManager {
         return;
       }
 
-      if (!SocketManager.clients.has(id)) {
-        SocketManager.clients.set(id, new Set());
+      // Only add socket if not already tracked
+      if (!SocketManager.socketToId.has(ws.id)) {
+        if (!SocketManager.clients.has(id)) {
+          SocketManager.clients.set(id, new Set());
+        }
+        SocketManager.clients.get(id)!.add(ws);
+        SocketManager.socketToId.set(ws.id, id);
       }
-      SocketManager.clients.get(id)!.add(ws);
-      SocketManager.socketToId.set(ws.id, id);
       ws.send(JSON.stringify({ type: "pong", payload: {} }));
       return;
     }
@@ -81,7 +98,6 @@ export class SocketManager {
   }
 
   public send<T>(to: string, message: string, data: T) {
-    console.log("Attempting to send message to " + to);
     const clientSet = SocketManager.clients.get(to);
 
     if (!clientSet || clientSet.size === 0) {
@@ -89,15 +105,19 @@ export class SocketManager {
       return;
     }
 
+    // Diagnostic: log if there are many sockets for this user
+    if (clientSet.size > 2) {
+      console.warn(`User ${to} has ${clientSet.size} socket connections! This may indicate a leak.`);
+    }
+
     clientSet.forEach((ws) => {
-      console.log("The websocket is state " + ws.readyState);
       if (ws.readyState == 3) {
         console.warn("Socket for " + to + " is closed. Removing...");
         clientSet.delete(ws);
         SocketManager.socketToId.delete(ws.id);
+        removeSocket(ws); // Also clear auth mapping
         return;
       }
-      console.log("Sending message to " + to);
       ws.send(JSON.stringify({ type: message, payload: data }));
     });
 
