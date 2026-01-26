@@ -1,4 +1,4 @@
-type ThemeListener = (resolvedTheme: "light" | "dark", rawTheme: Theme) => void;
+type ThemeListener = (resolvedTheme: Theme, rawTheme: Theme) => void;
 export type Theme = "light" | "dark" | "system";
 export const colorAccentOptions = [
   "#22A7D2",
@@ -46,6 +46,7 @@ export class ThemeManager {
     this._accentColor = color;
     document.documentElement.style.setProperty("--primary-color", color);
     localStorage.setItem("accentColor", color);
+    for (const cb of this._listeners) cb(this._theme, this._theme);
     // apply it to the <html> element
   }
 

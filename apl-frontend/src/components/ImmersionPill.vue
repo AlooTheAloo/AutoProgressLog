@@ -118,7 +118,7 @@ onUnmounted(() => {
       
       <div class="flex items-center flex-col">
         <div class="pill-content">
-          <span class="activity-name w-96 text-ellipsis overflow-hidden whitespace-nowrap ">{{ activityName }}</span>
+          <span class="activity-name max-w-96 text-ellipsis overflow-hidden whitespace-nowrap ">{{ activityName }}</span>
           <span class="separator">|</span>
           <span class="timer">{{ elapsedTime }}</span>
         </div>
