@@ -116,7 +116,7 @@ onUnmounted(() => {
         </button>
       </div>
       
-      <div class="flex items-center flex-col">
+      <div class="flex items-center flex-col flex-grow">
         <div class="pill-content">
           <span class="activity-name max-w-96 text-ellipsis overflow-hidden whitespace-nowrap ">{{ activityName }}</span>
           <span class="separator">|</span>
@@ -163,9 +163,7 @@ onUnmounted(() => {
   opacity: 1;
 }
 
-.activity-name {
-  margin-left: 20px; /* Make space for the absolute close button */
-}
+
 
 .separator {
   opacity: 0.6;
