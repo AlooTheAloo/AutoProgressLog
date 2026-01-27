@@ -1,7 +1,7 @@
 type ThemeListener = (resolvedTheme: Theme, rawTheme: Theme) => void;
 export type Theme = "light" | "dark" | "system";
 export const colorAccentOptions = [
-  "#22A7D2",
+  "#097EA3",
   "#22C8CD",
   "#49EB7E",
   "#8B61D0",

@@ -63,7 +63,7 @@ const options = computed<ApexOptions>(() => {
       bar: {
         borderRadius: 7.5,
         distributed: true,
-        columnWidth: "45%",
+        columnWidth: "20%",
         barHeight: "10px",
       },
     },
@@ -96,8 +96,18 @@ const options = computed<ApexOptions>(() => {
     chart: {
       type: "bar",
       animations: {
-        enabled: false,
-      },
+        enabled: true,
+        easing: "easeinout",
+        speed: 1000,
+        animateGradually: {
+          enabled: true,
+          delay: 150,
+        },
+        dynamicAnimation: {
+          enabled: true,
+          speed: 1000,
+        },
+      } as any,
       toolbar: {
         show: false,
       },
@@ -134,10 +144,36 @@ const props = defineProps<{
   streak: { label: string; seconds: number }[];
 }>();
 
+const localStreak = ref(props.streak);
+const isLocked = ref(true);
+const pendingUpdate = ref(false);
+
+onMounted(() => {
+  console.log("Theme is " + theme.value);
+  setTimeout(() => {
+    isLocked.value = false;
+    if (pendingUpdate.value) {
+      localStreak.value = props.streak;
+      pendingUpdate.value = false;
+    }
+  }, 1200);
+});
+
+watch(
+  () => props.streak,
+  (newVal) => {
+    if (isLocked.value) {
+      pendingUpdate.value = true;
+    } else {
+      localStreak.value = newVal;
+    }
+  }
+);
+
 const series = computed(() => {
   return [
     {
-      data: props.streak.map((x) => x.seconds / SECONDS_IN_HOUR),
+      data: (localStreak.value || []).map((x) => x.seconds / SECONDS_IN_HOUR),
     },
   ];
 });

@@ -24,7 +24,7 @@ type DashboardImmersionSource = {
   colorIndex: number;
 };
 
-const limit /* As x goes to infinity ∫sqrt(tan x) dx ??? */ = ref<number>(4);
+const limit = ref<number>(4);
 const props = defineProps<{
   sources: ImmersionSource[];
   lastSyncTime?: string;
@@ -38,7 +38,6 @@ const totalHours = computed(() => {
 
 const computedSources = ref<DashboardImmersionSource[]>([]);
 
-const reactiveSources = ref(props.sources);
 watchEffect(() => {
   computedSources.value = props.sources
     .sort((a, b) => b.relativeValue - a.relativeValue)
@@ -113,10 +112,20 @@ let gradient = new NWayInterpol(
 let options: ComputedRef<ApexOptions> = computed(() => {
   const ret: ApexOptions = {
     chart: {
-      width: 300,
+      width: 280,
       animations: {
-        enabled: false,
-      },
+        enabled: true,
+        easing: 'easeinout', 
+        speed: 1000, 
+        animateGradually: {
+            enabled: true,
+            delay: 150
+        },
+        dynamicAnimation: {
+            enabled: true,
+            speed: 350
+        }
+      } as any,
     },
     states: {
       active: {
@@ -134,7 +143,10 @@ let options: ComputedRef<ApexOptions> = computed(() => {
       pie: {
         expandOnClick: false,
         donut: {
-          size: "90%",
+          size: "85%", 
+          labels: {
+            show: false,
+          },
         },
       },
     },
@@ -152,16 +164,12 @@ let options: ComputedRef<ApexOptions> = computed(() => {
       custom: function ({ seriesIndex }: { seriesIndex: number }) {
         {
           const value = sortedSources.value[seriesIndex];
-          return `<div class="flex flex-col gap-2 bg-white dark:bg-gray-900 text-black dark:text-white">
-              <div class="flex flex-row gap-2 items-center p-2">
-                  <div class="w-3 h-3 rounded-full" style="background-color: ${colors.value[seriesIndex]}">
+          return `<div class="flex flex-col gap-2 bg-white dark:bg-gray-900 text-black dark:text-white p-2 rounded shadow-lg">
+              <div class="flex flex-row gap-2 items-center">
+                  <div class="w-3 h-3 rounded-full" style="background-color: ${colors.value[seriesIndex]}"></div>
+                  <span class="font-bold">${value.name}</span>
               </div>
-              <p class="text-ellipsis overflow-hidden whitespace-nowrap text-sm font-normal">
-                  ${value.name}
-              </p>
-              <p class="text-ellipsis overflow-hidden whitespace-nowrap text-sm font-normal">
-                  ${value.hr}
-              </p>
+              <div class="text-sm">${value.hr}</div>
           </div>`;
         }
       },
@@ -180,75 +188,70 @@ onUnmounted(() => {
   unsubscribe();
 });
 
-let series /* Literally a calculus reference */ = computed(() => {
+let series = computed(() => {
   return sortedSources.value.map((x) => x.relativeValue);
 });
 </script>
 
 <template>
   <div
-    class="flex flex-col text-black dark:text-white bg-[#ebebec] dark:bg-black rounded-lg w-0 flex-grow pt-5 border-2 border-transparent hover:border-[var(--primary-color)] trantiton-all duration-200"
+    class="flex flex-col h-full text-black dark:text-white bg-[#ebebec] dark:bg-black rounded-lg pt-6 pb-6 px-8 border-2 border-transparent hover:border-[var(--primary-color)] transition-all duration-200"
   >
-    <div class="flex font-extrabold 1720:text-2xl text-xl px-5">
-      Immersion in the last 30 days
+    <div class="flex flex-col gap-1 mb-4">
+      <div class="font-extrabold text-2xl">
+        Immersion in the last 30 days
+      </div>
+      <div class="font-bold text-gray-600 dark:text-gray-400 text-sm">
+        {{ dateString }}
+      </div>
     </div>
-    <div
-      class="font-extrabold text-gray-600 dark:text-gray-400 px-5 1720:text-lg text-sm"
-    >
-      {{ dateString }}
-    </div>
-    <div class="flex items-center h-full">
-      <!-- Left Section -->
-      <div class="flex flex-col px-5 justify-center w-1/2">
-        <!-- Title -->
-        <div class="flex flex-col justify-center w-fit gap-5">
-          <!-- ApexCharts Section -->
-          <div
-            class="flex flex-col items-center justify-center flex-none relative"
-          >
-            <div class="absolute flex flex-col items-center">
-              <div class="font-bold text-xl 1720:text-2xl">
-                {{ totalHours }} hours
-              </div>
-              <div class="text-sm 1720:text-lg">
-                From {{ props.sources.length }}
-                {{ pluralize("source", props.sources.length) }}
-              </div>
-            </div>
-            <div class="w-full h-full">
-              <ApexCharts
-                type="donut"
-                :options="options"
-                :series="series"
-                @click.stop
-              />
-            </div>
+
+    <div class="flex flex-1 items-center justify-center gap-16 w-full">
+      
+      <div class="relative flex items-center justify-center">
+        
+        <div class="absolute flex flex-col items-center pointer-events-none">
+          <div class="font-extrabold text-3xl">
+            {{ totalHours }} hours
+          </div>
+          <div class="font-bold text-gray-500 text-sm mt-1">
+            From {{ props.sources.length }} {{ pluralize("source", props.sources.length) }}
           </div>
         </div>
+
+        <ApexCharts
+          width="280"
+          type="donut"
+          :options="options"
+          :series="series"
+          @click.stop
+        />
       </div>
 
-      <!-- List Section -->
       <ul
-        style=""
-        class="min-w-[21.5rem] 1720:flex hidden divide-black/60 dark:divide-white/60 w-fit mr-4 divide-y divide-dashed dark:text-white text-black flex-col justify-center"
+        class="min-w-[18rem] flex flex-col justify-center divide-y divide-dashed divide-gray-400/50 dark:divide-gray-600/50"
       >
         <li
           v-for="(x, i) in sortedSources"
           :key="x.name"
-          class="flex flex-row items-center gap-3 py-2.5 truncate"
+          class="flex items-center justify-between py-3 gap-4"
         >
-          <div
-            :style="{
-              backgroundColor: colors[i],
-            }"
-            class="w-5 h-3 rounded-md min-w-5"
-          />
-          <p class="overflow-hidden truncate text-base font-normal flex-grow">
-            {{ x.name }}
-          </p>
-          <p class="font-bold">{{ (x.relativeValue / 3600).toFixed(2) }} h</p>
+          <div class="flex items-center gap-3 overflow-hidden">
+            <div
+              :style="{ backgroundColor: colors[i] }"
+              class="w-6 h-3 rounded-full flex-shrink-0"
+            ></div>
+            <span class="font-bold truncate text-base">
+              {{ x.name }}
+            </span>
+          </div>
+          
+          <span class="font-bold whitespace-nowrap">
+            {{ (x.relativeValue / 3600).toFixed(2) }} h
+          </span>
         </li>
       </ul>
+
     </div>
   </div>
 </template>

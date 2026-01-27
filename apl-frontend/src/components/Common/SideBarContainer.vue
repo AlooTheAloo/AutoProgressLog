@@ -232,7 +232,7 @@ const toastValue = ref<UserDialog>();
       class="flex flex-col border-r-[1px] border-[#e0e0e0] dark:border-[#3d3e42] bg-[#f3f3f4] dark:bg-[#1B1B1B] p-3 transition-all duration-250"
       :class="{
         'w-20': !sidebarState,
-        'w-48': sidebarState,
+        'w-80': sidebarState,
       }"
       v-if="props.showSidebar ?? false"
     >
@@ -243,10 +243,7 @@ const toastValue = ref<UserDialog>();
           ease: 'easeInOut',
           duration: 5,
         }"
-        class="flex justify-between h-24"
-        :class="{
-          'flex-col': !sidebarState,
-        }"
+        class="flex items-center justify-between h-24 relative"
       >
         <!-- Logo  -->
         <!-- Sidebar here -->
@@ -267,15 +264,45 @@ const toastValue = ref<UserDialog>();
         </div>
         <AnimatePresence>
           <motion.button
-            :initial="{ opacity: 0, filter: 'blur(10px)' }"
-            :animate="{ opacity: 1, filter: 'blur(0px)' }"
-            :exit="{ opacity: 0, filter: 'blur(10px)' }"
-            :transition="{ duration: 0.5, ease: 'easeInOut' }"
+            class="absolute -right-8 top-[31px] bg-white dark:bg-[#1B1B1B] border border-gray-200 dark:border-gray-700 p-1.5 rounded-full shadow-md z-50 flex items-center justify-center"
+            :initial="{ opacity: 0, scale: 0.8 }"
+            :animate="{ opacity: 1, scale: 1 }"
+            :exit="{ opacity: 0, scale: 0.8 }"
+            :transition="{ duration: 0.2, ease: 'easeInOut' }"
             v-if="width >= 1280"
             key="sidebar-button"
             @click="requestedSidebarState = !requestedSidebarState"
           >
-            <i class="pi pi-bars text-black dark:text-white" key="bars"></i>
+            <svg
+              v-if="sidebarState"
+              key="open-icon"
+              width="20"
+              height="20"
+              viewBox="0 0 32 32"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              class="text-black dark:text-white"
+            >
+              <path
+                d="M22 21.3333V10.6667L16.6667 16L22 21.3333ZM6.66667 28C5.93333 28 5.30556 27.7389 4.78333 27.2167C4.26111 26.6944 4 26.0667 4 25.3333V6.66667C4 5.93333 4.26111 5.30556 4.78333 4.78333C5.30556 4.26111 5.93333 4 6.66667 4H25.3333C26.0667 4 26.6944 4.26111 27.2167 4.78333C27.7389 5.30556 28 5.93333 28 6.66667V25.3333C28 26.0667 27.7389 26.6944 27.2167 27.2167C26.6944 27.7389 26.0667 28 25.3333 28H6.66667ZM10.6667 25.3333V6.66667H6.66667V25.3333H10.6667ZM13.3333 25.3333H25.3333V6.66667H13.3333V25.3333Z"
+                fill="currentColor"
+              />
+            </svg>
+            <svg
+              v-else
+              key="closed-icon"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              class="text-black dark:text-white"
+            >
+              <path
+                d="M12.5 9.2V14.8C12.5 15.0333 12.6 15.1917 12.8 15.275C13 15.3583 13.1833 15.3167 13.35 15.15L15.8 12.7C16 12.5 16.1 12.2667 16.1 12C16.1 11.7333 16 11.5 15.8 11.3L13.35 8.85C13.1833 8.68333 13 8.64167 12.8 8.725C12.6 8.80833 12.5 8.96667 12.5 9.2ZM5 21C4.45 21 3.97917 20.8042 3.5875 20.4125C3.19583 20.0208 3 19.55 3 19V5C3 4.45 3.19583 3.97917 3.5875 3.5875C3.97917 3.19583 4.45 3 5 3H19C19.55 3 20.0208 3.19583 20.4125 3.5875C20.8042 3.97917 21 4.45 21 5V19C21 19.55 20.8042 20.0208 20.4125 20.4125C20.0208 20.8042 19.55 21 19 21H5ZM8 19V5H5V19H8ZM10 19H19V5H10V19Z"
+                fill="currentColor"
+              />
+            </svg>
           </motion.button>
         </AnimatePresence>
       </motion.div>
