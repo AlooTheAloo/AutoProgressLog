@@ -71,9 +71,8 @@ const sortedSources = computed(() => {
   let arr = [...sort.slice(0, limit.value)];
   if (sort.length > limit.value) {
     arr.push({
-      name: `${sort.length - limit.value} other${
-        sort.length - limit.value > 1 ? "s" : ""
-      }`,
+      name: `${sort.length - limit.value} other${sort.length - limit.value > 1 ? "s" : ""
+        }`,
       relativeValue: bottomActivitiesSeconds,
       enabled: true,
       colorIndex: 727,
@@ -109,21 +108,23 @@ let gradient = new NWayInterpol(
   "#FF964F"
 );
 
-let options: ComputedRef<ApexOptions> = computed(() => {
+const options: ComputedRef<ApexOptions> = computed(() => {
   const ret: ApexOptions = {
     chart: {
       width: 280,
+      // ApexCharts TypeScript types are incomplete and lack animateGradually/dynamicAnimation fields,
+      // so cast is required to avoid type errors while still using these documented animation options
       animations: {
         enabled: true,
-        easing: 'easeinout', 
-        speed: 1000, 
+        easing: 'easeinout',
+        speed: 1000,
         animateGradually: {
-            enabled: true,
-            delay: 150
+          enabled: true,
+          delay: 150
         },
         dynamicAnimation: {
-            enabled: true,
-            speed: 350
+          enabled: true,
+          speed: 350
         }
       } as any,
     },
@@ -143,7 +144,7 @@ let options: ComputedRef<ApexOptions> = computed(() => {
       pie: {
         expandOnClick: false,
         donut: {
-          size: "85%", 
+          size: "85%",
           labels: {
             show: false,
           },
@@ -188,70 +189,53 @@ onUnmounted(() => {
   unsubscribe();
 });
 
-let series = computed(() => {
+const series = computed(() => {
   return sortedSources.value.map((x) => x.relativeValue);
 });
 </script>
 
 <template>
   <div
-    class="flex flex-col h-full text-black dark:text-white bg-[#ebebec] dark:bg-black rounded-lg pt-6 pb-6 px-8 border-2 border-transparent hover:border-[var(--primary-color)] transition-all duration-200"
-  >
-    <div class="flex flex-col gap-1 mb-4">
-      <div class="font-extrabold text-2xl">
+    class="flex flex-col h-full text-black dark:text-white bg-[#ebebec] dark:bg-black rounded-lg pt-5 pb-5 border-2 border-transparent hover:border-[var(--primary-color)] transition-all duration-200 flex-1 min-w-0 overflow-hidden ">
+    <div class="px-10 h-full flex flex-col">
+      <div class="font-extrabold text-lg 1720:text-2xl">
         Immersion in the last 30 days
       </div>
       <div class="font-bold text-gray-600 dark:text-gray-400 text-sm">
         {{ dateString }}
       </div>
-    </div>
 
-    <div class="flex flex-1 items-center justify-center gap-16 w-full">
-      
-      <div class="relative flex items-center justify-center">
-        
-        <div class="absolute flex flex-col items-center pointer-events-none">
-          <div class="font-extrabold text-3xl">
-            {{ totalHours }} hours
+      <div class="flex flex-1 items-center justify-center gap-16 w-full">
+        <div class="relative flex items-center justify-center">
+
+          <div class="absolute flex flex-col items-center pointer-events-none">
+            <div class="font-extrabold text-3xl">
+              {{ totalHours }} hours
+            </div>
+            <div class="font-bold text-gray-500 text-sm mt-1">
+              From {{ props.sources.length }} {{ pluralize("source", props.sources.length) }}
+            </div>
           </div>
-          <div class="font-bold text-gray-500 text-sm mt-1">
-            From {{ props.sources.length }} {{ pluralize("source", props.sources.length) }}
-          </div>
+
+          <ApexCharts width="280" type="donut" :options="options" :series="series" @click.stop />
         </div>
 
-        <ApexCharts
-          width="280"
-          type="donut"
-          :options="options"
-          :series="series"
-          @click.stop
-        />
-      </div>
-
-      <ul
-        class="min-w-[18rem] flex flex-col justify-center divide-y divide-dashed divide-gray-400/50 dark:divide-gray-600/50"
-      >
-        <li
-          v-for="(x, i) in sortedSources"
-          :key="x.name"
-          class="flex items-center justify-between py-3 gap-4"
-        >
-          <div class="flex items-center gap-3 overflow-hidden">
-            <div
-              :style="{ backgroundColor: colors[i] }"
-              class="w-6 h-3 rounded-full flex-shrink-0"
-            ></div>
-            <span class="font-bold truncate text-base">
-              {{ x.name }}
+        <ul
+          class="1720:flex hidden flex-col justify-center divide-y divide-dashed divide-gray-400/50 dark:divide-gray-600/50">
+          <li v-for="(x, i) in sortedSources" :key="x.name" class="flex items-center justify-between py-3 gap-4">
+            <div class="flex items-center gap-3 overflow-hidden">
+              <div :style="{ backgroundColor: colors[i] }" class="w-6 h-3 rounded-full flex-shrink-0"></div>
+              <span class="font-bold truncate text-base">
+                {{ x.name }}
+              </span>
+            </div>
+            <span class="font-bold whitespace-nowrap">
+              {{ (x.relativeValue / 3600).toFixed(2) }} h
             </span>
-          </div>
-          
-          <span class="font-bold whitespace-nowrap">
-            {{ (x.relativeValue / 3600).toFixed(2) }} h
-          </span>
-        </li>
-      </ul>
-
+          </li>
+        </ul>
+      </div>
     </div>
+
   </div>
 </template>
