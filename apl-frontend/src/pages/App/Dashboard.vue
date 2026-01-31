@@ -78,8 +78,6 @@ async function sync() {
   }
 }
 
-window.ipcRenderer.on("SetSync", (evt, newSync: boolean) => { });
-
 onMounted(async () => {
   window.ipcRenderer.invoke("GetConfig").then((data: Options) => {
     config.value = data;

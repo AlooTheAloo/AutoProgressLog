@@ -3,4 +3,5 @@
 - Added immersion pill with timer
 - Fixed legacy import issues for users coming from v1.0.0
 - Fixed race condition in socket initialization
+- Fixed issue with computed sources not updating
 - Various bug fixes and improvements

@@ -187,7 +187,7 @@ const series = computed(() => {
 
 <template>
   <div
-    class="flex flex-col text-black dark:text-white bg-[#ebebec] dark:bg-black rounded-lg flex-1 min-w-0 pt-5 overflow-hidden border-2 border-transparent hover:border-[var(--primary-color)] trantiton-all duration-200">
+    class="flex flex-col text-black dark:text-white bg-[#ebebec] dark:bg-black rounded-lg flex-1 min-w-0 pt-5 overflow-hidden border-2 border-transparent hover:border-[var(--primary-color)] transition-all duration-200">
     <div class="flex font-extrabold 1720:text-2xl text-lg px-5">
       Immersion Time
     </div>

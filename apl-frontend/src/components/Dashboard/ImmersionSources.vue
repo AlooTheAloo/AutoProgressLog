@@ -39,8 +39,7 @@ const totalHours = computed(() => {
 const computedSources = ref<DashboardImmersionSource[]>([]);
 
 watchEffect(() => {
-  computedSources.value = props.sources
-    .sort((a, b) => b.relativeValue - a.relativeValue)
+  computedSources.value = [...props.sources].sort((a, b) => b.relativeValue - a.relativeValue)
     .map((x: ImmersionSource, i) => {
       return {
         name: x.name,
@@ -62,7 +61,7 @@ const dateString = computed(() => {
 });
 
 const sortedSources = computed(() => {
-  const sort = computedSources.value.sort(
+  const sort = [...computedSources.value].sort(
     (a, b) => b.relativeValue - a.relativeValue
   );
   const bottomActivitiesSeconds = sort
