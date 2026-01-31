@@ -55,9 +55,9 @@ const options = computed<ApexOptions>(() => {
           colors: theme.value == "dark" ? "#fff" : "#000",
         },
         formatter: (value: any) => {
-          if (!props.streak || props.streak.length === 0) return "";
+          if (!localStreak.value || localStreak.value.length === 0) return "";
           const index = Math.round(value);
-          return props.streak[index - 1]?.label || "";
+          return localStreak.value[index - 1]?.label || "";
         },
       },
     },
