@@ -164,10 +164,16 @@ const options: ComputedRef<ApexOptions> = computed(() => {
       custom: function ({ seriesIndex }: { seriesIndex: number }) {
         {
           const value = sortedSources.value[seriesIndex];
+          const safeName = value.name
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#39;");
           return `<div class="flex flex-col gap-2 bg-white dark:bg-gray-900 text-black dark:text-white p-2 rounded shadow-lg">
               <div class="flex flex-row gap-2 items-center">
                   <div class="w-3 h-3 rounded-full" style="background-color: ${colors.value[seriesIndex]}"></div>
-                  <span class="font-bold">${value.name}</span>
+                  <span class="font-bold">${safeName}</span>
               </div>
               <div class="text-sm">${value.hr}</div>
           </div>`;
