@@ -1,5 +1,5 @@
 import Elysia, { t } from "elysia";
-import { TokenType, AnkiRetentionMode, AutoGenConfig } from "@prisma/client";
+import { TokenType, AnkiRetentionMode, AutoGenConfig, Prisma } from "@prisma/client";
 import { Database } from "bun:sqlite";
 import prisma from "../../db/client";
 import { authGuard } from "../../middlewares/authGuard";
@@ -277,23 +277,44 @@ export const importLegacyRoute = new Elysia({ name: "import-legacy" })
 
             // --- 5) Migrate SyncData (+AnkiData) ---
             for (const row of syncRows) {
-              const created = await prisma.syncData.create({
-                data: {
-                  userId,
-                  generationTime: fromEpochMaybeMs(row.generationTime),
-                  totalImmersionTime: row.totalSeconds,
-                  ankiData: {
-                    create: {
-                      totalCardsStudied: row.totalCardsStudied,
-                      cardsStudied: row.cardsStudied,
-                      mature: row.mature,
-                      retention: row.retention,
+              try {
+                const created = await prisma.syncData.create({
+                  data: {
+                    userId,
+                    generationTime: fromEpochMaybeMs(row.generationTime),
+                    totalImmersionTime: row.totalSeconds,
+                    ankiData: {
+                      create: {
+                        totalCardsStudied: row.totalCardsStudied,
+                        cardsStudied: row.cardsStudied,
+                        mature: row.mature,
+                        retention: row.retention,
+                      },
                     },
                   },
-                },
-              });
-              legacyIdToNewSyncId.set(row.id, created.id);
-              createdSync++;
+                });
+                legacyIdToNewSyncId.set(row.id, created.id);
+                createdSync++;
+              } catch (error) {
+                if (
+                  error instanceof Prisma.PrismaClientKnownRequestError &&
+                  error.code === "P2002"
+                ) {
+                  // Unique constraint violation - find the existing record
+                  const existing = await prisma.syncData.findFirst({
+                    where: {
+                      userId,
+                      generationTime: fromEpochMaybeMs(row.generationTime),
+                    },
+                  });
+                  if (existing) {
+                    legacyIdToNewSyncId.set(row.id, existing.id);
+                    console.log(`Skipping duplicate syncData for generationTime: ${row.generationTime}`);
+                  }
+                } else {
+                  throw error;
+                }
+              }
             }
 
             // --- 6) Migrate ImmersionActivity ---
@@ -365,24 +386,52 @@ export const importLegacyRoute = new Elysia({ name: "import-legacy" })
                 // Prefer mapping by legacy syncID from cache; otherwise create a new SyncData from the cache row.
                 let syncDataId = legacyIdToNewSyncId.get(Number(item.syncID));
                 if (!syncDataId) {
-                const created = await prisma.syncData.create({
-                    data: {
-                    userId,
-                    generationTime: item.generationTime
-                        ? new Date(item.generationTime)
-                        : new Date(),
-                    totalImmersionTime: Number(item.totalSeconds ?? 0),
-                    ankiData: {
-                        create: {
-                        totalCardsStudied: Number(item.totalCardsStudied ?? 0),
-                        cardsStudied: Number(item.cardsStudied ?? 0),
-                        mature: Number(item.mature ?? 0),
-                        retention: Number(item.retention ?? 0),
+                  const generationTime = item.generationTime
+                    ? new Date(item.generationTime)
+                    : new Date();
+                  try {
+                    const created = await prisma.syncData.create({
+                      data: {
+                        userId,
+                        generationTime,
+                        totalImmersionTime: Number(item.totalSeconds ?? 0),
+                        ankiData: {
+                          create: {
+                            totalCardsStudied: Number(item.totalCardsStudied ?? 0),
+                            cardsStudied: Number(item.cardsStudied ?? 0),
+                            mature: Number(item.mature ?? 0),
+                            retention: Number(item.retention ?? 0),
+                          },
                         },
-                    },
-                    },
-                });
-                syncDataId = created.id;
+                      },
+                    });
+                    syncDataId = created.id;
+                  } catch (error) {
+                    if (
+                      error instanceof Prisma.PrismaClientKnownRequestError &&
+                      error.code === "P2002"
+                    ) {
+                      // Unique constraint violation - find the existing record
+                      const existing = await prisma.syncData.findFirst({
+                        where: {
+                          userId,
+                          generationTime,
+                        },
+                      });
+                      if (existing) {
+                        syncDataId = existing.id;
+                        console.log(`Using existing syncData for generationTime: ${generationTime}`);
+                      }
+                    } else {
+                      throw error;
+                    }
+                  }
+                }
+
+                // Skip if we couldn't get a syncDataId (no creation and no existing found)
+                if (!syncDataId) {
+                  console.log(`Skipping report for item without syncDataId`);
+                  continue;
                 }
 
                 await prisma.report.upsert({

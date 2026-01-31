@@ -13,7 +13,7 @@ const startTime = ref<string | null>(null);
 const elapsedTime = ref("00:00:00");
 const accentColor = ref(ThemeManager.getAccentColor());
 const encouragementMessage = ref("");
-let timerInterval: NodeJS.Timeout | null = null;
+let timerInterval: ReturnType<typeof setInterval> | null = null;
 let themeListenerCleanup: (() => void) | null = null;
 
 const messages = [
@@ -57,10 +57,10 @@ const handleSocketEvent = (_event: any, data: SocketEvent) => {
   if (data.type === "ActivityStart") {
     activityName.value = data.payload.activity;
     startTime.value = data.payload.start;
-    
+
     // Pick random message
     encouragementMessage.value = messages[Math.floor(Math.random() * messages.length)];
-    
+
     isVisible.value = true;
     updateTimer();
     if (timerInterval) clearInterval(timerInterval);
@@ -79,7 +79,7 @@ onMounted(() => {
     console.log("Adding listener for socket-event");
     window.ipcRenderer.on("socket-event", handleSocketEvent);
   }
-  
+
   // Update color when theme changes
   themeListenerCleanup = ThemeManager.onThemeChange(() => {
     accentColor.value = ThemeManager.getAccentColor();
@@ -89,7 +89,7 @@ onMounted(() => {
 onUnmounted(() => {
   console.log("Unmounting Immersion Pill");
   if (window.ipcRenderer) {
-    window.ipcRenderer.removeAllListeners("socket-event");
+    window.ipcRenderer.removeListener("socket-event", handleSocketEvent);
   }
   if (timerInterval) {
     clearInterval(timerInterval);
@@ -102,23 +102,21 @@ onUnmounted(() => {
 
 <template>
   <Transition name="slide-down">
-    <div
-      v-if="isVisible"
-      class="immersion-pill-container flex flex-row"
-      :style="{ backgroundColor: accentColor }"
-    >
+    <div v-if="isVisible" class="immersion-pill-container flex flex-row" :style="{ backgroundColor: accentColor }">
       <div class="w-5 flex justify-center items-center">
         <button class="close-btn" @click="closePill">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
             <line x1="18" y1="6" x2="6" y2="18"></line>
             <line x1="6" y1="6" x2="18" y2="18"></line>
           </svg>
         </button>
       </div>
-      
+
       <div class="flex items-center flex-col flex-grow">
         <div class="pill-content">
-          <span class="activity-name max-w-96 text-ellipsis overflow-hidden whitespace-nowrap ">{{ activityName }}</span>
+          <span class="activity-name max-w-96 text-ellipsis overflow-hidden whitespace-nowrap ">{{ activityName
+          }}</span>
           <span class="separator">|</span>
           <span class="timer">{{ elapsedTime }}</span>
         </div>
