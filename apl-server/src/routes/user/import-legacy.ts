@@ -328,14 +328,14 @@ export const importLegacyRoute = new Elysia({ name: "import-legacy" })
                     createdAt: fromEpochMaybeMs(a.time),
                     seconds: a.seconds,
                     activityName: a.activityName,
-                    activityTogglId: a.id.toString(),
+                    activityTogglId: `legacy_sqlite:${a.id}`,
                   },
                 });
                 createdActivities++;
               } catch (error: any) {
                 // Skip duplicates (unique constraint violations)
                 if (error.code === "P2002") {
-                  console.log(`Skipping duplicate activityTogglId: ${a.id}`);
+                  console.log(`Skipping duplicate activityTogglId: legacy_sqlite:${a.id}`);
                   skippedDuplicates++;
                 } else {
                   // Re-throw other errors
