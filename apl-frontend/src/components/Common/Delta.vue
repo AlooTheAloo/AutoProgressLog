@@ -16,29 +16,27 @@ const bgColor = computed(() => {
   if (props.direction == 0) {
     return "#555555";
   } else {
-    return "#FE7D7D";
+    return "#EB3D3D";
   }
+});
+
+// Neutral (gray) background needs white text for WCAG 4.5:1 contrast ratio
+const textColor = computed(() => {
+  return props.direction === 0 ? "text-white" : "text-black";
 });
 </script>
 <template>
-  <div
-    :style="{
-      backgroundColor: bgColor,
-    }"
-    class="h-6 w-fit flex items-center justify-center rounded-md text-white"
-  >
-    <div class="flex text-center text-sm font-bold gap-1 p-2">
-      <div class="" v-if="direction != 0">
-        <div
-          v-if="direction > 0"
-          class="pi pi-chevron-up"
-          style="font-size: 0.7rem"
-        />
-        <div
-          v-else-if="direction < 0"
-          class="pi pi-chevron-down"
-          style="font-size: 0.7rem"
-        ></div>
+  <div :style="{
+    backgroundColor: bgColor,
+  }" :class="['h-6 w-fit flex items-center justify-center rounded-md', textColor]">
+    <div class="flex items-center justify-center text-sm font-bold gap-1 p-2">
+      <div v-if="direction != 0">
+        <svg :class="{ 'rotate-180': direction < 0 }" width="8" height="7" viewBox="0 0 8 7" fill="none"
+          xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M2.87961 0.576752C3.41221 -0.191991 4.54873 -0.191991 5.08133 0.576752L7.72034 4.38584C8.3357 5.27403 7.70002 6.48779 6.61948 6.48779L1.34146 6.48779C0.260919 6.48779 -0.374766 5.27403 0.240596 4.38584L2.87961 0.576752Z"
+            fill="currentColor" />
+        </svg>
       </div>
       {{ delta }}
     </div>

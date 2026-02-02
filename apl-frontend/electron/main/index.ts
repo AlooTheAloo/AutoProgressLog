@@ -26,6 +26,7 @@ import { Logger } from "../../apl-backend/Helpers/Log";
 import { init } from "@bokuweb/zstd-wasm";
 import { APLStorage } from "./Electron-Backend/util/auth";
 import { VersionManager } from "../../apl-backend/Helpers/VersionManager";
+import { createSocketBridge } from "./Electron-Backend/Socket/SocketBridge";
 
 const isProd = app.isPackaged;
 if (isProd) {
@@ -251,6 +252,7 @@ app.on("ready", async () => {
       await new SocketClient().init({
         token: (await APLStorage.get("token")) as string,
       });
+      createSocketBridge();
     } catch (e) {
       Logger.log("Failed to init socket client", "Socket");
       Logger.log(e, "Socket");

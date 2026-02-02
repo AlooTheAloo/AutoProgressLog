@@ -4,6 +4,9 @@ import createWebhook from "../integrations/toggl/createWebhook";
 import { syncTogglData } from "../services/toggl/syncService";
 
 export class SocketManager {
+
+  
+
   private authListeners: ((ws: ElysiaWS) => void)[] = [];
   static instance: SocketManager;
   private static clients: Map<string, Set<ElysiaWS>>;

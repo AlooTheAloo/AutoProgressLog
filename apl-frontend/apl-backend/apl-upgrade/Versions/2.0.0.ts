@@ -20,25 +20,35 @@ let migrated = false;
 
 export default async function upgrade_2_0_0() {
   console.log("Upgrading to 2.0.0");
+
+  // If already at version 2.0.0+, skip this upgrade
+  if (new SemVer(CacheManager.get().version ?? "0.0.0").compare("2.0.0") > -1) {
+    return;
+  }
+  
+  // If NO legacy files exist, there's nothing to migrate - skip this upgrade
+  if (!existsSync(cache_location) && !existsSync(configPath) && !existsSync(syncDataPath)) {
+    return;
+  }
   
   // Run previous upgrade steps to migrate older configs (v1.0.0, v1.0.1)
   // This ensures the config has the required `appearance` property
   await upgrade_1_0_2();
-  
-  if (
-    new SemVer(CacheManager.get().version ?? "0.0.0").compare("2.0.0") > -1 &&
-    !existsSync(cache_location)
-  ) {
-    return;
-  }
+
   await new Promise<void>((res, req) => {
     console.log("Sending 2_0_0_upgrade");
-    win?.webContents.send("2_0_0_upgrade");
+    // Add a small delay to ensure the frontend event listener is ready
+    // This fixes a timing issue where 1.0.0 users get stuck on the update screen
+    setTimeout(() => {
+      win?.webContents.send("2_0_0_upgrade");
+    }, 100);
     ipcMain.handleOnce("update-2_0_0_done", async () => {
       
       console.log("Setup complete true 1");
       await APLStorage.set("setupComplete", true);
-      [cache_location, configPath, syncDataPath].forEach((x) => rmSync(x));
+      [cache_location, configPath, syncDataPath].forEach((x) => {
+        if(existsSync(x)) rmSync(x)
+      });
       await new SocketClient().init({
         token: (await APLStorage.get("token")) as string,
       });
@@ -53,20 +63,20 @@ export default async function upgrade_2_0_0() {
       console.log("migrating...");
       try {
         const paths = [cache_location, configPath, syncDataPath];
-        const bufs = paths.map((x) => readFileSync(x));
+        const bufs = paths.map((x) => existsSync(x) ? readFileSync(x) : null);
         const files = bufs.map(
           (x, i) =>
-            new File([x], path.basename(paths[i]), {
+            x ? new File([x], path.basename(paths[i]), {
               type: "application/text",
-            })
+            }) : null
         );
         
         // Call Eden treaty route
         const res = await EdenClient.user["import-legacy"].post(
           {
-            cache: files[0],
-            config: files[1],
-            syncdb: files[2],
+            cache: files[0] ?? undefined,
+            config: files[1] ?? undefined,
+            syncdb: files[2] ?? undefined,
           },
           {
             headers: {
@@ -75,37 +85,56 @@ export default async function upgrade_2_0_0() {
           }
         );
 
-        const oldConfig: {
-          general: {
-            discordIntegration: boolean;
-          };
-          appearance?: {
-            glow: boolean;
-          };
-          appreance?: {
-            glow: boolean;
-          };
-          outputOptions: OutputOptions;
-        } = JSON.parse(readFileSync(configPath).toString());
-
-        console.log(JSON.stringify(oldConfig));
-
-        const localConfig: APLLocalOptions = {
-          general: {
-            discordIntegration: oldConfig.general.discordIntegration,
-          },
-          appearance: {
-            glow: oldConfig.appearance?.glow ?? oldConfig.appreance?.glow ?? true,
-          },
-          outputOptions: {
-            outputFile: {
-              path: oldConfig.outputOptions.outputFile.path,
-              name: oldConfig.outputOptions.outputFile.name,
-              extension: oldConfig.outputOptions.outputFile.extension,
-            },
-            outputQuality: oldConfig.outputOptions.outputQuality,
-          },
+        let localConfig: APLLocalOptions = {
+             general: {
+                discordIntegration: true
+             },
+             appearance: {
+                glow: true,
+             },
+             outputOptions: {
+                outputFile: {
+                    path: "",
+                    name: "",
+                    extension: ".png"
+                },
+                outputQuality: 1
+             }
         };
+
+        if (existsSync(configPath)) {
+            const oldConfig: {
+            general: {
+                discordIntegration: boolean;
+            };
+            appearance?: {
+                glow: boolean;
+            };
+            appreance?: {
+                glow: boolean;
+            };
+            outputOptions: OutputOptions;
+            } = JSON.parse(readFileSync(configPath).toString());
+
+            console.log(JSON.stringify(oldConfig));
+
+            localConfig = {
+            general: {
+                discordIntegration: oldConfig.general.discordIntegration,
+            },
+            appearance: {
+                glow: oldConfig.appearance?.glow ?? oldConfig.appreance?.glow ?? true,
+            },
+            outputOptions: {
+                outputFile: {
+                path: oldConfig.outputOptions.outputFile.path,
+                name: oldConfig.outputOptions.outputFile.name,
+                extension: oldConfig.outputOptions.outputFile.extension,
+                },
+                outputQuality: oldConfig.outputOptions.outputQuality,
+            },
+            };
+        }
         
         APLStorage.set("localConfig", {
           ...localConfig,

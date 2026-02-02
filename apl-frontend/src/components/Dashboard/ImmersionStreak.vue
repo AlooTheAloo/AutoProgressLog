@@ -4,6 +4,7 @@ import { ApexOptions } from "apexcharts";
 import dayjs from "dayjs";
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { ThemeManager } from "../../util/theme-manager";
+import { useWindowSize } from "@vueuse/core";
 
 const CHART_COLORS = [
   "#22C8CD",
@@ -15,18 +16,19 @@ const CHART_COLORS = [
   "#FF3B3B",
 ];
 
+const { width } = useWindowSize();
+
 const theme = ref<string>(ThemeManager.getTheme());
 
 const unsubscribe = ThemeManager.onThemeChange((newTheme) => {
   theme.value = newTheme;
 });
 
-onMounted(() => {
-  console.log("Theme is " + theme.value);
-});
-
 onUnmounted(() => {
   unsubscribe();
+  if (unlockTimerId) {
+    clearTimeout(unlockTimerId);
+  }
 });
 
 const options = computed<ApexOptions>(() => {
@@ -53,9 +55,9 @@ const options = computed<ApexOptions>(() => {
           colors: theme.value == "dark" ? "#fff" : "#000",
         },
         formatter: (value: any) => {
-          if (!props.streak || props.streak.length === 0) return "";
+          if (!localStreak.value || localStreak.value.length === 0) return "";
           const index = Math.round(value);
-          return props.streak[index - 1]?.label || "";
+          return localStreak.value[index - 1]?.label || "";
         },
       },
     },
@@ -63,7 +65,7 @@ const options = computed<ApexOptions>(() => {
       bar: {
         borderRadius: 7.5,
         distributed: true,
-        columnWidth: "45%",
+        columnWidth: "15px",
         barHeight: "10px",
       },
     },
@@ -83,9 +85,8 @@ const options = computed<ApexOptions>(() => {
           return `
         <div class="flex flex-col gap-2 bg-white dark:bg-gray-900">
             <div class="flex flex-row gap-2 items-center p-2">
-                <div class="w-3 h-3 rounded-full" style="background-color: ${
-                  CHART_COLORS[dataPointIndex]
-                }"></div>
+                <div class="w-3 h-3 rounded-full" style="background-color: ${CHART_COLORS[dataPointIndex]
+            }"></div>
             <p class="text-ellipsis overflow-hidden whitespace-nowrap text-sm font-normal">
       ${series.value[seriesIndex].data[dataPointIndex].toFixed(2)} hours
             </p>
@@ -96,8 +97,18 @@ const options = computed<ApexOptions>(() => {
     chart: {
       type: "bar",
       animations: {
-        enabled: false,
-      },
+        enabled: true,
+        easing: "easeinout",
+        speed: 1000,
+        animateGradually: {
+          enabled: true,
+          delay: 150,
+        },
+        dynamicAnimation: {
+          enabled: true,
+          speed: 1000,
+        },
+      } as any,
       toolbar: {
         show: false,
       },
@@ -134,10 +145,37 @@ const props = defineProps<{
   streak: { label: string; seconds: number }[];
 }>();
 
+const localStreak = ref(props.streak);
+const isLocked = ref(true);
+const pendingUpdate = ref(false);
+let unlockTimerId: ReturnType<typeof setTimeout> | null = null;
+
+onMounted(() => {
+  console.log("Theme is " + theme.value);
+  unlockTimerId = setTimeout(() => {
+    isLocked.value = false;
+    if (pendingUpdate.value) {
+      localStreak.value = props.streak;
+      pendingUpdate.value = false;
+    }
+  }, 1200);
+});
+
+watch(
+  () => props.streak,
+  (newVal) => {
+    if (isLocked.value) {
+      pendingUpdate.value = true;
+    } else {
+      localStreak.value = newVal;
+    }
+  }
+);
+
 const series = computed(() => {
   return [
     {
-      data: props.streak.map((x) => x.seconds / SECONDS_IN_HOUR),
+      data: (localStreak.value || []).map((x) => x.seconds / SECONDS_IN_HOUR),
     },
   ];
 });
@@ -145,34 +183,19 @@ const series = computed(() => {
 
 <template>
   <div
-    class="flex flex-col text-black dark:text-white bg-[#ebebec] dark:bg-black rounded-lg w-0 flex-grow pt-5 overflow-hidden border-2 border-transparent hover:border-[var(--primary-color)] trantiton-all duration-200"
-  >
-    <div class="flex font-extrabold 1720:text-2xl text-xl px-5">
+    class="flex flex-col text-black dark:text-white bg-[#ebebec] dark:bg-black rounded-lg flex-1 min-w-0 pt-5 overflow-hidden border-2 border-transparent hover:border-[var(--primary-color)] transition-all duration-200">
+    <div class="flex font-extrabold 1720:text-2xl text-lg px-5">
       Immersion Time
     </div>
-    <div
-      class="font-extrabold text-gray-600 dark:text-gray-400 px-5 1720:text-lg text-sm"
-    >
+    <div class="font-extrabold text-gray-600 dark:text-gray-400 px-5 1720:text-lg text-sm">
       From the last 7 days
     </div>
     <div class="flex flex-grow">
-      <!-- Left Section -->
       <div class="flex flex-col px-5 justify-center w-full h-full">
-        <!-- Title -->
         <div class="flex flex-col justify-center gap-5 w-full h-full">
-          <!-- ApexCharts Section -->
-          <div
-            class="h-full flex flex-col items-center justify-center flex-none relative"
-          >
+          <div class="h-full flex flex-col items-center justify-center flex-none relative">
             <div class="w-full h-full">
-              <ApexCharts
-                height="100%"
-                width="100%"
-                type="bar"
-                :options="options"
-                :series="series"
-                @click.stop
-              />
+              <ApexCharts height="100%" width="100%" type="bar" :options="options" :series="series" @click.stop />
             </div>
           </div>
         </div>

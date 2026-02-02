@@ -104,5 +104,6 @@ export default async function upgrade_1_0_2() {
   delete (newConfig as any).appreance;
 
   setLegacyConfig(newConfig);
+  CacheManager.setVersion("1.0.2");
   return;
 }

@@ -3,10 +3,13 @@ import { SERVER_URL } from "../api/ApiManager";
 import { Logger } from "../../../../apl-backend/Helpers/Log";
 
 export class SocketClient {
+
+
+
   static instance: SocketClient; // Singleton
   private socket?: WebSocket;
   private eventListeners: Partial<{
-    [K in keyof EventMap]: (data: EventMap[K]) => void;
+    [K in keyof EventMap]: ((data: EventMap[K]) => void)[];
   }> = {};
   private authData?: { token: string }; // store last authData for reconnect
   private reconnectDelay = 3000; // ms
@@ -61,9 +64,9 @@ export class SocketClient {
         try {
           const parsed = JSON.parse(event.data.toString());
           const { type, payload } = parsed;
-          const listener = this.eventListeners[type as keyof EventMap];
-          if (listener) {
-            listener(payload);
+          const listeners = this.eventListeners[type as keyof EventMap];
+          if (listeners) {
+            listeners.forEach((listener) => listener(payload));
           }
           if (type !== "pong") {
             Logger.log("Message! " + event.data, "Socket");
@@ -102,7 +105,12 @@ export class SocketClient {
     event: K,
     callback: (data: EventMap[K]) => void
   ): void {
-    this.eventListeners[event] = callback as (data: any) => void;
+    if (!this.eventListeners[event]) {
+      this.eventListeners[event] = [];
+    }
+    (this.eventListeners[event] as ((data: EventMap[K]) => void)[]).push(
+      callback
+    );
   }
 
   public off<K extends keyof EventMap>(event: K): void {
